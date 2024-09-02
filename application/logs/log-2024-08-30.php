@@ -403,3 +403,277 @@ FROM `material_planning_base_on_produksi` `a`
 LEFT JOIN `so_internal` `b` ON `a`.`so_number`=`b`.`so_number`
 LEFT JOIN `customer` `c` ON `a`.`id_customer`=`c`.`id_customer`
 WHERE `a`.`so_number` = 'P240800001'
+ERROR - 2024-08-30 08:46:10 --> Query error: Table 'metalsindo_db.tran_pr_detail' doesn't exist - Invalid query: SELECT `id`
+FROM `tran_pr_detail`
+WHERE `checklist` = '1'
+AND `checklist_by` IS NULL
+AND `no_rfq` IS NULL
+ERROR - 2024-08-30 13:48:44 --> Query error: Unknown column 'tipe' in 'where clause' - Invalid query: SELECT *
+FROM `dt_trans_po`
+WHERE `idpr` = '3'
+AND `tipe` = 'pr depart'
+ERROR - 2024-08-30 14:50:40 --> Query error: Unknown column 'tipe' in 'where clause' - Invalid query: SELECT *
+FROM `dt_trans_po`
+WHERE `idpr` = '3'
+AND `tipe` = 'pr depart'
+ERROR - 2024-08-30 14:51:47 --> Query error: Table 'metalsindo_db.tr_po_checked_pr' doesn't exist - Invalid query: SELECT *
+FROM `tr_po_checked_pr`
+WHERE `no_pr` = 'PLN2408001'
+AND `id_user` = '1'
+ERROR - 2024-08-30 09:53:13 --> 404 Page Not Found: ../modules/purchase_order/controllers/Purchase_order/proses
+ERROR - 2024-08-30 14:53:47 --> Query error: Table 'metalsindo_db.new_inventory_4' doesn't exist - Invalid query: 
+			SELECT 
+				a.id as id,
+				a.so_number as so_number,
+				a.id_material as id_material,
+				a.propose_purchase as propose_purchase,
+				(b.qty_stock - b.qty_booking) AS avl_stock, 
+				IF(c.code = '' OR c.code IS NULL, d.id_stock, c.code) as code, 
+				'' as code1, 
+				IF(c.nama = '' OR c.nama IS NULL, d.stock_name, c.nama) as nm_material,
+				'' as tipe_pr,
+				e.code as packing_unit,	
+				f.code as packing_unit2,
+				IF(g.code IS NOT NULL, g.code, h.code) as unit_measure
+			FROM
+				material_planning_base_on_produksi_detail a
+				LEFT JOIN warehouse_stock b ON b.id_material = a.id_material
+				LEFT JOIN new_inventory_4 c ON c.code_lv4 = a.id_material 
+				LEFT JOIN accessories d ON d.id = a.id_material
+				LEFT JOIN ms_satuan e ON e.id = c.id_unit_packing
+				LEFT JOIN ms_satuan f ON f.id = d.id_unit_gudang
+				LEFT JOIN ms_satuan g ON g.id = c.id_unit
+				LEFT JOIN ms_satuan h ON h.id = d.id_unit
+			WHERE
+				a.so_number IN ('PLN2408001')
+				AND a.status_app = 'Y'
+			GROUP BY a.id_material
+
+			UNION ALL
+
+			SELECT
+				a.id as id,
+				a.no_pengajuan as so_number,
+				'' as id_material,
+				a.qty as propose_purchase,
+				'0' as avl_stock,
+				a.nm_barang as code,
+				'' as code1,
+				a.nm_barang as nm_material,
+				'pr depart' as tipe_pr,
+				b.code as packing_unit,
+				'' as packing_unit2,
+				b.code as unit_measure
+			FROM
+				rutin_non_planning_detail a 
+				LEFT JOIN ms_satuan b ON b.id = a.satuan
+			WHERE
+				a.no_pengajuan IN ('PLN2408001')
+				
+			GROUP BY a.id
+
+			UNION ALL
+
+			SELECT
+				a.id as id,
+				a.code_plan as so_number,
+				'' as id_material,
+				a.rev_qty as propose_purchase,
+				0 as avl_stock,
+				a.nama_asset as code,
+				'' as code1,
+				a.nama_asset as nm_material,
+				'pr asset' as tipe_pr,
+				'Pcs' as packing_unit,
+				'' as packing_unit2,
+				'Pcs' as unit_measure
+			FROM
+				asset_planning a 
+			WHERE
+				a.code_plan IN ('PLN2408001')
+		
+ERROR - 2024-08-30 14:54:58 --> Query error: Table 'metalsindo_db.asset_planning' doesn't exist - Invalid query: 
+			SELECT 
+				a.id as id,
+				a.so_number as so_number,
+				a.id_material as id_material,
+				a.propose_purchase as propose_purchase,
+				(b.qty_stock - b.qty_booking) AS avl_stock, 
+				d.id_stock as code, 
+				'' as code1, 
+				d.stock_name as nm_material,
+				'' as tipe_pr,
+				e.code as packing_unit,	
+				f.code as packing_unit2,
+				h.code as unit_measure
+			FROM
+				material_planning_base_on_produksi_detail a
+				LEFT JOIN warehouse_stock b ON b.id_material = a.id_material
+				LEFT JOIN accessories d ON d.id = a.id_material
+				LEFT JOIN ms_satuan f ON f.id = d.id_unit_gudang
+				LEFT JOIN ms_satuan h ON h.id = d.id_unit
+			WHERE
+				a.so_number IN ('PLN2408001')
+				AND a.status_app = 'Y'
+			GROUP BY a.id_material
+
+			UNION ALL
+
+			SELECT
+				a.id as id,
+				a.no_pengajuan as so_number,
+				'' as id_material,
+				a.qty as propose_purchase,
+				'0' as avl_stock,
+				a.nm_barang as code,
+				'' as code1,
+				a.nm_barang as nm_material,
+				'pr depart' as tipe_pr,
+				b.code as packing_unit,
+				'' as packing_unit2,
+				b.code as unit_measure
+			FROM
+				rutin_non_planning_detail a 
+				LEFT JOIN ms_satuan b ON b.id = a.satuan
+			WHERE
+				a.no_pengajuan IN ('PLN2408001')
+				
+			GROUP BY a.id
+
+			UNION ALL
+
+			SELECT
+				a.id as id,
+				a.code_plan as so_number,
+				'' as id_material,
+				a.rev_qty as propose_purchase,
+				0 as avl_stock,
+				a.nama_asset as code,
+				'' as code1,
+				a.nama_asset as nm_material,
+				'pr asset' as tipe_pr,
+				'Pcs' as packing_unit,
+				'' as packing_unit2,
+				'Pcs' as unit_measure
+			FROM
+				asset_planning a 
+			WHERE
+				a.code_plan IN ('PLN2408001')
+		
+ERROR - 2024-08-30 14:55:08 --> Query error: Unknown column 'e.code' in 'field list' - Invalid query: 
+			SELECT 
+				a.id as id,
+				a.so_number as so_number,
+				a.id_material as id_material,
+				a.propose_purchase as propose_purchase,
+				(b.qty_stock - b.qty_booking) AS avl_stock, 
+				d.id_stock as code, 
+				'' as code1, 
+				d.stock_name as nm_material,
+				'' as tipe_pr,
+				e.code as packing_unit,	
+				f.code as packing_unit2,
+				h.code as unit_measure
+			FROM
+				material_planning_base_on_produksi_detail a
+				LEFT JOIN warehouse_stock b ON b.id_material = a.id_material
+				LEFT JOIN accessories d ON d.id = a.id_material
+				LEFT JOIN ms_satuan f ON f.id = d.id_unit_gudang
+				LEFT JOIN ms_satuan h ON h.id = d.id_unit
+			WHERE
+				a.so_number IN ('PLN2408001')
+				AND a.status_app = 'Y'
+			GROUP BY a.id_material
+
+			UNION ALL
+
+			SELECT
+				a.id as id,
+				a.no_pengajuan as so_number,
+				'' as id_material,
+				a.qty as propose_purchase,
+				'0' as avl_stock,
+				a.nm_barang as code,
+				'' as code1,
+				a.nm_barang as nm_material,
+				'pr depart' as tipe_pr,
+				b.code as packing_unit,
+				'' as packing_unit2,
+				b.code as unit_measure
+			FROM
+				rutin_non_planning_detail a 
+				LEFT JOIN ms_satuan b ON b.id = a.satuan
+			WHERE
+				a.no_pengajuan IN ('PLN2408001')
+				
+			GROUP BY a.id
+		
+ERROR - 2024-08-30 14:55:40 --> Query error: Table 'metalsindo_db.customer' doesn't exist - Invalid query: SELECT *
+FROM `customer`
+WHERE `deleted_by` IS NULL
+ERROR - 2024-08-30 14:56:45 --> Severity: Warning --> Invalid argument supplied for foreach() C:\xampp56\htdocs\metalsindo\application\modules\purchase_order_non_material\views\add_purchaseorder.php 27
+ERROR - 2024-08-30 14:58:55 --> Severity: Warning --> Invalid argument supplied for foreach() C:\xampp56\htdocs\metalsindo\application\modules\purchase_order_non_material\views\add_purchaseorder.php 27
+ERROR - 2024-08-30 14:59:39 --> Severity: Warning --> Invalid argument supplied for foreach() C:\xampp56\htdocs\metalsindo\application\modules\purchase_order_non_material\views\add_purchaseorder.php 27
+ERROR - 2024-08-30 14:59:47 --> Query error: Table 'metalsindo_db.list_help' doesn't exist - Invalid query: SELECT *
+FROM `list_help`
+WHERE `group_by` = 'top'
+AND `sts` = 'Y'
+ERROR - 2024-08-30 15:00:43 --> Severity: Warning --> Invalid argument supplied for foreach() C:\xampp56\htdocs\metalsindo\application\modules\purchase_order_non_material\views\add_purchaseorder.php 27
+ERROR - 2024-08-30 15:00:53 --> Severity: Warning --> Invalid argument supplied for foreach() C:\xampp56\htdocs\metalsindo\application\modules\purchase_order_non_material\views\add_purchaseorder.php 27
+ERROR - 2024-08-30 15:05:01 --> Severity: Warning --> Invalid argument supplied for foreach() C:\xampp56\htdocs\metalsindo\application\modules\purchase_order_non_material\views\add_purchaseorder.php 27
+ERROR - 2024-08-30 15:08:44 --> Severity: Warning --> Invalid argument supplied for foreach() C:\xampp56\htdocs\metalsindo\application\modules\purchase_order_non_material\views\add_purchaseorder.php 27
+ERROR - 2024-08-30 10:10:52 --> 404 Page Not Found: ../modules/purchase_order/controllers/Purchase_order/CariPPN
+ERROR - 2024-08-30 10:11:01 --> 404 Page Not Found: ../modules/purchase_order/controllers/Purchase_order/CariPPN
+ERROR - 2024-08-30 15:11:55 --> Severity: Warning --> Invalid argument supplied for foreach() C:\xampp56\htdocs\metalsindo\application\modules\purchase_order_non_material\views\add_purchaseorder.php 27
+ERROR - 2024-08-30 15:12:17 --> Severity: Warning --> Invalid argument supplied for foreach() C:\xampp56\htdocs\metalsindo\application\modules\purchase_order_non_material\views\add_purchaseorder.php 27
+ERROR - 2024-08-30 15:12:33 --> Severity: Warning --> Invalid argument supplied for foreach() C:\xampp56\htdocs\metalsindo\application\modules\purchase_order_non_material\views\add_purchaseorder.php 27
+ERROR - 2024-08-30 10:12:40 --> 404 Page Not Found: ../modules/purchase_order/controllers/Purchase_order/CariPPN
+ERROR - 2024-08-30 15:13:20 --> Severity: Warning --> Invalid argument supplied for foreach() C:\xampp56\htdocs\metalsindo\application\modules\purchase_order_non_material\views\add_purchaseorder.php 27
+ERROR - 2024-08-30 15:14:04 --> Severity: Warning --> Invalid argument supplied for foreach() C:\xampp56\htdocs\metalsindo\application\modules\purchase_order_non_material\views\add_purchaseorder.php 27
+ERROR - 2024-08-30 15:14:56 --> Query error: Table 'metalsindo_db.new_inventory_4' doesn't exist - Invalid query: SELECT `code_lv4`, `nama`
+FROM `new_inventory_4`
+WHERE `code_lv4` = ''
+OR `id` = ''
+ERROR - 2024-08-30 15:15:03 --> Query error: Table 'metalsindo_db.new_inventory_4' doesn't exist - Invalid query: SELECT `code_lv4`, `nama`
+FROM `new_inventory_4`
+WHERE `code_lv4` = ''
+OR `id` = ''
+ERROR - 2024-08-30 15:23:56 --> Severity: Warning --> Invalid argument supplied for foreach() C:\xampp56\htdocs\metalsindo\application\modules\purchase_order_non_material\views\add_purchaseorder.php 27
+ERROR - 2024-08-30 15:25:42 --> Query error: Table 'metalsindo_db.new_inventory_4' doesn't exist - Invalid query: SELECT `code_lv4`, `nama`
+FROM `new_inventory_4`
+WHERE `code_lv4` = ''
+OR `id` = ''
+ERROR - 2024-08-30 15:25:50 --> Query error: Table 'metalsindo_db.new_inventory_4' doesn't exist - Invalid query: SELECT `code_lv4`, `nama`
+FROM `new_inventory_4`
+WHERE `code_lv4` = ''
+OR `id` = ''
+ERROR - 2024-08-30 15:26:46 --> Query error: Table 'metalsindo_db.tr_incoming_check' doesn't exist - Invalid query: SELECT `a`.`kode_trans`
+FROM `tr_incoming_check` `a`
+WHERE `a`.`no_ipp` LIKE '%P2400378%' ESCAPE '!'
+ERROR - 2024-08-30 15:29:28 --> Query error: Table 'metalsindo_db.tr_incoming_check' doesn't exist - Invalid query: SELECT `a`.`kode_trans`
+FROM `tr_incoming_check` `a`
+WHERE `a`.`no_ipp` LIKE '%P2400378%' ESCAPE '!'
+ERROR - 2024-08-30 15:29:54 --> Query error: Table 'metalsindo_db.tr_incoming_check' doesn't exist - Invalid query: SELECT `a`.`kode_trans`
+FROM `tr_incoming_check` `a`
+WHERE `a`.`no_ipp` LIKE '%P2400378%' ESCAPE '!'
+ERROR - 2024-08-30 15:30:57 --> Query error: Unknown column 'aa.tipe' in 'where clause' - Invalid query: 
+							SELECT
+								b.no_pr as no_pr
+							FROM
+								material_planning_base_on_produksi_detail a
+								JOIN material_planning_base_on_produksi b ON b.so_number = a.so_number
+							WHERE
+								a.id IN (SELECT aa.idpr FROM dt_trans_po aa WHERE aa.no_po = 'P2400378' AND (aa.tipe IS NULL OR aa.tipe = ''))
+							GROUP BY b.no_pr
+
+							UNION ALL 
+
+							SELECT
+								b.no_pr as no_pr
+							FROM
+								rutin_non_planning_detail a
+								JOIN rutin_non_planning_header b ON b.no_pengajuan = a.no_pengajuan
+							WHERE
+								a.id IN (SELECT aa.idpr FROM dt_trans_po aa WHERE aa.no_po = 'P2400378' AND aa.tipe = 'pr depart')
+							GROUP BY b.no_pr
+						

@@ -125,7 +125,7 @@ class App_pr_stock_model extends BF_Model
       // $nestedData[]  = "<div align='left'><span class='badge bg-" . $warna . "'>" . $status . "</span></div>";
 
       $approve  = "";
-      $view  = "<a href='" . site_url($this->uri->segment(1)) . '/detail_planning/' . $row['so_number'] . "' class='btn btn-sm btn-warning' title='Detail PR' data-role='qtip'><i class='fa fa-eye'></i></a>";
+      $view  = "<a href='" . site_url($this->uri->segment(1)) . '/detail_planning/' . $row['so_number'] . "' class='btn btn-sm btn-warning' title='Detail PR' data-role='qtip' target='_blank'><i class='fa fa-eye'></i></a>";
       if ($this->ENABLE_MANAGE and COUNT($getCheck) > 0) {
         $approve  = "<a href='" . site_url($this->uri->segment(1)) . '/approval_planning/' . $row['so_number'] . "/".$tingkat_approval."' class='btn btn-sm btn-success' title='Approval PR' data-role='qtip'><i class='fa fa-check'></i></a>";
       }
@@ -173,14 +173,14 @@ class App_pr_stock_model extends BF_Model
     $sql = "SELECT
               (@row:=@row+1) AS nomor,
               a.*,
-              b.nm_customer
+              b.name_customer as nm_customer
             FROM
               material_planning_base_on_produksi a
               INNER JOIN material_planning_base_on_produksi_detail z ON a.so_number=z.so_number
-              LEFT JOIN customer b ON a.id_customer=b.id_customer,
+              LEFT JOIN master_customers b ON a.id_customer = b.id_customer,
               (SELECT @row:=0) r
             WHERE 1=1 AND a.category='pr stok' AND a.booking_date IS NOT NULL AND z.status_app = 'N' AND a.close_pr IS NULL AND a.rejected IS NULL " . $filter_approval . " AND (
-              b.nm_customer LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+              b.name_customer LIKE '%" . $this->db->escape_like_str($like_value) . "%'
               OR a.so_number LIKE '%" . $this->db->escape_like_str($like_value) . "%'
               OR a.project LIKE '%" . $this->db->escape_like_str($like_value) . "%'
               OR a.no_pr LIKE '%" . $this->db->escape_like_str($like_value) . "%'

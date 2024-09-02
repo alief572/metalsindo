@@ -166,11 +166,11 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 											<option value="">- Supplier -</option>
 											<?php foreach ($results['list_supplier'] as $supplier) {
 												$selected = '';
-												if ($supplier->kode_supplier == $results['get_po']->id_suplier) {
+												if ($supplier->id_suplier == $results['get_po']->id_suplier) {
 													$selected = 'selected';
 												}
 											?>
-												<option value="<?= $supplier->kode_supplier ?>" <?= $selected; ?>><?= strtoupper(strtolower($supplier->nama)) ?></option>
+												<option value="<?= $supplier->id_suplier ?>" <?= $selected; ?>><?= strtoupper(strtolower($supplier->name_suplier)) ?></option>
 											<?php } ?>
 										</select>
 									</div>
@@ -528,7 +528,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 						</div>
 					</div>
 					<center>
-						<a href="<?= base_url('purchase_order') ?>" class="btn btn-sm btn-danger">
+						<a href="<?= base_url('purchase_order_non_material') ?>" class="btn btn-sm btn-danger">
 							<i class="fa fa-arrow-left"></i> Back
 						</a>
 					</center>

@@ -173,8 +173,8 @@
         <?php
         foreach ($header as $header) {
         }
-        $detailsum = $this->db->query("SELECT SUM(width) as sumwidth, SUM(qty) as sumqty, SUM(totalwidth) as sumtotalwidth, SUM(jumlahharga) as sumjumlahharga, SUM(hargasatuan) as sumhargasatuan FROM dt_trans_po WHERE no_po = '" . $header->no_po . "' ")->result();
-        $jumlahdetail = $this->db->query("SELECT COUNT(no_po) as no_po FROM dt_trans_po WHERE no_po = '" . $header->no_po . "' ")->result();
+        $detailsum = $this->db->query("SELECT SUM(width) as sumwidth, SUM(qty) as sumqty, SUM(totalwidth) as sumtotalwidth, SUM(jumlahharga) as sumjumlahharga, SUM(hargasatuan) as sumhargasatuan FROM dt_trans_po_non_material WHERE no_po = '" . $header->no_po . "' ")->result();
+        $jumlahdetail = $this->db->query("SELECT COUNT(no_po) as no_po FROM dt_trans_po_non_material WHERE no_po = '" . $header->no_po . "' ")->result();
         $jumlahdata = $jumlahdetail[0]->no_po;
         $tinggi = 300 / $jumlahdata;
         if (empty($header->negara)) {
@@ -192,7 +192,7 @@
         <table class="gridtable2" border="0">
             <tr>
                 <td style="text-align:left;">
-                    <img src='<?= $_SERVER['DOCUMENT_ROOT'] . '/origa_live/assets/images/ori_logo2.png'; ?>' alt="" width="75" height="95">
+                    <img src='<?='./assets/images/logo_metalsindo.jpeg'; ?>' alt="" width="75" height="95">
                 </td>
                 <td align="right" width="630">
                     <br>
@@ -350,7 +350,7 @@
                     $satuan = $detail->satuan;
                     $satuan_packing = $detail->satuan_packing;
                     if($detail->tipe == '' || $detail->tipe == null) {
-                        $check_code4 = $this->db->get_where('new_inventory_4', ['code_lv4' => $detail->idmaterial])->num_rows();
+                        $check_code = $this->db->get_where('accessories', ['id' => $detail->idmaterial])->num_rows();
 
                         if($check_code4 < 1) {
                             $this->db->select('b.code as satuan, c.code as satuan_packing');

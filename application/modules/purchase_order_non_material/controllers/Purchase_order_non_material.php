@@ -68,29 +68,17 @@ class Purchase_order_non_material extends Admin_Controller
 		foreach ($data as $item) {
 			$incoming_no = [];
 			$this->db->select('a.kode_trans');
-			$this->db->from('tr_incoming_check a');
+			$this->db->from('warehouse_adjustment a');
 			$this->db->like('a.no_ipp', $item->no_po, 'both');
-			$get_no_incoming = $this->db->get()->result();
+			$get_no_incoming_warehouse = $this->db->get()->result();
 
-			if (!empty($get_no_incoming)) {
-				foreach ($get_no_incoming as $item_incoming) {
+			if (!empty($get_no_incoming_warehouse)) {
+				foreach ($get_no_incoming_warehouse as $item_incoming) {
 					$incoming_no[] = $item_incoming->kode_trans;
 				}
 				$incoming_no = implode(', ', $incoming_no);
 			} else {
-				$this->db->select('a.kode_trans');
-				$this->db->from('warehouse_adjustment a');
-				$this->db->like('a.no_ipp', $item->no_po, 'both');
-				$get_no_incoming_warehouse = $this->db->get()->result();
-
-				if (!empty($get_no_incoming_warehouse)) {
-					foreach ($get_no_incoming_warehouse as $item_incoming) {
-						$incoming_no[] = $item_incoming->kode_trans;
-					}
-					$incoming_no = implode(', ', $incoming_no);
-				} else {
-					$incoming_no = '';
-				}
+				$incoming_no = '';
 			}
 
 			$link_no_incoming[$item->no_po] = $incoming_no;
@@ -135,7 +123,7 @@ class Purchase_order_non_material extends Admin_Controller
 		// print_r($no_po);
 		// exit;
 
-		$get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $no_po])->row();
+		$get_po = $this->db->get_where('tr_purchase_order_non_material', ['no_po' => $no_po])->row();
 
 		$getso = $this->Pr_model->get_where_in('so_number', $getparam, 'material_planning_base_on_produksi');
 		// $getitemso = $this->Pr_model->get_where_in('so_number', $getparam, 'material_planning_base_on_produksi_detail');
@@ -172,18 +160,15 @@ class Purchase_order_non_material extends Admin_Controller
 				a.persen_disc as persen_disc,
 				a.nilai_disc as nilai_disc,
 				e.propose_purchase as propose_purchase,
-				g.code as packing_unit,
-				h.code as packing_unit2,
-				IF(i.code IS NOT NULL, i.code, j.code) as unit_measure
+				h.code as packing_unit,
+				'' as packing_unit2,
+				h.code as unit_measure
 			FROM
-				dt_trans_po a
+				dt_trans_po_non_material a
 				LEFT JOIN warehouse_stock b ON b.id_material = a.idmaterial
-				LEFT JOIN new_inventory_4 c ON c.code_lv4 = a.idmaterial OR c.id = a.idmaterial
 				LEFT JOIN material_planning_base_on_produksi_detail e ON e.id = a.idpr
 				LEFT JOIN accessories f ON f.id = a.idmaterial
-				LEFT JOIN ms_satuan g ON g.id = c.id_unit_packing
 				LEFT JOIN ms_satuan h ON h.id = f.id_unit_gudang
-				LEFT JOIN ms_satuan i ON i.id = c.id_unit
 				LEFT JOIN ms_satuan j ON j.id = f.id_unit
 			WHERE
 				a.no_po IN ('" . str_replace(",", "','", $no_po) . "') AND
@@ -218,7 +203,7 @@ class Purchase_order_non_material extends Admin_Controller
 				'' as packing_unit2,
 				IF(f.code IS NULL, 'Pcs', f.code) as unit_measure
 			FROM
-				dt_trans_po a
+				dt_trans_po_non_material a
 				LEFT JOIN rutin_non_planning_detail e ON e.id = a.idpr
 				LEFT JOIN ms_satuan f ON f.id = e.satuan
 			WHERE
@@ -253,7 +238,7 @@ class Purchase_order_non_material extends Admin_Controller
 				'' as packing_unit2,
 				'Pcs' as unit_measure
 			FROM
-				dt_trans_po a
+				dt_trans_po_non_material a
 				LEFT JOIN rutin_non_planning_detail e ON e.id = a.idpr
 			WHERE
 				a.no_po IN ('" . str_replace(",", "','", $no_po) . "') AND 
@@ -273,10 +258,10 @@ class Purchase_order_non_material extends Admin_Controller
 		// $supplier = $data = $this->db->query("SELECT a.* FROM new_supplier as a INNER JOIN dt_trans_pr as b on b.suplier = a.id_suplier INNER JOIN tr_purchase_request as c on b.no_pr = c.no_pr WHERE c.status = '2' GROUP BY b.suplier ")->result();
 
 		// $comp	= $this->db->query("select a.*, b.nominal as nominal_harga FROM ms_compotition as a inner join child_history_lme as b on b.id_compotition=a.id_compotition where a.deleted='0' and b.status='0' ")->result();
-		$customers = $this->db->get_where('customer', ['deleted_by' => null])->result();
+		$customers = $this->db->get_where('master_customers', ['deleted' => 0])->result();
 		$karyawan = $this->db->get_where('ms_karyawan', ['deleted_by' => null])->result();
 		$mata_uang = $this->db->get_where('mata_uang', ['deleted' => null])->result();
-		$list_supplier = $this->db->get_where('new_supplier', ['deleted_by' => null])->result();
+		$list_supplier = $this->db->get_where('master_supplier', ['deleted' => 0])->result();
 		$list_department = $this->db->select('id, nama')->get_where('ms_department', ['deleted_by' => null])->result();
 		// $matauang = $this->db->get_where('matauang')->result();
 		$list_group_top = $this->db->get_where('list_help', ['group_by' => 'top', 'sts' => 'Y'])->result();
@@ -316,8 +301,8 @@ class Purchase_order_non_material extends Admin_Controller
 		$aktif = 'active';
 		$deleted = '0';
 		$comp	= $this->db->query("select a.*, b.nominal as nominal_harga FROM ms_compotition as a inner join child_history_lme as b on b.id_compotition=a.id_compotition where a.deleted='0' and b.status='0' ")->result();
-		$head = $this->db->query("SELECT a.*, b.name_suplier as suplier FROM tr_purchase_order as a INNER JOIN master_supplier as b on a.id_suplier = b.id_suplier  WHERE a.no_po = '$id' ")->result();
-		$detail = $this->db->query("SELECT a.*, b.nama  FROM dt_trans_po a
+		$head = $this->db->query("SELECT a.*, b.name_suplier as suplier FROM tr_purchase_order_non_material as a INNER JOIN master_supplier as b on a.id_suplier = b.id_suplier  WHERE a.no_po = '$id' ")->result();
+		$detail = $this->db->query("SELECT a.*, b.nama  FROM dt_trans_po_non_material a
 		INNER JOIN ms_inventory_category3 b ON a.idmaterial = b.id_category3
 		WHERE no_po = '$id' ")->result();
 		$supplier = $data = $this->db->query("SELECT a.* FROM master_supplier as a INNER JOIN dt_trans_pr as b on b.suplier = a.id_suplier INNER JOIN tr_purchase_request as c on b.no_pr = c.no_pr WHERE c.status = '2' ")->result();
@@ -1294,7 +1279,7 @@ class Purchase_order_non_material extends Admin_Controller
 		];
 
 		$this->db->trans_begin();
-		$this->db->where('no_po', $id)->update("tr_purchase_order", $data);
+		$this->db->where('no_po', $id)->update("tr_purchase_order_non_material", $data);
 
 		if ($this->db->trans_status() === FALSE) {
 			$this->db->trans_rollback();
@@ -1439,7 +1424,7 @@ class Purchase_order_non_material extends Admin_Controller
 				$po_pr_depart = '1';
 			}
 			// }
-			if($used[tipe_pr] == 'pr asset') {
+			if ($used[tipe_pr] == 'pr asset') {
 				$po_pr_asset = '1';
 			}
 		}
@@ -1537,7 +1522,7 @@ class Purchase_order_non_material extends Admin_Controller
 			];
 		}
 		//Add Data
-		$insert_tr_purchase_order = $this->db->insert('tr_purchase_order', $data);
+		$insert_tr_purchase_order = $this->db->insert('tr_purchase_order_non_material', $data);
 		// if(!$insert_tr_purchase_order){
 		// 	print_r($this->db->error($insert_tr_purchase_order));
 		// 	exit;
@@ -1545,14 +1530,7 @@ class Purchase_order_non_material extends Admin_Controller
 
 		$valid_qty = 1;
 		$numb1 = 0;
-		$get_material = $this->db->select('code_lv4, nama')
-			->from('new_inventory_4')
-			->where('code_lv4', $used[idmaterial])
-			->or_where('id', $used[idmaterial])
-			->get()
-			->row_array();
-		// $id_material = $get_material['code_lv4'];
-		// $nm_material = '';
+
 		foreach ($_POST['dt'] as $used) {
 			if (isset($used[checked_point])) {
 				$numb1++;
@@ -1585,7 +1563,7 @@ class Purchase_order_non_material extends Admin_Controller
 					'tipe'			=> $used[tipe_pr]
 				);
 
-				$insert_dt_trans_po = $this->db->insert('dt_trans_po', $dt);
+				$insert_dt_trans_po = $this->db->insert('dt_trans_po_non_material', $dt);
 				// if(!$insert_dt_trans_po){
 				// 	print_r($this->db->error($insert_dt_trans_po));
 				// 	exit;
@@ -1596,7 +1574,7 @@ class Purchase_order_non_material extends Admin_Controller
 				];
 
 				if ($valid_qty == 1) {
-					$get_other_po_brg = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS other_qty FROM dt_trans_po a WHERE a.idpr = '" . $used[idpr] . "' AND a.tipe = '" . $used[tipe_pr] . "'")->row();
+					$get_other_po_brg = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS other_qty FROM dt_trans_po_non_material a WHERE a.idpr = '" . $used[idpr] . "' AND a.tipe = '" . $used[tipe_pr] . "'")->row();
 
 					if ($used[tipe_pr] == 'pr depart') {
 						$get_data_pr = $this->db->query("SELECT IF(qty IS NOT NULL, qty, 0) AS qty_pr FROM rutin_non_planning_detail WHERE id = '" . $used[idpr] . "'")->row();
@@ -1717,7 +1695,7 @@ class Purchase_order_non_material extends Admin_Controller
 
 		$this->db->trans_begin();
 
-		$get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $post['no_po']]);
+		$get_po = $this->db->get_where('tr_purchase_order_non_material', ['no_po' => $post['no_po']]);
 
 		$data = [
 			'id_suplier'		=> $post['supplier'],
@@ -1747,7 +1725,7 @@ class Purchase_order_non_material extends Admin_Controller
 			'note' => $post['note']
 		];
 		//Add Data
-		$this->db->update('tr_purchase_order', $data, ['no_po' => $post['no_po']]);
+		$this->db->update('tr_purchase_order_non_material', $data, ['no_po' => $post['no_po']]);
 
 		$valid_qty = 1;
 		$numb1 = 0;
@@ -1768,7 +1746,7 @@ class Purchase_order_non_material extends Admin_Controller
 			);
 
 			if ($valid_qty == 1) {
-				$get_other_po_brg = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS other_qty FROM dt_trans_po a WHERE a.idpr = '" . $used[idpr] . "' AND a.tipe = '" . $used[tipe_pr] . "'")->row();
+				$get_other_po_brg = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS other_qty FROM dt_trans_po_non_material a WHERE a.idpr = '" . $used[idpr] . "' AND a.tipe = '" . $used[tipe_pr] . "'")->row();
 
 				if ($used[tipe_pr] == 'pr depart') {
 					$get_data_pr = $this->db->query("SELECT IF(qty IS NOT NULL, qty, 0) AS qty_pr FROM rutin_non_planning_detail WHERE id = '" . $used[idpr] . "'")->row();
@@ -1790,7 +1768,7 @@ class Purchase_order_non_material extends Admin_Controller
 			// print_r($used[id]);
 			// exit;
 
-			$this->db->update('dt_trans_po', $dt, ['id' => $used[id]]);
+			$this->db->update('dt_trans_po_non_material', $dt, ['id' => $used[id]]);
 			// $nopr = $used[no_pr];
 			$dataupdate = [
 				'status_po'				=> 'CLS',
@@ -1886,8 +1864,8 @@ class Purchase_order_non_material extends Admin_Controller
 			'created_by'		=> $this->auth->user_id()
 		];
 		//Add Data 
-		$this->db->where('no_po', $code)->update("tr_purchase_order", $data);
-		$this->db->delete('dt_trans_po', array('no_po' => $code));
+		$this->db->where('no_po', $code)->update("tr_purchase_order_non_material", $data);
+		$this->db->delete('dt_trans_po_non_material', array('no_po' => $code));
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
 			$numb1++;
@@ -1912,7 +1890,7 @@ class Purchase_order_non_material extends Admin_Controller
 				'jumlahharga'			=> str_replace(",", "", $used[jumlahharga]),
 				'note'					=> $used[note],
 			);
-			$this->db->insert('dt_trans_po', $dt);
+			$this->db->insert('dt_trans_po_non_material', $dt);
 		}
 		if ($this->db->trans_status() === FALSE) {
 			$this->db->trans_rollback();
@@ -1938,9 +1916,9 @@ class Purchase_order_non_material extends Admin_Controller
 		ob_start();
 		$this->auth->restrict($this->managePermission);
 		$id = $this->uri->segment(3);
-		$data['header'] = $this->db->query("SELECT a.*, b.name_suplier as name_suplier, b.address_office as address_office,b.id_negara as negara, b.telephone as telephone,b.fax as fax FROM tr_purchase_order as a INNER JOIN master_supplier as b on a.id_suplier = b.id_suplier WHERE a.no_po = '" . $id . "' ")->result();
-		$data['detail']  = $this->db->query("SELECT * FROM dt_trans_po WHERE no_po = '" . $id . "' ")->result();
-		$data['detailsum'] = $this->db->query("SELECT AVG(width) as totalwidth, AVG(qty) as totalqty FROM dt_trans_po WHERE no_po = '" . $id . "' ")->result();
+		$data['header'] = $this->db->query("SELECT a.*, b.name_suplier as name_suplier, b.address_office as address_office,b.id_negara as negara, b.telephone as telephone,b.fax as fax FROM tr_purchase_order_non_material as a INNER JOIN master_supplier as b on a.id_suplier = b.id_suplier WHERE a.no_po = '" . $id . "' ")->result();
+		$data['detail']  = $this->db->query("SELECT * FROM dt_trans_po_non_material WHERE no_po = '" . $id . "' ")->result();
+		$data['detailsum'] = $this->db->query("SELECT AVG(width) as totalwidth, AVG(qty) as totalqty FROM dt_trans_po_non_material WHERE no_po = '" . $id . "' ")->result();
 		$this->load->view('print', $data);
 		$html = ob_get_contents();
 
@@ -1958,18 +1936,18 @@ class Purchase_order_non_material extends Admin_Controller
 		ob_start();
 		$this->auth->restrict($this->managePermission);
 		$id = $this->uri->segment(3);
-		$data['header'] = $this->db->query("SELECT a.*, a.id_suplier, b.nama as nm_supp, b.address as alamat, c.name as country_name, b.contact as nm_pic, b.telp as hp, b.email as email_pic, b.fax FROM tr_purchase_order as a LEFT JOIN material_planning_base_on_produksi x ON x.po_number = a.no_po LEFT JOIN new_supplier b ON b.kode_supplier = a.id_suplier LEFT JOIN country_all c ON c.iso3 = b.id_country WHERE a.no_po = '" . $id . "' ")->result();
+		$data['header'] = $this->db->query("SELECT a.*, a.id_suplier, b.name_suplier as nm_supp, b.address_office as alamat, c.name as country_name, '' as nm_pic, b.telephone as hp, b.email as email_pic, b.fax FROM tr_purchase_order_non_material as a LEFT JOIN material_planning_base_on_produksi x ON x.po_number = a.no_po LEFT JOIN master_supplier b ON b.id_suplier = a.id_suplier LEFT JOIN country_all c ON c.iso3 = b.id_negara WHERE a.no_po = '" . $id . "' ")->result();
 		// print_r($data['header'][0]->tipe);
 		// exit;
 		if ($data['header'][0]->tipe !== '' && $data['header'][0]->tipe !== null) {
-			if($data['header'][0]->tipe == 'pr depart') {
-				$data['detail']  = $this->db->query("SELECT a.id as id, a.no_po as no_po, a.id_dt_po as id_dt_po, a.idpr as idpr, a.idmaterial as idmaterial, a.namamaterial as namamaterial, a.description as description, a.hargasatuan as hargasatuan, a.jumlahharga as jumlahharga, a.kode_barang as kode_barang, a.ppn as ppn, a.ppn_persen as ppn_persen, a.harga_total as harga_total, a.tipe as tipe, a.keterangan as keterangan, a.namamaterial as nama, '' as code, '1' as konversi, c.code as satuan, c.code as satuan_packing, a.qty as qty FROM dt_trans_po a 
+			if ($data['header'][0]->tipe == 'pr depart') {
+				$data['detail']  = $this->db->query("SELECT a.id as id, a.no_po as no_po, a.id_dt_po as id_dt_po, a.idpr as idpr, a.idmaterial as idmaterial, a.namamaterial as namamaterial, a.description as description, a.hargasatuan as hargasatuan, a.jumlahharga as jumlahharga, a.kode_barang as kode_barang, a.ppn as ppn, a.ppn_persen as ppn_persen, a.harga_total as harga_total, a.tipe as tipe, a.keterangan as keterangan, a.namamaterial as nama, '' as code, '1' as konversi, c.code as satuan, c.code as satuan_packing, a.qty as qty FROM dt_trans_po_non_material a 
 				LEFT JOIN rutin_non_planning_detail b ON b.id = a.idpr
 				LEFT JOIN ms_satuan c ON c.id = b.satuan
 				WHERE a.no_po = '" . $id . "' ")->result();
 			}
-			if($data['header'][0]->tipe == 'pr asset') {
-				$data['detail']  = $this->db->query("SELECT a.id as id, a.no_po as no_po, a.id_dt_po as id_dt_po, a.idpr as idpr, a.idmaterial as idmaterial, a.namamaterial as namamaterial, a.description as description, a.hargasatuan as hargasatuan, a.jumlahharga as jumlahharga, a.kode_barang as kode_barang, a.ppn as ppn, a.ppn_persen as ppn_persen, a.harga_total as harga_total, a.tipe as tipe, a.keterangan as keterangan, a.namamaterial as nama, '' as code, '1' as konversi, 'Pcs' as satuan, 'Pcs' as satuan_packing, a.qty as qty FROM dt_trans_po a 
+			if ($data['header'][0]->tipe == 'pr asset') {
+				$data['detail']  = $this->db->query("SELECT a.id as id, a.no_po as no_po, a.id_dt_po as id_dt_po, a.idpr as idpr, a.idmaterial as idmaterial, a.namamaterial as namamaterial, a.description as description, a.hargasatuan as hargasatuan, a.jumlahharga as jumlahharga, a.kode_barang as kode_barang, a.ppn as ppn, a.ppn_persen as ppn_persen, a.harga_total as harga_total, a.tipe as tipe, a.keterangan as keterangan, a.namamaterial as nama, '' as code, '1' as konversi, 'Pcs' as satuan, 'Pcs' as satuan_packing, a.qty as qty FROM dt_trans_po_non_material a 
 				LEFT JOIN asset_planning b ON b.id = a.idpr
 				WHERE a.no_po = '" . $id . "' ")->result();
 			}
@@ -1984,7 +1962,7 @@ class Purchase_order_non_material extends Admin_Controller
 				}
 			}
 
-			if($data['header'][0]->tipe == 'pr depart') {
+			if ($data['header'][0]->tipe == 'pr depart') {
 				$this->db->select('IF(a.nama IS NULL, "", a.nama) as nm_department');
 				$this->db->from('ms_department a');
 				$this->db->join('rutin_non_planning_header b', 'b.id_dept = a.id', 'left');
@@ -1992,7 +1970,7 @@ class Purchase_order_non_material extends Admin_Controller
 				$this->db->where('c.id', $data['detail'][0]->idpr);
 				$get_department = $this->db->get()->row();
 			}
-			if($data['header'][0]->tipe == 'pr asset') {
+			if ($data['header'][0]->tipe == 'pr asset') {
 				$this->db->select('IF(a.nama IS NULL, "", a.nama) as nm_department');
 				$this->db->from('ms_department a');
 				$this->db->join('asset_planning b', 'b.id_dept = a.id', 'left');
@@ -2004,7 +1982,7 @@ class Purchase_order_non_material extends Admin_Controller
 
 			$data['nm_department'] = $get_department->nm_department;
 
-			if($data['header'][0]->tipe == 'pr depart') {
+			if ($data['header'][0]->tipe == 'pr depart') {
 				$this->db->select('IF(a.no_pr IS NULL, "", a.no_pr) as no_pr');
 				$this->db->from('rutin_non_planning_header a');
 				$this->db->join('rutin_non_planning_detail b', 'b.no_pengajuan = a.no_pengajuan', 'left');
@@ -2012,7 +1990,7 @@ class Purchase_order_non_material extends Admin_Controller
 				$this->db->group_by('a.no_pr');
 				$get_pr = $this->db->get()->result();
 			}
-			if($data['header'][0]->tipe == 'pr asset') {
+			if ($data['header'][0]->tipe == 'pr asset') {
 				$this->db->select('IF(a.no_pr IS NULL, "", a.no_pr) as no_pr');
 				$this->db->from('asset_planning a');
 				$this->db->where_in('a.id', $list_idpr);
@@ -2052,12 +2030,10 @@ class Purchase_order_non_material extends Admin_Controller
 			// exit;
 		} else {
 			$data['detail']  = $this->db->query("SELECT a.*, 
-				a.namamaterial as nama, IF(b.code IS NULL OR b.code = '', e.id_stock, b.code), IF(b.konversi IS NULL, 1, b.konversi), c.code as satuan, d.code as satuan_packing FROM dt_trans_po a 
-			LEFT JOIN new_inventory_4 b ON b.code_lv4 = a.idmaterial OR b.id = a.idmaterial
-			LEFT JOIN ms_satuan c ON c.id = b.id_unit
-			LEFT JOIN ms_satuan d ON d.id = b.id_unit_packing
+				a.namamaterial as nama, e.id_stock , 1, f.code as satuan, g.code as satuan_packing FROM dt_trans_po_non_material a 
 			LEFT JOIN accessories e ON e.id = a.idmaterial
 			LEFT JOIN ms_satuan f ON f.id = e.id_unit
+			LEFT JOIN ms_satuan g ON g.id = e.id_unit_gudang
 			WHERE a.no_po = '" . $id . "' ")->result();
 
 			$list_idpr = [];
@@ -2111,9 +2087,9 @@ class Purchase_order_non_material extends Admin_Controller
 		// LEFT JOIN ms_satuan c ON c.id = b.satuan
 		// WHERE a.no_po = '" . $id . "' ");
 		// exit;
-		$data['detailsum'] = $this->db->query("SELECT AVG(width) as totalwidth, AVG(qty) as totalqty FROM dt_trans_po WHERE no_po = '" . $id . "' ")->result();
+		$data['detailsum'] = $this->db->query("SELECT AVG(width) as totalwidth, AVG(qty) as totalqty FROM dt_trans_po_non_material WHERE no_po = '" . $id . "' ")->result();
 
-		$data['data_supplier'] = $this->db->get_where('new_supplier', ['kode_supplier' => $data['header'][0]->id_suplier])->row();
+		$data['data_supplier'] = $this->db->get_where('master_supplier', ['id_suplier' => $data['header'][0]->id_suplier])->row();
 
 		$nm_depart = [];
 		$get_nm_depart = $this->db->query("SELECT nama FROM ms_department WHERE id IN ('" . str_replace(",", "','", $data['header'][0]->id_dept) . "')")->result();
@@ -2152,9 +2128,9 @@ class Purchase_order_non_material extends Admin_Controller
 	{
 
 		$data = [
-			'header' 	=> $this->db->query("SELECT a.*, b.name_suplier as name_suplier, b.address_office as address_office,b.id_negara as negara, b.telephone as telephone,b.fax as fax FROM tr_purchase_order as a INNER JOIN master_supplier as b on a.id_suplier = b.id_suplier WHERE a.no_po = '" . $id . "' ")->result(),
-			'detail'  	=> $this->db->query("SELECT * FROM dt_trans_po WHERE no_po = '" . $id . "' ")->result(),
-			'detailsum' => $this->db->query("SELECT AVG(width) as totalwidth, AVG(qty) as totalqty FROM dt_trans_po WHERE no_po = '" . $id . "' ")->result()
+			'header' 	=> $this->db->query("SELECT a.*, b.name_suplier as name_suplier, b.address_office as address_office,b.id_negara as negara, b.telephone as telephone,b.fax as fax FROM tr_purchase_order_non_material as a INNER JOIN master_supplier as b on a.id_suplier = b.id_suplier WHERE a.no_po = '" . $id . "' ")->result(),
+			'detail'  	=> $this->db->query("SELECT * FROM dt_trans_po_non_material WHERE no_po = '" . $id . "' ")->result(),
+			'detailsum' => $this->db->query("SELECT AVG(width) as totalwidth, AVG(qty) as totalqty FROM dt_trans_po_non_material WHERE no_po = '" . $id . "' ")->result()
 		];
 		$this->load->view('print3', $data);
 	}
@@ -2781,10 +2757,10 @@ class Purchase_order_non_material extends Admin_Controller
 
 		$no_po 		= (!empty($this->input->post('no_po'))) ? $this->input->post('no_po') : 0;
 
-		$get_no_po 	= $this->db->get_where('tr_purchase_order', array('no_po' => $no_po))->result();
+		$get_no_po 	= $this->db->get_where('tr_purchase_order_non_material', array('no_po' => $no_po))->result();
 		$npo 		= (!empty($get_no_po)) ? $get_no_po[0]->no_pr : 0;
 
-		$filter_pr 	= $this->db->get_where('tr_purchase_order', array('no_pr <>' => $npo))->result_array();
+		$filter_pr 	= $this->db->get_where('tr_purchase_order_non_material', array('no_pr <>' => $npo))->result_array();
 
 
 		$ArrPR = [];
@@ -2864,21 +2840,18 @@ class Purchase_order_non_material extends Admin_Controller
 				a.id_material as id_material,
 				a.propose_purchase as propose_purchase,
 				(b.qty_stock - b.qty_booking) AS avl_stock, 
-				IF(c.code = '' OR c.code IS NULL, d.id_stock, c.code) as code, 
+				d.id_stock as code, 
 				'' as code1, 
-				IF(c.nama = '' OR c.nama IS NULL, d.stock_name, c.nama) as nm_material,
+				d.stock_name as nm_material,
 				'' as tipe_pr,
-				e.code as packing_unit,	
+				'' as packing_unit,	
 				f.code as packing_unit2,
-				IF(g.code IS NOT NULL, g.code, h.code) as unit_measure
+				h.code as unit_measure
 			FROM
 				material_planning_base_on_produksi_detail a
 				LEFT JOIN warehouse_stock b ON b.id_material = a.id_material
-				LEFT JOIN new_inventory_4 c ON c.code_lv4 = a.id_material 
 				LEFT JOIN accessories d ON d.id = a.id_material
-				LEFT JOIN ms_satuan e ON e.id = c.id_unit_packing
 				LEFT JOIN ms_satuan f ON f.id = d.id_unit_gudang
-				LEFT JOIN ms_satuan g ON g.id = c.id_unit
 				LEFT JOIN ms_satuan h ON h.id = d.id_unit
 			WHERE
 				a.so_number IN ('" . str_replace(",", "','", implode(',', $getparam)) . "')
@@ -2907,26 +2880,6 @@ class Purchase_order_non_material extends Admin_Controller
 				a.no_pengajuan IN ('" . str_replace(",", "','", implode(',', $getparam)) . "')
 				
 			GROUP BY a.id
-
-			UNION ALL
-
-			SELECT
-				a.id as id,
-				a.code_plan as so_number,
-				'' as id_material,
-				a.rev_qty as propose_purchase,
-				0 as avl_stock,
-				a.nama_asset as code,
-				'' as code1,
-				a.nama_asset as nm_material,
-				'pr asset' as tipe_pr,
-				'Pcs' as packing_unit,
-				'' as packing_unit2,
-				'Pcs' as unit_measure
-			FROM
-				asset_planning a 
-			WHERE
-				a.code_plan IN ('" . str_replace(",", "','", implode(',', $getparam)) . "')
 		")->result();
 
 
@@ -2940,10 +2893,10 @@ class Purchase_order_non_material extends Admin_Controller
 		// $supplier = $data = $this->db->query("SELECT a.* FROM new_supplier as a INNER JOIN dt_trans_pr as b on b.suplier = a.id_suplier INNER JOIN tr_purchase_request as c on b.no_pr = c.no_pr WHERE c.status = '2' GROUP BY b.suplier ")->result();
 
 		// $comp	= $this->db->query("select a.*, b.nominal as nominal_harga FROM ms_compotition as a inner join child_history_lme as b on b.id_compotition=a.id_compotition where a.deleted='0' and b.status='0' ")->result();
-		$customers = $this->db->get_where('customer', ['deleted_by' => null])->result();
+		$customers = $this->db->get_where('master_customers', ['deleted' => 0])->result();
 		$karyawan = $this->db->get_where('ms_karyawan', ['deleted_by' => null])->result();
 		$mata_uang = $this->db->get_where('mata_uang', ['deleted' => null])->result();
-		$list_supplier = $this->db->get_where('new_supplier', ['deleted_by' => null])->result();
+		$list_supplier = $this->db->get_where('master_supplier', ['deleted' => 0])->result();
 		$list_department = $this->db->select('id, nama')->get_where('ms_department', ['deleted_by' => null])->result();
 		// $matauang = $this->db->get_where('matauang')->result();
 		$data = [
@@ -2971,7 +2924,7 @@ class Purchase_order_non_material extends Admin_Controller
 
 		$this->db->trans_begin();
 
-		$this->db->update('tr_purchase_order', [
+		$this->db->update('tr_purchase_order_non_material', [
 			'note' => $post['notes']
 		], [
 			'no_po' => $post['no_po']
@@ -3054,16 +3007,16 @@ class Purchase_order_non_material extends Admin_Controller
 		$get_checked_pr = $this->db->get_where('tr_po_checked_pr', ['id_user' => $id_user])->result();
 		$list_id = [];
 		foreach ($get_checked_pr as $item) {
-			if($item->tipe_pr == 'pr asset') {
+			if ($item->tipe_pr == 'pr asset') {
 				$get_pr = $this->db->select('b.code_plan')
-				->from('tran_pr_header a')
-				->join('asset_planning b', 'b.no_pr = a.no_pr', 'left')
-				->where('a.id', $item->no_pr)
-				->get()
-				->row();
+					->from('tran_pr_header a')
+					->join('asset_planning b', 'b.no_pr = a.no_pr', 'left')
+					->where('a.id', $item->no_pr)
+					->get()
+					->row();
 
 				$list_id[] = $get_pr->code_plan;
-			}else{
+			} else {
 				$list_id[] = $item->no_pr;
 			}
 		}
@@ -3087,7 +3040,7 @@ class Purchase_order_non_material extends Admin_Controller
 		// print_r($no_po);
 		// exit;
 
-		$get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $no_po])->row();
+		$get_po = $this->db->get_where('tr_purchase_order_non_material', ['no_po' => $no_po])->row();
 
 		$getso = $this->Pr_model->get_where_in('so_number', $getparam, 'material_planning_base_on_produksi');
 		// $getitemso = $this->Pr_model->get_where_in('so_number', $getparam, 'material_planning_base_on_produksi_detail');
@@ -3124,18 +3077,15 @@ class Purchase_order_non_material extends Admin_Controller
 				a.persen_disc as persen_disc,
 				a.nilai_disc as nilai_disc,
 				e.propose_purchase as propose_purchase,
-				g.code as packing_unit,
-				h.code as packing_unit2,
-				IF(i.code IS NOT NULL, i.code, j.code) as unit_measure
+				h.code as packing_unit,
+				'' as packing_unit2,
+				j.code as unit_measure
 			FROM
-				dt_trans_po a
+				dt_trans_po_non_material a
 				LEFT JOIN warehouse_stock b ON b.id_material = a.idmaterial
-				LEFT JOIN new_inventory_4 c ON c.code_lv4 = a.idmaterial OR c.id = a.idmaterial
 				LEFT JOIN material_planning_base_on_produksi_detail e ON e.id = a.idpr
 				LEFT JOIN accessories f ON f.id = a.idmaterial
-				LEFT JOIN ms_satuan g ON g.id = c.id_unit_packing
 				LEFT JOIN ms_satuan h ON h.id = f.id_unit_gudang
-				LEFT JOIN ms_satuan i ON i.id = c.id_unit
 				LEFT JOIN ms_satuan j ON j.id = f.id_unit
 			WHERE
 				a.no_po IN ('" . str_replace(",", "','", $no_po) . "') AND
@@ -3170,50 +3120,16 @@ class Purchase_order_non_material extends Admin_Controller
 				'' as packing_unit2,
 				IF(f.code IS NULL, 'Pcs', f.code) as unit_measure
 			FROM
-				dt_trans_po a
+				dt_trans_po_non_material a
 				LEFT JOIN rutin_non_planning_detail e ON e.id = a.idpr
 				LEFT JOIN ms_satuan f ON f.id = e.satuan
 			WHERE
 				a.no_po IN ('" . str_replace(",", "','", $no_po) . "') AND 
 				a.tipe = 'pr depart'
 
-			UNION ALL
-
-			SELECT 
-				a.id as id,
-				a.idpr as idpr,
-				a.no_po as no_po,
-				'' as idmaterial,
-				a.qty as qty,
-				a.hargasatuan as hargasatuan,
-				a.jumlahharga as jumlahharga,
-				a.kode_barang as kode_barang,
-				a.ppn as ppn,
-				a.ppn_persen as ppn_persen,
-				a.harga_total as harga_total,
-				a.tipe as tipe_pr,
-				a.keterangan as keterangan,
-				'0' AS avl_stock, 
-				a.kode_barang as code, 
-				'' as code1, 
-				a.namamaterial as nm_material, 
-				'' as nm_material1,
-				a.persen_disc as persen_disc,
-				a.nilai_disc as nilai_disc, 
-				a.qty as propose_purchase,
-				'Pcs' as packing_unit,
-				'' as packing_unit2,
-				'Pcs' as unit_measure
-			FROM
-				dt_trans_po a
-				LEFT JOIN asset_planning e ON e.id = a.idpr
-			WHERE
-				a.no_po IN ('" . str_replace(",", "','", $no_po) . "') AND 
-				a.tipe = 'pr asset'
-
 			GROUP BY id
 		")->result();
-		
+
 
 		// $getitemso = $this->db->get()->result();
 
@@ -3225,10 +3141,10 @@ class Purchase_order_non_material extends Admin_Controller
 		// $supplier = $data = $this->db->query("SELECT a.* FROM new_supplier as a INNER JOIN dt_trans_pr as b on b.suplier = a.id_suplier INNER JOIN tr_purchase_request as c on b.no_pr = c.no_pr WHERE c.status = '2' GROUP BY b.suplier ")->result();
 
 		// $comp	= $this->db->query("select a.*, b.nominal as nominal_harga FROM ms_compotition as a inner join child_history_lme as b on b.id_compotition=a.id_compotition where a.deleted='0' and b.status='0' ")->result();
-		$customers = $this->db->get_where('customer', ['deleted_by' => null])->result();
+		$customers = $this->db->get_where('master_customers', ['deleted' => 0])->result();
 		$karyawan = $this->db->get_where('ms_karyawan', ['deleted_by' => null])->result();
 		$mata_uang = $this->db->get_where('mata_uang', ['deleted' => null])->result();
-		$list_supplier = $this->db->get_where('new_supplier', ['deleted_by' => null])->result();
+		$list_supplier = $this->db->get_where('master_supplier', ['deleted' => 0])->result();
 		$list_department = $this->db->select('id, nama')->get_where('ms_department', ['deleted_by' => null])->result();
 		// $matauang = $this->db->get_where('matauang')->result();
 		$list_group_top = $this->db->get_where('list_help', ['group_by' => 'top', 'sts' => 'Y'])->result();
@@ -3287,17 +3203,19 @@ class Purchase_order_non_material extends Admin_Controller
 		]);
 	}
 
-	public function close_po_modal() {
+	public function close_po_modal()
+	{
 		$no_po = $this->input->post('no_po');
 
-		$get_no_surat = $this->db->get_where('tr_purchase_order', ['no_po' => $no_po])->row();
+		$get_no_surat = $this->db->get_where('tr_purchase_order_non_material', ['no_po' => $no_po])->row();
 
 		$this->template->set('no_po', $no_po);
 		$this->template->set('no_surat', $get_no_surat->no_surat);
 		$this->template->render('close_po_modal');
 	}
 
-	public function close_po() {
+	public function close_po()
+	{
 		$post = $this->input->post();
 
 		$this->db->trans_start();
@@ -3307,12 +3225,12 @@ class Purchase_order_non_material extends Admin_Controller
 			'close_po_desc' => $post['close_po_reason']
 		];
 
-		$this->db->update('tr_purchase_order', $data_update, ['no_po' => $post['no_po']]);
+		$this->db->update('tr_purchase_order_non_material', $data_update, ['no_po' => $post['no_po']]);
 
-		if($this->db->trans_status() === false) {
+		if ($this->db->trans_status() === false) {
 			$this->db->trans_rollback();
 			$valid = 0;
-		}else{
+		} else {
 			$this->db->trans_commit();
 			$valid = 1;
 		}

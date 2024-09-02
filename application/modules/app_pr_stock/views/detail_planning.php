@@ -27,12 +27,12 @@ $tgl_dibutuhkan = (!empty($header[0]['tgl_dibutuhkan'])) ? date('d F Y', strtoti
 							<td><?= $tgl_dibutuhkan; ?></td>
 						</tr>
 						<tr>
-							<td>Customer</td>
-							<td>:</td>
-							<td><?= $header[0]['nm_customer']; ?></td>
 							<td>Tingkat PR</td>
 							<td>:</td>
 							<td><?= ($header[0]['tingkat_pr'] == 2) ? 'Urgent' : 'Normal' ?></td>
+							<td></td>
+							<td></td>
+							<td></td>
 						</tr>
 					</table>
 				</div>
@@ -102,7 +102,7 @@ $tgl_dibutuhkan = (!empty($header[0]['tgl_dibutuhkan'])) ? date('d F Y', strtoti
 			<div class="form-group row">
 				<div class="col-md-12">
 					<!-- <button type="button" class="btn btn-primary" name="save" id="save">Process</button> -->
-					<button type="button" class="btn btn-danger" style='margin-left:5px;' name="back" id="back">Back</button>
+					<button type="button" class="btn btn-danger" style='margin-left:5px;' name="back" onclick="window.close();">Back</button>
 				</div>
 			</div>
 		</form>

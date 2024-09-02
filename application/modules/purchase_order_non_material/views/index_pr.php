@@ -70,9 +70,9 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 							foreach ($get_materil as $materil) {
 								$no_materil += $materil->qty;
 
-								$get_po_materil = $this->db->get_where('dt_trans_po', ['idpr' => $materil->id, 'tipe' => 'pr depart'])->num_rows();
+								$get_po_materil = $this->db->get_where('dt_trans_po_non_material', ['idpr' => $materil->id, 'tipe' => 'pr depart'])->num_rows();
 								if ($get_po_materil > 0) {
-									$get_po_materil_qty = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS qty_materil FROM dt_trans_po a WHERE a.idpr = '" . $materil->id . "' AND a.tipe = 'pr depart'")->row();
+									$get_po_materil_qty = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS qty_materil FROM dt_trans_po_non_material a WHERE a.idpr = '" . $materil->id . "' AND a.tipe = 'pr depart'")->row();
 									$no_materil_po += $get_po_materil_qty->qty_materil;
 								}
 							}
@@ -82,9 +82,9 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 							$no_materil = 1;
 							foreach ($get_materil as $materil) {
 
-								$get_po_materil = $this->db->get_where('dt_trans_po', ['idpr' => $materil->id, 'tipe' => 'pr asset'])->num_rows();
+								$get_po_materil = $this->db->get_where('dt_trans_po_non_material', ['idpr' => $materil->id, 'tipe' => 'pr asset'])->num_rows();
 								if ($get_po_materil > 0) {
-									$get_po_materil_qty = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS qty_materil FROM dt_trans_po a WHERE a.idpr = '" . $materil->id . "' AND a.tipe = 'pr asset'")->row();
+									$get_po_materil_qty = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS qty_materil FROM dt_trans_po_non_material a WHERE a.idpr = '" . $materil->id . "' AND a.tipe = 'pr asset'")->row();
 									$no_materil_po += $get_po_materil_qty->qty_materil;
 								}
 							}
@@ -94,9 +94,9 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 							foreach ($get_materil as $materil) {
 								$no_materil += $materil->propose_purchase;
 
-								$get_po_materil = $this->db->query("SELECT a.id FROM dt_trans_po a WHERE a.idpr = '".$materil->id."' AND (a.tipe IS NULL OR a.tipe = '')")->num_rows();
+								$get_po_materil = $this->db->query("SELECT a.id FROM dt_trans_po_non_material a WHERE a.idpr = '".$materil->id."' AND (a.tipe IS NULL OR a.tipe = '')")->num_rows();
 								if ($get_po_materil > 0) {
-									$get_po_materil_qty = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS qty_materil FROM dt_trans_po a WHERE a.idpr = '" . $materil->id . "' AND (a.tipe IS NULL OR a.tipe = '')")->row();
+									$get_po_materil_qty = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS qty_materil FROM dt_trans_po_non_material a WHERE a.idpr = '" . $materil->id . "' AND (a.tipe IS NULL OR a.tipe = '')")->row();
 									$no_materil_po += $get_po_materil_qty->qty_materil;
 								}
 							}
@@ -447,7 +447,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 	function proses_do() {
 		// var param = $('#cekcus').val();
 		// var uri3 = '<?php echo $this->uri->segment(3) ?>';
-		// window.location.href = siteurl + "purchase_order/proses/" + uri3 + "?param=" + param;
+		// window.location.href = siteurl + "purchase_order_non_material/proses/" + uri3 + "?param=" + param;
 
 		swal({
 				title: "Are you sure?",
@@ -479,7 +479,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 									cache: false,
 									dataType: 'json',
 									success: function(result) {
-										window.location.href = siteurl + "purchase_order/proses/?param=" + data.list_id;
+										window.location.href = siteurl + "purchase_order_non_material/proses/?param=" + data.list_id;
 									}
 								});
 							}

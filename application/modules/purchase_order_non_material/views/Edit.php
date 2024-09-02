@@ -166,11 +166,11 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 											<option value="">- Supplier -</option>
 											<?php foreach ($results['list_supplier'] as $supplier) {
 												$selected = '';
-												if ($supplier->kode_supplier == $results['get_po']->id_suplier) {
+												if ($supplier->id_suplier == $results['get_po']->id_suplier) {
 													$selected = 'selected';
 												}
 											?>
-												<option value="<?= $supplier->kode_supplier ?>" <?= $selected; ?>><?= strtoupper(strtolower($supplier->nama)) ?></option>
+												<option value="<?= $supplier->id_suplier ?>" <?= $selected; ?>><?= strtoupper(strtolower($supplier->name_suplier)) ?></option>
 											<?php } ?>
 										</select>
 									</div>
@@ -569,7 +569,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 			let id_suplier = $('#id_suplier').val();
 			$.ajax({
 				type: "POST",
-				url: siteurl + 'purchase_order/getPR',
+				url: siteurl + 'purchase_order_non_material/getPR',
 				data: {
 					'id_suplier': id_suplier
 				},
@@ -586,7 +586,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 			let no_pr = $(this).val();
 			$.ajax({
 				type: "POST",
-				url: siteurl + 'purchase_order/AddMaterial_Direct',
+				url: siteurl + 'purchase_order_non_material/AddMaterial_Direct',
 				data: {
 					'loi': loi,
 					'no_pr': no_pr
@@ -660,7 +660,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 						if (isConfirm) {
 
 							var formData = new FormData($('#data-form')[0]);
-							var baseurl = siteurl + 'purchase_order/SaveEditPO';
+							var baseurl = siteurl + 'purchase_order_non_material/SaveEditPO';
 							$.ajax({
 								url: baseurl,
 								type: "POST",
@@ -950,7 +950,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		} else {
 			$.ajax({
 				type: "GET",
-				url: siteurl + 'purchase_order/AddMaterial',
+				url: siteurl + 'purchase_order_non_material/AddMaterial',
 				data: "jumlah=" + jumlah + "&id_suplier=" + id_suplier + "&loi=" + loi,
 				success: function(html) {
 					$("#data_request").append(html);
@@ -965,7 +965,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 			});
 			$.ajax({
 				type: "GET",
-				url: siteurl + 'purchase_order/UbahImport',
+				url: siteurl + 'purchase_order_non_material/UbahImport',
 				data: "loi=" + loi,
 				success: function(html) {
 					$("ubahloi").html(html);
@@ -980,7 +980,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		var dt_hargasatuan = $("#dt_hargasatuan_" + id).val();
 		// $.ajax({
 		// type:"GET",
-		// url:siteurl+'purchase_order/HitungHarga',
+		// url:siteurl+'purchase_order_non_material/HitungHarga',
 		// data:"dt_hargasatuan="+dt_hargasatuan+"&dt_qty="+dt_qty+"&id="+id,
 		// success:function(html){
 		// $("#jumlahharga_"+id).html(html);
@@ -988,7 +988,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		// });
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/TotalWeight',
+			url: siteurl + 'purchase_order_non_material/TotalWeight',
 			data: "dt_width=" + dt_width + "&dt_qty=" + dt_qty + "&id=" + id,
 			success: function(html) {
 				$("#totalwidth_" + id).html(html);
@@ -1005,7 +1005,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		} else {
 			$.ajax({
 				type: "GET",
-				url: siteurl + 'purchase_order/CariPrice',
+				url: siteurl + 'purchase_order_non_material/CariPrice',
 				data: "dt_ratelme=" + dt_ratelme + "&dt_idmaterial=" + dt_idmaterial + "&id=" + id,
 				success: function(html) {
 					$("#dt_alloyprice_" + id).val(html);
@@ -1047,7 +1047,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		} else {
 			$.ajax({
 				type: "GET",
-				url: siteurl + 'purchase_order/CariPPN',
+				url: siteurl + 'purchase_order_non_material/CariPPN',
 				data: "harga=" + harga + "&id=" + id,
 				success: function(html) {
 					$("#dt_nilai_ppn_" + id).attr('readonly', false);
@@ -1065,7 +1065,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		// var loi = $("#loi").val();
 		// $.ajax({
 		// 	type: "GET",
-		// 	url: siteurl + 'purchase_order/FormInputKurs',
+		// 	url: siteurl + 'purchase_order_non_material/FormInputKurs',
 		// 	data: "loi=" + loi,
 		// 	success: function(html) {
 		// 		$("#input_kurs").html(html);
@@ -1087,7 +1087,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		// console.log(dt_width)
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/HitungUP',
+			url: siteurl + 'purchase_order_non_material/HitungUP',
 			data: "fabcost=" + fabcost + "&alloyprice=" + alloyprice + "&hargasatuan=" + hargasatuan + "&loi=" + loi,
 			success: function(html) {
 				// $("#dt_hargasatuan_"+id).val(html); 
@@ -1096,7 +1096,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		// $.ajax({
 		// type:"GET",
-		// url:siteurl+'purchase_order/Hitjumlah',
+		// url:siteurl+'purchase_order_non_material/Hitjumlah',
 		// data:"fabcost="+fabcost+"&alloyprice="+alloyprice+"&pajak="+pajak+"&diskon="+diskon+"&qty="+qty+"&hargasatuan="+hargasatuan+"&loi="+loi+"&dt_width="+dt_width,
 		// success:function(html){
 		// $("#dt_jumlahharga_"+id).val(html); 
@@ -1117,7 +1117,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		// console.log(dt_width)
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/HitungUP',
+			url: siteurl + 'purchase_order_non_material/HitungUP',
 			data: "fabcost=" + fabcost + "&alloyprice=" + alloyprice + "&hargasatuan=" + hargasatuan + "&loi=" + loi,
 			success: function(html) {
 				// $("#dt_hargasatuan_"+id).val(html); 
@@ -1129,7 +1129,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		// $.ajax({
 		// type:"GET",
-		// url:siteurl+'purchase_order/Hitjumlah',
+		// url:siteurl+'purchase_order_non_material/Hitjumlah',
 		// data:"fabcost="+fabcost+"&alloyprice="+alloyprice+"&pajak="+pajak+"&diskon="+diskon+"&qty="+qty+"&hargasatuan="+hargasatuan+"&loi="+loi+"&dt_width="+dt_width,
 		// success:function(html){
 		// $("#dt_jumlahharga_"+id).val(html); 
@@ -1141,7 +1141,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		var idpr = $("#dt_idpr_" + id).val();
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariIdMaterial',
+			url: siteurl + 'purchase_order_non_material/CariIdMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#idmaterial_" + id).html(html);
@@ -1149,7 +1149,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariNamaMaterial',
+			url: siteurl + 'purchase_order_non_material/CariNamaMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#namaterial_" + id).html(html);
@@ -1157,7 +1157,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariPanjangMaterial',
+			url: siteurl + 'purchase_order_non_material/CariPanjangMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#panjang_" + id).html(html);
@@ -1165,7 +1165,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariLebarMaterial',
+			url: siteurl + 'purchase_order_non_material/CariLebarMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#lebar_" + id).html(html);
@@ -1173,7 +1173,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariDescripitionMaterial',
+			url: siteurl + 'purchase_order_non_material/CariDescripitionMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#description_" + id).html(html);
@@ -1181,7 +1181,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariQtyMaterial',
+			url: siteurl + 'purchase_order_non_material/CariQtyMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#qty_" + id).html(html);
@@ -1189,7 +1189,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		// $.ajax({
 		// type:"GET",
-		// url:siteurl+'purchase_order/CariweightMaterial',
+		// url:siteurl+'purchase_order_non_material/CariweightMaterial',
 		// data:"idpr="+idpr+"&id="+id,
 		// success:function(html){
 		// $("#width_"+id).html(html);
@@ -1197,7 +1197,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		// });
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariTweightMaterial',
+			url: siteurl + 'purchase_order_non_material/CariTweightMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#totalwidth_" + id).html(html);
@@ -1206,7 +1206,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariWidthMaterial',
+			url: siteurl + 'purchase_order_non_material/CariWidthMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#width_" + id).html(html);
@@ -1221,7 +1221,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		}
 		$.ajax({
 			type: "POST",
-			url: siteurl + 'purchase_order/getDateExp',
+			url: siteurl + 'purchase_order_non_material/getDateExp',
 			data: {
 				'id_pr': ArrList
 			},
@@ -1241,7 +1241,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		console.log(dt_width);
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/HitungHarga',
+			url: siteurl + 'purchase_order_non_material/HitungHarga',
 			data: "dt_hargasatuan=" + dt_hargasatuan + "&dt_qty=" + dt_qty + "&id=" + id + "&dt_width=" + dt_width,
 			success: function(html) {
 				$("#jumlahharga_" + id).html(html);
@@ -1254,7 +1254,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		var supplier = $("#id_suplier").val();
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariLokasi',
+			url: siteurl + 'purchase_order_non_material/CariLokasi',
 			data: "supplier=" + supplier,
 			success: function(html) {
 				$("#loi").html(html);

@@ -65,7 +65,7 @@ class Pr_model extends BF_Model
 
 	function generate_code($tgl)
 	{
-		$query = $this->db->query("SELECT MAX(no_po) as max_id FROM tr_purchase_order WHERE no_po LIKE '%P".date('y', strtotime($tgl))."%'");
+		$query = $this->db->query("SELECT MAX(no_po) as max_id FROM tr_purchase_order_non_material WHERE no_po LIKE '%P".date('y', strtotime($tgl))."%'");
 		$row = $query->row_array();
 		$thn = date('y', strtotime($tgl));
 		$max_id = $row['max_id'];

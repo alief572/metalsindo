@@ -19,36 +19,6 @@ $ENABLE_DELETE  = has_permission('Approval_PR_Stock_Management.Delete');
 					<a class="btn btn-success btn-sm" style='float:right;' href="<?= base_url('stock_origa/add') ?>" title="Add">Add Stock</a> -->
         <?php endif; ?>
         <br>
-        <div class="form-group row" hidden>
-            <div class="col-md-1">
-                <b>Product Type</b>
-            </div>
-            <div class="col-md-3">
-                <select name='product' id='product' class='form-control input-sm chosen-select'>
-                    <option value='0'>All Product Type</option>
-                    <?php
-                    foreach (get_list_inventory_lv1('product') as $val => $valx) {
-                        echo "<option value='" . $valx['code_lv1'] . "'>" . strtoupper($valx['nama']) . "</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-        </div>
-        <div class="form-group row" hidden>
-            <div class="col-md-1">
-                <b>Costcenter</b>
-            </div>
-            <div class="col-md-3">
-                <select name='costcenter' id='costcenter' class='form-control input-sm chosen-select'>
-                    <option value='0'>All Costcenter</option>
-                    <?php
-                    foreach (get_costcenter() as $val => $valx) {
-                        echo "<option value='" . $valx['id_costcenter'] . "'>" . strtoupper($valx['nama_costcenter']) . "</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-        </div>
     </div>
     <!-- /.box-header -->
     <div class="box-body">

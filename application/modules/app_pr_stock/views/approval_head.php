@@ -137,19 +137,9 @@ $ENABLE_DELETE  = has_permission('Approval_PR_Stok_Head.Delete');
         $(document).ready(function() {
             var product = $("#product").val();
             var costcenter = $("#costcenter").val();
-            DataTables(costcenter, product);
+            DataTables();
 
-            $(document).on('change', '#costcenter', function() {
-                var costcenter = $("#costcenter").val();
-                var product = $("#product").val();
-                DataTables(costcenter, product);
-            });
-
-            $(document).on('change', '#product', function() {
-                var costcenter = $("#costcenter").val();
-                var product = $("#product").val();
-                DataTables(costcenter, product);
-            });
+            
 
         });
 

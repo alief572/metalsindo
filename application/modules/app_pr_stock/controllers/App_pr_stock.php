@@ -147,9 +147,8 @@ class App_pr_stock extends Admin_Controller
       $tingkat_approval = $this->uri->segment(4);
 
       $header     = $this->db
-        ->select('a.*, b.due_date, c.nm_customer')
-        ->join('so_internal b', 'a.so_number=b.so_number', 'left')
-        ->join('customer c', 'a.id_customer=c.id_customer', 'left')
+        ->select('a.*, c.name_customer as nm_customer')
+        ->join('master_customers c', 'a.id_customer=c.id_customer', 'left')
         ->get_where(
           'material_planning_base_on_produksi a',
           array(
@@ -185,9 +184,7 @@ class App_pr_stock extends Admin_Controller
         'so_number' => $so_number,
         'header' => $header,
         'detail' => $detail,
-        'tingkat_approval' => $tingkat_approval,
-        'GET_LEVEL4'   => get_inventory_lv4(),
-        'GET_STOK_PUSAT' => getStokMaterial(1)
+        'tingkat_approval' => $tingkat_approval
       ];
 
       $posisi_approval = "";
@@ -209,9 +206,8 @@ class App_pr_stock extends Admin_Controller
   public function detail_planning($so_number = null)
   {
     $header     = $this->db
-      ->select('a.*, b.due_date, c.nm_customer')
-      ->join('so_internal b', 'a.so_number=b.so_number', 'left')
-      ->join('customer c', 'a.id_customer=c.id_customer', 'left')
+      ->select('a.*, c.name_customer as nm_customer')
+      ->join('master_customers c', 'a.id_customer = c.id_customer', 'left')
       ->get_where(
         'material_planning_base_on_produksi a',
         array(
@@ -246,9 +242,7 @@ class App_pr_stock extends Admin_Controller
     $data = [
       'so_number' => $so_number,
       'header' => $header,
-      'detail' => $detail,
-      'GET_LEVEL4'   => get_inventory_lv4(),
-      'GET_STOK_PUSAT' => getStokMaterial(1)
+      'detail' => $detail
     ];
 
     $this->template->title('Detail - ' . $so_number);

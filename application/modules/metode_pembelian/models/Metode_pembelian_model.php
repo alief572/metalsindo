@@ -958,12 +958,12 @@ class Metode_pembelian_model extends BF_Model
 			$kode_jenis_pembelian = '2';
 		}
 
-		$check			= $this->db->select('id')->get_where('tran_pr_detail', array('checklist' => '1', 'checklist_by' => $UserName, 'no_rfq' => NULL))->result_array();
-		$ArrList 		= array();
-		foreach ($check as $val => $vaxl) {
-			$ArrList[] = $vaxl['id'];
-		}
-		$dtImplode		= "('" . implode("','", $ArrList) . "')";
+		// $check			= $this->db->select('id')->get_where('tran_pr_detail', array('checklist' => '1', 'checklist_by' => $UserName, 'no_rfq' => NULL))->result_array();
+		// $ArrList 		= array();
+		// foreach ($check as $val => $vaxl) {
+		// 	$ArrList[] = $vaxl['id'];
+		// }
+		// $dtImplode		= "('" . implode("','", $ArrList) . "')";
 
 		// print_r($check);
 		// echo $dtImplode;

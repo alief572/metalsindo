@@ -62,7 +62,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 								material_planning_base_on_produksi_detail a
 								JOIN material_planning_base_on_produksi b ON b.so_number = a.so_number
 							WHERE
-								a.id IN (SELECT aa.idpr FROM dt_trans_po aa WHERE aa.no_po = '" . $record->no_po . "' AND (aa.tipe IS NULL OR aa.tipe = ''))
+								a.id IN (SELECT aa.idpr FROM dt_trans_po_non_material aa WHERE aa.no_po = '" . $record->no_po . "' AND (aa.tipe IS NULL OR aa.tipe = ''))
 							GROUP BY b.no_pr
 
 							UNION ALL 
@@ -73,7 +73,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 								rutin_non_planning_detail a
 								JOIN rutin_non_planning_header b ON b.no_pengajuan = a.no_pengajuan
 							WHERE
-								a.id IN (SELECT aa.idpr FROM dt_trans_po aa WHERE aa.no_po = '" . $record->no_po . "' AND aa.tipe = 'pr depart')
+								a.id IN (SELECT aa.idpr FROM dt_trans_po_non_material aa WHERE aa.no_po = '" . $record->no_po . "' AND aa.tipe = 'pr depart')
 							GROUP BY b.no_pr
 						")->result();
 						foreach ($get_no_pr as $item_pr) {
@@ -108,10 +108,22 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 							} else {
 								$sts = "<td class='text-center'><span class='badge bg-orange'>Waiting In</span></td>";
 
-								$get_qty_incoming = $this->db->select('IF(SUM(qty_oke) IS NUll, 0, SUM(qty_oke)) as ttl_qty_incoming')->get_where('tr_checked_incoming_detail', ['no_ipp' => $record->no_po])->row();
-								$ttl_qty_incoming = $get_qty_incoming->ttl_qty_incoming;
+								// $get_qty_incoming = $this->db->select('IF(SUM(qty_oke) IS NUll, 0, SUM(qty_oke)) as ttl_qty_incoming')->get_where('tr_checked_incoming_detail', ['no_ipp' => $record->no_po])->row();
+								// $ttl_qty_incoming = $get_qty_incoming->ttl_qty_incoming;
 
-								$get_ttl_qty_po = $this->db->select('IF(SUM(qty) IS NULL, 0, SUM(qty)) AS ttl_qty_po')->get_where('dt_trans_po', ['no_po' => $record->no_po])->row();
+								// if($ttl_qty_incoming <= 1) {
+
+								// }
+
+								$this->db->select('IF(SUM(jumlah_mat) IS NULL, 0, SUM(jumlah_mat)) as ttl_qty_incoming');
+								$this->db->from('warehouse_adjustment');
+								$this->db->where('no_ipp', $record->no_po);
+								$this->db->or_where('no_ipp', $record->no_surat);
+								$get_qty_incoming = $this->db->get()->row();
+
+								$ttl_qty_incoming = $get_ttl_incoming->ttl_qty_incoming;
+
+								$get_ttl_qty_po = $this->db->select('IF(SUM(qty) IS NULL, 0, SUM(qty)) AS ttl_qty_po')->get_where('dt_trans_po_non_material', ['no_po' => $record->no_po])->row();
 								$ttl_qty_po = $get_ttl_qty_po->ttl_qty_po;
 
 								if ($ttl_qty_incoming < 1) {
@@ -146,13 +158,13 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 							<td><?= $record->reject_reason ?></td>
 							<td style="padding-left:20px">
 								<?php if ($ENABLE_VIEW) : ?>
-									<a class="btn btn-warning btn-sm" href="<?= base_url('/purchase_order/view_po/' . $record->no_po) ?>" title="View" data-no_po="<?= $record->no_po ?>"><i class="fa fa-eye"></i></a>
+									<a class="btn btn-warning btn-sm" href="<?= base_url('/purchase_order_non_material/view_po/' . $record->no_po) ?>" title="View" data-no_po="<?= $record->no_po ?>"><i class="fa fa-eye"></i></a>
 
-									<a class="btn btn-primary btn-sm" href="<?= base_url('/purchase_order/PrintH2/' . $record->no_po) ?>" target="_blank" title="Print"><i class="fa fa-print"></i></a>
+									<a class="btn btn-primary btn-sm" href="<?= base_url('/purchase_order_non_material/PrintH2/' . $record->no_po) ?>" target="_blank" title="Print"><i class="fa fa-print"></i></a>
 								<?php endif; ?>
 								<?php if ($ENABLE_MANAGE && $valid_edit > 0) :
 								?>
-									<a class="btn btn-info btn-sm" href="<?= base_url('/purchase_order/edit/' . $record->no_po) ?>" title="Edit"><i class="fa fa-edit"></i></a>
+									<a class="btn btn-info btn-sm" href="<?= base_url('/purchase_order_non_material/edit/' . $record->no_po) ?>" title="Edit"><i class="fa fa-edit"></i></a>
 
 								<?php
 								endif; ?>
