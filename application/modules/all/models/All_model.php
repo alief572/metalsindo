@@ -159,17 +159,18 @@ class All_model extends BF_Model
 	function GetDeptCombo($key = '')
 	{
 		$aCombo		= array();
-		$this->db->select('a.id, a.nm_dept');
-		$this->db->from('department a');
+		$this->db->select('a.id as id, a.nama as nm_dept');
+		$this->db->from('ms_department a');
 		if ($key != '') $this->db->where('a.id', $key);
+		$this->db->where('a.deleted_by', null);
 		//		$this->db->where('a.company_id','COM003');
-		$this->db->order_by('a.nm_dept', 'asc');
+		$this->db->order_by('a.nama', 'asc');
 		$query = $this->db->get();
 		$results	= $query->result_array();
 		if ($key == '') $aCombo[]	= '';
 		if ($results) {
 			foreach ($results as $key => $vals) {
-				$aCombo[$vals['id']]	= $vals['nm_dept'];
+				$aCombo[$vals['id']]	= strtoupper($vals['nm_dept']);
 			}
 		}
 		return $aCombo;

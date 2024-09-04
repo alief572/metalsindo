@@ -1667,9 +1667,20 @@ class Expense extends Admin_Controller
 		echo json_encode($param);
 	}
 
-	public function get_list_req_transport($nama, $departement = null, $date1, $date2)
+	public function get_list_req_transport()
 	{
-		$data	= $this->db->query("SELECT * FROM tr_transport WHERE nama='" . $nama . "' and departement='" . $departement . "' and tgl_doc between '" . $date1 . "' and '" . $date2 . "' and (no_req ='' or no_req is null) order by tgl_doc")->result();
+		$post = $this->input->post();
+
+		$nama = $post['nama'];
+		$departement = $post['departement'];
+		$date1 = $post['date1'];
+		$date2 = $post['date2'];
+
+		if($departement !== '' && $departement !== null) {
+			$data	= $this->db->query("SELECT * FROM tr_transport WHERE nama='" . $nama . "' and departement='" . $departement . "' and tgl_doc between '" . $date1 . "' and '" . $date2 . "' and (no_req ='' or no_req is null) order by tgl_doc")->result();
+		} else {
+			$data	= $this->db->query("SELECT * FROM tr_transport WHERE nama='" . $nama . "' and tgl_doc between '" . $date1 . "' and '" . $date2 . "' and (no_req ='' or no_req is null) order by tgl_doc")->result();
+		}
 
 		// print_r("SELECT * FROM tr_transport WHERE nama='" . $nama . "' and departement='" . $departement . "' and tgl_doc between '" . $date1 . "' and '" . $date2 . "' and (no_req ='' or no_req is null) order by tgl_doc");
 		echo json_encode($data);

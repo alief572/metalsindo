@@ -327,10 +327,17 @@ $dept = '';
 			var departement = $("#departement").val();
 			var date1 = $("#date1").val();
 			var date2 = $("#date2").val();
+			alert(nama + ' | ' + departement + ' | ' + date1 + ' | ' + date2);
 			$.ajax({
-				url: siteurl + '/expense/get_list_req_transport/' + nama + '/' + departement + '/' + date1 + '/' + date2,
+				url: siteurl + '/expense/get_list_req_transport/',
 				cache: false,
 				type: "POST",
+				data : {
+					'nama': nama,
+					'departement' : departement,
+					'date1' : date1,
+					'date2': date2
+				},
 				dataType: "json",
 				success: function(data) {
 					var i;
