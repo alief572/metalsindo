@@ -1,7 +1,7 @@
 <div class="box-body">
 	<input type="hidden" name='kode_trans' id='kode_trans' value='<?= $getData[0]['kode_trans']; ?>'>
 	<table class="table" width="100%" border='0'>
-		<thead>
+		<tbody>
 			<tr>
 				<td class="text-left" style='vertical-align:middle;' width='15%'>No Transaksi</td>
 				<td class="text-left" style='vertical-align:middle;' width='2%'>:</td>
@@ -34,7 +34,7 @@
 				<td class="text-left" style='vertical-align:middle;'></td>
 				<td class="text-left" style='vertical-align:middle;'></td>
 			</tr>
-		</thead>
+		</tbody>
 	</table><br>
 	<table class="table table-striped table-bordered table-hover table-condensed" width="100%">
 		<thead>

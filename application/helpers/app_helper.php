@@ -1047,3 +1047,450 @@ function generate_no_costbook($lebih = null)
 
     return $kodecollect;
 }
+
+function get_list_satuan()
+{
+    $CI = &get_instance();
+    $listGetCategory = $CI->db->get_where('ms_satuan', array('deleted_date' => NULL))->result_array();
+    $ArrGetCategory = [];
+    foreach ($listGetCategory as $key => $value) {
+        $ArrGetCategory[$value['id']]['code']     = $value['code'];
+    }
+    return $ArrGetCategory;
+}
+
+function getStokBarang($id_gudang)
+{
+    $CI = &get_instance();
+    $listGetCategory =     $CI->db
+        ->select('
+											a.id_material,
+											a.qty_stock,
+											a.qty_booking,
+											b.konversi
+										')
+        ->join('accessories b', 'a.id_material=b.id')
+        ->get_where('warehouse_stock a', array('a.id_gudang' => $id_gudang))->result_array();
+    $ArrGetCategory     = [];
+    foreach ($listGetCategory as $key => $value) {
+        $stok_packing = 0;
+        if ($value['qty_stock'] > 0 and $value['konversi'] > 0) {
+            $stok_packing = $value['qty_stock'] / $value['konversi'];
+        }
+
+        $id_material = $value['id_material'];
+        $ArrGetCategory[$id_material]['stok']     = $value['qty_stock'];
+        $ArrGetCategory[$id_material]['stok_packing']     = $stok_packing;
+        $ArrGetCategory[$id_material]['konversi']     = $value['konversi'];
+    }
+    return $ArrGetCategory;
+}
+
+function generateNoTransaksiStok()
+{
+    $CI = &get_instance();
+    $Ym             = date('ym');
+    $srcMtr            = "SELECT MAX(kode_trans) as maxP FROM warehouse_adjustment WHERE kode_trans LIKE 'TRM" . $Ym . "%' ";
+    $resultMtr        = $CI->db->query($srcMtr)->result_array();
+    $angkaUrut2        = $resultMtr[0]['maxP'];
+    $urutan2        = (int)substr($angkaUrut2, 7, 4);
+    $urutan2++;
+    $urut2            = sprintf('%04s', $urutan2);
+    $kode_trans        = "TRM" . $Ym . $urut2;
+
+    return $kode_trans;
+}
+
+function getStokBarangHistory($id_gudang, $date_filter)
+{
+    $CI = &get_instance();
+    $listGetCategory =     $CI->db
+        ->select('
+											a.id_material,
+											a.qty_stock,
+											a.qty_booking,
+											b.konversi
+										')
+        ->join('accessories b', 'a.id_material=b.id')
+        ->get_where('warehouse_stock_per_day a', array('a.id_gudang' => $id_gudang, 'DATE(a.hist_date)' => $date_filter))->result_array();
+    $ArrGetCategory     = [];
+    foreach ($listGetCategory as $key => $value) {
+        $stok_packing = 0;
+        if ($value['qty_stock'] > 0 and $value['konversi'] > 0) {
+            $stok_packing = $value['qty_stock'] / $value['konversi'];
+        }
+        $ArrGetCategory[$value['id_material']]['stok']     = $value['qty_stock'];
+        $ArrGetCategory[$value['id_material']]['stok_packing']     = $stok_packing;
+        $ArrGetCategory[$value['id_material']]['konversi']     = $value['konversi'];
+    }
+    return $ArrGetCategory;
+}
+
+function whiteCenterBold()
+{
+    $styleArray = array(
+        'alignment' => array(
+            'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER
+        ),
+        'font' => array(
+            'bold' => true,
+        ),
+        'borders' => array(
+            'allborders' => array(
+                'style' => PHPExcel_Style_Border::BORDER_THIN,
+                'color' => array('rgb' => '000000')
+            )
+        )
+    );
+    return $styleArray;
+}
+
+function whiteRightBold()
+{
+    $styleArray = array(
+        'alignment' => array(
+            'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT
+        ),
+        'font' => array(
+            'bold' => true,
+        ),
+        'borders' => array(
+            'allborders' => array(
+                'style' => PHPExcel_Style_Border::BORDER_THIN,
+                'color' => array('rgb' => '000000')
+            )
+        )
+    );
+    return $styleArray;
+}
+
+function whiteCenter()
+{
+    $styleArray = array(
+        'alignment' => array(
+            'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER
+        ),
+        'borders' => array(
+            'allborders' => array(
+                'style' => PHPExcel_Style_Border::BORDER_THIN,
+                'color' => array('rgb' => '000000')
+            )
+        )
+    );
+    return $styleArray;
+}
+
+function mainTitle()
+{
+    $styleArray = array(
+        'fill' => array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'color' => array('rgb' => 'e0e0e0'),
+        ),
+        'font' => array(
+            'bold' => true,
+        ),
+        'alignment' => array(
+            'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+            'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+        )
+    );
+    return $styleArray;
+}
+
+function tableHeader()
+{
+    $styleArray = array(
+        'borders' => array(
+            'allborders' => array(
+                'style' => PHPExcel_Style_Border::BORDER_THIN,
+                'color' => array('rgb' => '000000')
+            )
+        ),
+        'fill' => array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'color' => array('rgb' => 'e0e0e0'),
+        ),
+        'font' => array(
+            'bold' => true,
+        ),
+        'alignment' => array(
+            'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+            'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+        )
+    );
+    return $styleArray;
+}
+
+function tableBodyCenter()
+{
+    $styleArray = array(
+        'alignment' => array(
+            'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER
+        ),
+        'borders' => array(
+            'allborders' => array(
+                'style' => PHPExcel_Style_Border::BORDER_THIN,
+                'color' => array('rgb' => '000000')
+            )
+        )
+    );
+    return $styleArray;
+}
+
+function tableBodyLeft()
+{
+    $styleArray = array(
+        'alignment' => array(
+            'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT
+        ),
+        'borders' => array(
+            'allborders' => array(
+                'style' => PHPExcel_Style_Border::BORDER_THIN,
+                'color' => array('rgb' => '000000')
+            )
+        )
+    );
+    return $styleArray;
+}
+
+function tableBodyRight()
+{
+    $styleArray = array(
+        'alignment' => array(
+            'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT
+        ),
+        'borders' => array(
+            'allborders' => array(
+                'style' => PHPExcel_Style_Border::BORDER_THIN,
+                'color' => array('rgb' => '000000')
+            )
+        )
+    );
+    return $styleArray;
+}
+
+function move_warehouse_stok_adjustment($ArrUpdateStock = null, $id_gudang_dari = null, $id_gudang_ke = null, $kode_trans = null, $keterangan = null)
+{
+    $CI     = &get_instance();
+    $dateTime        = date('Y-m-d H:i:s');
+    $UserName         = $CI->auth->user_id();
+
+    $kd_gudang_ke         = strtoupper(get_name('warehouse', 'nm_gudang', 'id', $id_gudang_ke));
+    $kd_gudang_dari     = 'adjustment ' . $keterangan;
+
+    if ($id_gudang_dari != null) {
+        $kd_gudang_dari    = strtoupper(get_name('warehouse', 'nm_gudang', 'id', $id_gudang_dari));
+    }
+    //grouping sum
+    $temp = [];
+    foreach ($ArrUpdateStock as $value) {
+        if (!array_key_exists($value['id'], $temp)) {
+            $temp[$value['id']] = 0;
+        }
+        $temp[$value['id']] += $value['qty'];
+    }
+
+    $ArrStock = array();
+    $ArrHist = array();
+    $ArrStockInsert = array();
+    $ArrHistInsert = array();
+
+    $ArrStock2 = array();
+    $ArrHist2 = array();
+    $ArrStockInsert2 = array();
+    $ArrHistInsert2 = array();
+
+    foreach ($temp as $key => $value) {
+        //PENGURANGAN GUDANG
+        if ($id_gudang_dari != null) {
+            $rest_pusat = $CI->db->get_where('warehouse_stock', array('id_gudang' => $id_gudang_dari, 'id_material' => $key))->result();
+
+            if (!empty($rest_pusat)) {
+                $ArrStock[$key]['id']             = $rest_pusat[0]->id;
+                $ArrStock[$key]['qty_stock']     = $rest_pusat[0]->qty_stock - $value;
+                $ArrStock[$key]['update_by']     = $UserName;
+                $ArrStock[$key]['update_date']     = $dateTime;
+
+                $ArrHist[$key]['id_material']     = $key;
+                $ArrHist[$key]['nm_material']     = $rest_pusat[0]->nm_material;
+                $ArrHist[$key]['id_gudang']         = $id_gudang_dari;
+                $ArrHist[$key]['kd_gudang']         = $kd_gudang_dari;
+                $ArrHist[$key]['id_gudang_dari']     = $id_gudang_dari;
+                $ArrHist[$key]['kd_gudang_dari']     = $kd_gudang_dari;
+                $ArrHist[$key]['id_gudang_ke']         = $id_gudang_ke;
+                $ArrHist[$key]['kd_gudang_ke']         = $kd_gudang_ke;
+                $ArrHist[$key]['qty_stock_awal']     = $rest_pusat[0]->qty_stock;
+                $ArrHist[$key]['qty_stock_akhir']     = $rest_pusat[0]->qty_stock - $value;
+                $ArrHist[$key]['qty_booking_awal']     = $rest_pusat[0]->qty_booking;
+                $ArrHist[$key]['qty_booking_akhir'] = $rest_pusat[0]->qty_booking;
+                $ArrHist[$key]['qty_rusak_awal']     = $rest_pusat[0]->qty_rusak;
+                $ArrHist[$key]['qty_rusak_akhir']     = $rest_pusat[0]->qty_rusak;
+                $ArrHist[$key]['no_ipp']             = $kode_trans;
+                $ArrHist[$key]['jumlah_mat']         = $value;
+                $ArrHist[$key]['ket']                 = 'pengurangan gudang ' . $keterangan;
+                $ArrHist[$key]['update_by']         = $UserName;
+                $ArrHist[$key]['update_date']         = $dateTime;
+            } else {
+                $restMat    = $CI->db->select('stock_name AS nama')->get_where('accessories', array('id' => $key))->result();
+
+                $ArrStockInsert[$key]['id_material']     = $key;
+                $ArrStockInsert[$key]['nm_material']     = $restMat[0]->nama;
+                $ArrStockInsert[$key]['id_gudang']         = $id_gudang_dari;
+                $ArrStockInsert[$key]['kd_gudang']         = $kd_gudang_dari;
+                $ArrStockInsert[$key]['qty_stock']         = 0 - $value;
+                $ArrStockInsert[$key]['update_by']         = $UserName;
+                $ArrStockInsert[$key]['update_date']     = $dateTime;
+
+                $ArrHistInsert[$key]['id_material']     = $key;
+                $ArrHistInsert[$key]['nm_material']     = $restMat[0]->nama;
+                $ArrHistInsert[$key]['id_gudang']         = $id_gudang_dari;
+                $ArrHistInsert[$key]['kd_gudang']         = $kd_gudang_dari;
+                $ArrHistInsert[$key]['id_gudang_dari']     = $id_gudang_dari;
+                $ArrHistInsert[$key]['kd_gudang_dari']     = $kd_gudang_dari;
+                $ArrHistInsert[$key]['id_gudang_ke']     = $id_gudang_ke;
+                $ArrHistInsert[$key]['kd_gudang_ke']     = $kd_gudang_ke;
+                $ArrHistInsert[$key]['qty_stock_awal']         = 0;
+                $ArrHistInsert[$key]['qty_stock_akhir']     = 0 - $value;
+                $ArrHistInsert[$key]['qty_booking_awal']    = 0;
+                $ArrHistInsert[$key]['qty_booking_akhir']   = 0;
+                $ArrHistInsert[$key]['qty_rusak_awal']         = 0;
+                $ArrHistInsert[$key]['qty_rusak_akhir']     = 0;
+                $ArrHistInsert[$key]['no_ipp']             = $kode_trans;
+                $ArrHistInsert[$key]['jumlah_mat']         = $value;
+                $ArrHistInsert[$key]['ket']             = 'pengurangan gudang (insert new) ' . $keterangan;
+                $ArrHistInsert[$key]['update_by']         = $UserName;
+                $ArrHistInsert[$key]['update_date']     = $dateTime;
+            }
+        }
+
+        //PENAMBAHAN GUDANG
+        if ($id_gudang_ke != null) {
+            $rest_pusat = $CI->db->get_where('warehouse_stock', array('id_gudang' => $id_gudang_ke, 'id_material' => $key))->result();
+
+            if (!empty($rest_pusat)) {
+                $ArrStock2[$key]['id']             = $rest_pusat[0]->id;
+                if ($keterangan == 'minus') {
+                    $ArrStock2[$key]['qty_stock']     = $rest_pusat[0]->qty_stock - $value;
+                } else {
+                    $ArrStock2[$key]['qty_stock']     = $rest_pusat[0]->qty_stock + $value;
+                }
+                $ArrStock2[$key]['update_by']     =  $UserName;
+                $ArrStock2[$key]['update_date']     = $dateTime;
+
+                $ArrHist2[$key]['id_material']         = $key;
+                $ArrHist2[$key]['nm_material']         = $rest_pusat[0]->nm_material;
+                $ArrHist2[$key]['id_gudang']         = $id_gudang_ke;
+                $ArrHist2[$key]['kd_gudang']         = $kd_gudang_ke;
+                $ArrHist2[$key]['id_gudang_dari']     = $id_gudang_dari;
+                $ArrHist2[$key]['kd_gudang_dari']     = $kd_gudang_dari;
+                $ArrHist2[$key]['id_gudang_ke']     = $id_gudang_ke;
+                $ArrHist2[$key]['kd_gudang_ke']     = $kd_gudang_ke;
+                $ArrHist2[$key]['qty_stock_awal']     = $rest_pusat[0]->qty_stock;
+                if ($keterangan == 'minus') {
+                    $ArrHist2[$key]['qty_stock_akhir']     = $rest_pusat[0]->qty_stock - $value;
+                } else {
+                    $ArrHist2[$key]['qty_stock_akhir']     = $rest_pusat[0]->qty_stock + $value;
+                }
+
+                $ArrHist2[$key]['qty_booking_awal'] = $rest_pusat[0]->qty_booking;
+                $ArrHist2[$key]['qty_booking_akhir'] = $rest_pusat[0]->qty_booking;
+                $ArrHist2[$key]['qty_rusak_awal']     = $rest_pusat[0]->qty_rusak;
+                $ArrHist2[$key]['qty_rusak_akhir']     = $rest_pusat[0]->qty_rusak;
+                $ArrHist2[$key]['no_ipp']             = $kode_trans;
+                $ArrHist2[$key]['jumlah_mat']         = $value;
+                if ($keterangan == 'minus') {
+                    $ArrHist2[$key]['ket']                 = 'pengurangan gudang ' . $keterangan;
+                } else {
+                    $ArrHist2[$key]['ket']                 = 'penambahan gudang ' . $keterangan;
+                }
+
+                $ArrHist2[$key]['update_by']         = $UserName;
+                $ArrHist2[$key]['update_date']         = $dateTime;
+            } else {
+                $restMat    = $CI->db->select('stock_name AS nama')->get_where('accessories', array('id' => $key))->result();
+
+                $ArrStockInsert2[$key]['id_material']     = $key;
+                $ArrStockInsert2[$key]['nm_material']     = $restMat[0]->nama;
+                $ArrStockInsert2[$key]['id_gudang']     = $id_gudang_ke;
+                $ArrStockInsert2[$key]['kd_gudang']     = $kd_gudang_ke;
+                if ($keterangan == 'minus') {
+                    $ArrStockInsert2[$key]['qty_stock']     = $value * -1;
+                } else {
+                    $ArrStockInsert2[$key]['qty_stock']     = $value;
+                }
+
+                $ArrStockInsert2[$key]['update_by']     = $UserName;
+                $ArrStockInsert2[$key]['update_date']     = $dateTime;
+
+                $ArrHistInsert2[$key]['id_material']     = $key;
+                $ArrHistInsert2[$key]['nm_material']     = $restMat[0]->nama;
+                $ArrHistInsert2[$key]['id_gudang']         = $id_gudang_ke;
+                $ArrHistInsert2[$key]['kd_gudang']         = $kd_gudang_ke;
+                $ArrHistInsert2[$key]['id_gudang_dari'] = $id_gudang_dari;
+                $ArrHistInsert2[$key]['kd_gudang_dari'] = $kd_gudang_dari;
+                $ArrHistInsert2[$key]['id_gudang_ke']     = $id_gudang_ke;
+                $ArrHistInsert2[$key]['kd_gudang_ke']     = $kd_gudang_ke;
+                $ArrHistInsert2[$key]['qty_stock_awal']     = 0;
+                if ($keterangan == 'minus') {
+                    $ArrHistInsert2[$key]['qty_stock_akhir']     = $value * -1;
+                } else {
+                    $ArrHistInsert2[$key]['qty_stock_akhir']     = $value;
+                }
+
+                $ArrHistInsert2[$key]['qty_booking_awal']     = 0;
+                $ArrHistInsert2[$key]['qty_booking_akhir']  = 0;
+                $ArrHistInsert2[$key]['qty_rusak_awal']     = 0;
+                $ArrHistInsert2[$key]['qty_rusak_akhir']     = 0;
+                $ArrHistInsert2[$key]['no_ipp']             = $kode_trans;
+                $ArrHistInsert2[$key]['jumlah_mat']         = $value;
+                if ($keterangan == 'minus') {
+                    $ArrHistInsert2[$key]['ket']                 = 'pengurangan gudang (insert new) ' . $keterangan;
+                } else {
+                    $ArrHistInsert2[$key]['ket']                 = 'penambahan gudang (insert new) ' . $keterangan;
+                }
+
+                $ArrHistInsert2[$key]['update_by']             = $UserName;
+                $ArrHistInsert2[$key]['update_date']         = $dateTime;
+            }
+        }
+    }
+
+    // print_r($ArrStock);
+    // print_r($ArrHist);
+    // print_r($ArrStockInsert);
+    // print_r($ArrHistInsert);
+    // print_r($ArrStock2);
+    // print_r($ArrHist2);
+    // print_r($ArrStockInsert2);
+    // print_r($ArrHistInsert2);
+    // exit;
+
+    if (!empty($ArrStock)) {
+        $CI->db->update_batch('warehouse_stock', $ArrStock, 'id');
+    }
+    if (!empty($ArrHist)) {
+        $CI->db->insert_batch('warehouse_history', $ArrHist);
+    }
+
+    if (!empty($ArrStockInsert)) {
+        $CI->db->insert_batch('warehouse_stock', $ArrStockInsert);
+    }
+    if (!empty($ArrHistInsert)) {
+        $CI->db->insert_batch('warehouse_history', $ArrHistInsert);
+    }
+
+    if (!empty($ArrStock2)) {
+        $CI->db->update_batch('warehouse_stock', $ArrStock2, 'id');
+    }
+    if (!empty($ArrHist2)) {
+        $CI->db->insert_batch('warehouse_history', $ArrHist2);
+    }
+
+    if (!empty($ArrStockInsert2)) {
+        $CI->db->insert_batch('warehouse_stock', $ArrStockInsert2);
+    }
+    if (!empty($ArrHistInsert2)) {
+        $CI->db->insert_batch('warehouse_history', $ArrHistInsert2);
+    }
+}
