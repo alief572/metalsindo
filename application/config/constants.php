@@ -86,4 +86,4 @@ defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest auto
 
 
 define('DBACC', 'gl_metalsindo');
-define('DBERP', 'metalsindo_live');
+define('DBERP', 'metalsindo_db');

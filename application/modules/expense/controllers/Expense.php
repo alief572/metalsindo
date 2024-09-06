@@ -27,6 +27,7 @@ class Expense extends Admin_Controller
 		$this->template->page_icon('fa fa-cubes');
 		date_default_timezone_set('Asia/Bangkok');
 		$this->status = array("0" => "Baru", "1" => "Disetujui", "2" => "Disetujui Management", "3" => "Selesai", "9" => "Ditolak");
+		$this->load->library('upload');
 	}
 
 	// list kasbon
@@ -54,28 +55,10 @@ class Expense extends Admin_Controller
 	// kasbon create
 	public function kasbon_create()
 	{
-		// $this->db->select('a.no_pr AS no_pr');
-		// $this->db->from('material_planning_base_on_produksi a');
-		// $this->db->where('a.metode_pembelian', '2');
-		// $this->db->where('(SELECT COUNT(aa.id) AS count_er FROM material_planning_base_on_produksi_detail aa WHERE aa.so_number = a.so_number AND aa.kasbon_created IS NULL) > 0');
-		// $get_pr_stok_material = $this->db->get();
-
-		// $this->db->select('b.no_pr AS no_pr');
-		// $this->db->from('rutin_non_planning_header b');
-		// $this->db->where('b.metode_pembelian', '2');
-		// $this->db->where('(SELECT COUNT(bb.id) FROM rutin_non_planning_detail bb WHERE bb.no_pr = b.no_pr AND bb.kasbon_created IS NULL) > 0');
-		// $get_pr_departemen = $this->db->get();
-
-		// $union_query = $this->db->query($get_pr_stok_material->_compile_union_all($get_pr_departemen));
-		// $list_pr_non_po = $union_query->result_array();
-
-		// $this->template->set('list_pr_non_po', $list_pr_non_po);
 		$list_pr_non_po = [];
 		$this->db->select('b.no_pr')
 			->from('material_planning_base_on_produksi_detail a')
 			->join('material_planning_base_on_produksi b', 'b.so_number = a.so_number')
-			->join('new_inventory_4 c', 'c.code_lv4 = a.id_material', 'left')
-			->join('ms_satuan d', 'd.id = c.id_unit', 'left')
 			->join('accessories e', 'e.id = a.id_material', 'left')
 			->join('ms_satuan f', 'f.id = e.id_unit', 'left')
 			->where('b.metode_pembelian', '2')

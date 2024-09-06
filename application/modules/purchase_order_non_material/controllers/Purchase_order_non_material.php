@@ -69,7 +69,8 @@ class Purchase_order_non_material extends Admin_Controller
 			$incoming_no = [];
 			$this->db->select('a.kode_trans');
 			$this->db->from('warehouse_adjustment a');
-			$this->db->like('a.no_ipp', $item->no_po, 'both');
+			$this->db->where('a.no_ipp', $item->no_po);
+			$this->db->or_where('a.no_ipp', $item->no_surat);
 			$get_no_incoming_warehouse = $this->db->get()->result();
 
 			if (!empty($get_no_incoming_warehouse)) {

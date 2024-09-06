@@ -497,4 +497,24 @@ class All_model extends BF_Model
 		}
 		return $combos;
 	}
+
+	function GetWarehouseStok($key = '')
+	{
+		$aCombo		= array();
+		$this->db->select('a.id, UPPER(a.nm_gudang) AS nm_dept');
+		$this->db->from('warehouse a');
+		$this->db->where('a.desc', 'stok');
+		if ($key != '') $this->db->where('a.id', $key);
+		//		$this->db->where('a.company_id','COM003');
+		$this->db->order_by('a.urut', 'asc');
+		$query = $this->db->get();
+		$results	= $query->result_array();
+		if ($key == '') $aCombo[]	= '';
+		if ($results) {
+			foreach ($results as $key => $vals) {
+				$aCombo[$vals['id']]	= $vals['nm_dept'];
+			}
+		}
+		return $aCombo;
+	}
 }

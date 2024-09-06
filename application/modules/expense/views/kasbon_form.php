@@ -3,26 +3,28 @@ $dept = '';
 $bank_id = '';
 $accnumber = '';
 $accname = '';
-if (!isset($data->departement)) {
-	$datauser = $this->db->get_where('users', ['id_user' => $this->auth->user_id()])->row();
-	$datadept = $this->db->get_where('employee', ['id' => $datauser->employee_id])->row();
-	if (!empty($datadept)) {
-		$dept = $datauser->department_id;
-		$bank_id = $datadept->bank_id;
-		$accnumber = $datadept->accnumber;
-		$accname = $datadept->accname;
-	}
-}
+// if (!isset($data->departement)) {
+// 	$datauser = $this->db->get_where('users', ['id_user' => $this->auth->user_id()])->row();
+// 	$datadept = $this->db->get_where('employee', ['id' => $datauser->employee_id])->row();
+// 	if (!empty($datadept)) {
+// 		$dept = $datauser->department_id;
+// 		$bank_id = $datadept->bank_id;
+// 		$accnumber = $datadept->accnumber;
+// 		$accname = $datadept->accname;
+// 	}
+// }
 
 $data_user = $this->db->get_where('users', ['id_user' => $this->auth->user_id()])->row();
 
 $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : '';
 
+$department_id = (isset($data_user->department_id)) ? $data_user->department_id : '';  
+
 ?>
 
 <form action="" id="frm_data" class="form-horizontal" enctype="multipart/form-data">
 	<input type="hidden" id="id" name="id" value="<?php echo set_value('id', isset($data->id) ? $data->id : ''); ?>">
-	<input type="hidden" id="departement" name="departement" value="<?php echo ($data_user->department_id) ?>">
+	<input type="hidden" id="departement" name="departement" value="<?php echo $department_id ?>">
 	<input type="hidden" id="nama" name="nama" value="<?php echo (isset($data->nama) ? $data->nama : $this->auth->user_name()); ?>">
 	<input type="hidden" name="" class="stsview" value="<?= (isset($stsview)) ? $stsview : null ?>">
 
@@ -260,6 +262,7 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : '';
 
 <script src="<?= base_url('assets/js/number-divider.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/autoNumeric.js') ?>"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
 <script type="text/javascript">
 	var url_save = siteurl + 'expense/kasbon_save/';
 	var url_approve = siteurl + 'expense/kasbon_approve/';
@@ -402,40 +405,40 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : '';
 		const no_pr = $(this).val();
 
 		// if (e.keyCode == '13') {
-			
+
 		// } else {
 		// 	$('#search_pr_non_po').val(no_pr);
 		// }
 
 		$.ajax({
-				type: "POST",
-				url: siteurl + active_controller + 'get_pr_non_po',
-				data: {
-					'no_pr': no_pr
-				},
-				cache: false,
-				dataType: 'json',
-				success: function(result) {
-					if (result.sts == '1') {
-						$('.list_barang_pr').html(result.hasil);
-						$('#tipe_pr').val(result.tipe_pr);
-						$('.autonum').autoNumeric();
-					} else {
-						swal({
-							title: 'Error !',
-							text: result.pesan,
-							type: 'error'
-						});
-					}
-				},
-				error: function(result) {
+			type: "POST",
+			url: siteurl + active_controller + 'get_pr_non_po',
+			data: {
+				'no_pr': no_pr
+			},
+			cache: false,
+			dataType: 'json',
+			success: function(result) {
+				if (result.sts == '1') {
+					$('.list_barang_pr').html(result.hasil);
+					$('#tipe_pr').val(result.tipe_pr);
+					$('.autonum').autoNumeric();
+				} else {
 					swal({
 						title: 'Error !',
-						text: 'Error occured, please try again later !',
+						text: result.pesan,
 						type: 'error'
 					});
 				}
-			});
+			},
+			error: function(result) {
+				swal({
+					title: 'Error !',
+					text: 'Error occured, please try again later !',
+					type: 'error'
+				});
+			}
+		});
 	});
 
 	$(document).on('click', '.del_detail', function() {
