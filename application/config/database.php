@@ -96,6 +96,28 @@ $db['default'] = array(
     'save_queries' => true,
 );
 
+$db['accounting'] = array(
+    'dsn'    => '',
+    'hostname' => '203.160.58.170',
+    'username' => 'root',
+    'password' => 'sentral2022**',
+    'database' => 'gl_metalsindo_demo',
+    'dbdriver' => 'mysqli',
+    'dbprefix' => '',
+    'pconnect' => FALSE,
+    'db_debug' => (ENVIRONMENT !== 'development'),
+    'cache_on' => FALSE,
+    'cachedir' => '',
+    'char_set' => 'utf8mb4',
+    'dbcollat' => 'utf8mb4_general_ci',
+    'swap_pre' => '',
+    'encrypt' => FALSE,
+    'compress' => FALSE,
+    'stricton' => FALSE,
+    'failover' => array(),
+    'save_queries' => TRUE
+);
+
 $db['cms'] = array(
     'dsn' => '',
     'hostname' => 'localhost',
