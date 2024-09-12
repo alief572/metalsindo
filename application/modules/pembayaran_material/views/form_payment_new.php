@@ -165,13 +165,18 @@ foreach ($results['result_payment'] as $item) {
 						$get_rec_invoice = $this->db->get_where('tr_invoice_po', ['id' => $item->no_doc])->row();
 						// print_r($item->no_doc);
 						// exit;
-						if($get_rec_invoice->kurs < 1) {
-							$kurs_invoice = 1;
-						} else {
-							$kurs_invoice = $get_rec_invoice->kurs;
+						$kurs_invoice = 1;
+
+						if(!empty($get_rec_invoice)) {
+							if($get_rec_invoice->kurs > 0) {
+								$kurs_invoice = $get_rec_invoice->kurs;
+							}
 						}
 						
-						$ppn = $get_rec_invoice->nilai_ppn;
+						$ppn = 0;
+						if(!empty($get_rec_invoice)) {
+							$ppn = $get_rec_invoice->nilai_ppn;
+						}
 
 						$nilai_utuh = 0;
 						$persen_progress = 1;
