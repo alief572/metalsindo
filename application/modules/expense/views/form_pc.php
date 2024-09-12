@@ -8,18 +8,18 @@ $app = '';
 $bank_id = '';
 $accnumber = '';
 $accname = '';
-if (!isset($data->departement)) {
-	$data_user = $this->db->get_where('users', ['username' => $this->auth->user_name()])->row();
-	$data_employee = $this->db->get_where('employee', ['id' => $data_user->employee_id])->row();
-	if (!empty($data_employee)) {
-		$dept = $data_employee->department_id;
-		$bank_id = $data_employee->bank_id;
-		$accnumber = $data_employee->accnumber;
-		$accname = $data_employee->accname;
-		//$data_head = $this->db->get_where('divisions_head', ['id' => $data_employee->division_head])->row();
-		//$app=$data_head->employee_id;
-	}
-}
+// if (!isset($data->departement)) {
+// 	$data_user = $this->db->get_where('users', ['username' => $this->auth->user_name()])->row();
+// 	$data_employee = $this->db->get_where('employee', ['id' => $data_user->employee_id])->row();
+// 	if (!empty($data_employee)) {
+// 		$dept = $data_employee->department_id;
+// 		$bank_id = $data_employee->bank_id;
+// 		$accnumber = $data_employee->accnumber;
+// 		$accname = $data_employee->accname;
+// 		//$data_head = $this->db->get_where('divisions_head', ['id' => $data_employee->division_head])->row();
+// 		//$app=$data_head->employee_id;
+// 	}
+// }
 $budgets = 0;
 ?>
 <?= form_open($this->uri->uri_string(), array('id' => 'frm_data', 'name' => 'frm_data', 'role' => 'form', 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data')); ?>
