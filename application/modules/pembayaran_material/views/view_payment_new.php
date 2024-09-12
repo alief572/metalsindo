@@ -25,7 +25,7 @@ foreach ($results['result_payment'] as $item) {
 			$arr_no_po = implode(',', $arr_no_po);
 			$arr_no_po = str_replace(', ', ',', $arr_no_po);
 
-			$get_no_surat = $this->db->query("SELECT a.no_surat FROM tr_purchase_order a WHERE a.no_po IN ('" . str_replace(",", "','", $arr_no_po) . "')")->result();
+			$get_no_surat = $this->db->query("SELECT a.no_surat FROM tr_purchase_order_non_material a WHERE a.no_po IN ('" . str_replace(",", "','", $arr_no_po) . "')")->result();
 			foreach ($get_no_surat as $item_no_surat) {
 				$no_po[] = $item_no_surat->no_surat;
 			}
@@ -36,16 +36,16 @@ foreach ($results['result_payment'] as $item) {
 
 	if (!empty($no_po)) {
 		$get_nm_supplier = $this->db
-			->select('b.kode_supplier, b.nama')
-			->from('tr_purchase_order a')
-			->join('new_supplier b', 'b.kode_supplier = a.id_suplier', 'left')
+			->select('b.id_suplier, b.name_suplier')
+			->from('tr_purchase_order_non_material a')
+			->join('master_supplier b', 'b.id_suplier = a.id_suplier', 'left')
 			->where_in('a.no_surat', $no_po)
-			->group_by('b.kode_supplier')
+			->group_by('b.id_suplier')
 			->get()
 			->result();
 		foreach ($get_nm_supplier as $item_supplier) {
-			$kode_supplier[$item_supplier->kode_supplier] = $item_supplier->kode_supplier;
-			$nm_supplier[] = $item_supplier->nama;
+			$kode_supplier[$item_supplier->id_suplier] = $item_supplier->id_suplier;
+			$nm_supplier[] = $item_supplier->name_suplier;
 		}
 	}
 }
@@ -76,8 +76,8 @@ foreach ($results['result_payment'] as $item) {
 							<option value="">- Supplier Name -</option>
 							<?php
 							foreach ($results['list_supplier'] as $item_supplier) {
-								$selected = (isset($kode_supplier[$item_supplier->kode_supplier])) ? 'selected' : '';
-								echo '<option value="' . $item_supplier->kode_supplier . '" ' . $selected . '>' . $item_supplier->nama . '</option>';
+								$selected = (isset($kode_supplier[$item_supplier->id_suplier])) ? 'selected' : '';
+								echo '<option value="' . $item_supplier->id_suplier . '" ' . $selected . '>' . $item_supplier->name_suplier . '</option>';
 							}
 							?>
 						</select>
@@ -186,7 +186,7 @@ foreach ($results['result_payment'] as $item) {
 								$arr_no_po = implode(',', $arr_no_po);
 								$arr_no_po = str_replace(', ', ',', $arr_no_po);
 
-								$get_no_surat = $this->db->query("SELECT a.no_surat FROM tr_purchase_order a WHERE a.no_po IN ('" . str_replace(",", "','", $arr_no_po) . "')")->result();
+								$get_no_surat = $this->db->query("SELECT a.no_surat FROM tr_purchase_order_non_material a WHERE a.no_po IN ('" . str_replace(",", "','", $arr_no_po) . "')")->result();
 								foreach ($get_no_surat as $item_no_surat) {
 									$no_po[] = $item_no_surat->no_surat;
 								}
@@ -207,7 +207,7 @@ foreach ($results['result_payment'] as $item) {
 
 								$get_nilai_utuh = $this->db
 									->select('a.hargatotal')
-									->from('tr_purchase_order a')
+									->from('tr_purchase_order_non_material a')
 									->where('a.no_surat', $get_rec_invoice->no_po)
 									->get()
 									->result();
@@ -220,11 +220,11 @@ foreach ($results['result_payment'] as $item) {
 
 						if (!empty($no_po)) {
 							$get_nm_supplier = $this->db
-								->select('b.nama as nm_supplier')
-								->from('tr_purchase_order a')
-								->join('new_supplier b', 'b.kode_supplier = a.id_suplier', 'left')
+								->select('b.name_suplier as nm_supplier')
+								->from('tr_purchase_order_non_material a')
+								->join('master_supplier b', 'b.id_suplier = a.id_suplier', 'left')
 								->where_in('a.no_surat', $no_po)
-								->group_by('b.nama')
+								->group_by('b.name_suplier')
 								->get()
 								->result();
 							foreach ($get_nm_supplier as $item_supplier) {
