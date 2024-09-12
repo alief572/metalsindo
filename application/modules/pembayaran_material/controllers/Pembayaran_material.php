@@ -2228,10 +2228,7 @@ class Pembayaran_material extends Admin_Controller
 
 		}
 
-		echo json_encode([
-			'status' => $valid,
-			'pesan' => $pesan
-		]);
+		echo $valid;
 	}
 
 	public function used_choosed_payment() {

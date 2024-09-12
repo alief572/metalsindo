@@ -581,21 +581,18 @@ foreach ($results['result_payment'] as $item) {
 				function(isConfirm) {
 					if (isConfirm) {
 
-						var formData = new FormData($('#frm-data')[0]);
+						var formData = $('#frm-data').serialize();
 						var baseurl = siteurl + active_controller + '/save_payment';
 						$.ajax({
 							url: baseurl,
 							type: "POST",
 							data: formData,
 							cache: false,
-							dataType: 'JSON',
-							processData: false,
-							contentType: false,
-							success: function(data) {
-								if (data.status == 1) {
+							success: function(result) {
+								if (result == 1) {
 									swal({
 										title: "Save Success!",
-										text: data.pesan,
+										text: "Selamat, data telah berhasil dibayar!",
 										type: "success",
 										timer: 5000,
 										showCancelButton: false,
@@ -605,10 +602,10 @@ foreach ($results['result_payment'] as $item) {
 									window.location.href = base_url + active_controller + 'payment_list';
 								} else {
 
-									if (data.status == 2) {
+									if (result == 2) {
 										swal({
 											title: "Save Failed!",
-											text: data.pesan,
+											text: "Maaf, data gagal dibayar!",
 											type: "warning",
 											timer: 5000,
 											showCancelButton: false,
@@ -618,7 +615,7 @@ foreach ($results['result_payment'] as $item) {
 									} else {
 										swal({
 											title: "Save Failed!",
-											text: data.pesan,
+											text: "Maaf, data gagal dibayar!",
 											type: "warning",
 											timer: 5000,
 											showCancelButton: false,
