@@ -1494,3 +1494,1078 @@ function move_warehouse_stok_adjustment($ArrUpdateStock = null, $id_gudang_dari 
         $CI->db->insert_batch('warehouse_history', $ArrHistInsert2);
     }
 }
+
+function insert_jurnal_department($ArrData, $GudangFrom, $GudangTo, $kode_trans, $category, $ket_min, $ket_plus)
+{
+    $CI     = &get_instance();
+    $UserName        = $CI->auth->user_name();
+    $DateTime        = date('Y-m-d H:i:s');
+
+    $getHeaderAdjust = $CI->db->get_where('warehouse_adjustment', array('kode_trans' => $kode_trans))->result();
+    $DATE_JURNAL = (!empty($getHeaderAdjust[0]->tanggal)) ? $getHeaderAdjust[0]->tanggal : $getHeaderAdjust[0]->created_date;
+
+    $SUM_PRICE = 0;
+    $ArrDetail = [];
+    $ArrDetailNew = [];
+    foreach ($ArrData as $key => $value) {
+        $PRICE     = $value['unit_price'];
+        $QTY     = $value['qty'];
+        $TOTAL     = $PRICE * $QTY;
+        $SUM_PRICE += $TOTAL;
+
+        $ArrDetail[$key]['kode_trans']         = $kode_trans;
+        $ArrDetail[$key]['id_material']     = $value['id_barang'];
+        $ArrDetail[$key]['price_book']         = $PRICE;
+        $ArrDetail[$key]['berat']             = $QTY;
+        $ArrDetail[$key]['amount']             = $TOTAL;
+        $ArrDetail[$key]['updated_by']         = $UserName;
+        $ArrDetail[$key]['updated_date']     = $DateTime;
+
+        $ArrDetailNew[$key]['kode_trans']     = $kode_trans;
+        $ArrDetailNew[$key]['no_ipp']         = $value['no_po'];
+        $ArrDetailNew[$key]['category']     = $category;
+        $ArrDetailNew[$key]['gudang_dari']     = $GudangFrom;
+        $ArrDetailNew[$key]['gudang_ke']     = $GudangTo;
+        $ArrDetailNew[$key]['tanggal']         = date('Y-m-d', strtotime($DATE_JURNAL));
+        $ArrDetailNew[$key]['id_material']     = $value['id_barang'];
+        $ArrDetailNew[$key]['nm_material']     = $value['nm_barang'];
+        $ArrDetailNew[$key]['cost_book']     = $PRICE;
+        $ArrDetailNew[$key]['qty']             = $QTY;
+        $ArrDetailNew[$key]['total_nilai']     = $TOTAL;
+        $ArrDetailNew[$key]['created_by']     = $UserName;
+        $ArrDetailNew[$key]['created_date'] = $DateTime;
+    }
+
+    //DEBET
+    $ArrJurnal[0]['category'] = $category;
+    $ArrJurnal[0]['posisi'] = 'DEBIT';
+    $ArrJurnal[0]['amount'] = $SUM_PRICE;
+    $ArrJurnal[0]['gudang'] = $GudangTo;
+    $ArrJurnal[0]['keterangan'] = $ket_plus;
+    $ArrJurnal[0]['kode_trans'] = $kode_trans;
+    $ArrJurnal[0]['updated_by'] = $UserName;
+    $ArrJurnal[0]['updated_date'] = $DateTime;
+
+    //KREDIT
+    $ArrJurnal[1]['category'] = $category;
+    $ArrJurnal[1]['posisi'] = 'KREDIT';
+    $ArrJurnal[1]['amount'] = $SUM_PRICE;
+    $ArrJurnal[1]['gudang'] = $GudangFrom;
+    $ArrJurnal[1]['keterangan'] = $ket_min;
+    $ArrJurnal[1]['kode_trans'] = $kode_trans;
+    $ArrJurnal[1]['updated_by'] = $UserName;
+    $ArrJurnal[1]['updated_date'] = $DateTime;
+
+    $CI->db->insert_batch('jurnal_temp', $ArrJurnal);
+    $CI->db->insert_batch('jurnal_temp_detail', $ArrDetail);
+    $CI->db->insert_batch('jurnal', $ArrDetailNew);
+    // if ($category == 'incoming department') {
+    //     auto_jurnal_product($kode_trans, $category);
+    // }
+    // if ($category == 'incoming asset') {
+    //     auto_jurnal_product($kode_trans, $category);
+    // }
+}
+
+// function auto_jurnal_product($ArrDetailProduct, $ket)
+// {
+//     $CI     = &get_instance();
+//     $CI->load->model('Jurnal_model');
+//     $CI->load->model('Acc_model');
+//     $data_session    = $CI->session->userdata;
+//     $UserName        = $data_session['ORI_User']['username'];
+//     $DateTime        = date('Y-m-d H:i:s');
+
+
+//     if ($ket == 'WIP - FINISH GOOD') {
+//         $kodejurnal = 'JV005';
+//         foreach ($ArrDetailProduct as $keys => $values) {
+//             $id = $values['id_detail'];
+//             $datajurnal = $CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join product_parent b on a.product=b.product_parent WHERE a.category='quality control' and a.status_jurnal='0' and a.id_detail ='$id' limit 1")->row();
+//             $id = $datajurnal->id;
+//             $tgl_voucher = $datajurnal->tanggal;
+//             $no_request = $id;
+
+//             //$datasodetailheader = $CI->db->query("SELECT * FROM so_detail_header WHERE id ='".$datajurnal->id_milik."' limit 1" )->row();
+//             $datasodetailheader = $CI->db->query("SELECT * FROM laporan_per_hari_action WHERE id_milik ='" . $datajurnal->id_milik . "' limit 1")->row();
+
+//             // print_r($datajurnal->id_milik);
+//             // exit;
+
+
+//             $kurs = 1;
+//             $sqlkurs = "select * from ms_kurs where tanggal <='" . $datajurnal->tanggal . "' and mata_uang='USD' order by tanggal desc limit 1";
+//             $dtkurs    = $CI->db->query($sqlkurs)->row();
+//             if (!empty($dtkurs)) $kurs = $dtkurs->kurs;
+//             $data_pro_det = $CI->db->query("SELECT * FROM production_detail WHERE id='" . $datajurnal->id_detail . "' and id_milik ='" . $datajurnal->id_milik . "' limit 1")->row();
+//             $dataprodet = "";
+//             if (!empty($data_pro_det)) {
+//                 if ($data_pro_det->finish_good > 0) {
+//                     $dataprodet = $data_pro_det->id;
+//                     $wip_material = $data_pro_det->wip_material;
+//                     $pe_direct_labour = $data_pro_det->wip_dl;
+//                     $foh = $data_pro_det->wip_foh;
+//                     $pe_indirect_labour = $data_pro_det->wip_il;
+//                     $pe_consumable = $data_pro_det->wip_consumable;
+//                     $finish_good = $data_pro_det->finish_good;
+//                 }
+//             }
+//             if ($dataprodet == "") {
+//                 $wip_material = $datajurnal->total_nilai;
+//                 $pe_direct_labour = (($datasodetailheader->direct_labour * $datasodetailheader->man_hours) * $kurs);
+//                 $pe_indirect_labour = (($datasodetailheader->indirect_labour * $datasodetailheader->man_hours) * $kurs);
+//                 $foh = (($datasodetailheader->machine + $datasodetailheader->mould_mandrill + $datasodetailheader->foh_depresiasi + $datasodetailheader->biaya_rutin_bulanan + $datasodetailheader->foh_consumable) * $kurs);
+//                 $pe_consumable = ($datasodetailheader->consumable * $kurs);
+//                 $finish_good = ($wip_material + $pe_direct_labour + $foh + $pe_indirect_labour + $pe_consumable);
+
+//                 $CI->db->query("update production_detail set wip_kurs='" . $kurs . "', wip_material='" . $wip_material . "' , wip_dl='" . $pe_direct_labour . "' , wip_foh='" . $foh . "', wip_il='" . $pe_indirect_labour . "', wip_consumable='" . $pe_consumable . "', finish_good='" . $finish_good . "' WHERE id='" . $datajurnal->id_detail . "' and id_milik ='" . $datajurnal->id_milik . "' limit 1");
+//             }
+//             $masterjurnal    = $CI->Acc_model->GetTemplateJurnal($kodejurnal);
+//             $totaldebit = 0;
+//             $totalkredit = 0;
+//             $coa_cogm = '';
+//             $no_spk = $datajurnal->id_spk;
+//             $det_Jurnaltes = [];
+//             foreach ($masterjurnal as $record) {
+//                 $debit = 0;
+//                 $kredit = 0;
+//                 $nokir      = $record->no_perkiraan;
+//                 $posisi     = $record->posisi;
+//                 $parameter  = $record->parameter_no;
+//                 $keterangan = $record->keterangan;
+//                 if ($parameter == '1') {
+//                     $debit = ($wip_material);
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $nokir,
+//                         'keterangan'    => $keterangan . ' ' . $datajurnal->id_spk,
+//                         'no_reff'       => $id,
+//                         'debet'         => $debit,
+//                         'kredit'        => 0,
+//                         'jenis_jurnal'  => 'wip finishgood',
+//                         'no_request'    => $no_request,
+//                         'stspos'          => 1
+//                     );
+//                 }
+//                 if ($parameter == '2') {
+//                     $debit = ($pe_direct_labour);
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $nokir,
+//                         'keterangan'    => $keterangan . ' ' . $datajurnal->id_spk,
+//                         'no_reff'       => $id,
+//                         'debet'         => $debit,
+//                         'kredit'        => 0,
+//                         'jenis_jurnal'  => 'wip finishgood',
+//                         'no_request'    => $no_request,
+//                         'stspos'          => 1
+//                     );
+//                 }
+//                 if ($parameter == '3') {
+//                     $debit = ($pe_indirect_labour);
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $nokir,
+//                         'keterangan'    => $keterangan . ' ' . $datajurnal->id_spk,
+//                         'no_reff'       => $id,
+//                         'debet'         => $debit,
+//                         'kredit'        => 0,
+//                         'jenis_jurnal'  => 'wip finishgood',
+//                         'no_request'    => $no_request,
+//                         'stspos'          => 1
+//                     );
+//                 }
+//                 if ($parameter == '4') {
+//                     $debit = ($pe_consumable);
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $nokir,
+//                         'keterangan'    => $keterangan . ' ' . $datajurnal->id_spk,
+//                         'no_reff'       => $id,
+//                         'debet'         => $debit,
+//                         'kredit'        => 0,
+//                         'jenis_jurnal'  => 'wip finishgood',
+//                         'no_request'    => $no_request,
+//                         'stspos'          => 1
+//                     );
+//                 }
+//                 if ($parameter == '5') {
+//                     $debit = ($foh);
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $nokir,
+//                         'keterangan'    => $keterangan . ' ' . $datajurnal->id_spk,
+//                         'no_reff'       => $id,
+//                         'debet'         => ($debit),
+//                         'kredit'        => 0,
+//                         'jenis_jurnal'  => 'wip finishgood',
+//                         'no_request'    => $no_request,
+//                         'stspos'          => 1
+//                     );
+//                 }
+//                 if ($parameter == '6') {
+//                     $kredit = ($wip_material);
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $datajurnal->coa,
+//                         'keterangan'    => $keterangan . ' ' . $datajurnal->id_spk,
+//                         'no_reff'       => $id,
+//                         'debet'         => 0,
+//                         'kredit'        => $kredit,
+//                         'jenis_jurnal'  => 'wip finishgood',
+//                         'no_request'    => $no_request,
+//                         'stspos'          => 1
+//                     );
+//                 }
+//                 if ($parameter == '7') {
+//                     $kredit = ($pe_direct_labour);
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $datajurnal->coa,
+//                         'keterangan'    => $keterangan . ' ' . $datajurnal->id_spk,
+//                         'no_reff'       => $id,
+//                         'debet'         => 0,
+//                         'kredit'        => $kredit,
+//                         'jenis_jurnal'  => 'wip finishgood',
+//                         'no_request'    => $no_request,
+//                         'stspos'          => 1
+//                     );
+//                 }
+//                 if ($parameter == '8') {
+//                     $kredit = ($pe_indirect_labour);
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $datajurnal->coa,
+//                         'keterangan'    => $keterangan . ' ' . $datajurnal->id_spk,
+//                         'no_reff'       => $id,
+//                         'debet'         => 0,
+//                         'kredit'        => $kredit,
+//                         'jenis_jurnal'  => 'wip finishgood',
+//                         'no_request'    => $no_request,
+//                         'stspos'          => 1
+//                     );
+//                 }
+//                 if ($parameter == '9') {
+//                     $kredit = ($pe_consumable);
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $datajurnal->coa,
+//                         'keterangan'    => $keterangan . ' ' . $datajurnal->id_spk,
+//                         'no_reff'       => $id,
+//                         'debet'         => 0,
+//                         'kredit'        => $kredit,
+//                         'jenis_jurnal'  => 'wip finishgood',
+//                         'no_request'    => $no_request,
+//                         'stspos'          => 1
+//                     );
+//                 }
+//                 if ($parameter == '10') {
+//                     $kredit = ($foh);
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $datajurnal->coa,
+//                         'keterangan'    => $keterangan . ' ' . $datajurnal->id_spk,
+//                         'no_reff'       => $id,
+//                         'debet'         => 0,
+//                         'kredit'        => $kredit,
+//                         'jenis_jurnal'  => 'wip finishgood',
+//                         'no_request'    => $no_request,
+//                         'stspos'          => 1
+//                     );
+//                 }
+//                 if ($parameter == '11') {
+//                     $coa_cogm = $nokir;
+//                 }
+//                 $totaldebit += $debit;
+//                 $totalkredit += $kredit;
+//             }
+//             $Keterangan_INV = ($ket) . ' (' . $datajurnal->no_so . ' - ' . $datajurnal->product . ' - ' . $no_spk . ')';
+//             $nilaibayar = $datajurnal->total_nilai;
+//             $det_Jurnaltes[]  = array(
+//                 'nomor'         => '',
+//                 'tanggal'       => $tgl_voucher,
+//                 'tipe'          => 'JV',
+//                 'no_perkiraan'  => $coa_cogm,
+//                 'keterangan'    => $Keterangan_INV,
+//                 'no_reff'       => $id,
+//                 'debet'         => 0,
+//                 'kredit'        => $totalkredit,
+//                 'jenis_jurnal'  => 'wip finishgood',
+//                 'no_request'    => $no_request,
+//                 'stspos'        => 1
+//             );
+//             $det_Jurnaltes[]  = array(
+//                 'nomor'         => '',
+//                 'tanggal'       => $tgl_voucher,
+//                 'tipe'          => 'JV',
+//                 'no_perkiraan'  => $datajurnal->coa_fg,
+//                 'keterangan'    => $Keterangan_INV,
+//                 'no_reff'       => $id,
+//                 'debet'         => $totaldebit,
+//                 'kredit'        => 0,
+//                 'jenis_jurnal'  => 'wip finishgood',
+//                 'no_request'    => $no_request,
+//                 'stspos'        => 1
+//             );
+//             $CI->db->query("delete from jurnaltras WHERE jenis_jurnal='wip finishgood' and no_reff ='$id'");
+//             $CI->db->insert_batch('jurnaltras', $det_Jurnaltes);
+//             $Nomor_JV = $CI->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+//             $Bln    = substr($tgl_voucher, 5, 2);
+//             $Thn    = substr($tgl_voucher, 0, 4);
+//             $dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalkredit, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV . '-' . $id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+//             $CI->db->insert(DBACC . '.javh', $dataJVhead);
+//             $datadetail = array();
+//             foreach ($det_Jurnaltes as $vals) {
+//                 $datadetail = array(
+//                     'tipe'            => 'JV',
+//                     'nomor'            => $Nomor_JV,
+//                     'tanggal'        => $tgl_voucher,
+//                     'no_perkiraan'    => $vals['no_perkiraan'],
+//                     'keterangan'    => $vals['keterangan'],
+//                     'no_reff'        => $vals['no_reff'],
+//                     'debet'            => $vals['debet'],
+//                     'kredit'        => $vals['kredit'],
+//                 );
+//                 $CI->db->insert(DBACC . '.jurnal', $datadetail);
+//             }
+//             $CI->db->query("UPDATE jurnal_product SET status_jurnal='1',approval_by='" . $UserName . "',approval_date='" . $DateTime . "' WHERE id ='$id'");
+//             unset($det_Jurnaltes);
+//             unset($datadetail);
+//         }
+//     }
+//     if ($ket == 'FINISH GOOD - TRANSIT') {
+//         $kodejurnal = 'JV006';
+//         foreach ($ArrDetailProduct as $keys => $values) {
+//             $id = $values['id_detail'];
+//             $datajurnal = $CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join product_parent b on a.product=b.product_parent WHERE a.category='delivery' and a.status_jurnal='0' and a.id_detail ='$id' limit 1")->row();
+//             $id = $datajurnal->id;
+//             $tgl_voucher = $datajurnal->tanggal;
+//             $no_request = $id;
+
+//             $dataproductiondetail = $CI->db->query("select * from production_detail where id='" . $datajurnal->id_detail . "' and id_milik ='" . $datajurnal->id_milik . "' limit 1")->row();
+//             if ($dataproductiondetail->finish_good == 0) {
+//                 //$datasodetailheader = $CI->db->query("SELECT * FROM so_detail_header WHERE id ='".$datajurnal->id_milik."' limit 1" )->row();
+//                 $datasodetailheader = $CI->db->query("SELECT * FROM laporan_per_hari_action WHERE id_milik ='" . $datajurnal->id_milik . "' limit 1")->row();
+
+
+//                 $kurs = 1;
+//                 $sqlkurs = "select * from ms_kurs where tanggal <='" . $datajurnal->tanggal . "' and mata_uang='USD' order by tanggal desc limit 1";
+//                 $dtkurs    = $CI->db->query($sqlkurs)->row();
+//                 if (!empty($dtkurs)) $kurs = $dtkurs->kurs;
+//                 $wip_material = $datajurnal->total_nilai;
+//                 $pe_direct_labour = (($datasodetailheader->direct_labour * $datasodetailheader->man_hours) * $kurs);
+//                 $pe_indirect_labour = (($datasodetailheader->indirect_labour * $datasodetailheader->man_hours) * $kurs);
+//                 $foh = (($datasodetailheader->machine + $datasodetailheader->mould_mandrill + $datasodetailheader->foh_depresiasi + $datasodetailheader->biaya_rutin_bulanan + $datasodetailheader->foh_consumable) * $kurs);
+//                 $pe_consumable = ($datasodetailheader->consumable * $kurs);
+//                 $finish_good = ($wip_material + $pe_direct_labour + $foh + $pe_indirect_labour + $pe_consumable);
+
+//                 $CI->db->query("update production_detail set wip_kurs='" . $kurs . "', wip_material='" . $wip_material . "' , wip_dl='" . $pe_direct_labour . "' , wip_foh='" . $foh . "', wip_il='" . $pe_indirect_labour . "', wip_consumable='" . $pe_consumable . "', finish_good='" . $finish_good . "' WHERE id='" . $datajurnal->id_detail . "' and id_milik ='" . $datajurnal->id_milik . "' limit 1");
+
+//                 $totalall = $finish_good;
+//             } else {
+//                 $totalall = $dataproductiondetail->finish_good;
+//             }
+//             $no_spk = $datajurnal->id_spk;
+//             $Keterangan_INV = ($ket) . ' (' . $datajurnal->no_so . ' - ' . $datajurnal->product . ' - ' . $no_spk . ' - ' . $datajurnal->no_surat_jalan . ')';
+//             $datajurnal       = $CI->Acc_model->GetTemplateJurnal($kodejurnal);
+//             $det_Jurnaltes = [];
+//             foreach ($datajurnal as $record) {
+//                 $tabel  = $record->menu;
+//                 $posisi = $record->posisi;
+//                 $field  = $record->field;
+//                 $nokir  = $record->no_perkiraan;
+
+//                 $totalall2 = (!empty($totalall)) ? $totalall : 0;
+//                 $param  = 'id';
+//                 if ($posisi == 'D') {
+//                     $value_param  = $id;
+//                     $val = $CI->Acc_model->GetData($tabel, $field, $param, $value_param);
+//                     $nilaibayar = $val[0]->$field;
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $nokir,
+//                         'keterangan'    => $Keterangan_INV,
+//                         'no_reff'       => $no_request,
+//                         'debet'         => $totalall2,
+//                         'kredit'        => 0,
+//                         'jenis_jurnal'  => 'finish good intransit',
+//                         'no_request'    => $no_request,
+//                         'stspos'        => 1
+//                     );
+//                 } elseif ($posisi == 'K') {
+//                     $coa =     $CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join product_parent b on a.product=b.product_parent WHERE a.id ='$id'")->result();
+//                     $nokir = $coa[0]->coa_fg;
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $nokir,
+//                         'keterangan'    => $Keterangan_INV,
+//                         'no_reff'       => $no_request,
+//                         'debet'         => 0,
+//                         'kredit'        => $totalall2,
+//                         'jenis_jurnal'  => 'finish good intransit',
+//                         'no_request'    => $no_request,
+//                         'stspos'        => 1
+//                     );
+//                 }
+//             }
+//             $CI->db->query("delete from jurnaltras WHERE jenis_jurnal='finish good intransit' and no_reff ='$id'");
+//             $CI->db->insert_batch('jurnaltras', $det_Jurnaltes);
+//             $Nomor_JV = $CI->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+//             $Bln    = substr($tgl_voucher, 5, 2);
+//             $Thn    = substr($tgl_voucher, 0, 4);
+//             $dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalall2, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV . '-' . $id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+//             $CI->db->insert(DBACC . '.javh', $dataJVhead);
+//             $datadetail = array();
+//             foreach ($det_Jurnaltes as $vals) {
+//                 $datadetail = array(
+//                     'tipe'            => 'JV',
+//                     'nomor'            => $Nomor_JV,
+//                     'tanggal'        => $tgl_voucher,
+//                     'no_perkiraan'    => $vals['no_perkiraan'],
+//                     'keterangan'    => $vals['keterangan'],
+//                     'no_reff'        => $vals['no_reff'],
+//                     'debet'            => $vals['debet'],
+//                     'kredit'        => $vals['kredit'],
+//                 );
+//                 $CI->db->insert(DBACC . '.jurnal', $datadetail);
+//             }
+//             $CI->db->query("UPDATE jurnal_product SET status_jurnal='1',approval_by='" . $UserName . "',approval_date='" . $DateTime . "' WHERE id ='$id'");
+//             unset($det_Jurnaltes);
+//             unset($datadetail);
+//         }
+//     }
+//     if ($ket == 'TRANSIT - CUSTOMER') {
+//         $kodejurnal = 'JV007';
+//         foreach ($ArrDetailProduct as $keys => $values) {
+//             $id = $values['id_detail'];
+
+//             $datajurnal = $CI->db->query("SELECT a.*, b.coa,b.coa_fg FROM jurnal_product a join product_parent b on a.product=b.product_parent WHERE a.category='diterima customer' and a.status_jurnal='0' and a.id_detail ='$id' limit 1")->row();
+//             $id = (!empty($datajurnal->id)) ? $datajurnal->id : 0;
+//             $tgl_voucher = (!empty($datajurnal->tanggal)) ? $datajurnal->tanggal : date('Y-m-d');
+//             $no_request = $id;
+
+//             $id_detail = (!empty($datajurnal->id_detail)) ? $datajurnal->id_detail : 0;
+//             $id_milik = (!empty($datajurnal->id_milik)) ? $datajurnal->id_milik : 0;
+//             $total_nilai = (!empty($datajurnal->total_nilai)) ? $datajurnal->total_nilai : 0;
+//             $id_spk = (!empty($datajurnal->id_spk)) ? $datajurnal->id_spk : 0;
+//             $no_so = (!empty($datajurnal->no_so)) ? $datajurnal->no_so : 0;
+//             $product = (!empty($datajurnal->product)) ? $datajurnal->product : 0;
+//             $no_surat_jalan = (!empty($datajurnal->no_surat_jalan)) ? $datajurnal->no_surat_jalan : 0;
+
+//             $dataproductiondetail = $CI->db->query("select * from production_detail where id='" . $id_detail . "' and id_milik ='" . $id_milik . "' limit 1")->row();
+
+
+//             if (!empty($dataproductiondetail->finish_good)) {
+//                 if ($dataproductiondetail->finish_good == 0) {
+//                     $datasodetailheader = $CI->db->query("SELECT * FROM laporan_per_hari_action WHERE id_milik ='" . $datajurnal->id_milik . "' limit 1")->row();
+
+
+//                     $kurs = 1;
+//                     $sqlkurs = "select * from ms_kurs where tanggal <='" . $datajurnal->tanggal . "' and mata_uang='USD' order by tanggal desc limit 1";
+//                     $dtkurs    = $CI->db->query($sqlkurs)->row();
+//                     if (!empty($dtkurs)) $kurs = $dtkurs->kurs;
+//                     $wip_material = $datajurnal->total_nilai;
+//                     $pe_direct_labour = (($datasodetailheader->direct_labour * $datasodetailheader->man_hours) * $kurs);
+//                     $pe_indirect_labour = (($datasodetailheader->indirect_labour * $datasodetailheader->man_hours) * $kurs);
+//                     $foh = (($datasodetailheader->machine + $datasodetailheader->mould_mandrill + $datasodetailheader->foh_depresiasi + $datasodetailheader->biaya_rutin_bulanan + $datasodetailheader->foh_consumable) * $kurs);
+//                     $pe_consumable = ($datasodetailheader->consumable * $kurs);
+//                     $finish_good = ($wip_material + $pe_direct_labour + $foh + $pe_indirect_labour + $pe_consumable);
+
+//                     $CI->db->query("update production_detail set wip_kurs='" . $kurs . "', wip_material='" . $wip_material . "' , wip_dl='" . $pe_direct_labour . "' , wip_foh='" . $foh . "', wip_il='" . $pe_indirect_labour . "', wip_consumable='" . $pe_consumable . "', finish_good='" . $finish_good . "' WHERE id='" . $datajurnal->id_detail . "' and id_milik ='" . $datajurnal->id_milik . "' limit 1");
+
+//                     $totalall = $finish_good;
+//                 } else {
+//                     $totalall = (!empty($dataproductiondetail->finish_good)) ? $dataproductiondetail->finish_good : 0;
+//                 }
+//             }
+
+//             // print_r($totalall);
+//             // exit;
+
+//             $no_spk = $id_spk;
+//             $Keterangan_INV = ($ket) . ' (' . $no_so . ' - ' . $product . ' - ' . $no_spk . ' - ' . $no_surat_jalan . ')';
+//             $datajurnal       = $CI->Acc_model->GetTemplateJurnal($kodejurnal);
+//             $det_Jurnaltes = [];
+//             if (!empty($datajurnal)) {
+//                 foreach ($datajurnal as $record) {
+//                     $tabel  = $record->menu;
+//                     $posisi = $record->posisi;
+//                     $field  = $record->field;
+//                     $nokir  = $record->no_perkiraan;
+//                     $totalall2 = (!empty($totalall)) ? $totalall : 0;
+//                     $param  = 'id';
+//                     if ($posisi == 'D') {
+//                         $value_param  = $id;
+//                         $val = $CI->Acc_model->GetData($tabel, $field, $param, $value_param);
+//                         $nilaibayar = (!empty($val[0]->$field)) ? $val[0]->$field : 0;
+//                         $det_Jurnaltes[]  = array(
+//                             'nomor'         => '',
+//                             'tanggal'       => $tgl_voucher,
+//                             'tipe'          => 'JV',
+//                             'no_perkiraan'  => $nokir,
+//                             'keterangan'    => $Keterangan_INV,
+//                             'no_reff'       => $no_request,
+//                             'debet'         => $totalall2,
+//                             'kredit'        => 0,
+//                             'jenis_jurnal'  => 'intransit incustomer',
+//                             'no_request'    => $no_request,
+//                             'stspos'        => 1
+//                         );
+//                     } elseif ($posisi == 'K') {
+//                         $det_Jurnaltes[]  = array(
+//                             'nomor'         => '',
+//                             'tanggal'       => $tgl_voucher,
+//                             'tipe'          => 'JV',
+//                             'no_perkiraan'  => $nokir,
+//                             'keterangan'    => $Keterangan_INV,
+//                             'no_reff'       => $no_request,
+//                             'debet'         => 0,
+//                             'kredit'        => $totalall2,
+//                             'jenis_jurnal'  => 'intransit incustomer',
+//                             'no_request'    => $no_request,
+//                             'stspos'        => 1
+//                         );
+//                     }
+//                 }
+//             }
+//             $CI->db->query("delete from jurnaltras WHERE jenis_jurnal='diterima customer' and no_reff ='$id'");
+//             $CI->db->insert_batch('jurnaltras', $det_Jurnaltes);
+//             $Nomor_JV = $CI->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+//             $Bln    = substr($tgl_voucher, 5, 2);
+//             $Thn    = substr($tgl_voucher, 0, 4);
+//             $dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalall2, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV . '-' . $id, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+//             $CI->db->insert(DBACC . '.javh', $dataJVhead);
+//             $datadetail = array();
+//             foreach ($det_Jurnaltes as $vals) {
+//                 $datadetail = array(
+//                     'tipe'            => 'JV',
+//                     'nomor'            => $Nomor_JV,
+//                     'tanggal'        => $tgl_voucher,
+//                     'no_perkiraan'    => $vals['no_perkiraan'],
+//                     'keterangan'    => $vals['keterangan'],
+//                     'no_reff'        => $vals['no_reff'],
+//                     'debet'            => $vals['debet'],
+//                     'kredit'        => $vals['kredit'],
+//                 );
+//                 $CI->db->insert(DBACC . '.jurnal', $datadetail);
+//             }
+//             $CI->db->query("UPDATE jurnal_product SET status_jurnal='1',approval_by='" . $UserName . "',approval_date='" . $DateTime . "' WHERE id ='$id'");
+//             unset($det_Jurnaltes);
+//             unset($datadetail);
+//         }
+//     }
+//     if ($ket == 'incoming stok') {
+//         $kodejurnal = 'JV035';
+//         $id = $ArrDetailProduct;
+//         $Keterangan_INV = "INCOMING STOCK " . $id;
+//         $datajurnal = $CI->db->query("select sum(total_nilai) as nilaibayar, tanggal, no_ipp from jurnal where kode_trans='" . $id . "' limit 1")->row();
+//         $tgl_voucher = $datajurnal->tanggal;
+//         $no_ipp = $datajurnal->no_ipp;
+//         $no_request = $id;
+//         $nilaibayar    = 0;
+//         $totalbayar    = 0;
+//         $masterjurnal       = $CI->Acc_model->GetTemplateJurnal($kodejurnal);
+//         $det_Jurnaltes = [];
+//         $unbill_coa = '';
+
+//         // print_r($id);
+//         // exit;
+
+//         foreach ($masterjurnal as $record) {
+//             $posisi = $record->posisi;
+//             $nokir  = $record->no_perkiraan;
+//             $param  = 'id';
+//             $value_param  = $id;
+//             $jenisjurnal = $ket;
+//             $totalall = $datajurnal->nilaibayar;
+//             if ($posisi == 'D') {
+//                 $det_Jurnaltes[]  = array(
+//                     'nomor'         => '',
+//                     'tanggal'       => $tgl_voucher,
+//                     'tipe'          => 'JV',
+//                     'no_perkiraan'  => $nokir,
+//                     'keterangan'    => $Keterangan_INV,
+//                     'no_reff'       => $id,
+//                     'debet'         => $totalall,
+//                     'kredit'        => 0,
+//                     'jenis_jurnal'  => $jenisjurnal,
+//                     'no_request'    => $no_request,
+//                     'stspos'          => 1
+//                 );
+//             } elseif ($posisi == 'K') {
+//                 $unbill_coa = $nokir;
+//                 $det_Jurnaltes[]  = array(
+//                     'nomor'         => '',
+//                     'tanggal'       => $tgl_voucher,
+//                     'tipe'          => 'JV',
+//                     'no_perkiraan'  => $nokir,
+//                     'keterangan'    => $Keterangan_INV,
+//                     'no_reff'       => $id,
+//                     'debet'         => 0,
+//                     'kredit'        => $totalall,
+//                     'jenis_jurnal'  => $jenisjurnal,
+//                     'no_request'    => $no_request,
+//                     'stspos'          => 1
+//                 );
+//             }
+//         }
+//         $CI->db->query("UPDATE jurnal SET status_jurnal='1',approval_by='" . $UserName . "',approval_date='" . $DateTime . "' WHERE kode_trans ='$id' and category='" . $jenisjurnal . "'");
+//         $CI->db->insert_batch('jurnaltras', $det_Jurnaltes);
+//         $Nomor_JV = $CI->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+//         $Bln    = substr($tgl_voucher, 5, 2);
+//         $Thn    = substr($tgl_voucher, 0, 4);
+//         $dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalall, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+//         $CI->db->insert(DBACC . '.javh', $dataJVhead);
+//         $datadetail = array();
+//         foreach ($det_Jurnaltes as $vals) {
+//             $datadetail = array(
+//                 'tipe'            => 'JV',
+//                 'nomor'            => $Nomor_JV,
+//                 'tanggal'        => $tgl_voucher,
+//                 'no_perkiraan'    => $vals['no_perkiraan'],
+//                 'keterangan'    => $vals['keterangan'],
+//                 'no_reff'        => $vals['no_reff'],
+//                 'debet'            => $vals['debet'],
+//                 'kredit'        => $vals['kredit'],
+//             );
+//             $CI->db->insert(DBACC . '.jurnal', $datadetail);
+//         }
+//         $data_po = $CI->db->query("select * from tran_po_header where no_po in (select no_ipp from warehouse_adjustment where kode_trans='" . $id . "') limit 1")->row();
+//         if ($data_po->mata_uang != 'IDR') $unbill_coa = '2101-01-04';
+//         $datahutang = array(
+//             'tipe'            => 'JV',
+//             'nomor'            => $Nomor_JV,
+//             'tanggal'        => $tgl_voucher,
+//             'no_perkiraan'   => $unbill_coa,
+//             'keterangan'     => $Keterangan_INV,
+//             'no_reff'          => $data_po->no_po,
+//             'kredit'           => $datajurnal->nilaibayar,
+//             'debet'          => 0,
+//             'id_supplier'    => $data_po->id_supplier,
+//             'nama_supplier'  => $data_po->nm_supplier,
+//             'no_request'     => $id,
+//         );
+//         $CI->db->insert('tr_kartu_hutang', $datahutang);
+//         unset($det_Jurnaltes);
+//         unset($datadetail);
+//         unset($datahutang);
+//     }
+//     if ($ket == 'outgoing stok') {
+//         $kodejurnal = 'JV039';
+//         $id = $ArrDetailProduct;
+//         $Keterangan_INV = "OUTGOING STOCK " . $id;
+//         $datajurnal = $CI->db->query("select sum(ROUND(total_nilai)) as nilaibayar, tanggal from jurnal where kode_trans='" . $id . "' limit 1")->row();
+//         $tgl_voucher = $datajurnal->tanggal;
+//         $no_request = $id;
+//         $nilaibayar    = 0;
+//         $totalbayar    = 0;
+//         $sql = "SELECT * FROM warehouse_adjustment where kode_trans='" . $id . "'";
+//         $wh = $CI->db->query($sql)->row();
+//         $kode_gudang = $wh->id_gudang_ke;
+//         $coa_deffered = '';
+//         if ($kode_gudang == '17') {
+//             $sql_deff = "select c.nm_customer, c.coa_deffered from so_number a 
+//             left join table_sales_order b on a.id_bq=b.id_bq 
+//             left join customer c on b.id_customer=c.id_customer
+//             where a.so_number='" . $wh->no_so . "'";
+//             $dt_coa = $CI->db->query($sql_deff)->row();
+//             if (!empty($dt_coa)) {
+//                 $coa_deffered = $dt_coa->coa_deffered;
+//             }
+//             if ($coa_deffered == "") {
+//                 $sql_deff = "select coa_biaya from costcenter where id='" . $wh->id_gudang_ke . "'";
+//                 $dt_coa = $CI->db->query($sql_deff)->row();
+//                 $coa_deffered = $dt_coa->coa_biaya;
+//             }
+//         }
+//         $masterjurnal       = $CI->Acc_model->GetTemplateJurnal($kodejurnal);
+//         $det_Jurnaltes = [];
+//         foreach ($masterjurnal as $record) {
+//             $posisi = $record->posisi;
+//             $nokir  = $record->no_perkiraan;
+//             $param  = 'id';
+//             $value_param  = $id;
+//             $jenisjurnal = $ket;
+//             $totalall = $datajurnal->nilaibayar;
+//             if ($posisi == 'D') {
+//                 if ($kode_gudang == '17') {
+//                     $val = $CI->db->query("select ROUND(a.total_nilai) total_nilai,a.id_material,a.nm_material, a.gudang_ke, '" . $coa_deffered . "' coa_biaya from jurnal a  where a.kode_trans='" . $id . "'")->result();
+//                 } else {
+//                     $val = $CI->db->query("select ROUND(a.total_nilai) total_nilai,a.id_material,a.nm_material, a.gudang_ke, b.category_awal, c.coa_biaya from jurnal a left join con_nonmat_new b on a.id_material=b.code_group left join con_nonmat_category_costcenter c on a.gudang_ke=c.costcenter and b.category_awal=c.category where a.kode_trans='" . $id . "'")->result();
+//                 }
+//                 foreach ($val as $rec) {
+//                     $nilaibayar = $rec->total_nilai;
+//                     $totalbayar = ($totalbayar + $nilaibayar);
+//                     $dtcoa_biaya = $rec->coa_biaya;
+//                     if ($dtcoa_biaya != "") {
+//                     } else {
+//                         $dtcoa_biaya = $nokir;
+//                     }
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $dtcoa_biaya,
+//                         'keterangan'    => $rec->nm_material . ' ' . $id,
+//                         'no_reff'       => $id,
+//                         'debet'         => $nilaibayar,
+//                         'kredit'        => 0,
+//                         'jenis_jurnal'  => $jenisjurnal,
+//                         'no_request'    => $no_request,
+//                         'stspos'          => 1
+//                     );
+//                 }
+//             } elseif ($posisi == 'K') {
+//                 $det_Jurnaltes[]  = array(
+//                     'nomor'         => '',
+//                     'tanggal'       => $tgl_voucher,
+//                     'tipe'          => 'JV',
+//                     'no_perkiraan'  => $nokir,
+//                     'keterangan'    => $Keterangan_INV,
+//                     'no_reff'       => $id,
+//                     'debet'         => 0,
+//                     'kredit'        => $totalall,
+//                     'jenis_jurnal'  => $jenisjurnal,
+//                     'no_request'    => $no_request,
+//                     'stspos'          => 1
+//                 );
+//             }
+//         }
+//         $CI->db->query("UPDATE jurnal SET status_jurnal='1',approval_by='" . $UserName . "',approval_date='" . $DateTime . "' WHERE kode_trans ='$id' and category='" . $jenisjurnal . "'");
+//         $CI->db->insert_batch('jurnaltras', $det_Jurnaltes);
+//         $Nomor_JV = $CI->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+//         $Bln    = substr($tgl_voucher, 5, 2);
+//         $Thn    = substr($tgl_voucher, 0, 4);
+//         $dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalall, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+//         $CI->db->insert(DBACC . '.javh', $dataJVhead);
+//         $datadetail = array();
+//         foreach ($det_Jurnaltes as $vals) {
+//             $datadetail = array(
+//                 'tipe'            => 'JV',
+//                 'nomor'            => $Nomor_JV,
+//                 'tanggal'        => $tgl_voucher,
+//                 'no_perkiraan'    => $vals['no_perkiraan'],
+//                 'keterangan'    => $vals['keterangan'],
+//                 'no_reff'        => $vals['no_reff'],
+//                 'debet'            => $vals['debet'],
+//                 'kredit'        => $vals['kredit'],
+//             );
+//             $CI->db->insert(DBACC . '.jurnal', $datadetail);
+//         }
+//         unset($det_Jurnaltes);
+//         unset($datadetail);
+//     }
+//     if ($ket == 'incoming department') {
+//         $kodejurnal = 'JV036';
+//         $id = $ArrDetailProduct;
+//         $Keterangan_INV = "INCOMING DEPARTMENT " . $id;
+//         $datajurnal    = $CI->Acc_model->GetTemplateJurnal($kodejurnal);
+//         $nilaibayar    = 0;
+//         $totalbayar    = 0;
+//         $unbill_coa = '';
+//         $no_po = '';
+//         foreach ($datajurnal as $record) {
+//             $nokir1 = $record->no_perkiraan;
+//             $tabel  = $record->menu;
+//             $posisi = $record->posisi;
+//             $field  = $record->field;
+//             $nokir  = $record->no_perkiraan;
+//             $kd_bayar = $id;
+//             $param  = 'id';
+//             $value_param  = $id;
+//             $jenisjurnal = 'incoming department';
+//             if ($posisi == 'D') {
+//                 $val = $CI->db->query("select a.no_ipp, a.tanggal, a.total_nilai,a.id_material,a.nm_material, c.coa from jurnal a left join rutin_non_planning_detail b on a.id_material=b.id left join rutin_non_planning_header c on b.no_pr=c.no_pr where a.kode_trans='" . $kd_bayar . "'")->result();
+//                 foreach ($val as $rec) {
+//                     $tgl_voucher = $rec->tanggal;
+//                     $no_po = $rec->no_ipp;
+//                     $nilaibayar = $rec->total_nilai;
+//                     $totalbayar = ($totalbayar + $nilaibayar);
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $rec->coa,
+//                         'keterangan'    => $rec->nm_material . ' ' . $kd_bayar . ', ' . $no_po,
+//                         'no_reff'       => $id,
+//                         'debet'         => $nilaibayar,
+//                         'kredit'        => 0,
+//                         'jenis_jurnal'  => $jenisjurnal,
+//                         'no_request'    => $id
+//                     );
+//                 }
+//             } elseif ($posisi == 'K') {
+//                 $unbill_coa = $nokir;
+//                 $det_Jurnaltes[]  = array(
+//                     'nomor'         => '',
+//                     'tanggal'       => $tgl_voucher,
+//                     'tipe'          => 'JV',
+//                     'no_perkiraan'  => $nokir,
+//                     'keterangan'    => $Keterangan_INV,
+//                     'no_reff'       => $id,
+//                     'debet'         => 0,
+//                     'kredit'        => $totalbayar,
+//                     'jenis_jurnal'  => $jenisjurnal,
+//                     'no_request'    => $id
+//                 );
+//             }
+//         }
+
+//         $CI->db->query("UPDATE jurnal SET status_jurnal='1',approval_by='" . $UserName . "',approval_date='" . $DateTime . "' WHERE kode_trans ='$id' and category='" . $jenisjurnal . "'");
+//         $CI->db->insert_batch('jurnaltras', $det_Jurnaltes);
+//         $Nomor_JV = $CI->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+//         $Bln    = substr($tgl_voucher, 5, 2);
+//         $Thn    = substr($tgl_voucher, 0, 4);
+//         $dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalbayar, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+//         $CI->db->insert(DBACC . '.javh', $dataJVhead);
+//         $datadetail = array();
+//         foreach ($det_Jurnaltes as $vals) {
+//             $datadetail = array(
+//                 'tipe'            => 'JV',
+//                 'nomor'            => $Nomor_JV,
+//                 'tanggal'        => $tgl_voucher,
+//                 'no_perkiraan'    => $vals['no_perkiraan'],
+//                 'keterangan'    => $vals['keterangan'],
+//                 'no_reff'        => $vals['no_reff'],
+//                 'debet'            => $vals['debet'],
+//                 'kredit'        => $vals['kredit'],
+//             );
+//             $CI->db->insert(DBACC . '.jurnal', $datadetail);
+//         }
+//         $data_po = $CI->db->query("select * from tran_po_header where no_po='" . $no_po . "' limit 1")->row();
+//         if ($data_po->mata_uang != 'IDR') $unbill_coa = '2101-01-04';
+//         $datahutang = array(
+//             'tipe'            => 'JV',
+//             'nomor'            => $Nomor_JV,
+//             'tanggal'        => $tgl_voucher,
+//             'no_perkiraan'   => $unbill_coa,
+//             'keterangan'     => $Keterangan_INV,
+//             'no_reff'          => $no_po,
+//             'kredit'           => $totalbayar,
+//             'debet'          => 0,
+//             'id_supplier'    => $data_po->id_supplier,
+//             'nama_supplier'  => $data_po->nm_supplier,
+//             'no_request'     => $id,
+//         );
+//         $CI->db->insert('tr_kartu_hutang', $datahutang);
+//         unset($det_Jurnaltes);
+//         unset($datadetail);
+//         unset($datahutang);
+//     }
+//     if ($ket == 'incoming asset') {
+//         $kodejurnal = 'JV038';
+//         $id = $ArrDetailProduct;
+//         $Keterangan_INV = "INCOMING ASSET " . $id;
+//         $datajurnal    = $CI->Acc_model->GetTemplateJurnal($kodejurnal);
+//         $nilaibayar    = 0;
+//         $totalbayar    = 0;
+//         $unbill_coa = '';
+//         $no_po = '';
+//         foreach ($datajurnal as $record) {
+//             $nokir1 = $record->no_perkiraan;
+//             $tabel  = $record->menu;
+//             $posisi = $record->posisi;
+//             $field  = $record->field;
+//             $nokir  = $record->no_perkiraan;
+//             $kd_bayar = $id;
+//             $param  = 'id';
+//             $value_param  = $id;
+//             $jenisjurnal = 'incoming asset';
+//             if ($posisi == 'D') {
+//                 $val = $CI->db->query("select a.no_ipp, a.tanggal, a.total_nilai,a.id_material,a.nm_material, b.coa from jurnal a left join asset_planning b on a.id_material=b.code_plan where a.kode_trans='" . $kd_bayar . "'")->result();
+//                 foreach ($val as $rec) {
+//                     $tgl_voucher = $rec->tanggal;
+//                     $no_po = $rec->no_ipp;
+//                     $nilaibayar = $rec->total_nilai;
+//                     $totalbayar = ($totalbayar + $nilaibayar);
+//                     $det_Jurnaltes[]  = array(
+//                         'nomor'         => '',
+//                         'tanggal'       => $tgl_voucher,
+//                         'tipe'          => 'JV',
+//                         'no_perkiraan'  => $rec->coa,
+//                         'keterangan'    => $rec->nm_material . ' ' . $kd_bayar . ', ' . $no_po,
+//                         'no_reff'       => $id,
+//                         'debet'         => $nilaibayar,
+//                         'kredit'        => 0,
+//                         'jenis_jurnal'  => $jenisjurnal,
+//                         'no_request'    => $id
+//                     );
+//                 }
+//             } elseif ($posisi == 'K') {
+//                 $unbill_coa = $nokir;
+//                 $det_Jurnaltes[]  = array(
+//                     'nomor'         => '',
+//                     'tanggal'       => $tgl_voucher,
+//                     'tipe'          => 'JV',
+//                     'no_perkiraan'  => $nokir,
+//                     'keterangan'    => $Keterangan_INV,
+//                     'no_reff'       => $id,
+//                     'debet'         => 0,
+//                     'kredit'        => $totalbayar,
+//                     'jenis_jurnal'  => $jenisjurnal,
+//                     'no_request'    => $id
+//                 );
+//             }
+//         }
+
+//         $CI->db->query("UPDATE jurnal SET status_jurnal='1',approval_by='" . $UserName . "',approval_date='" . $DateTime . "' WHERE kode_trans ='$id' and category='" . $jenisjurnal . "'");
+//         $CI->db->insert_batch('jurnaltras', $det_Jurnaltes);
+//         $Nomor_JV = $CI->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+//         $Bln    = substr($tgl_voucher, 5, 2);
+//         $Thn    = substr($tgl_voucher, 0, 4);
+//         $dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalbayar, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+//         $CI->db->insert(DBACC . '.javh', $dataJVhead);
+//         $datadetail = array();
+//         foreach ($det_Jurnaltes as $vals) {
+//             $datadetail = array(
+//                 'tipe'            => 'JV',
+//                 'nomor'            => $Nomor_JV,
+//                 'tanggal'        => $tgl_voucher,
+//                 'no_perkiraan'    => $vals['no_perkiraan'],
+//                 'keterangan'    => $vals['keterangan'],
+//                 'no_reff'        => $vals['no_reff'],
+//                 'debet'            => $vals['debet'],
+//                 'kredit'        => $vals['kredit'],
+//             );
+//             $CI->db->insert(DBACC . '.jurnal', $datadetail);
+//         }
+//         $data_po = $CI->db->query("select * from tran_po_header where no_po='" . $no_po . "' limit 1")->row();
+//         if ($data_po->mata_uang != 'IDR') $unbill_coa = '2101-01-05';
+//         $datahutang = array(
+//             'tipe'            => 'JV',
+//             'nomor'            => $Nomor_JV,
+//             'tanggal'        => $tgl_voucher,
+//             'no_perkiraan'   => $unbill_coa,
+//             'keterangan'     => $Keterangan_INV,
+//             'no_reff'          => $no_po,
+//             'kredit'           => $totalbayar,
+//             'debet'          => 0,
+//             'id_supplier'    => $data_po->id_supplier,
+//             'nama_supplier'  => $data_po->nm_supplier,
+//             'no_request'     => $id,
+//         );
+//         $CI->db->insert('tr_kartu_hutang', $datahutang);
+//         unset($det_Jurnaltes);
+//         unset($datadetail);
+//     }
+
+//     if ($ket == 'incoming project') {
+//         $kodejurnal = 'JV078';
+//         $id = $ArrDetailProduct;
+//         $Keterangan_INV = "INCOMING PROJECT " . $id;
+//         $datajurnal = $CI->db->query("select sum(total_nilai) as nilaibayar, tanggal, no_ipp from jurnal where kode_trans='" . $id . "' limit 1")->row();
+//         $tgl_voucher = $datajurnal->tanggal;
+//         $no_ipp = $datajurnal->no_ipp;
+//         $no_request = $id;
+//         $nilaibayar    = 0;
+//         $totalbayar    = 0;
+//         $masterjurnal       = $CI->Acc_model->GetTemplateJurnal($kodejurnal);
+//         $det_Jurnaltes = [];
+//         $unbill_coa = '';
+
+
+
+//         foreach ($masterjurnal as $record) {
+//             $posisi = $record->posisi;
+//             $nokir  = $record->no_perkiraan;
+//             $param  = 'id';
+//             $value_param  = $id;
+//             $jenisjurnal = $ket;
+//             $totalall = $datajurnal->nilaibayar;
+//             if ($posisi == 'D') {
+//                 $det_Jurnaltes[]  = array(
+//                     'nomor'         => '',
+//                     'tanggal'       => $tgl_voucher,
+//                     'tipe'          => 'JV',
+//                     'no_perkiraan'  => $nokir,
+//                     'keterangan'    => $Keterangan_INV,
+//                     'no_reff'       => $id,
+//                     'debet'         => $totalall,
+//                     'kredit'        => 0,
+//                     'jenis_jurnal'  => $jenisjurnal,
+//                     'no_request'    => $no_request,
+//                     'stspos'          => 1
+//                 );
+//             } elseif ($posisi == 'K') {
+//                 $unbill_coa = $nokir;
+//                 $det_Jurnaltes[]  = array(
+//                     'nomor'         => '',
+//                     'tanggal'       => $tgl_voucher,
+//                     'tipe'          => 'JV',
+//                     'no_perkiraan'  => $nokir,
+//                     'keterangan'    => $Keterangan_INV,
+//                     'no_reff'       => $id,
+//                     'debet'         => 0,
+//                     'kredit'        => $totalall,
+//                     'jenis_jurnal'  => $jenisjurnal,
+//                     'no_request'    => $no_request,
+//                     'stspos'          => 1
+//                 );
+//             }
+//         }
+//         $CI->db->query("UPDATE jurnal SET status_jurnal='1',approval_by='" . $UserName . "',approval_date='" . $DateTime . "' WHERE kode_trans ='$id' and category='" . $jenisjurnal . "'");
+//         $CI->db->insert_batch('jurnaltras', $det_Jurnaltes);
+//         $Nomor_JV = $CI->Jurnal_model->get_Nomor_Jurnal_Sales('101', $tgl_voucher);
+//         $Bln    = substr($tgl_voucher, 5, 2);
+//         $Thn    = substr($tgl_voucher, 0, 4);
+//         $dataJVhead = array('nomor' => $Nomor_JV, 'tgl' => $tgl_voucher, 'jml' => $totalall, 'koreksi_no' => '-', 'kdcab' => '101', 'jenis' => 'JV', 'keterangan' => $Keterangan_INV, 'bulan' => $Bln, 'tahun' => $Thn, 'user_id' => $UserName, 'memo' => $id, 'tgl_jvkoreksi' => $tgl_voucher, 'ho_valid' => '');
+//         $CI->db->insert(DBACC . '.javh', $dataJVhead);
+//         $datadetail = array();
+//         foreach ($det_Jurnaltes as $vals) {
+//             $datadetail = array(
+//                 'tipe'            => 'JV',
+//                 'nomor'            => $Nomor_JV,
+//                 'tanggal'        => $tgl_voucher,
+//                 'no_perkiraan'    => $vals['no_perkiraan'],
+//                 'keterangan'    => $vals['keterangan'],
+//                 'no_reff'        => $vals['no_reff'],
+//                 'debet'            => $vals['debet'],
+//                 'kredit'        => $vals['kredit'],
+//             );
+//             $CI->db->insert(DBACC . '.jurnal', $datadetail);
+//         }
+//         $data_po = $CI->db->query("select * from tran_po_header where no_po in (select no_ipp from warehouse_adjustment where kode_trans='" . $id . "') limit 1")->row();
+//         if ($data_po->mata_uang != 'IDR') $unbill_coa = '2101-01-04';
+//         $datahutang = array(
+//             'tipe'            => 'JV',
+//             'nomor'            => $Nomor_JV,
+//             'tanggal'        => $tgl_voucher,
+//             'no_perkiraan'   => $unbill_coa,
+//             'keterangan'     => $Keterangan_INV,
+//             'no_reff'          => $data_po->no_po,
+//             'kredit'           => $datajurnal->nilaibayar,
+//             'debet'          => 0,
+//             'id_supplier'    => $data_po->id_supplier,
+//             'nama_supplier'  => $data_po->nm_supplier,
+//             'no_request'     => $id,
+//         );
+//         $CI->db->insert('tr_kartu_hutang', $datahutang);
+//         unset($det_Jurnaltes);
+//         unset($datadetail);
+//         unset($datahutang);
+//     }
+// }
