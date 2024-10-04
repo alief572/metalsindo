@@ -91,7 +91,11 @@ class Budget_periodik extends Admin_Controller
 
 		$this->db->trans_begin();
 
-		$delid = implode("','", $detail_id);
+		if(empty($detail_id)){
+			$delid = [''];
+		} else {
+			$delid = implode("','", $detail_id);
+		}
 		$budgetcoa = array();
 		$this->All_model->dataDelete('ms_budget_rutin', "id not in ('" . $delid . "') and departement='" . $departement . "'");
 		for ($x = 0; $x < count($detail_id); $x++) {
