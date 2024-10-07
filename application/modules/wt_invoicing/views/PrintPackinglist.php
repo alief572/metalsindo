@@ -446,7 +446,7 @@
 	</table>
 
 	<br><br><br>
-	<table border="1" width='100%' align="left">
+	<table border="0" width='100%' align="left">
 
 		<tr>
 			<td width="100" align="left" border='0'>
