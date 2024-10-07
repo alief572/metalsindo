@@ -76,10 +76,10 @@ $query_builder = true;
 
 $db['default'] = array(
     'dsn' => '',
-    'hostname' => 'localhost',
+    'hostname' => '203.160.58.170',
     'username' => 'root',
-    'password' => '',
-    'database' => 'metalsindo_db',
+    'password' => 'sentral2022**',
+    'database' => 'metalsindo_live',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
     'pconnect' => false,
@@ -98,10 +98,10 @@ $db['default'] = array(
 
 $db['accounting'] = array(
     'dsn'    => '',
-    'hostname' => 'localhost',
+    'hostname' => '203.160.58.170',
     'username' => 'root',
-    'password' => '',
-    'database' => 'gl_metalsindo_dev',
+    'password' => 'sentral2022**',
+    'database' => 'gl_metalsindo_live',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
     'pconnect' => FALSE,
