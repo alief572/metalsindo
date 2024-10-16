@@ -1,8 +1,8 @@
 <?php
-$ENABLE_ADD     = has_permission('PR_Departemen.Add');
-$ENABLE_MANAGE  = has_permission('PR_Departemen.Manage');
-$ENABLE_VIEW    = has_permission('PR_Departemen.View');
-$ENABLE_DELETE  = has_permission('PR_Departemen.Delete');
+$ENABLE_ADD     = has_permission('PR_Department.Add');
+$ENABLE_MANAGE  = has_permission('PR_Department.Manage');
+$ENABLE_VIEW    = has_permission('PR_Department.View');
+$ENABLE_DELETE  = has_permission('PR_Department.Delete');
 ?>
 <link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" integrity="sha512-yVvxUQV0QESBt1SyZbNJMAwyKvFTLMyXSyBHDO4BG5t7k/Lw34tyqlSDlKIrIENIzCl+RVUNjmCPG+V/GMesRw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
