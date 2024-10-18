@@ -418,7 +418,7 @@ class Approval_po_non_material extends Admin_Controller
         '' as packing_unit2
 			FROM
 				dt_trans_po_non_material a
-				JOIN rutin_non_planning_detail e ON e.id = a.idpr
+				JOIN tran_pr_detail e ON e.id = a.idpr
         LEFT JOIN ms_satuan f ON f.id = e.satuan
 			WHERE
 				a.no_po IN ('".str_replace(",","','",$no_po)."') AND 

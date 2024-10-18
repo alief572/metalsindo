@@ -109,7 +109,7 @@ class Expense extends Admin_Controller
 		$metode_pembayaran = $this->input->post('metode_pembayaran');
 
 		$this->db->trans_begin();
-		$config['upload_path'] = 'assets/expense/';
+		$config['upload_path'] = './assets/expense/';
 		$config['allowed_types'] = '*';
 		$config['remove_spaces'] = TRUE;
 		$config['encrypt_name'] = TRUE;
