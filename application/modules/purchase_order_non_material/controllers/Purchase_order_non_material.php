@@ -1751,7 +1751,14 @@ class Purchase_order_non_material extends Admin_Controller
 
 				if ($used[tipe_pr] == 'pr depart') {
 					$get_data_pr = $this->db->query("SELECT IF(qty IS NOT NULL, qty, 0) AS qty_pr FROM rutin_non_planning_detail WHERE id = '" . $used[idpr] . "'")->row();
-				} else {
+				}
+				else if($used[tipe_pr] == 'pr asset') {
+					$this->db->select('IF(a.qty IS NOT NULL, a.qty, 0) as qty_pr');
+					$this->db->from('tran_pr_detail a');
+					$this->db->where('a.id', $used[idpr]);
+					$get_data_pr = $this->db->get()->row();
+				} 
+				else {
 					$get_data_pr = $this->db->query("SELECT IF(propose_purchase IS NOT NULL, propose_purchase, 0) AS qty_pr FROM material_planning_base_on_produksi_detail WHERE id = '" . $used[idpr] . "'")->row();
 				}
 
@@ -2879,6 +2886,26 @@ class Purchase_order_non_material extends Admin_Controller
 				LEFT JOIN ms_satuan b ON b.id = a.satuan
 			WHERE
 				a.no_pengajuan IN ('" . str_replace(",", "','", implode(',', $getparam)) . "')
+
+			UNION ALL
+
+			SELECT
+				a.id as id,
+				a.code_plan as so_number,
+				'' as id_material,
+				a.rev_qty as propose_purchase,
+				0 as avl_stock,
+				a.nama_asset as code,
+				'' as code1,
+				a.nama_asset as nm_material,
+				'pr asset' as tipe_pr,
+				'Pcs' as packing_unit,
+				'' as packing_unit2,
+				'Pcs' as unit_measure
+			FROM
+				asset_planning a 
+			WHERE
+				a.code_plan IN ('" . str_replace(",", "','", implode(',', $getparam)) . "')
 				
 			GROUP BY a.id
 		")->result();
@@ -3127,6 +3154,40 @@ class Purchase_order_non_material extends Admin_Controller
 			WHERE
 				a.no_po IN ('" . str_replace(",", "','", $no_po) . "') AND 
 				a.tipe = 'pr depart'
+			
+			UNION ALL
+
+			SELECT 
+				a.id as id,
+				a.idpr as idpr,
+				a.no_po as no_po,
+				'' as idmaterial,
+				a.qty as qty,
+				a.hargasatuan as hargasatuan,
+				a.jumlahharga as jumlahharga,
+				a.kode_barang as kode_barang,
+				a.ppn as ppn,
+				a.ppn_persen as ppn_persen,
+				a.harga_total as harga_total,
+				a.tipe as tipe_pr,
+				a.keterangan as keterangan,
+				'0' AS avl_stock, 
+				a.kode_barang as code, 
+				'' as code1, 
+				a.namamaterial as nm_material, 
+				'' as nm_material1,
+				a.persen_disc as persen_disc,
+				a.nilai_disc as nilai_disc, 
+				a.qty as propose_purchase,
+				'Pcs' as packing_unit,
+				'' as packing_unit2,
+				'Pcs' as unit_measure
+			FROM
+				dt_trans_po_non_material a
+				LEFT JOIN asset_planning e ON e.id = a.idpr
+			WHERE
+				a.no_po IN ('" . str_replace(",", "','", $no_po) . "') AND 
+				a.tipe = 'pr asset'
 
 			GROUP BY id
 		")->result();

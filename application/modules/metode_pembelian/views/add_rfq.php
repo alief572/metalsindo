@@ -25,7 +25,7 @@
 						<!-- <option value='material'>MATERIAL</option> -->
 						<option value='stok'>STOK</option>
 						<option value='departemen'>DEPARTEMEN</option>
-						<!-- <option value="asset">ASSET</option> -->
+						<option value="asset">ASSET</option>
 					</select>
 				</div>
 			</div>

@@ -65,7 +65,7 @@ class Pr_model extends BF_Model
 
 	function generate_code($tgl)
 	{
-		$query = $this->db->query("SELECT MAX(no_po) as max_id FROM tr_purchase_order_non_material WHERE no_po LIKE '%P".date('y', strtotime($tgl))."%'");
+		$query = $this->db->query("SELECT MAX(no_po) as max_id FROM tr_purchase_order_non_material WHERE no_po LIKE '%P" . date('y', strtotime($tgl)) . "%'");
 		$row = $query->row_array();
 		$thn = date('y', strtotime($tgl));
 		$max_id = $row['max_id'];
@@ -287,6 +287,22 @@ class Pr_model extends BF_Model
 				LEFT JOIN users b ON b.id_user = a.created_by
 			WHERE
 				a.sts_app = "Y" AND
+				a.metode_pembelian = "1" AND
+				a.close_pr IS NULL
+
+			UNION ALL
+			
+			SELECT 
+				a.id as so_number,
+				a.no_pr as no_pr,
+				DATE_FORMAT(a.created_date, "%Y-%m-%d") as tgl_so,
+				b.nm_lengkap as nama_user,
+				"pr asset" as tipe_pr
+			FROM
+				tran_pr_header a
+				LEFT JOIN users b ON b.id_user = a.created_by
+			WHERE
+				a.app_status_3 = "Y" AND
 				a.metode_pembelian = "1" AND
 				a.close_pr IS NULL
 		')->result();
