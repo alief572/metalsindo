@@ -76,7 +76,7 @@ $query_builder = true;
 
 $db['default'] = array(
     'dsn' => '',
-    'hostname' => 'localhost',
+    'hostname' => '203.160.58.170',
     'username' => 'root',
     'password' => 'sentral2022**',
     'database' => 'metalsindo_live',
@@ -98,7 +98,7 @@ $db['default'] = array(
 
 $db['accounting'] = array(
     'dsn'    => '',
-    'hostname' => 'localhost',
+    'hostname' => '203.160.58.170',
     'username' => 'root',
     'password' => 'sentral2022**',
     'database' => 'gl_metalsindo',
