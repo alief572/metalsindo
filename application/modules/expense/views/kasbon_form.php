@@ -100,14 +100,14 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 					</div>
 
 					<div class="form-group">
-						<label class="col-sm-2 control-label">Metode Pembayaran</label>
+						<!-- <label class="col-sm-2 control-label">Metode Pembayaran</label>
 						<div class="col-sm-4">
 							<select name="metode_pembayaran" id="" class="form-control metode_pembayaran" required>
 								<option value="">- Metode Pembayaran -</option>
 								<option value="1" <?= ($metode_pembayaran == 1) ? 'selected' : null ?>>Request Payment</option>
 								<option value="2" <?= ($metode_pembayaran == 2) ? 'selected' : null ?>>Pettycash Finance</option>
 							</select>
-						</div>
+						</div> -->
 					</div>
 
 					<div class="transfer_ke_cont" style="display: none;">
