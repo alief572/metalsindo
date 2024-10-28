@@ -159,7 +159,7 @@ $budgets = 0;
 						</tbody>
 					</table>
 
-					<h4>List Penggunaan Pettycash</h4>
+					<!-- <h4>List Penggunaan Pettycash</h4>
 					<table class="table table-bordered ">
 						<thead>
 							<tr>
@@ -185,7 +185,7 @@ $budgets = 0;
 							}
 							?>
 						</tbody>
-					</table>
+					</table> -->
 
 				<?php
 				}
@@ -222,7 +222,7 @@ $budgets = 0;
 								<th scope="col" width="50">Bon Bukti</th>
 								<th scope="col" class="column-primary">
 									<div class="pull-right">
-										<a class="btn btn-info btn-xs stsview" href="javascript:void(0)" title="Kasbon" onclick="add_kasbon()" id="add-kasbon"><i class="fa fa-user"></i> Kasbon</a><br />
+										<!-- <a class="btn btn-info btn-xs stsview" href="javascript:void(0)" title="Kasbon" onclick="add_kasbon()" id="add-kasbon"><i class="fa fa-user"></i> Kasbon</a><br /> -->
 										<a class="btn btn-success btn-xs stsview" href="javascript:void(0)" title="Tambah" onclick="add_detail()" id="add-material"><i class="fa fa-plus"></i> Tambah</a>
 									</div>
 								</th>
