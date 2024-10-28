@@ -77,7 +77,7 @@
     var active_function	= '<?php echo $this->uri->segment(2); ?>'+'/';
   </script>
 </head>
-<body class="hold-transition skin-blue sidebar-mini fixed sidebar-collapse" >
+<body class="hold-transition skin-blue sidebar-mini fixed " >
 <div class="ajax_loader">
   <img src="<?php echo base_url('assets/images/ajax_loader.gif'); ?>" >
 </div>
