@@ -2103,6 +2103,7 @@ class Purchase_order extends Admin_Controller
 			'created_by'			=> $this->auth->user_id(),
 			'created_on'			=> date('Y-m-d H:i:s'),
 			'keterangan'			=> $post['keterangan'],
+			'tgl_terima_invoice'			=> $post['tgl_terima_invoice']
 		);
 		$this->db->insert('tr_request', $data);
 
