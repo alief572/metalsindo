@@ -52,6 +52,12 @@ $inv          =  $this->db->query("SELECT * FROM tr_request WHERE no_request = '
 								</div>
 							</div>
 							<div class="form-group">
+								<label for="jenis_invoice" class="col-sm-4 control-label">Nilai Invoice </font></label>
+								<div class="col-sm-6">
+									<input type="text" name="nilai_invoice" id="nilai_invoice" class="form-control input-sm" value="<?= number_format($inv->nilai_invoice_est) ?>" readonly>
+								</div>
+							</div>
+							<div class="form-group">
 								<label for="jenis_invoice" class="col-sm-4 control-label">Request </font></label>
 								<div class="col-sm-6">
 									<input type="text" name="request" id="request" class="form-control input-sm" value="<?= number_format($inv->nilai_invoice) ?>">

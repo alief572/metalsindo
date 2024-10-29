@@ -107,6 +107,12 @@
 									<input type="hidden" name="id_lebihbayar" class="form-control input-sm" id="id_lebihbayar">
 								</div>
 							</div>
+							<div class="form-group ">
+								<label class="col-sm-4 control-label">Nilai Invoice</label>
+								<div class="col-sm-6">
+									<input type="text" name="nilai_invoice" id="" class="form-control input-sm text-right divide">
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>

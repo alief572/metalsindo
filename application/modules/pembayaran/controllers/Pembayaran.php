@@ -262,6 +262,7 @@ class Pembayaran extends Admin_Controller
 			'no_reff' => '-',
 			'tgl_pembayaran' => $this->input->post('tgl_bayar'),
 			'tgl_terima_invoice' => $this->input->post('tgl_terima_invoice'),
+			'nilai_invoice_est' => str_replace(',', '', $this->input->post('nilai_invoice')),
 			'kurs_bayar' => $this->input->post('kurs'),
 			'jumlah_piutang' => str_replace(",", "", $this->input->post('total_invoice')),
 			'jumlah_piutang_idr' => str_replace(",", "", $this->input->post('total_invoice')) * $kurs,
@@ -283,6 +284,7 @@ class Pembayaran extends Admin_Controller
 			'nm_customer' => $nmcs,
 			'lebih_bayar' => str_replace(",", "", $this->input->post('pakai_lebih_bayar')),
 			'tambah_lebih_bayar' => str_replace(",", "", $this->input->post('tambah_lebih_bayar')),
+			'nilai_invoice_est' => str_replace(',', '', $this->input->post('nilai_invoice'))
 		);
 
 
@@ -1132,6 +1134,7 @@ class Pembayaran extends Admin_Controller
 			'no_reff' => '-',
 			'tgl_pembayaran' => $this->input->post('tgl_bayar'),
 			'tgl_terima_invoice' => $this->input->post('tgl_terima_invoice'),
+			'nilai_invoice' => str_replace(',', '', $this->input->post('nilai_invoice')),
 			'no_invoice' => $this->input->post('no_invoice'),
 			'no_po' => $this->input->post('no_po'),
 			'kurs_bayar' => $kurs,
