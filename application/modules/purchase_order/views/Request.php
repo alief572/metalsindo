@@ -141,7 +141,16 @@ $suplier	= $this->db->query("SELECT * FROM master_supplier WHERE id_suplier = '"
 						<input type="date" id="tgl_terima_invoice" name="tgl_terima_invoice" class="form-control sm" required>
 					</div>
 				</div>
-
+			</div>
+			<div class="col-sm-6">
+				<div class="form-group row">
+					<div class="col-md-4">
+						<label for="nilai_invoice">Nilai Invoice</label>
+					</div>
+					<div class="col-md-4">
+						<input type="text" id="nilai_invoice" name="nilai_invoice" class="form-control sm text-right divide" required>
+					</div>
+				</div>
 			</div>
 		</div>
 		<br>
