@@ -48,9 +48,10 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 			</div>
 			<form action="" method="post" id="frm-data">
 				<div class="modal-body" id="ModalView">
+					<input type="hidden" name="id_incoming">
 					<div class="form-group">
 						<label for="">Receive Date</label>
-						<input type="date" class="form-control form-control-sm" name="receive_date" id="">
+						<input type="date" class="form-control form-control-sm" name="receive_date" id="" required>
 					</div>
 					<div class="form-group">
 						<label for="">No. Invoice</label>
@@ -58,12 +59,20 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 					</div>
 					<div class="form-group">
 						<label for="">Total Invoice</label>
-						<input type="text" class="form-control form-control-sm auto_num" name="total_invoice" id="">
+						<input type="text" class="form-control form-control-sm text-right auto_num" name="total_invoice" id="">
+					</div>
+					<div class="form-group">
+						<label for="">Nilai PPN</label>
+						<input type="text" class="form-control form-control-sm text-right auto_num" name="nilai_ppn" id="">
+					</div>
+					<div class="form-group">
+						<label for="">No. Faktur Pajak</label>
+						<input type="text" class="form-control form-control-sm" name="no_faktur_pajak" id="">
 					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-sm btn-secondary" onclick="$('#dialog-popup').modal('hide')">Cancel</button>
-					<button type="submit" class="btn btn-sm btn-danger">Close PR</button>
+					<button type="submit" class="btn btn-sm btn-success">Create</button>
 				</div>
 			</form>
 		</div>
@@ -85,6 +94,35 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 		$('.auto_num').autoNumeric();
 	});
 
+	$(document).on('click', '.create_rec_inv', function() {
+		var id_incoming = $(this).data('id_incoming');
+
+		$('input[name="id_incoming"]').val(id_incoming);
+
+		$('#dialog-popup').modal('show');
+
+		$('input[name="receive_date"]').val('');
+		$('input[name=""]').val('');
+		$('input[name="no_invoice"]').val('');
+		$('input[name="total_invoice"]').val('');
+		$('input[name="nilai_ppn"]').val('');
+		$('input[name="no_faktur_pajak"]').val('');
+	});
+
+	$(document).on('submit', '#frm-data', function(e) {
+		e.preventDefault();
+
+		swal({
+			type: 'warning',
+			title: 'Are you sure ?',
+			text: 'This will make receive invoice data !',
+			showCancelButton: true
+		}, function(next) {
+			if(next) {
+				
+			}
+		});
+	});
 
 	function DataTables(costcenter = null, product = null) {
 		var dataTable = $('#example1').DataTable({
