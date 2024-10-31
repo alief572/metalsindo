@@ -119,7 +119,7 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 			showCancelButton: true
 		}, function(next) {
 			if(next) {
-				
+				var formData = $('#frm-data').serialize();
 			}
 		});
 	});
