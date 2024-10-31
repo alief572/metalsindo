@@ -72,7 +72,7 @@ class Incoming extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$data = $this->db->query("SELECT a.*, b.name_suplier as name_suplier FROM tr_incoming as a INNER JOIN master_supplier as b on a.id_suplier=b.id_suplier WHERE a.status_jurnal='1' AND a.status_logistik='1'  ORDER BY a.id_incoming DESC")->result();
+		$data = $this->db->query("SELECT a.*, b.name_suplier as name_suplier FROM tr_incoming as a INNER JOIN master_supplier as b on a.id_suplier=b.id_suplier WHERE (a.status_jurnal='1' AND a.status_logistik='1') OR (a.rec_ap = 1)  ORDER BY a.id_incoming DESC")->result();
 		$this->template->set('results', $data);
 		$this->template->title('Index Request AP');
 		$this->template->render('index_request_hutang');
@@ -87,7 +87,8 @@ class Incoming extends Admin_Controller
 		$this->template->page_icon('fa fa-pencil');
 		$aktif = 'active';
 		$deleted = '0';
-		$po = $data = $this->db->query("SELECT * FROM tr_incoming WHERE status_jurnal='1' AND id_data='$id' ")->result();
+		// $po = $data = $this->db->query("SELECT * FROM tr_incoming WHERE status_jurnal='1' AND id_data='$id' ")->result();
+		$po = $data = $this->db->query("SELECT * FROM tr_incoming WHERE id_data='$id' ")->result();
 
 		$data = [
 			'po' => $po,
