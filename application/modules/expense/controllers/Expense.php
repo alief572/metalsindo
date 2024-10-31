@@ -211,11 +211,9 @@ class Expense extends Admin_Controller
 					$this->db->update_batch('rutin_non_planning_detail', $arrUpdateDetail, 'id');
 				} else {
 					// $get_detail_pr = $this->db->get_where('material_planning_base_on_produksi_detail', ['no_pr' => $no_pr])->result_array();
-					$this->db->select('a.*, if(c.nama IS NULL, e.stock_name, c.nama) as nm_barang, if(d.code IS NULL, f.code, d.code) as satuan');
+					$this->db->select('a.*, e.stock_name as nm_barang, f.code as satuan');
 					$this->db->from('material_planning_base_on_produksi_detail a');
 					$this->db->join('material_planning_base_on_produksi b,', 'b.so_number = a.so_number');
-					$this->db->join('new_inventory_4 c', 'c.code_lv4 = a.id_material', 'left');
-					$this->db->join('ms_satuan d', 'd.id = c.id_unit', 'left');
 					$this->db->join('accessories e', 'e.id = a.id_material', 'left');
 					$this->db->join('ms_satuan f', 'f.id = e.id_unit', 'left');
 					$this->db->where('b.no_pr', $no_pr);
@@ -319,11 +317,9 @@ class Expense extends Admin_Controller
 					$this->db->insert_batch('tr_pr_detail_kasbon', $arrInsertDetail);
 					$this->db->update_batch('rutin_non_planning_detail', $arrUpdateDetail, 'id');
 				} else {
-					$this->db->select('a.*, if(c.nama IS NULL, e.stock_name, c.nama) as nm_barang, if(d.code IS NULL, f.code, d.code) as satuan');
+					$this->db->select('a.*, e.stock_name as nm_barang, f.code as satuan');
 					$this->db->from('material_planning_base_on_produksi_detail a');
 					$this->db->join('material_planning_base_on_produksi b', 'b.so_number = a.so_number');
-					$this->db->join('new_inventory_4 c', 'c.code_lv4 = a.id_material', 'left');
-					$this->db->join('ms_satuan d', 'd.id = c.id_unit', 'left');
 					$this->db->join('accessories e', 'e.id = a.id_material', 'left');
 					$this->db->join('ms_satuan f', 'f.id = e.id_unit', 'left');
 					$this->db->where('b.no_pr', $no_pr);
