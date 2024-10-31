@@ -44,11 +44,22 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-				<h4 class="modal-title" id="myModalLabel">Closing PR</h4>
+				<h4 class="modal-title" id="myModalLabel">Create Receive Invoice</h4>
 			</div>
 			<form action="" method="post" id="frm-data">
 				<div class="modal-body" id="ModalView">
-					...
+					<div class="form-group">
+						<label for="">Receive Date</label>
+						<input type="date" class="form-control form-control-sm" name="receive_date" id="">
+					</div>
+					<div class="form-group">
+						<label for="">No. Invoice</label>
+						<input type="text" class="form-control form-control-sm" name="no_invoice" id="">
+					</div>
+					<div class="form-group">
+						<label for="">Total Invoice</label>
+						<input type="text" class="form-control form-control-sm auto_num" name="total_invoice" id="">
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-sm btn-secondary" onclick="$('#dialog-popup').modal('hide')">Cancel</button>
@@ -61,6 +72,7 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 
 <!-- DataTables -->
 <script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
+<script src="<?= base_url('asset/js/autoNumeric.js') ?>"></script>
 <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 
 <!-- page script -->
@@ -69,6 +81,8 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 
 	$(document).ready(function() {
 		DataTables();
+
+		$('.auto_num').autoNumeric();
 	});
 
 

@@ -39,10 +39,6 @@ class Receive_invoice_ap extends Admin_Controller
     $this->db->select('a.*, b.name_suplier');
     $this->db->from('tr_incoming a');
     $this->db->join('master_supplier b', 'b.id_suplier = a.id_suplier', 'left');
-    $this->db->group_start();
-    $this->db->where('a.no_invoice', '');
-    $this->db->or_where('a.no_invoice', null);
-    $this->db->group_end();
     if (!empty($search)) {
       $this->db->group_start();
       $this->db->like('a.id_incoming', $search['value'], 'both');
@@ -51,6 +47,7 @@ class Receive_invoice_ap extends Admin_Controller
       $this->db->or_like('a.nilai_invoice', $search['value'], 'both');
       $this->db->group_end();
     }
+    $this->db->group_by('a.id_incoming');
     $this->db->order_by('a.created_date', 'desc');
     $this->db->limit($length, $start);
 
@@ -59,11 +56,6 @@ class Receive_invoice_ap extends Admin_Controller
     $this->db->select('a.*, b.name_suplier');
     $this->db->from('tr_incoming a');
     $this->db->join('master_supplier b', 'b.id_suplier = a.id_suplier', 'left');
-    $this->db->group_start();
-    $this->db->where('a.no_invoice', '');
-    $this->db->or_where('a.no_invoice', null);
-    $this->db->group_end();
-
     if (!empty($search)) {
       $this->db->group_start();
       $this->db->like('a.id_incoming', $search['value'], 'both');
@@ -72,14 +64,14 @@ class Receive_invoice_ap extends Admin_Controller
       $this->db->or_like('a.nilai_invoice', $search['value'], 'both');
       $this->db->group_end();
     }
-
+    $this->db->group_by('a.id_incoming');
     $this->db->order_by('a.created_date', 'desc');
 
     $get_data_all = $this->db->get();
 
     $hasil = [];
 
-    $no = 1;
+    $no = ($start + 1);
     foreach ($get_data->result() as $item) {
 
       $this->db->select('c.no_surat');
@@ -96,6 +88,17 @@ class Receive_invoice_ap extends Admin_Controller
         $no_po[] = $item_po->no_surat;
       }
 
+      $status = '<button type="button" class="btn btn-sm btn-danger">Not Received Yet</button>';
+      if($item->rec_ap == '1') {
+        $status = '<button type="button" class="btn btn-sm btn-success">Received</button>';
+      }
+
+      $option = '<button type="button" class="btn btn-sm btn-warning create_rec_inv" title="Create Receive Invoice" data-id_incoming="'.$item->id_incoming.'"><i class="fa fa-pencil"></i></button>';
+
+      if($item->rec_ap == '1') {
+        $option = '<button type="button" class="btn btn-sm btn-info" title="View Receive Invoice"><i class="fa fa-eye"></i></button>';
+      }
+
       $hasil[] = [
         'no' => $no,
         'no_incoming' => $item->id_incoming,
@@ -103,8 +106,8 @@ class Receive_invoice_ap extends Admin_Controller
         'no_invoice' => $item->no_invoice,
         'supplier' => $item->name_suplier,
         'nominal_invoice' => $item->nilai_invoice,
-        'status' => 'test',
-        'option' => 'test'
+        'status' => $status,
+        'option' => $option
       ];
 
       $no++;
