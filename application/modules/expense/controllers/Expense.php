@@ -65,7 +65,7 @@ class Expense extends Admin_Controller
 			->where('a.kasbon_created', null)
 			->group_by('b.no_pr');
 		$get_detail_pr_stok_material = $this->db->get()->result_array();
-		foreach($get_detail_pr_stok_material as $item) {
+		foreach ($get_detail_pr_stok_material as $item) {
 			$list_pr_non_po[] = $item['no_pr'];
 		}
 
@@ -77,7 +77,7 @@ class Expense extends Admin_Controller
 			->where('a.kasbon_created', null)
 			->group_by('b.no_pr');
 		$get_detail_pr_departemen = $this->db->get()->result_array();
-		foreach($get_detail_pr_departemen as $item) {
+		foreach ($get_detail_pr_departemen as $item) {
 			$list_pr_non_po[] = $item['no_pr'];
 		}
 
@@ -544,7 +544,7 @@ class Expense extends Admin_Controller
 		$this->db->join('ms_satuan b', 'b.id = a.unit', 'left');
 		$this->db->where('a.id_kasbon', $data->no_doc);
 		$get_pr_detail_kasbon = $this->db->get()->result_array();
-		
+
 
 
 		$this->template->set('mod', $mod);
@@ -622,7 +622,8 @@ class Expense extends Admin_Controller
 			simpan_aktifitas($nm_hak_akses, $kode_universal, $keterangan, $jumlah, $sql, $status);
 		}
 		$param = array(
-			'save' => $result, 'id' => $id
+			'save' => $result,
+			'id' => $id
 		);
 		echo json_encode($param);
 	}
@@ -839,7 +840,8 @@ class Expense extends Admin_Controller
 			simpan_aktifitas($nm_hak_akses, $kode_universal, $keterangan, $jumlah, $sql, $status);
 		}
 		$param = array(
-			'save' => $result, 'id' => $id
+			'save' => $result,
+			'id' => $id
 		);
 		echo json_encode($param);
 	}
@@ -1272,7 +1274,8 @@ class Expense extends Admin_Controller
 			}
 		}
 		$param = array(
-			'save' => $result, 'id' => $id
+			'save' => $result,
+			'id' => $id
 		);
 		echo json_encode($param);
 	}
@@ -1478,7 +1481,8 @@ class Expense extends Admin_Controller
 			}
 		}
 		$param = array(
-			'save' => $result, 'id' => $id
+			'save' => $result,
+			'id' => $id
 		);
 		echo json_encode($param);
 	}
@@ -1645,7 +1649,8 @@ class Expense extends Admin_Controller
 		}
 
 		$param = array(
-			'save' => $result, 'id' => $id
+			'save' => $result,
+			'id' => $id
 		);
 		echo json_encode($param);
 	}
@@ -1659,7 +1664,7 @@ class Expense extends Admin_Controller
 		$date1 = $post['date1'];
 		$date2 = $post['date2'];
 
-		if($departement !== '' && $departement !== null) {
+		if ($departement !== '' && $departement !== null) {
 			$data	= $this->db->query("SELECT * FROM tr_transport WHERE nama='" . $nama . "' and departement='" . $departement . "' and tgl_doc between '" . $date1 . "' and '" . $date2 . "' and (no_req ='' or no_req is null) order by tgl_doc")->result();
 		} else {
 			$data	= $this->db->query("SELECT * FROM tr_transport WHERE nama='" . $nama . "' and tgl_doc between '" . $date1 . "' and '" . $date2 . "' and (no_req ='' or no_req is null) order by tgl_doc")->result();
@@ -1731,7 +1736,8 @@ class Expense extends Admin_Controller
 			$id = 0;
 		}
 		$param = array(
-			'save' => $result, 'id' => $id
+			'save' => $result,
+			'id' => $id
 		);
 		echo json_encode($param);
 	}
@@ -1755,7 +1761,8 @@ class Expense extends Admin_Controller
 			simpan_aktifitas($nm_hak_akses, $kode_universal, $keterangan, $jumlah, $sql, $status);
 		}
 		$param = array(
-			'save' => $result, 'id' => $id
+			'save' => $result,
+			'id' => $id
 		);
 		echo json_encode($param);
 	}
@@ -1932,7 +1939,8 @@ class Expense extends Admin_Controller
 			simpan_aktifitas($nm_hak_akses, $kode_universal, $keterangan, $jumlah, $sql, $status);
 		}
 		$param = array(
-			'save' => $result, 'id' => $id
+			'save' => $result,
+			'id' => $id
 		);
 		echo json_encode($param);
 	}
@@ -2199,7 +2207,9 @@ class Expense extends Admin_Controller
 			}
 		}
 		$param = array(
-			'save' => $result, 'id' => $id, 'valid' => $valid
+			'save' => $result,
+			'id' => $id,
+			'valid' => $valid
 		);
 		echo json_encode($param);
 	}
@@ -2208,11 +2218,9 @@ class Expense extends Admin_Controller
 	{
 		$no_pr = $this->input->post('no_pr');
 
-		$this->db->select('if(c.nama IS NULL, e.stock_name, c.nama) as material_name, a.propose_purchase as qty, if(d.code IS NULL, f.code, d.code) as unit, b.category as tipe_pr, a.id')
+		$this->db->select('e.stock_name as material_name, a.propose_purchase as qty, f.code as unit, b.category as tipe_pr, a.id')
 			->from('material_planning_base_on_produksi_detail a')
 			->join('material_planning_base_on_produksi b', 'b.so_number = a.so_number')
-			->join('new_inventory_4 c', 'c.code_lv4 = a.id_material', 'left')
-			->join('ms_satuan d', 'd.id = c.id_unit', 'left')
 			->join('accessories e', 'e.id = a.id_material', 'left')
 			->join('ms_satuan f', 'f.id = e.id_unit', 'left')
 			->where('b.no_pr', $no_pr)
@@ -2240,24 +2248,24 @@ class Expense extends Admin_Controller
 			$valid = 0;
 		} else {
 			$no = 1;
-			if (count($get_detail_pr_stok_material) > 0) {
-				foreach ($get_detail_pr_stok_material as $detail_pr) :
-					if ($tipe_pr == '') {
-						$tipe_pr = $detail_pr['tipe_pr'];
-					}
+			// if (count($get_detail_pr_stok_material) > 0) {
+			// 	foreach ($get_detail_pr_stok_material as $detail_pr) :
+			// 		if ($tipe_pr == '') {
+			// 			$tipe_pr = $detail_pr['tipe_pr'];
+			// 		}
 
-					$hasil .= '<tr class="detail_pr_' . $detail_pr['id'] . '">';
-					$hasil .= '<td class="text-center">' . $no . '</td>';
-					$hasil .= '<td class="text-center">' . $detail_pr['material_name'] . '</td>';
-					$hasil .= '<td class="text-center">' . number_format($detail_pr['qty']) . ' <input type="hidden" class="qty_' . $detail_pr['id'] . '" value="' . $detail_pr['qty'] . '"></td>';
-					$hasil .= '<td class="text-center">' . $detail_pr['unit'] . '</td>';
-					$hasil .= '<td class="text-center"><input type="text" name="price_input_' . $detail_pr['id'] . '" class="form-control form-control-sm text-right price_input price_input_' . $detail_pr['id'] . ' autonum" data-no="' . $detail_pr['id'] . '"></td>';
-					$hasil .= '<td class="text-center"><input type="text" name="grand_total_' . $detail_pr['id'] . '" class="form-control form-control-sm text-right grand_total_' . $detail_pr['id'] . ' autonum"></td>';
-					$hasil .= '<td class="text-center"><button type="button" class="btn btn-sm btn-danger del_detail" data-no="' . $detail_pr['id'] . '"><i class="fa fa-trash"></i></button></td>';
-					$hasil .= '</tr>';
-					$no++;
-				endforeach;
-			}
+			// 		$hasil .= '<tr class="detail_pr_' . $detail_pr['id'] . '">';
+			// 		$hasil .= '<td class="text-center">' . $no . '</td>';
+			// 		$hasil .= '<td class="text-center">' . $detail_pr['material_name'] . '</td>';
+			// 		$hasil .= '<td class="text-center">' . number_format($detail_pr['qty']) . ' <input type="hidden" class="qty_' . $detail_pr['id'] . '" value="' . $detail_pr['qty'] . '"></td>';
+			// 		$hasil .= '<td class="text-center">' . $detail_pr['unit'] . '</td>';
+			// 		$hasil .= '<td class="text-center"><input type="text" name="price_input_' . $detail_pr['id'] . '" class="form-control form-control-sm text-right price_input price_input_' . $detail_pr['id'] . ' autonum" data-no="' . $detail_pr['id'] . '"></td>';
+			// 		$hasil .= '<td class="text-center"><input type="text" name="grand_total_' . $detail_pr['id'] . '" class="form-control form-control-sm text-right grand_total_' . $detail_pr['id'] . ' autonum"></td>';
+			// 		$hasil .= '<td class="text-center"><button type="button" class="btn btn-sm btn-danger del_detail" data-no="' . $detail_pr['id'] . '"><i class="fa fa-trash"></i></button></td>';
+			// 		$hasil .= '</tr>';
+			// 		$no++;
+			// 	endforeach;
+			// }
 
 			if (count($get_detail_pr_departemen) > 0) {
 				foreach ($get_detail_pr_departemen as $detail_pr) :
@@ -2278,6 +2286,7 @@ class Expense extends Admin_Controller
 				endforeach;
 			}
 		}
+		
 
 		$pesan = '';
 		if ($valid == '0') {
