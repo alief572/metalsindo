@@ -108,6 +108,8 @@ class Expense extends Admin_Controller
 		$tipe_pr		= $this->input->post("tipe_pr");
 		$metode_pembayaran = 1;
 
+
+
 		$this->db->trans_begin();
 		$config['upload_path'] = './assets/expense/';
 		$config['allowed_types'] = '*';
@@ -115,7 +117,7 @@ class Expense extends Admin_Controller
 		$config['encrypt_name'] = TRUE;
 		$filenames = '';
 		if ($id !== '') {
-			$get_filenames = $this->db->select('doc_file')->get_where('tr_kasbon', ['id' => $id])->row_array();
+			$get_filenames = $this->db->get_where('tr_kasbon', ['id' => $id])->row_array();
 			if (!empty($get_filenames)) {
 				$filenames = $get_filenames['doc_file'];
 			}
@@ -135,7 +137,7 @@ class Expense extends Admin_Controller
 		}
 		$filenames2 = '';
 		if ($id !== '') {
-			$get_filenames = $this->db->select('doc_file_2')->get_where('tr_kasbon', ['id' => $id])->row_array();
+			$get_filenames = $this->db->get_where('tr_kasbon', ['id' => $id])->row_array();
 			if (!empty($get_filenames)) {
 				$filenames2 = $get_filenames['doc_file_2'];
 			}
@@ -154,9 +156,7 @@ class Expense extends Admin_Controller
 			}
 		}
 
-
-
-		if ($id != "") {
+		if ($id !== "") {
 			$data = array(
 				'tgl_doc' => date('Y-m-d', strtotime($tgl_doc)),
 				'departement' => $departement,
@@ -177,7 +177,12 @@ class Expense extends Admin_Controller
 				'modified_by' => $this->auth->user_name(),
 				'modified_on' => date("Y-m-d h:i:s"),
 			);
-			$this->db->delete('tr_pr_detail_kasbon', ['id_kasbon' => $id]);
+			$del_detail_kasbon = $this->db->delete('tr_pr_detail_kasbon', ['id_kasbon' => $this->input->post('no_doc')]);
+			if (!$del_detail_kasbon) {
+				print_r('awd 1 - ' . $this->db->error($del_detail_kasbon));
+				exit;
+			}
+
 
 			if (!empty($no_pr)) {
 				if ($tipe_pr == 'pr departemen') {
@@ -185,30 +190,33 @@ class Expense extends Admin_Controller
 					$arrInsertDetail = [];
 					$arrUpdateDetail = [];
 					foreach ($get_detail_pr as $detail_pr) :
-						if (isset($_POST['price_input_' . $detail_pr['id']])) {
-							$arrInsertDetail[] = [
-								'id_detail' => $detail_pr['id'],
-								'id_kasbon' => $no_doc,
-								'no_pr' => $no_pr,
-								'nm_material' => $detail_pr['nm_barang'],
-								'qty' => $detail_pr['qty'],
-								'unit' => $detail_pr['satuan'],
-								'harga' => str_replace(',', '', $this->input->post('price_input_' . $detail_pr['id'])),
-								'total_harga' => str_replace(',', '', $this->input->post('grand_total_' . $detail_pr['id'])),
-								'created_by' => $this->auth->user_id(),
-								'tipe_pr' => $tipe_pr,
-								'created_date' => date('Y-m-d H:i:s')
-							];
-
-							$arrUpdateDetail[] = [
-								'id' => $detail_pr['id'],
-								'kasbon_created' => 1
-							];
+						$arrInsertDetail[] = [
+							'id_detail' => $detail_pr['id'],
+							'id_kasbon' => $no_doc,
+							'no_pr' => $no_pr,
+							'nm_material' => $detail_pr['nm_barang'],
+							'qty' => $detail_pr['qty'],
+							'unit' => $detail_pr['satuan'],
+							'harga' => str_replace(',', '', $this->input->post('price_input_' . $detail_pr['id'])),
+							'total_harga' => str_replace(',', '', $this->input->post('grand_total_' . $detail_pr['id'])),
+							'created_by' => $this->auth->user_id(),
+							'tipe_pr' => $tipe_pr,
+							'created_date' => date('Y-m-d H:i:s')
+						];
+						
+						$update_rutin_non_planning_detail = $this->db->update('rutin_non_planning_detail', ['kasbon_created' => 1], ['id' => $detail_pr['id']]);
+						if (!$update_rutin_non_planning_detail) {
+							print_r($arrUpdateDetail);
+							exit;
 						}
 					endforeach;
 
-					$this->db->insert_batch('tr_pr_detail_kasbon', $arrInsertDetail);
-					$this->db->update_batch('rutin_non_planning_detail', $arrUpdateDetail, 'id');
+					$insert_pr_detail_kasbon = $this->db->insert_batch('tr_pr_detail_kasbon', $arrInsertDetail);
+					if (!$insert_pr_detail_kasbon) {
+						print_r('awd 2 - ' . $this->db->error($insert_pr_detail_kasbon));
+						exit;
+					}
+					
 				} else {
 					// $get_detail_pr = $this->db->get_where('material_planning_base_on_produksi_detail', ['no_pr' => $no_pr])->result_array();
 					$this->db->select('a.*, e.stock_name as nm_barang, f.code as satuan');
@@ -244,12 +252,26 @@ class Expense extends Admin_Controller
 						}
 					endforeach;
 
-					$this->db->insert_batch('tr_pr_detail_kasbon', $arrInsertDetail);
-					$this->db->update_batch('material_planning_base_on_produksi_detail', $arrUpdateDetail, 'id');
+					$insert_pr_detail_kasbon = $this->db->insert_batch('tr_pr_detail_kasbon', $arrInsertDetail);
+					if (!$insert_pr_detail_kasbon) {
+						print_r('awd 4 - ' . $this->db->error($insert_pr_detail_kasbon));
+						exit;
+					}
+					$update_material_planning_base_on_produksi_detail = $this->db->update_batch('material_planning_base_on_produksi_detail', $arrUpdateDetail, 'id');
+					if (!$update_material_planning_base_on_produksi_detail) {
+						print_r('awd 5 - ' . $this->db->error($update_material_planning_base_on_produksi_detail));
+						exit;
+					}
 				}
 			}
 
+
+
 			$result = $this->db->update('tr_kasbon', $data, array('id' => $id));
+			if (!$result) {
+				print_r('awd - ' . $this->db->error($result));
+				exit;
+			}
 			if ($this->db->trans_status() === FALSE) {
 				$this->db->trans_rollback();
 			} else {
@@ -264,7 +286,7 @@ class Expense extends Admin_Controller
 			$no_doc = $this->All_model->GetAutoGenerate('format_kasbon');
 			$data =  array(
 				'no_doc' => $no_doc,
-				'tgl_doc' => $tgl_doc,
+				'tgl_doc' => date('Y-m-d', strtotime($tgl_doc)),
 				'departement' => $departement,
 				'keperluan' => $keperluan,
 				'keterangan' => $keterangan,
@@ -439,7 +461,7 @@ class Expense extends Admin_Controller
 				(SELECT COUNT(aa.id) FROM tr_expense aa JOIN tr_expense_detail ab ON ab.no_doc = aa.no_doc WHERE ab.id_expense_detail = a.id AND aa.status IN ('0','1','2','3')) < 1
 		")->num_rows();
 		if (!$query1) {
-			print_r($this->db->error($query1));
+			print_r('awd - ' . $this->db->error($query1));
 			exit;
 		}
 
@@ -518,7 +540,7 @@ class Expense extends Admin_Controller
 				(SELECT COUNT(aa.id) FROM tr_expense aa JOIN tr_expense_detail ab ON ab.no_doc = aa.no_doc WHERE ab.id_expense_detail = a.id AND aa.status IN ('0','1','2','3')) < 1
 		")->result();
 			if (!$data) {
-				print_r($this->db->error($data));
+				print_r('awd - ' . $this->db->error($data));
 				exit;
 			}
 		} else {
@@ -1140,7 +1162,7 @@ class Expense extends Admin_Controller
 			// $id = $this->All_model->dataSave('tr_expense', $data);
 			$insert_expense = $this->db->insert('tr_expense', $data);
 			if (!$insert_expense) {
-				print_r($this->db->error($insert_expense));
+				print_r('awd - ' . $this->db->error($insert_expense));
 				exit;
 			}
 			// print_r($id);
@@ -1210,7 +1232,7 @@ class Expense extends Admin_Controller
 
 							$update_expense_kembalian = $this->db->update('tr_expense', ['expense_id_kembalian' => $no_doc], ['no_doc' => $post['pengembalian_expense_' . $detail_id[$keys]]]);
 							if (!$update_expense_kembalian) {
-								print_r($this->db->error($update_expense_kembalian));
+								print_r('awd - ' . $this->db->error($update_expense_kembalian));
 								exit;
 							}
 
@@ -1225,7 +1247,7 @@ class Expense extends Admin_Controller
 								'created_date' => date('Y-m-d H:i:s')
 							]);
 							if (!$insert_log_kembalian) {
-								print_r($this->db->error($insert_log_kembalian));
+								print_r('awd - ' . $this->db->error($insert_log_kembalian));
 								exit;
 							}
 						} else {
@@ -1250,7 +1272,7 @@ class Expense extends Admin_Controller
 						// $this->All_model->dataSave('tr_expense_detail', $data_detail);
 						$insert_detail_expense = $this->db->insert('tr_expense_detail', $data_detail);
 						if (!$insert_detail_expense) {
-							print_r($this->db->error($insert_detail_expense));
+							print_r('awd - ' . $this->db->error($insert_detail_expense));
 							exit;
 						}
 					}
@@ -2282,7 +2304,7 @@ class Expense extends Admin_Controller
 				endforeach;
 			}
 		}
-		
+
 
 		$pesan = '';
 		if ($valid == '0') {
