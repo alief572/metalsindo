@@ -455,7 +455,7 @@ class Incoming extends Admin_Controller
 		
 		<td><input  type='text' 		value='".$idroll."'	class='form-control input-sm' id='id_roll_".$id."_".$no."' 		required name='dt[".$id."][detail][".$no."][id_roll]' 	readonly></td>
 		
-		<td	><input  type='text' 											class='form-control input-sm text-right autoNumeric' id='dt_widthrecive".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][widthrecive]'  onBlur='cariPanjang($id,$no)'		data-numb1='".$id."' data-numb2='".$no."'  ></td>
+		<td	><input  type='text' 											class='form-control input-sm text-right autoNumeric beratIncoming' id='dt_widthrecive".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][widthrecive]'  onBlur='cariPanjang($id,$no)'		data-numb1='".$id."' data-numb2='".$no."'  ></td>
 		<td	width ='130'><input  type='text' 											class='form-control input-sm' id='dt_lotno_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][loto]' 		></td>
 		
 		
@@ -550,7 +550,7 @@ class Incoming extends Admin_Controller
 		<td                 	><input  type='text' 		value='".$idroll."'	class='form-control input-sm' id='id_roll_".$id."_".$no."' 		required name='dt[".$id."][detail][".$no."][id_roll]' 	readonly></td>
 		
 		
-		<td						><input  type='text' 											class='form-control text-right input-sm autoNumeric' id='dt_widthrecive".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][widthrecive]' 	 onBlur='cariPanjang($id,$no)'		data-numb1='".$id."' data-numb2='".$no."'	></td>
+		<td						><input  type='text' 											class='form-control text-right input-sm beratIncoming autoNumeric' id='dt_widthrecive".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][widthrecive]' 	 onBlur='cariPanjang($id,$no)'		data-numb1='".$id."' data-numb2='".$no."'	></td>
 		
 		<td						><input  type='text' 											class='form-control input-sm ' id='dt_lotno_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][loto]' 		></td>
 		

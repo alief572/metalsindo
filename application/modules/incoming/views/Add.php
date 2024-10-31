@@ -124,7 +124,7 @@
 					</div>
 				</div>
 				<div class='form-group row' >
-					<table class='table table-bordered table-striped'>
+					<table class='table table-bordered table-striped'> 
 					<thead>
 					<tr class='bg-blue'>
 					<th width='5'>Total</th>					 
@@ -172,6 +172,10 @@
 	//$('#input-kendaraan').hide();
 	var base_url			= '<?php echo base_url(); ?>';
 	var active_controller	= '<?php echo($this->uri->segment(1)); ?>';
+	
+	
+	
+		
 	$(document).ready(function(){	
 			var max_fields2      = 10; //maximum input boxes allowed
 			var wrapper2         = $(".input_fields_wrap2"); //Fields wrapper
@@ -425,7 +429,7 @@
             type:"GET",
             url:siteurl+'purchase_order/FormInputKurs',
             data:"loi="+loi,
-            success:function(html){
+            success:function(html){ 
                $("#input_kurs").html(html);
             }
         });
@@ -623,10 +627,10 @@
 		var density				= getNum($("#dt_density_"+id+"_"+no).val());
 		
 		
-		console.log(beratpackinglist);
-		console.log(thickness);
-		console.log(width);
-		console.log(density);
+		// console.log(beratpackinglist);
+		// console.log(thickness);
+		// console.log(width);
+		// console.log(density);
 
 		
 		var panjang 	= beratpackinglist / (thickness * width * density );
@@ -636,9 +640,27 @@
 		$("#dt_panjang2_"+id+"_"+no).val(number_format(panjang*1000,2)); 
 		
 		customerSelect(id,no);
+		
+		totalBalanced();
 	
 
     }
+	
+	
+	function totalBalanced(){
+		
+		var SUMx = 0;
+		$(".beratIncoming" ).each(function() {
+			SUMx += Number($(this).val().split(",").join(""));
+		});
+		
+		
+		$('#total_incoming').val(number_format(SUMx,2));
+
+		
+
+		
+	}
 	
 	function cariSelisih(id,no){
 		
