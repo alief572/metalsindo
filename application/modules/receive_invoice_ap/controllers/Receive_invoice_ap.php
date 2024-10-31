@@ -105,7 +105,7 @@ class Receive_invoice_ap extends Admin_Controller
         'no_po' => implode(', ', $no_po),
         'no_invoice' => $item->no_invoice_rec_ap,
         'supplier' => $item->name_suplier,
-        'nominal_invoice' => $item->nilai_invoice,
+        'nominal_invoice' => number_format($item->nilai_invoice),
         'status' => $status,
         'option' => $option
       ];
@@ -118,6 +118,40 @@ class Receive_invoice_ap extends Admin_Controller
       'recordsTotal' => $get_data_all->num_rows(),
       'recordsFiltered' => $get_data_all->num_rows(),
       'data' => $hasil
+    ]);
+  }
+
+  public function save_receive_invoice() {
+    $post = $this->input->post();
+
+    $this->db->trans_begin();
+
+    $data_update = [
+      'no_invoice_rec_ap' => $post['no_invoice'],
+      'receive_date' => $post['receive_date'],
+      'nilai_invoice' => str_replace(',', '', $post['total_invoice']),
+      'nilai_ppn' => str_replace(',', '', $post['nilai_ppn']),
+      'no_faktur_pajak' => $post['no_faktur_pajak'],
+      'rec_ap' => 1
+    ];
+
+    $this->db->update('tr_incoming', $data_update, array('id_incoming' => $post['id_incoming']));
+
+    if($this->db->trans_status() === false) {
+      $this->db->trans_rollback();
+
+      $valid = 0;
+      $pesan = 'Please try again later !';
+    } else {
+      $this->db->trans_commit();
+
+      $valid = 1;
+      $pesan = 'Receive Invoice has been success !';
+    }
+
+    echo json_encode([
+      'status' => $valid,
+      'pesan' => $pesan
     ]);
   }
 }

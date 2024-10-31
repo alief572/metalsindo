@@ -86,8 +86,6 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 
 <!-- page script -->
 <script type="text/javascript">
-	
-
 	$(document).ready(function() {
 		DataTables();
 
@@ -118,8 +116,42 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 			text: 'This will make receive invoice data !',
 			showCancelButton: true
 		}, function(next) {
-			if(next) {
+			if (next) {
 				var formData = $('#frm-data').serialize();
+
+				$.ajax({
+					type: 'post',
+					url: siteurl + active_controller + 'save_receive_invoice',
+					data: formData,
+					cache: false,
+					dataType: 'JSON',
+					success: function(result) {
+						if (result.status == '1') {
+							swal({
+								type: 'success',
+								title: 'Success !',
+								text: result.pesan
+							}, function(lanjut) {
+								$('#dialog-popup').modal('hide');
+
+								DataTables();
+							});
+						} else {
+							swal({
+								type: 'warning',
+								title: 'Faield !',
+								text: result.pesan
+							});
+						}
+					},
+					error: function(result) {
+						swal({
+							type: 'error',
+							title: 'Error !',
+							text: 'Please try again later !'
+						});
+					}
+				})
 			}
 		});
 	});

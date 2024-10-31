@@ -4,6 +4,7 @@
     $ENABLE_VIEW    = has_permission('Penerimaan.View');
     $ENABLE_DELETE  = has_permission('Penerimaan.Delete');
 ?>
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
 <form action="#" method="POST" id="form_proses_bro" enctype="multipart/form-data"> 
 	<div class="box box-primary">
 		<div class="box-header">
@@ -135,6 +136,7 @@
   </div>
 </div>
 </form>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 <script>
 	$(document).ready(function(){
 		$('#spinnerx').hide();
@@ -186,55 +188,9 @@
 			}
 		});
 	});
-	// function DataTables(){
-	// 	var dataTable = $('#my-grid').DataTable({
-	// 		"serverSide": true,
-	// 		"stateSave" : true,
-	// 		"bAutoWidth": true,
-	// 		"destroy": true,
-	// 		"processing": true,
-	// 		"responsive": true,
-	// 		"fixedHeader": {
-	// 			"header": true,
-	// 			"footer": true
-	// 		},
-	// 		"oLanguage": {
-	// 			"sSearch": "<b>Search : </b>",
-	// 			"sLengthMenu": "_MENU_ &nbsp;&nbsp;<b>Records Per Page</b>&nbsp;&nbsp;",
-	// 			"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
-	// 			"sInfoFiltered": "(filtered from _MAX_ total entries)",
-	// 			"sZeroRecords": "No matching records found",
-	// 			"sEmptyTable": "No data available in table",
-	// 			"sLoadingRecords": "Please wait - loading...",
-	// 			"oPaginate": {
-	// 				"sPrevious": "Prev",
-	// 				"sNext": "Next"
-	// 			}
-	// 		},
-	// 		"aaSorting": [[ 1, "asc" ]],
-	// 		"columnDefs": [ {
-	// 			"targets": 'no-sort',
-	// 			"orderable": false,
-	// 		}],
-	// 		"sPaginationType": "simple_numbers",
-	// 		"iDisplayLength": 10,
-	// 		"aLengthMenu": [[10, 20, 50, 100, 150], [10, 20, 50, 100, 150]],
-	// 		"ajax":{
-	// 			url: siteurl + active_controller + 'server_side_payment',
-	// 			//url : base_url + active_controller+'/server_side_inv', 
-	// 			type: "post",
-	// 			data: function(d){
-	// 				// d.kode_partner = $('#kode_partner').val()
-	// 			},
-	// 			cache: false,
-	// 			error: function(){
-	// 				$(".my-grid-error").html("");
-	// 				$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-	// 				$("#my-grid_processing").css("display","none");
-	// 			}
-	// 		}
-	// 	});
-	// }
+	function DataTables(){
+		var dataTable = $('#example1').DataTable();
+	}
 	
 	// function add_inv(){ 
         // window.location.href = base_url + active_controller +'create_new'; modal_detail_invoice
