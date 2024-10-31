@@ -35,8 +35,7 @@ class Request_payment extends Admin_Controller
 		// $list_coa = $this->db->get_where(DBACC.'.coa_master', ['no_perkirran'])->result_array();
 
 		$this->db->select('a.*');
-		$this->db->from(DBACC . '.coa_master a')
-			->where('a.no_perkiraan LIKE', '%1102-%');
+		$this->db->from(DBACC . '.coa_master a');
 		$list_coa = $this->db->get()->result_array();
 
 		$list_no_invoice = [];
@@ -72,7 +71,7 @@ class Request_payment extends Admin_Controller
 			];
 		}
 
-		$data_bank = $this->db->select('no_perkiraan, nama')->get_where(DBACC . '.coa_master', ['nama LIKE' => '%bank%'])->result();
+		$data_bank = $this->db->select('no_perkiraan, nama')->fron(DBACC.'.coa_master')->result();
 		$this->template->set('data', $data);
 		$this->template->set('data_bank', $data_bank);
 		$this->template->set('list_tgl_pengajuan_pembayaran', $list_tgl_pengajuan_pembayaran);
@@ -1728,7 +1727,7 @@ class Request_payment extends Admin_Controller
 
 		$list_curr = $this->db->get_where('mata_uang', ['deleted' => null])->result();
 		// $list_coa = $this->db->get_where(DBACC . '.coa_master', ['no_perkiraan' => null])->result();
-		$list_coa = $this->db->select('*')->from(DBACC . '.coa_master a')->like('a.no_perkiraan', '1102-', 'both')->get()->result();
+		$list_coa = $this->db->select('*')->from(DBACC . '.coa_master a')->get()->result();
 
 		$list_no_invoice = [];
 		$this->db->select('id, invoice_no');

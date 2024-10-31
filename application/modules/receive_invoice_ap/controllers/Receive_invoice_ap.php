@@ -103,7 +103,7 @@ class Receive_invoice_ap extends Admin_Controller
         'no' => $no,
         'no_incoming' => $item->id_incoming,
         'no_po' => implode(', ', $no_po),
-        'no_invoice' => $item->no_invoice,
+        'no_invoice' => $item->no_invoice_rec_ap,
         'supplier' => $item->name_suplier,
         'nominal_invoice' => $item->nilai_invoice,
         'status' => $status,
