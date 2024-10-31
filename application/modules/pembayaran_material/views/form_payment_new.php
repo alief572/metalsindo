@@ -96,7 +96,7 @@ foreach ($results['result_payment'] as $item) {
 							<option value="">- Bank -</option>
 							<?php
 							foreach ($results['list_bank'] as $item_bank) {
-								echo '<option value="' . $item_bank->no_perkiraan . '">' . $item_bank->nama . '</option>';
+								echo '<option value="' . $item_bank->no_perkiraan . '">' . $item_bank->nama . ' - '.$item_bank->no_perkiraan.'</option>';
 							}
 							?>
 						</select>

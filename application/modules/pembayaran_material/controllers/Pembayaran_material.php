@@ -441,7 +441,7 @@ class Pembayaran_material extends Admin_Controller
 		->get()
 		->result();
 		$get_supplier = $this->db->get('master_supplier')->result();
-		$get_bank = $this->db->select('*')->from(DBACC . '.coa_master')->like('no_perkiraan', '1102-', 'both')->get()->result();
+		$get_bank = $this->db->select('*')->from(DBACC . '.coa_master')->get()->result();
 		$get_mata_uang = $this->db->get_where('mata_uang', ['deleted_by' => 0, 'activation' => 'active'])->result();
 
 		$data = [
