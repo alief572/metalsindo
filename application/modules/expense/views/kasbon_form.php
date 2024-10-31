@@ -110,7 +110,7 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 						</div> -->
 					</div>
 
-					<div class="transfer_ke_cont" style="display: none;">
+					<div class="transfer_ke_cont" >
 						<h4>Transfer ke</h4>
 						<div class="form-group ">
 							<label class="col-md-1 control-label">Bank</label>
