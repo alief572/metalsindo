@@ -58,7 +58,7 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 						<input type="text" class="form-control form-control-sm" name="no_invoice" id="">
 					</div>
 					<div class="form-group">
-						<label for="">Total Invoice</label>
+						<label for="">Total Invoice + PPN</label>
 						<input type="text" class="form-control form-control-sm text-right auto_num" name="total_invoice" id="">
 					</div>
 					<div class="form-group">
@@ -92,6 +92,30 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 		$('.auto_num').autoNumeric();
 	});
 
+	function number_format(number, decimals, dec_point, thousands_sep) {
+		// Strip all characters but numerical ones.
+		number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+		var n = !isFinite(+number) ? 0 : +number,
+			prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+			sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+			dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+			s = '',
+			toFixedFix = function(n, prec) {
+				var k = Math.pow(10, prec);
+				return '' + Math.round(n * k) / k;
+			};
+		// Fix for IE parseFloat(0.55).toFixed(0) = 0;
+		s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+		if (s[0].length > 3) {
+			s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+		}
+		if ((s[1] || '').length < prec) {
+			s[1] = s[1] || '';
+			s[1] += new Array(prec - s[1].length + 1).join('0');
+		}
+		return s.join(dec);
+	}
+
 	$(document).on('click', '.create_rec_inv', function() {
 		var id_incoming = $(this).data('id_incoming');
 
@@ -100,11 +124,57 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 		$('#dialog-popup').modal('show');
 
 		$('input[name="receive_date"]').val('');
-		$('input[name=""]').val('');
+		$('input[name="receive_date"]').attr('readonly', false);
 		$('input[name="no_invoice"]').val('');
+		$('input[name="no_invoice"]').attr('readonly', false);
 		$('input[name="total_invoice"]').val('');
+		$('input[name="total_invoice"]').attr('readonly', false);
 		$('input[name="nilai_ppn"]').val('');
+		$('input[name="nilai_ppn"]').attr('readonly', false);
 		$('input[name="no_faktur_pajak"]').val('');
+		$('input[name="no_faktur_pajak"]').attr('readonly', false);
+	});
+
+	$(document).on('click', '.view_inv', function() {
+		var id_incoming = $(this).data('id_incoming');
+
+		$.ajax({
+			type: 'POST',
+			url: siteurl + active_controller + 'view_inv',
+			data: {
+				'id_incoming': id_incoming
+			},
+			cache: false,
+			dataType: 'json',
+			success: function(result) {
+				$('input[name="receive_date"]').val(result.data_incoming.receive_date);
+				$('input[name="receive_date"]').attr('readonly', true);
+
+				$('input[name="no_invoice"]').val(result.data_incoming.no_invoice_rec_ap);
+				$('input[name="no_invoice"]').attr('readonly', true);
+
+				$('input[name="total_invoice"]').val(number_format(result.data_incoming.nilai_invoice, 2));
+				$('input[name="total_invoice"]').attr('readonly', true);
+
+				$('input[name="nilai_ppn"]').val(number_format(result.data_incoming.nilai_ppn));
+				$('input[name="nilai_ppn"]').attr('readonly', true);
+
+				$('input[name="no_faktur_pajak"]').val(result.data_incoming.no_faktur_pajak);
+				$('input[name="no_faktur_pajak"]').attr('readonly', true);
+
+
+				$('#dialog-popup').modal('show');
+
+				$('.auto_num').autoNumeric();
+			},
+			error: function(result) {
+				swal({
+					type: 'error',
+					title: 'Error !',
+					text: 'Please try again later !'
+				});
+			}
+		});
 	});
 
 	$(document).on('submit', '#frm-data', function(e) {

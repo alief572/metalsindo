@@ -20,7 +20,7 @@ $alamat_cust =  $this->db->query("SELECT * FROM master_customers WHERE id_custom
                             <div class="col-sm-6">
                                 <input type="hidden" name="no_invoice" id="no_invoice" value="<?php echo $inv->no_invoice ?>" class="form-control input-sm" readonly>
                                 <input type="hidden" name="tgl_invoice" id="tgl_invoice" value="<?php echo $inv->tgl_invoice ?>" class="form-control input-sm" readonly>
-                                <input type="date" name="tgl_bayar" id="tgl_bayar" class="form-control input-sm tanggal" value="<?php echo date('Y-m-d') ?>" readonly>
+                                <input type="date" name="tgl_bayar" id="tgl_bayar" class="form-control input-sm tanggal" value="<?php echo date('Y-m-d') ?>" >
                             </div>
                           </div>
                         </div>
