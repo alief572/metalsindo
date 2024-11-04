@@ -183,8 +183,8 @@
             // $findnegara = $this->db->query("SELECT * FROM negara WHERE id_negara = '" . $header->negara . "' ")->result();
             // $cou = $findnegara[0]->nm_negara;
         }
-        // $findpic = $this->db->query("SELECT * FROM child_supplier_pic WHERE id_suplier = '" . $header->id_suplier . "' ")->result();
-        // $namapic = $findpic[0]->name_pic;
+        $findpic = $this->db->query("SELECT * FROM child_supplier_pic WHERE id_suplier = '" . $header->id_suplier . "' ")->result();
+        $namapic = $findpic[0]->name_pic;
 
         // print_r($_SERVER['DOCUMENT_ROOT'] . '/origa_live/assets/images/ori_logo.jpg');
         // exit;
@@ -202,12 +202,11 @@
                 </td>
             </tr>
         </table>
-        <hr>
         <div style='display:block; border-color:none; background-color:#c2c2c2;' align='center'>
             <h3>PURCHASE ORDER</h3>
         </div>
         <br>
-        <table class='gridtable2' width='100%' border='1' align='left' cellpadding='0' cellspacing='0'>
+        <!-- <table class='gridtable2' width='100%' border='1' align='left' cellpadding='0' cellspacing='0'>
             <tr>
                 <td width="300" align="center">
                     <table width='300' align="center">
@@ -314,7 +313,71 @@
         if (strtolower($header->matauang) == 'idr') {
             $kode = 'Rp';
         }
-        ?>
+        ?> -->
+
+        <table class='gridtableX' width='100%' cellpadding='2' border='0'>
+            <tbody>
+                <tr>
+                    <td style='width: 50%;'>
+                        <p>
+                            Address<br>
+                            Jl. Jababeka XIV, Blok J no. 10 H<br>
+                            Cikarang Industrial Estate, Bekasi 17530<br>
+                            Phone : (62-21) 89831726734<br>
+                            Fax : (62-21) 89831866<br>
+                        </p>
+                    </td>
+                    <td style='width: 50%; text-align:right; vertical-align:top;'>
+                        <p>
+                            PO No : <?= $header->no_surat ?>
+                        </p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <table class='gridtable2' width='100%' border='1' align='center' cellpadding='0' cellspacing='0'>
+            <tr>
+                <td width="380" align="center">
+                    <table width='380' align="center">
+                        <tr>
+                            <td width='70' align="left">Supplier</td>
+                            <td width='10' align="left">:</td>
+                            <td width='300' align="left"><?= $data_supplier->name_suplier ?></td>
+                        </tr>
+                        <tr>
+                            <td width='70' align="left">Address</td>
+                            <td width='10' align="left">:</td>
+                            <td width='300' align="left"><?= $data_supplier->address_office ?></td>
+                        </tr>
+                        <tr>
+                            <td width='70' align="left">Country</td>
+                            <td width='10' align="left">:</td>
+                            <td width='300' align="left"><?= $cou ?></td>
+                        </tr>
+                        <tr>
+                            <td width='70' align="left">PIC</td>
+                            <td width='10' align="left">:</td>
+                            <td width='300' align="left"><?= $namapic ?></td>
+                        </tr>
+                        <tr>
+                            <td width='70' align="left">Phone</td>
+                            <td width='10' align="left">:</td>
+                            <td width='300' align="left"><?= $data_supplier->telephone ?></td>
+                        </tr>
+                        <tr>
+                            <td width='70' align="left">Fax</td>
+                            <td width='10' align="left">:</td>
+                            <td width='300' align="left"><?= (empty($data_supplier->fax)) ?
+                                                                "-"
+                                                                :
+                                                                $data_supplier->fax
+                                                            ?></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
         <table class='gridtable' width="100%" cellpadding='0' cellspacing='0' style='vertical-align:top;min-width: 400px !important; max-width: 750px !important;'>
             <tbody>
                 <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
