@@ -189,20 +189,16 @@
         // print_r($_SERVER['DOCUMENT_ROOT'] . '/origa_live/assets/images/ori_logo.jpg');
         // exit;
         ?>
-        <table class="gridtable2" border="0">
+        <table border="0" width='100%'>
             <tr>
-                <td style="text-align:left;">
-                    <img src='<?='./assets/images/logo_metalsindo.jpeg'; ?>' alt="" width="75" height="95">
+                <td align="left">
+                    <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'>
                 </td>
-                <td align="right" width="630">
-                    <br>
-                    Jl. Pembangunan II <br>
-                    Kel. Batusari, <br>
-                    Kec. Batuceper, <br>
-                    Kota Tangerang Postal <br>
-                    Code 15122 <br>
-                    Indonesia
-
+                <td align="left">
+                    <h5 style="text-align: left;">PT METALSINDO PACIFIC</h5>
+                </td>
+                <td align="right" width="483">
+                    <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/img/ISO_9001V1.jpg' alt="" height='30' width='60'>
                 </td>
             </tr>
         </table>
@@ -349,10 +345,10 @@
 
                     $satuan = $detail->satuan;
                     $satuan_packing = $detail->satuan_packing;
-                    if($detail->tipe == '' || $detail->tipe == null) {
+                    if ($detail->tipe == '' || $detail->tipe == null) {
                         $check_code = $this->db->get_where('accessories', ['id' => $detail->idmaterial])->num_rows();
 
-                        if($check_code4 < 1) {
+                        if ($check_code4 < 1) {
                             $this->db->select('b.code as satuan, c.code as satuan_packing');
                             $this->db->from('accessories a');
                             $this->db->join('ms_satuan b', 'b.id = a.id_unit', 'left');
@@ -475,7 +471,7 @@
 
         <br>
 
-        <table class="gridtable2" width="620" border="1"  cellpadding='0' cellspacing='0'>
+        <table class="gridtable2" width="620" border="1" cellpadding='0' cellspacing='0'>
             <tr>
                 <td width="620" align="left" style="font-size: 10px; overflow: auto !important; border-top: 1px solid black; border-right: 1px solid black; border-left: 1px solid black; ">
                     <table width="620" align="left" border="0">

@@ -159,6 +159,9 @@
         <td align="left">
             <h5 style="text-align: left;">PT METALSINDO PACIFIC</h5>
         </td>
+        <td align="right" width="483">
+            <img src='<?=$_SERVER['DOCUMENT_ROOT'];?>/metalsindo/assets/img/ISO_9001V1.jpg' alt="" height='30' width='60'>
+        </td>
     </tr>
 </table>
 <div style='display:block; border-color:none; background-color:#c2c2c2;' align='center'>

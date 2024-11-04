@@ -96,7 +96,7 @@ class Receive_invoice_ap extends Admin_Controller
       $option = '<button type="button" class="btn btn-sm btn-warning create_rec_inv" title="Create Receive Invoice" data-id_incoming="'.$item->id_incoming.'"><i class="fa fa-pencil"></i></button>';
 
       if($item->rec_ap == '1') {
-        $option = '<button type="button" class="btn btn-sm btn-info" title="View Receive Invoice"><i class="fa fa-eye"></i></button>';
+        $option = '<button type="button" class="btn btn-sm btn-info view_inv" title="View Receive Invoice" data-id_incoming="'.$item->id_incoming.'"><i class="fa fa-eye"></i></button>';
       }
 
       $hasil[] = [
@@ -152,6 +152,16 @@ class Receive_invoice_ap extends Admin_Controller
     echo json_encode([
       'status' => $valid,
       'pesan' => $pesan
+    ]);
+  }
+
+  public function view_inv() {
+    $id_incoming = $this->input->post('id_incoming');
+
+    $get_incoming = $this->db->get_where('tr_incoming', ['id_incoming' => $id_incoming])->row();
+
+    echo json_encode([
+      'data_incoming' => $get_incoming
     ]);
   }
 }
