@@ -378,7 +378,7 @@
                 </td>
             </tr>
         </table>
-        <table class='gridtable' width="100%" cellpadding='0' cellspacing='0' style='vertical-align:top;min-width: 400px !important; max-width: 750px !important;'>
+        <table class='gridtable' width="100%" cellpadding='0' cellspacing='0' style='margin-top: 10px; vertical-align:top;min-width: 400px !important; max-width: 750px !important;'>
             <tbody>
                 <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
                     <td align="center">Code</td>
