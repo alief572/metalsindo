@@ -368,10 +368,10 @@
                             <td width='70' align="left" style="font-size: 10px;">Fax</td>
                             <td width='10' align="left" style="font-size: 10px;">:</td>
                             <td width='300' align="left" style="font-size: 10px;"><?= (empty($data_supplier->fax)) ?
-                                                                "-"
-                                                                :
-                                                                $data_supplier->fax
-                                                            ?></td>
+                                                                                        "-"
+                                                                                        :
+                                                                                        $data_supplier->fax
+                                                                                    ?></td>
                         </tr>
                     </table>
                 </td>
@@ -550,26 +550,24 @@
 
         <br>
 
-        <table class='gridtable2' width='100%' border='0' align='left' cellpadding='0' cellspacing='0'>
+        <table class='gridtableX2' width='100%' cellpadding='0' cellspacing='0' border='0' align='right'>
             <tr>
-                <td style="text-align: center; height: 70px; vertical-align: top;">Authorized</td>
-                <td style="text-align: center; height: 70px; vertical-align: top;">Supplier Acceptance</td>
+                <td align='center'>Approved</td>
+                <td width='50'></td>
             </tr>
             <tr>
-                <td style="text-align:center; font-size: 11px;" width="310">Purchasing</td>
-                <td style="text-align:center; font-size: 11px;" width="310">
-                    Name : <br>
-                    Designation : <br>
-                    Date : <br>
-                </td>
+                <td height='50' align='center'></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td align='center'><u>HARRY WIDJAJA</u></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td align='center'>President Director</td>
+                <td></td>
             </tr>
         </table>
-
-        <br>
-
-        <div style="text-align: right; font-size: 11px;">
-            Doc No : FR-PCH-06-03
-        </div>
 
     </body>
 
