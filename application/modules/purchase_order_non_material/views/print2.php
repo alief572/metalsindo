@@ -205,7 +205,6 @@
         <div style='display:block; border-color:none; background-color:#c2c2c2;' align='center'>
             <h3>PURCHASE ORDER</h3>
         </div>
-        <br>
         <!-- <table class='gridtable2' width='100%' border='1' align='left' cellpadding='0' cellspacing='0'>
             <tr>
                 <td width="300" align="center">
@@ -319,7 +318,7 @@
             <tbody>
                 <tr>
                     <td style='width: 50%;'>
-                        <p>
+                        <p style="font-size: 10px;">
                             Address<br>
                             Jl. Jababeka XIV, Blok J no. 10 H<br>
                             Cikarang Industrial Estate, Bekasi 17530<br>
@@ -328,7 +327,7 @@
                         </p>
                     </td>
                     <td style='width: 50%; text-align:right; vertical-align:top;'>
-                        <p>
+                        <p style="font-size: 10px;">
                             PO No : <?= $header->no_surat ?>
                         </p>
                     </td>
@@ -341,34 +340,34 @@
                 <td width="380" align="center">
                     <table width='380' align="center">
                         <tr>
-                            <td width='70' align="left">Supplier</td>
-                            <td width='10' align="left">:</td>
-                            <td width='300' align="left"><?= $data_supplier->name_suplier ?></td>
+                            <td width='70' align="left" style="font-size: 10px;">Supplier</td>
+                            <td width='10' align="left" style="font-size: 10px;">:</td>
+                            <td width='300' align="left" style="font-size: 10px;"><?= $data_supplier->name_suplier ?></td>
                         </tr>
                         <tr>
-                            <td width='70' align="left">Address</td>
-                            <td width='10' align="left">:</td>
-                            <td width='300' align="left"><?= $data_supplier->address_office ?></td>
+                            <td width='70' align="left" style="font-size: 10px;">Address</td>
+                            <td width='10' align="left" style="font-size: 10px;">:</td>
+                            <td width='300' align="left" style="font-size: 10px;"><?= $data_supplier->address_office ?></td>
                         </tr>
                         <tr>
-                            <td width='70' align="left">Country</td>
-                            <td width='10' align="left">:</td>
-                            <td width='300' align="left"><?= $cou ?></td>
+                            <td width='70' align="left" style="font-size: 10px;">Country</td>
+                            <td width='10' align="left" style="font-size: 10px;">:</td>
+                            <td width='300' align="left" style="font-size: 10px;"><?= $cou ?></td>
                         </tr>
                         <tr>
-                            <td width='70' align="left">PIC</td>
-                            <td width='10' align="left">:</td>
-                            <td width='300' align="left"><?= $namapic ?></td>
+                            <td width='70' align="left" style="font-size: 10px;">PIC</td>
+                            <td width='10' align="left" style="font-size: 10px;">:</td>
+                            <td width='300' align="left" style="font-size: 10px;"><?= $namapic ?></td>
                         </tr>
                         <tr>
-                            <td width='70' align="left">Phone</td>
-                            <td width='10' align="left">:</td>
-                            <td width='300' align="left"><?= $data_supplier->telephone ?></td>
+                            <td width='70' align="left" style="font-size: 10px;">Phone</td>
+                            <td width='10' align="left" style="font-size: 10px;">:</td>
+                            <td width='300' align="left" style="font-size: 10px;"><?= $data_supplier->telephone ?></td>
                         </tr>
                         <tr>
-                            <td width='70' align="left">Fax</td>
-                            <td width='10' align="left">:</td>
-                            <td width='300' align="left"><?= (empty($data_supplier->fax)) ?
+                            <td width='70' align="left" style="font-size: 10px;">Fax</td>
+                            <td width='10' align="left" style="font-size: 10px;">:</td>
+                            <td width='300' align="left" style="font-size: 10px;"><?= (empty($data_supplier->fax)) ?
                                                                 "-"
                                                                 :
                                                                 $data_supplier->fax
@@ -480,28 +479,28 @@
                 }
                 ?>
                 <tr>
-                    <td align="right" colspan='8'>Total </td>
+                    <td align="right" colspan='8' style="font-size: 8px;">Total </td>
                     <td align="right" style="font-size: 8px;"><?= number_format($header->total_barang, 2) ?></td>
 
                 </tr>
                 <tr>
-                    <td align="right" colspan='8'>Biaya Kirim </td>
+                    <td align="right" colspan='8' style="font-size: 8px;">Biaya Kirim </td>
                     <td align="right" style="font-size: 8px;"><?= number_format($header->taxtotal, 2) ?></td>
 
                 </tr>
 
                 <tr>
-                    <td align="right" colspan='8'>Discount </td>
+                    <td align="right" colspan='8' style="font-size: 8px;">Discount </td>
                     <td align="right" style="font-size: 8px;"><?= number_format($header->nilai_disc, 2) ?></td>
                 </tr>
 
                 <tr>
-                    <td align="right" colspan='8'>PPN </td>
+                    <td align="right" colspan='8' style="font-size: 8px;">PPN </td>
                     <td align="right" style="font-size: 8px;"><?= number_format($header->total_ppn, 2) ?></td>
                 </tr>
 
                 <tr>
-                    <td align="right" colspan='8'>Grand Total </td>
+                    <td align="right" colspan='8' style="font-size: 8px;">Grand Total </td>
                     <td align="right" style="font-size: 8px;"><?= number_format($header->subtotal, 2) ?></td>
 
                 </tr>
@@ -513,7 +512,7 @@
 
         <table width="100%" border="1" cellpadding='0' cellspacing='0'>
             <tr>
-                <td width="620" style="font-size: 10px;">
+                <td width="620" style="font-size: 8px;">
                     <b>Syarat & Ketentuan :</b> <br>
                     1. Cantumkan nomor PO ini dalam surat jalan, faktur/kwitansi, dan semua dokumen yang berkaitan. <br>
                     2. Cantumkan nomor & nama rekening untuk pembayaran secara lengkap (beserta nama bank) pada invoice. <br>
