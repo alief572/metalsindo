@@ -1,8 +1,8 @@
 <?php
-$ENABLE_ADD     = has_permission('Penerimaan.Add');
-$ENABLE_MANAGE  = has_permission('Penerimaan.Manage');
-$ENABLE_VIEW    = has_permission('Penerimaan.View');
-$ENABLE_DELETE  = has_permission('Penerimaan.Delete');
+$ENABLE_ADD     = has_permission('Request_Pembayaran_AP.Add');
+$ENABLE_MANAGE  = has_permission('Request_Pembayaran_AP.Manage');
+$ENABLE_VIEW    = has_permission('Request_Pembayaran_AP.View');
+$ENABLE_DELETE  = has_permission('Request_Pembayaran_AP.Delete');
 ?>
 <style type="text/css">
 	thead input {
