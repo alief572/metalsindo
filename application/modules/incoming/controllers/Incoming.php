@@ -368,7 +368,7 @@ class Incoming extends Admin_Controller
 		$this->template->render('editPenawaran');
 	}
 
-	public function TambahData()
+	/*public function TambahData()
 	{
 		$id 	= $_GET['id'];
 		$no 	= $_GET['no'];
@@ -451,14 +451,10 @@ class Incoming extends Admin_Controller
 		
 		
 		<td><input  type='text' 		value='" . $idroll . "'	class='form-control input-sm' id='id_roll_" . $id . "_" . $no . "' 		required name='dt[" . $id . "][detail][" . $no . "][id_roll]' 	readonly></td>
-		
-<<<<<<< HEAD
 		<td	><input  type='text' 											class='form-control input-sm text-right autoNumeric beratIncoming' id='dt_widthrecive".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][widthrecive]'  onBlur='cariPanjang($id,$no)'		data-numb1='".$id."' data-numb2='".$no."'  ></td>
 		<td	width ='130'><input  type='text' 											class='form-control input-sm' id='dt_lotno_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][loto]' 		></td>
-=======
 		<td	><input  type='text' 											class='form-control input-sm text-right autoNumeric' id='dt_widthrecive" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][widthrecive]'  onBlur='cariPanjang($id,$no)'		data-numb1='" . $id . "' data-numb2='" . $no . "'  ></td>
 		<td	width ='130'><input  type='text' 											class='form-control input-sm' id='dt_lotno_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][loto]' 		></td>
->>>>>>> 909ac77b5ac3f590e7f9fdc73dbc4fa28f9b77ea
 		
 		
 			
@@ -490,9 +486,9 @@ class Incoming extends Admin_Controller
 		</td>
 		</tr>";
 		}
-	}
-
-	public function TambahDataRepeat()
+	}*/
+	
+	/*public function TambahDataRepeat()
 	{
 		$id 	= $_GET['id'];
 		$no_sebelumnya = $_GET['no'];
@@ -551,13 +547,10 @@ class Incoming extends Admin_Controller
 		
 		<td                 	><input  type='text' 		value='" . $idroll . "'	class='form-control input-sm' id='id_roll_" . $id . "_" . $no . "' 		required name='dt[" . $id . "][detail][" . $no . "][id_roll]' 	readonly></td>
 		
-		
-<<<<<<< HEAD
+		<!--
 		<td						><input  type='text' 											class='form-control text-right input-sm beratIncoming autoNumeric' id='dt_widthrecive".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][widthrecive]' 	 onBlur='cariPanjang($id,$no)'		data-numb1='".$id."' data-numb2='".$no."'	></td>
-=======
 		<td						><input  type='text' 											class='form-control text-right input-sm autoNumeric' id='dt_widthrecive" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][widthrecive]' 	 onBlur='cariPanjang($id,$no)'		data-numb1='" . $id . "' data-numb2='" . $no . "'	></td>
->>>>>>> 909ac77b5ac3f590e7f9fdc73dbc4fa28f9b77ea
-		
+		-->
 		<td						><input  type='text' 											class='form-control input-sm ' id='dt_lotno_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][loto]' 		></td>
 		
 		<td						hidden><input  type='text' 											class='form-control input-sm' id='dt_panjang2_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][panjang2]' 		readonly></td>
@@ -595,9 +588,233 @@ class Incoming extends Admin_Controller
 		</td> 
 		</tr>";
 		}
+	}*/
+
+
+	
+	public function TambahData(){
+		$id 	= $_GET['id'];
+		$no 	= $_GET['no'];
+		$no_po 	= $_GET['nopo'];
+		
+			
+		$mt     = $this->db->query("SELECT * FROM tr_purchase_order WHERE no_po = '".$no_po."'  ")->row();
+		$no_surat = $mt->no_surat;
+		$material = $this->db->query("SELECT * FROM dt_trans_po WHERE no_po = '".$no_po."' AND close_po = 'N' ")->result();
+		$customer	= $this->db->query("select * FROM master_customers ")->result();
+		$gudang	= $this->db->query("select * FROM ms_gudang WHERE id_gudang IN(1,3,5) ")->result();
+		foreach($material as $material){
+			$no_pr  = $material->idpr;
+			$id_dt_po  = $material->id_dt_po;
+			
+			
+			
+			$totalweight = $this->db->query("SELECT * FROM dt_trans_pr WHERE id_dt_pr = '".$no_pr."'  ")->row();
+			$id_material  = $material->idmaterial;
+			
+			$idroll=$this->db->query("SELECT MAX(id_roll) as id_roll FROM stock_material WHERE id_category3='$id_material'")->row();
+			
+			
+			
+			$bntk=$this->db->query("SELECT id_bentuk as bentuk FROM ms_inventory_category3 WHERE id_category3='$id_material'")->row();
+			
+			$bentuk = $bntk->bentuk;
+			$dens=$this->db->query("SELECT density FROM view_material WHERE id_category3='$id_material' AND bentuk='$bentuk'")->row();
+			
+			$thick=$this->db->query("SELECT nilai_dimensi as thickness FROM view_material WHERE id_category3='$id_material' AND bentuk='$bentuk' AND nama='THICKNESS'")->row();
+			
+			$incoming = $this->db->query("SELECT SUM(width_recive) AS incoming FROM dt_incoming WHERE id_dt_po='$id_dt_po' ")->row();
+			
+			
+			
+			$roll = substr($idroll->id_roll,-3) +1;
+			$idroll =$id_material."-".str_pad($roll, 3, "0", STR_PAD_LEFT);			
+			
+			
+			
+			
+			
+			
+		$no++;
+		echo"
+		<tr id='trmaterial_".$id."_".$no."'> 
+		
+		<td				hidden	><input  type='date' 		value='".$tanggal."'				class='form-control input-sm' id='dt_tanggal_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][tanggal]' >
+		<input  type='text' 		value='".$no_po."'		            class='form-control input-sm' id='no_po".$id."_".$no."' 			        required name='dt[".$id."][detail][".$no."][no_po]' 	readonly>
+		<input  type='text' 		value='".$material->id_dt_po."'		class='form-control input-sm' id='dt_iddtpo_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][iddtpo]' 	readonly>
+		<input  type='text' 		value='".$material->idmaterial."'	class='form-control input-sm' id='dt_idmaterial_".$id."_".$no."' 		required name='dt[".$id."][detail][".$no."][id_material]' 	readonly>
+		<input  type='text' 		value='".$material->panjang."'		class='form-control input-sm text-right' id='dt_length_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][length]' 		readonly>
+		<input  type='number' 		value='".$material->lebar."'		class='form-control input-sm text-right' id='dt_width_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][width]'  		readonly>
+		<input  type='text' 		value='".number_format($material->width,2)."'		class='form-control input-sm text-right' id='dt_weight_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][weight]' 		readonly>
+		<input  type='text' 		value='".number_format($material->totalwidth,2)."'	class='form-control input-sm text-right' id='dt_qtyorder_".$id."_".$no."' 		required name='dt[".$id."][detail][".$no."][qtyorder]'     readonly>
+		<input  type='text' 		value='1'									class='form-control input-sm text-right autoNumeric' id='dt_qtyrecive_".$id."_".$no."' 		required name='dt[".$id."][detail][".$no."][qtyrecive]' 	>
+		<input  type='text' 											class='form-control input-sm' id='dt_panjang2_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][panjang2]' 		readonly>
+		
+		</td>
+		
+		
+		<td hidden ><input  type='text' 		value='".$no_surat."'		        class='form-control input-sm' id='no_surat".$id."_".$no."' 			        required name='dt[".$id."][detail][".$no."][no_surat]' 	readonly></td>
+		
+		<td width ='130'><input  type='text' 		value='".$material->namamaterial."'	class='form-control input-sm' id='dt_namamaterial_".$id."_".$no."' 	required name='dt[".$id."][detail][".$no."][nama_material]' readonly></td>
+		
+		<td>
+		Thickness : ".$thick->thickness." <br>
+		Density   : ".$dens->density." <br>
+		Width     : ".number_format($material->width,2)." <br>
+		Ttl PO    : ".number_format($material->totalwidth,2)."<br>
+		Blm Diterima: ".number_format(($material->totalwidth - $incoming->incoming)*-1,2)." <br>
+
+		
+		<input  type='hidden' 		value='".number_format($thick->thickness,2)."'		class='form-control input-sm text-right' id='dt_thickness_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][thickness]' 		readonly>
+		
+		<input  type='hidden' 		value='".number_format($dens->density,2)."'		class='form-control input-sm text-right' id='dt_density_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][density]' 		readonly>
+		
+		</td>
+		
+		
+		
+		<td><input  type='text' 		value='".$idroll."'	class='form-control input-sm' id='id_roll_".$id."_".$no."' 		required name='dt[".$id."][detail][".$no."][id_roll]' 	readonly></td>
+		
+		<td	><input  type='text' 	class='form-control input-sm text-right autoNumeric beratIncoming' id='dt_widthrecive".$id."_".$no."' required name='dt[".$id."][detail][".$no."][widthrecive]'  onBlur='cariPanjang($id,$no)'		data-numb1='".$id."' data-numb2='".$no."' placeholder='Receive' ></td>
+		<td	width ='130'><input  type='text' 	class='form-control input-sm' id='dt_lotno_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][loto]' 	placeholder='Lot'	></td>
+		
+		
+			
+		<td style='font-size:90%'><select style='font-size:90%' class='form-control chosen-select' id='dt_gudang_".$id."_".$no."'
+		name='dt[".$id."][detail][".$no."][gudang]'  onchange='customerSelect($id,$no)'>";
+		echo"<option value=''>Pilih Gudang</option>";
+		foreach ($gudang as $gudangx){
+			//$sel = ($gudangx->id_gudang == 3)?'selected':'';
+		echo"<option value='$gudangx->id_gudang'>$gudangx->nama_gudang</option>";
+		};
+		echo"</select></td>
+		<td style='font-size:90%'><select style='font-size:90%' class='form-control chosen-select' id='dt_customer_".$id."_".$no."'
+		name='dt[".$id."][detail][".$no."][customer]' >";
+		echo"<option value=''>Pilih Customer</option>";
+		foreach ($customer as $customerx){
+			//$sel = ($customerx->id_gudang == 3)?'selected':'';		
+		echo"<option value='$customerx->name_customer'>$customerx->name_customer</option>";
+		}; 
+		echo"</select></td>
+		
+		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_aktual_".$id."_".$no."' 	onBlur='cariSelisih($id,$no)'		required name='dt[".$id."][detail][".$no."][aktual]' 	Placeholder='Berat Aktual'	></td>
+		
+		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_selisih_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][selisih]' 	readonly	></td>
+		<td				       hidden ><input  type='text' 		value='".number_format($material->hargasatuan,3)."'									class='form-control input-sm text-right' id='dt_hargasatuan_".$id."_".$no."' 		required name='dt[".$id."][detail][".$no."][hargasatuan]' 	></td>
+		
+		<td align='center'>
+			<button type='button' class='btn btn-sm btn-danger cancelSubPart' data-no1='".$id."' data-no2='".$no."' title='Delete Part'><i class='fa fa-close'></i></button>
+			<button type='button' class='btn btn-sm btn-primary repeatSubPart' data-no1='".$id."' data-no2='".$no."'  data-lot='".$roll."' data-id='".$material->id_dt_po."' id='tombol".$no."' 		 title='Repeat Part'><i class='fa fa-retweet'></i></button>
+		</td>
+		</tr>"; 
+		}
+
+	}
+	
+	
+	public function TambahDataRepeat(){
+		$id 	= $_GET['id'];
+		$no_sebelumnya = $_GET['no'];
+		$no 	= $_GET['no'] + 100;
+		$no_po 		= substr($_GET['nopo'],0,8);
+		$no_po_id 	= $_GET['nopo'];
+		//$idroll 	= $_GET['idroll']+$_GET['no'];
+		
+		$roll = $_GET['idroll']+1;
+		$idroll =$id_material."-".str_pad($roll, 3, "0", STR_PAD_LEFT);		
+		
+		$mt     = $this->db->query("SELECT * FROM tr_purchase_order WHERE no_po = '".$no_po."'  ")->row();
+		$no_surat = $mt->no_surat;
+		$gudang	= $this->db->query("select * FROM ms_gudang WHERE id_gudang IN(1,3,5)")->result();
+		$customer	= $this->db->query("select * FROM master_customers ")->result();
+		$material = $this->db->query("SELECT * FROM dt_trans_po WHERE id_dt_po = '".$no_po_id."'  ")->result();
+		foreach($material as $material){
+			$no_pr  = $material->idpr;
+			$id_material = $material->idmaterial;
+			$idroll =$id_material."-".str_pad($roll, 3, "0", STR_PAD_LEFT);		
+			
+			$bntk=$this->db->query("SELECT id_bentuk as bentuk FROM ms_inventory_category3 WHERE id_category3='$id_material'")->row();
+			
+			$bentuk = $bntk->bentuk;
+			$dens=$this->db->query("SELECT density FROM view_material WHERE id_category3='$id_material' AND bentuk='$bentuk'")->row();
+			
+			$thick=$this->db->query("SELECT nilai_dimensi as thickness FROM view_material WHERE id_category3='$id_material' AND bentuk='$bentuk' AND nama='THICKNESS'")->row();
+			
+		$no++;
+		echo"
+		<tr id='trmaterial_".$id."_".$no."'> 
+		<td				hidden	><input  type='date' 		value='".$tanggal."'				class='form-control' id='dt_tanggal_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][tanggal]' >
+		</td>
+		<td				hidden  ><input  type='text' 		value='".$no_po."'		            class='form-control' id='no_po".$id."_".$no."' 			        required name='dt[".$id."][detail][".$no."][no_po]' 	readonly></td>
+		<td				hidden ><input  type='hidden' 		value='".$no_surat."'		        class='form-control' id='no_surat".$id."_".$no."' 			        required name='dt[".$id."][detail][".$no."][no_surat]' 	readonly>
+								<input  type='text' 		value='".$no_sebelumnya."'		        class='form-control' id='no_sebelumnya".$id."_".$no."' 			        required name='dt[".$id."][detail][".$no."][no_sebelumnya]' 	readonly>
+		
+		</td>
+		<td				  ><input  type='hidden' 		value='".$material->id_dt_po."'		class='form-control' id='dt_iddtpo_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][iddtpo]' 	readonly></td>
+		<td				hidden	><input  type='text' 		value='".$material->idmaterial."'	class='form-control' id='dt_idmaterial_".$id."_".$no."' 		required name='dt[".$id."][detail][".$no."][id_material]' 	readonly></td>
+		<td						><input  type='hidden' 		value='".$material->namamaterial."'	class='form-control' id='dt_namamaterial_".$id."_".$no."' 	required name='dt[".$id."][detail][".$no."][nama_material]' readonly></td>
+		<td				hidden	><input  type='text' 		value='".$material->panjang."'		class='form-control' id='dt_length_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][length]' 		readonly></td>
+		<td				hidden	><input  type='number' 		value='".$material->lebar."'		class='form-control' id='dt_width_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][width]'  		readonly></td>
+		
+		<td				hidden	>
+		
+		<input  type='hidden' 		value='".number_format($thick->thickness,2)."'		class='form-control input-sm text-right' id='dt_thickness_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][thickness]' 		readonly>		
+		<input  type='hidden' 		value='".number_format($dens->density,2)."'		class='form-control input-sm text-right' id='dt_density_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][density]' 		readonly>
+		<input  type='number' 		value='".$material->width."'		class='form-control' id='dt_weight_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][weight]' 		readonly>
+		
+		</td>
+		
+		<td				hidden		><input  type='hidden' 		value='".$material->totalwidth."'class='form-control' id='dt_qtyorder_".$id."_".$no."' 		required name='dt[".$id."][detail][".$no."][qtyorder]'     readonly></td>
+		
+		<td				hidden><input  type='text' 		value='1'									class='form-control text-right input-sm autoNumeric' id='dt_qtyrecive_".$id."_".$no."' 		required name='dt[".$id."][detail][".$no."][qtyrecive]' 	></td>
+		
+		<td                 	><input  type='text' 		value='".$idroll."'	class='form-control input-sm' id='id_roll_".$id."_".$no."' 		required name='dt[".$id."][detail][".$no."][id_roll]' 	readonly></td>
+		
+		
+		<td						><input  type='text' 											class='form-control text-right input-sm autoNumeric beratIncoming'  id='dt_widthrecive".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][widthrecive]' 	 onBlur='cariPanjang($id,$no)'		data-numb1='".$id."' data-numb2='".$no."' placeholder='Receive'	></td>
+		
+		<td						><input  type='text' 											class='form-control input-sm ' id='dt_lotno_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][loto]' 		></td>
+		
+		<td						hidden><input  type='text' 											class='form-control input-sm' id='dt_panjang2_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][panjang2]' 		readonly></td>
+		
+		
+		<td style='font-size:90%'><select style='font-size:90%' class='form-control chosen-select' id='dt_gudang_".$id."_".$no."'
+		name='dt[".$id."][detail][".$no."][gudang]' onchange='customerSelect($id,$no)'>";
+		echo"<option value=''>Pilih Gudang</option>";
+		foreach ($gudang as $gudangx){
+			//$sel = ($gudangx->id_gudang == 3)?'selected':'';
+		echo"<option value='$gudangx->id_gudang'>$gudangx->nama_gudang</option>";
+		}; 
+		echo"</select></td>
+		
+		
+		<td style='font-size:90%'><select style='font-size:90%' class='form-control chosen-select' id='dt_customer_".$id."_".$no."'
+		name='dt[".$id."][detail][".$no."][customer]' >";
+		echo"<option value=''>Pilih Customer</option>";
+		foreach ($customer as $customerx){
+			//$sel = ($customerx->id_gudang == 3)?'selected':'';
+		
+		echo"<option value='$customerx->name_customer'>$customerx->name_customer</option>";
+		}; 
+		echo"</select></td>
+		
+		
+		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_aktual_".$id."_".$no."' 		onBlur='cariSelisih($id,$no)'	required name='dt[".$id."][detail][".$no."][aktual]' 	Placeholder='Berat Aktual'	></td>
+		
+		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_selisih_".$id."_".$no."' 			required name='dt[".$id."][detail][".$no."][selisih]'  	readonly	></td>
+		<td				       hidden ><input  type='text' 		value='".number_format($material->hargasatuan,3)."'									class='form-control input-sm text-right' id='dt_hargasatuan_".$id."_".$no."' 		required name='dt[".$id."][detail][".$no."][hargasatuan]' 	></td>
+		
+		<td align='center'>
+			<button type='button' class='btn btn-sm btn-danger cancelSubPart' data-no1='".$id."' data-no2='".$no."' title='Delete Part'><i class='fa fa-close'></i></button>
+			<button type='button' class='btn btn-sm btn-primary repeatSubPart' data-no1='".$id."' data-no2='".$no."' data-id='".$material->id_dt_po."' data-lot='".$roll."' id='tombol".$no."'  title='Repeat Part'><i class='fa fa-retweet'></i></button>
+		</td> 
+		</tr>"; 
+		}
+
 	}
 
 
+	
 	public function View($id)
 	{
 		$this->auth->restrict($this->viewPermission);

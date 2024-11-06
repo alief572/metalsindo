@@ -164,11 +164,11 @@
 			<tr class='bg-blue'>
 			<th width='30%'>Nama Material</th>
 			<th width='5%'>Thickness</th>
-			<th width='5%'>Width</th>
+			<th width='10%'>Width</th>
 			<th width='10%'>Part Number</th>
 			<th width='10%'>Harga Penawaran</th>
 			<th width='10%'>Harga Deal / Kg</th>
-			<th width='5%' >Qty (KG)</th>
+			<th width='10%' >Qty (KG)</th>
 			<th width='10%' hidden>Weight / Coil</th>
 			<th width='10%' hidden>Total Wight</th>
 			<th width='10%'>Total Harga</th>
