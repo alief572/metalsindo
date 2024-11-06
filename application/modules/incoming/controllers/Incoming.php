@@ -19,6 +19,11 @@ class Incoming extends Admin_Controller
 	protected $managePermission = 'Incoming.Manage';
 	protected $deletePermission = 'Incoming.Delete';
 
+	protected $viewPermission2 	= 'Request_Pembayaran_AP.View';
+	protected $addPermission2  	= 'Request_Pembayaran_AP.Add';
+	protected $managePermission2 = 'Request_Pembayaran_AP.Manage';
+	protected $deletePermission2 = 'Request_Pembayaran_AP.Delete';
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -69,7 +74,7 @@ class Incoming extends Admin_Controller
 
 	public function index_request_hutang()
 	{
-		$this->auth->restrict($this->viewPermission);
+		$this->auth->restrict($this->viewPermission2);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
 		$data = $this->db->query("SELECT a.*, b.name_suplier as name_suplier FROM tr_incoming as a INNER JOIN master_supplier as b on a.id_suplier=b.id_suplier WHERE (a.status_jurnal='1' AND a.status_logistik='1') OR (a.rec_ap = 1)  ORDER BY a.id_incoming DESC")->result();
@@ -82,7 +87,7 @@ class Incoming extends Admin_Controller
 	public function request()
 	{
 		$id = $this->uri->segment(3);
-		$this->auth->restrict($this->viewPermission);
+		$this->auth->restrict($this->viewPermission2);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-pencil');
 		$aktif = 'active';
