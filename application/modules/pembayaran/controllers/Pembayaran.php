@@ -11,6 +11,11 @@ class Pembayaran extends Admin_Controller
 	protected $managePermission = "Pembayaran.Manage";
 	protected $deletePermission = "Pembayaran.Delete";
 
+	protected $viewPermission2   = "Request_Uang_Muka.View";
+	protected $addPermission2    = "Request_Uang_Muka.Add";
+	protected $managePermission2 = "Request_Uang_Muka.Manage";
+	protected $deletePermission2 = "Request_Uang_Muka.Delete";
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -54,6 +59,8 @@ class Pembayaran extends Admin_Controller
 
 	public function index_jurnal_um()
 	{
+		$this->auth->restrict($this->viewPermission2);
+
 		$this->template->page_icon('fa fa-list');
 		$data = $this->pembayaran_model->get_data_request_payment_um();
 		$this->template->set('results', $data);
