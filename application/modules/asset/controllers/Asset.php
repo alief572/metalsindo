@@ -66,6 +66,7 @@ class Asset extends Admin_Controller
 			'list_catg' => $this->Asset_model->getList('asset_category'),
 			'list_cab' 	=> $this->Asset_model->getList('asset_branch'),
 			'list_pajak' => $this->Asset_model->getList('asset_category_pajak'),
+			'list_coa_asset' => $this->Asset_model->getList(DBACC.'.coa_master'),
 			'data' 		=> $result
 		);
 
@@ -289,6 +290,7 @@ class Asset extends Admin_Controller
 
 		$category		= $data['category'];
 		$penyusutan		= $data['penyusutan'];
+		$kelompok_penyusutan		= $data['kelompok_penyusutan'];
 		$category_pajak	= $data['category_pajak'];
 		$KdCategory		= sprintf('%02s', $category);
 		$KdCategoryPjk	= sprintf('%02s', $category_pajak);
@@ -307,7 +309,7 @@ class Asset extends Admin_Controller
 		if (!empty($data['tanggal'])) {
 			$Year			= date('ym', strtotime($data['tanggal']));
 			$Ym				= $Year;
-			$tgl_oleh		= $data['tanggal'];
+			$tgl_oleh		= date('Y-m-d', strtotime($data['tanggal']));
 		}
 
 		$qQuery			= "SELECT max(kd_asset) as maxP FROM asset WHERE category='" . $category . "' AND kd_asset LIKE '" . $branch . "-" . $Ym . $KdCategory . $KdCategoryPjk . "-%' ";
@@ -370,6 +372,7 @@ class Asset extends Admin_Controller
 			$detailData[$lopp]['kdcab'] 		= $branch;
 			$detailData[$lopp]['foto'] 			= $pic;
 			$detailData[$lopp]['penyusutan'] 	= $penyusutan;
+			$detailData[$lopp]['id_coa'] 	= $kelompok_penyusutan;
 			$detailData[$lopp]['lokasi_asset'] 	= $data['lokasi_asset'];
 			$detailData[$lopp]['cost_center'] 	= $data['cost_center'];
 			$detailData[$lopp]['created_by'] 	= $this->session->userdata['app_session']['username'];
@@ -556,7 +559,7 @@ class Asset extends Admin_Controller
 		$Q_result	= $this->db->query($query)->result();
 		$option 	= "<option value='0'>Select an Option</option>";
 		foreach ($Q_result as $row) {
-			$option .= "<option value='" . $row->id . "'>" . strtoupper($row->nm_dept) . "</option>";
+			$option .= "<option value='" . $row->id . "'>" . strtoupper($row->cost_center) . "</option>";
 		}
 		echo json_encode(array(
 			'option' => $option
@@ -573,72 +576,6 @@ class Asset extends Admin_Controller
 			'jangka_waktu' => $data
 		));
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	public function edit()
 	{
@@ -742,10 +679,11 @@ class Asset extends Admin_Controller
 		echo json_encode($Arr_Data);
 	}
 
-	public function download_excel_all_default($category=null){
+	public function download_excel_all_default($category = null)
+	{
 		//membuat objek PHPExcel
 		set_time_limit(0);
-		ini_set('memory_limit','1024M');
+		ini_set('memory_limit', '1024M');
 
 		$this->load->library("PHPExcel");
 		// $this->load->library("PHPExcel/Writer/Excel2007");
@@ -754,13 +692,13 @@ class Asset extends Admin_Controller
 		$style_header = array(
 			'borders' => array(
 				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
+					'style' => PHPExcel_Style_Border::BORDER_THIN,
+					'color' => array('rgb' => '000000')
+				)
 			),
 			'fill' => array(
 				'type' => PHPExcel_Style_Fill::FILL_SOLID,
-				'color' => array('rgb'=>'e0e0e0'),
+				'color' => array('rgb' => 'e0e0e0'),
 			),
 			'font' => array(
 				'bold' => true,
@@ -771,10 +709,10 @@ class Asset extends Admin_Controller
 			)
 		);
 
-		$style_header2 = array(	
+		$style_header2 = array(
 			'fill' => array(
 				'type' => PHPExcel_Style_Fill::FILL_SOLID,
-				'color' => array('rgb'=>'e0e0e0'),
+				'color' => array('rgb' => 'e0e0e0'),
 			),
 			'font' => array(
 				'bold' => true,
@@ -785,123 +723,123 @@ class Asset extends Admin_Controller
 			)
 		);
 
-		$styleArray = array(					  
-			  'alignment' => array(
+		$styleArray = array(
+			'alignment' => array(
 				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER
-			  ),
-			  'borders' => array(
+			),
+			'borders' => array(
 				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
+					'style' => PHPExcel_Style_Border::BORDER_THIN,
+					'color' => array('rgb' => '000000')
+				)
 			)
-		  );
-		$styleArray3 = array(					  
-			  'alignment' => array(
+		);
+		$styleArray3 = array(
+			'alignment' => array(
 				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT
-			  ),
-			  'borders' => array(
+			),
+			'borders' => array(
 				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
+					'style' => PHPExcel_Style_Border::BORDER_THIN,
+					'color' => array('rgb' => '000000')
+				)
 			)
-		  );  
-		 $styleArray4 = array(					  
-			  'alignment' => array(
+		);
+		$styleArray4 = array(
+			'alignment' => array(
 				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT
-			  ),
-			  'borders' => array(
+			),
+			'borders' => array(
 				'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN,
-					  'color' => array('rgb'=>'000000')
-				  )
+					'style' => PHPExcel_Style_Border::BORDER_THIN,
+					'color' => array('rgb' => '000000')
+				)
 			)
-		  );  
-	    $styleArray1 = array(
-			  'borders' => array(
-				  'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN
-				  )
-			  ),
-			  'alignment' => array(
+		);
+		$styleArray1 = array(
+			'borders' => array(
+				'allborders' => array(
+					'style' => PHPExcel_Style_Border::BORDER_THIN
+				)
+			),
+			'alignment' => array(
 				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_LEFT,
 				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			  )
-		  );
+			)
+		);
 		$styleArray2 = array(
-			  'borders' => array(
-				  'allborders' => array(
-					  'style' => PHPExcel_Style_Border::BORDER_THIN
-				  )
-			  ),
-			  'alignment' => array(
+			'borders' => array(
+				'allborders' => array(
+					'style' => PHPExcel_Style_Border::BORDER_THIN
+				)
+			),
+			'alignment' => array(
 				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
 				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
-			  )
-		  );
+			)
+		);
 
-		$Arr_Bulan	= array(1=>'Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+		$Arr_Bulan	= array(1 => 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 		$sheet 		= $objPHPExcel->getActiveSheet();
 
 		$Row		= 1;
-		$NewRow		= $Row+1;
+		$NewRow		= $Row + 1;
 		$Col_Akhir	= $Cols	= getColsChar(9);
-		$sheet->setCellValue('A'.$Row, 'DATA ASSETS');
-		$sheet->getStyle('A'.$Row.':'.$Col_Akhir.$NewRow)->applyFromArray($style_header2);
-		$sheet->mergeCells('A'.$Row.':'.$Col_Akhir.$NewRow);
+		$sheet->setCellValue('A' . $Row, 'DATA ASSETS');
+		$sheet->getStyle('A' . $Row . ':' . $Col_Akhir . $NewRow)->applyFromArray($style_header2);
+		$sheet->mergeCells('A' . $Row . ':' . $Col_Akhir . $NewRow);
 
-		$NewRow	= $NewRow +2;
-		$NextRow= $NewRow;
+		$NewRow	= $NewRow + 2;
+		$NextRow = $NewRow;
 
-		$sheet->setCellValue('A'.$NewRow, '#');
-		$sheet->getStyle('A'.$NewRow.':A'.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('A'.$NewRow.':A'.$NextRow);
+		$sheet->setCellValue('A' . $NewRow, '#');
+		$sheet->getStyle('A' . $NewRow . ':A' . $NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('A' . $NewRow . ':A' . $NextRow);
 		$sheet->getColumnDimension('A')->setWidth(10);
 
-		$sheet->setCellValue('B'.$NewRow, 'CODE');
-		$sheet->getStyle('B'.$NewRow.':B'.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('B'.$NewRow.':B'.$NextRow);
+		$sheet->setCellValue('B' . $NewRow, 'CODE');
+		$sheet->getStyle('B' . $NewRow . ':B' . $NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('B' . $NewRow . ':B' . $NextRow);
 		$sheet->getColumnDimension('B')->setWidth(20);
 
-		$sheet->setCellValue('C'.$NewRow, 'ASSET NAME');
-		$sheet->getStyle('C'.$NewRow.':C'.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('C'.$NewRow.':C'.$NextRow);
+		$sheet->setCellValue('C' . $NewRow, 'ASSET NAME');
+		$sheet->getStyle('C' . $NewRow . ':C' . $NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('C' . $NewRow . ':C' . $NextRow);
 		$sheet->getColumnDimension('C')->setAutoSize(true);
 
-		$sheet->setCellValue('D'.$NewRow, 'TGL PEROLEHAN');
-		$sheet->getStyle('D'.$NewRow.':D'.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('D'.$NewRow.':D'.$NextRow);
+		$sheet->setCellValue('D' . $NewRow, 'TGL PEROLEHAN');
+		$sheet->getStyle('D' . $NewRow . ':D' . $NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('D' . $NewRow . ':D' . $NextRow);
 		$sheet->getColumnDimension('D')->setAutoSize(true);
 
-		$sheet->setCellValue('E'.$NewRow, 'CATEGORY');
-		$sheet->getStyle('E'.$NewRow.':E'.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('E'.$NewRow.':E'.$NextRow);
+		$sheet->setCellValue('E' . $NewRow, 'CATEGORY');
+		$sheet->getStyle('E' . $NewRow . ':E' . $NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('E' . $NewRow . ':E' . $NextRow);
 		$sheet->getColumnDimension('E')->setWidth(10);
 
-		$sheet->setCellValue('F'.$NewRow, 'KELOMPOK PENYUSUTAN');
-		$sheet->getStyle('F'.$NewRow.':F'.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('F'.$NewRow.':F'.$NextRow);
+		$sheet->setCellValue('F' . $NewRow, 'KELOMPOK PENYUSUTAN');
+		$sheet->getStyle('F' . $NewRow . ':F' . $NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('F' . $NewRow . ':F' . $NextRow);
 		$sheet->getColumnDimension('F')->setWidth(10);
 
-		$sheet->setCellValue('G'.$NewRow, 'COSTCENTER');
-		$sheet->getStyle('G'.$NewRow.':G'.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('G'.$NewRow.':G'.$NextRow);
+		$sheet->setCellValue('G' . $NewRow, 'COSTCENTER');
+		$sheet->getStyle('G' . $NewRow . ':G' . $NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('G' . $NewRow . ':G' . $NextRow);
 		$sheet->getColumnDimension('G')->setWidth(10);
 
-		$sheet->setCellValue('H'.$NewRow, 'DEPRESIASI (YEAR)');
-		$sheet->getStyle('H'.$NewRow.':H'.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('H'.$NewRow.':H'.$NextRow);
+		$sheet->setCellValue('H' . $NewRow, 'DEPRESIASI (YEAR)');
+		$sheet->getStyle('H' . $NewRow . ':H' . $NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('H' . $NewRow . ':H' . $NextRow);
 		$sheet->getColumnDimension('H')->setWidth(10);
 
-		$sheet->setCellValue('I'.$NewRow, 'NILAI PEROLEHAN');
-		$sheet->getStyle('I'.$NewRow.':I'.$NextRow)->applyFromArray($style_header);
-		$sheet->mergeCells('I'.$NewRow.':I'.$NextRow);
+		$sheet->setCellValue('I' . $NewRow, 'NILAI PEROLEHAN');
+		$sheet->getStyle('I' . $NewRow . ':I' . $NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('I' . $NewRow . ':I' . $NextRow);
 		$sheet->getColumnDimension('I')->setWidth(10);
 
 		$where_kategori = "";
-		if($category != '0'){
-			$where_kategori = " AND a.category = '".$category."' ";
+		if ($category != '0') {
+			$where_kategori = " AND a.category = '" . $category . "' ";
 		}
 
 		$SQL = "
@@ -923,19 +861,19 @@ class Asset extends Admin_Controller
 			d.nama AS ket_coa
 		FROM
 			asset a
-			LEFT JOIN ".DBACC.".coa_master d ON a.id_coa = d.no_perkiraan
+			LEFT JOIN " . DBACC . ".coa_master d ON a.id_coa = d.no_perkiraan
 		WHERE 1=1
 			AND a.deleted = 'N'
-			".$where_kategori."
+			" . $where_kategori . "
 			ORDER BY a.id
 		";
 
 		$result = $this->db->query($SQL)->result_array();
 
-		if($result){
+		if ($result) {
 			$awal_row	= $NextRow;
-			$no=0;
-			foreach($result as $key => $row_Cek){
+			$no = 0;
+			foreach ($result as $key => $row_Cek) {
 				$no++;
 				$awal_row++;
 				$awal_col	= 0;
@@ -943,58 +881,58 @@ class Asset extends Admin_Controller
 				$awal_col++;
 				$detail_name	= $no;
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $detail_name);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->setCellValue($Cols . $awal_row, $detail_name);
+				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
 
-				
+
 
 				$awal_col++;
 				$kd_asset	= strtoupper($row_Cek['kd_asset']);
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $kd_asset);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->setCellValue($Cols . $awal_row, $kd_asset);
+				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
 
 				$awal_col++;
 				$nm_asset	= strtoupper($row_Cek['nm_asset']);
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $nm_asset);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->setCellValue($Cols . $awal_row, $nm_asset);
+				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
 
 				$awal_col++;
 				$tgl_perolehan	= $row_Cek['tgl_perolehan'];
 				$Cols		= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $tgl_perolehan);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->setCellValue($Cols . $awal_row, $tgl_perolehan);
+				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
 
 				$awal_col++;
 				$nm_category	= strtoupper($row_Cek['nm_category']);
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $nm_category);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->setCellValue($Cols . $awal_row, $nm_category);
+				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
 
-				$KEL_PENYUSUTAN = (!empty($row_Cek['no_perkiraan']))?strtoupper($row_Cek['no_perkiraan'].' | '.$row_Cek['ket_coa']):'';
+				$KEL_PENYUSUTAN = (!empty($row_Cek['no_perkiraan'])) ? strtoupper($row_Cek['no_perkiraan'] . ' | ' . $row_Cek['ket_coa']) : '';
 				$awal_col++;
 				$Cols			= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $KEL_PENYUSUTAN);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->setCellValue($Cols . $awal_row, $KEL_PENYUSUTAN);
+				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
 
 				$awal_col++;
 				$cost_center		= strtoupper($row_Cek['cost_center']);
 				$Cols		= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $cost_center);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray3);
+				$sheet->setCellValue($Cols . $awal_row, $cost_center);
+				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
 
 				$awal_col++;
 				$depresiasi		= $row_Cek['depresiasi'];
 				$Cols		= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $depresiasi);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+				$sheet->setCellValue($Cols . $awal_row, $depresiasi);
+				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray4);
 
 				$awal_col++;
 				$nilai_asset		= $row_Cek['nilai_asset'];
 				$Cols		= getColsChar($awal_col);
-				$sheet->setCellValue($Cols.$awal_row, $nilai_asset);
-				$sheet->getStyle($Cols.$awal_row)->applyFromArray($styleArray4);
+				$sheet->setCellValue($Cols . $awal_row, $nilai_asset);
+				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray4);
 			}
 		}
 
