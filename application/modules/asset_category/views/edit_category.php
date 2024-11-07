@@ -1,8 +1,8 @@
 <?php
-    $ENABLE_ADD     = has_permission('Asset_category.Add');
-    $ENABLE_MANAGE  = has_permission('Asset_category.Manage');
-    $ENABLE_VIEW    = has_permission('Asset_category.View');
-    $ENABLE_DELETE  = has_permission('Asset_category.Delete');
+    $ENABLE_ADD     = has_permission('Assets_Category.Add');
+    $ENABLE_MANAGE  = has_permission('Assets_Category.Manage');
+    $ENABLE_VIEW    = has_permission('Assets_Category.View');
+    $ENABLE_DELETE  = has_permission('Assets_Category.Delete');
 foreach ($results['inven'] as $record){
 }	
 ?>
