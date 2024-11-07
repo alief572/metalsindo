@@ -128,6 +128,9 @@ class Assets_depreciation extends Admin_Controller
 			if ($akumulasi_depresiasi < 0) {
 				$akumulasi_depresiasi = 0;
 			}
+			if($akumulasi_depresiasi > $item->nilai_asset) { 
+				$akumulasi_depresiasi = $item->nilai_asset;
+			}
 
 			$asset_val = ($item->nilai_asset - $akumulasi_depresiasi);
 			if ($asset_val < 0) {
@@ -271,7 +274,7 @@ class Assets_depreciation extends Admin_Controller
 		$this->db->trans_start();
 		$this->db->insert_batch('jurnal', $ArrDebit);
 		$this->db->insert_batch('jurnal', $ArrKredit);
-		$this->db->insert_batch('javh', $ArrJavh);
+		$this->db->insert_batch('javh', $ArrJavh);	
 		$this->db->trans_complete();
 
 		if ($this->db->trans_status() === FALSE) {
@@ -1027,6 +1030,9 @@ class Assets_depreciation extends Admin_Controller
 				$akumulasi_depresiasi = ($row_Cek['value'] * ($exp_tahun + $exp_bulan));
 				if ($akumulasi_depresiasi < 0) {
 					$akumulasi_depresiasi = 0;
+				}
+				if($akumulasi_depresiasi > $row_Cek['nilai_asset']) { 
+					$akumulasi_depresiasi = $row_Cek['nilai_asset'];
 				}
 
 				$asset_val = ($row_Cek['nilai_asset'] - $akumulasi_depresiasi);
