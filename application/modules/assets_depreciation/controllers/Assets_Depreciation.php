@@ -1090,25 +1090,25 @@ class Assets_depreciation extends Admin_Controller
 				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray4);
 
 				$awal_col++;
-				$nilai_asset		= number_format($row_Cek['nilai_asset'], 2);
+				$nilai_asset		= $row_Cek['nilai_asset'];
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols . $awal_row, $nilai_asset);
 				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray4);
 
 				$awal_col++;
-				$value		= number_format($row_Cek['value'], 2);
+				$value		= $row_Cek['value'];
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols . $awal_row, $value);
 				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray4);
 
 				$awal_col++;
-				$akumulasi_depresiasi = number_format($akumulasi_depresiasi, 2);
+				// $akumulasi_depresiasi = number_format($akumulasi_depresiasi, 2);
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols . $awal_row, $akumulasi_depresiasi);
 				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray4);
 
 				$awal_col++;
-				$asset_val = number_format($asset_val, 2);
+				// $asset_val = number_format($asset_val, 2);
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols . $awal_row, $asset_val);
 				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray4);
