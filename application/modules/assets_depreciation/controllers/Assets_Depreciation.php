@@ -79,6 +79,7 @@ class Assets_depreciation extends Admin_Controller
 			$this->db->or_like('a.value', $search['value'], 'both');
 			$this->db->group_end();
 		}
+		$this->db->group_by('a.id');
 		$this->db->order_by('a.id', 'desc');
 		$this->db->limit($length, $start);
 
@@ -105,6 +106,7 @@ class Assets_depreciation extends Admin_Controller
 			$this->db->or_like('a.value', $search['value'], 'both');
 			$this->db->group_end();
 		}
+		$this->db->group_by('a.id');
 		$this->db->order_by('a.id', 'desc');
 
 		$get_data_all = $this->db->get();
@@ -1007,6 +1009,7 @@ class Assets_depreciation extends Admin_Controller
 		WHERE 1=1
 			AND a.deleted = 'N'
 			" . $where_kategori . "
+			GROUP BY a.id
 			ORDER BY a.id
 		";
 
