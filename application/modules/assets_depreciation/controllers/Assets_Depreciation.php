@@ -2,13 +2,13 @@
 	exit('No direct script access allowed');
 }
 
-class Asset extends Admin_Controller
+class Assets_depreciation extends Admin_Controller
 {
 
-	protected $viewPermission = 'Barang.View';
-	protected $addPermission = 'Barang.Add';
-	protected $managePermission = 'Barang.Manage';
-	protected $deletePermission = 'Barang.Delete';
+	protected $viewPermission = 'Assets_Depreciation.View';
+	protected $addPermission = 'Assets_Depreciation.Add';
+	protected $managePermission = 'Assets_Depreciation.Manage';
+	protected $deletePermission = 'Assets_Depreciation.Delete';
 
 	public function __construct()
 	{
@@ -16,7 +16,7 @@ class Asset extends Admin_Controller
 
 		$this->load->library(array('Mpdf', 'upload'));
 		$this->load->model(array(
-			'Asset/Asset_model'
+			'Assets_depreciation/Assets_depreciation_model'
 		));
 
 		date_default_timezone_set('Asia/Bangkok');
@@ -30,16 +30,141 @@ class Asset extends Admin_Controller
 		$cabang		= $this->db->query("SELECT * FROM cabang WHERE sts_aktif = 'aktif'")->result_array();
 		$kategori	= $this->db->query("SELECT * FROM asset_category")->result_array();
 
+		$this->db->select('DATE_FORMAT(a.tgl_perolehan, "%Y") as tahun_perolehan');
+		$this->db->from('asset a');
+		$this->db->group_by('DATE_FORMAT(a.tgl_perolehan, "%Y")');
+		$this->db->order_by('a.tgl_perolehan', 'desc');
+		$get_year_asset = $this->db->get()->result();
+
+		$this->db->select('a.id, a.nm_category');
+		$this->db->from('asset_category a');
+		$get_list_category = $this->db->get()->result();
+
 		$dataArr = array(
 			'cabang' => $cabang,
-			'kategori' => $kategori
+			'kategori' => $kategori,
+			'list_asset_year' => $get_year_asset,
+			'list_category' => $get_list_category
 		);
 		$this->template->render('index', $dataArr);
 	}
 
+	public function get_data_asset()
+	{
+		$draw = $this->input->post('draw');
+		$start = $this->input->post('start');
+		$length = $this->input->post('length');
+		$search = $this->input->post('search');
+		$category_sp = $this->input->post('category_sp');
+		$tahun_sp = $this->input->post('tahun_sp');
+		$bulan_sp = $this->input->post('bulan_sp');
+
+
+
+		$this->db->select('a.*, b.nama as nm_coa');
+		$this->db->from('asset a');
+		$this->db->join(DBACC . '.coa_master b', 'b.no_perkiraan = a.id_coa');
+		$this->db->where('a.deleted', 'N');
+		if (!empty($category_sp)) {
+			$this->db->where('a.nm_category', $category_sp);
+		}
+		if (!empty($search['value'])) {
+			$this->db->group_start();
+			$this->db->like('a.nm_asset', $search['value'], 'both');
+			$this->db->or_like('a.kd_asset', $search['value'], 'both');
+			$this->db->or_like('DATE_FORMAT(a.tgl_perolehan, "%d-%M-%Y")', $search['value'], 'both');
+			$this->db->or_like('a.id_coa', $search['value'], 'both');
+			$this->db->or_like('b.nama', $search['value'], 'both');
+			$this->db->or_like('a.depresiasi', $search['value'], 'both');
+			$this->db->or_like('a.value', $search['value'], 'both');
+			$this->db->group_end();
+		}
+		$this->db->order_by('a.id', 'desc');
+		$this->db->limit($length, $start);
+
+		$get_data = $this->db->get();
+
+		// print_r($this->db->last_query());
+		// exit;
+
+		$this->db->select('a.*, b.nama as nm_coa');
+		$this->db->from('asset a');
+		$this->db->join(DBACC . '.coa_master b', 'b.no_perkiraan = a.id_coa');
+		$this->db->where('a.deleted', 'N');
+		if (!empty($category_sp)) {
+			$this->db->where('a.nm_category', $category_sp);
+		}
+		if (!empty($search['value'])) {
+			$this->db->group_start();
+			$this->db->like('a.nm_asset', $search['value'], 'both');
+			$this->db->or_like('a.kd_asset', $search['value'], 'both');
+			$this->db->or_like('DATE_FORMAT(a.tgl_perolehan, "%d-%M-%Y")', $search['value'], 'both');
+			$this->db->or_like('a.id_coa', $search['value'], 'both');
+			$this->db->or_like('b.nama', $search['value'], 'both');
+			$this->db->or_like('a.depresiasi', $search['value'], 'both');
+			$this->db->or_like('a.value', $search['value'], 'both');
+			$this->db->group_end();
+		}
+		$this->db->order_by('a.id', 'desc');
+
+		$get_data_all = $this->db->get();
+
+		$hasil = [];
+
+		$no = $start + 1;
+		foreach ($get_data->result() as $item) {
+
+			$tahun_tgl_perolehan = date('y', strtotime($item->tgl_perolehan));
+			$tahun = (!empty($tahun_sp)) ? date('y', strtotime($tahun_sp)) : date('y');
+
+			$exp_tahun = (($tahun - $tahun_tgl_perolehan) * 12);
+
+			$bulan_tgl_perolehan = date('m', strtotime($item->tgl_perolehan));
+			$bulan = (!empty($bulan_sp)) ? date('m', strtotime('2024-' . sprintf('%02s', $bulan_sp . '-01'))) : date('m');
+
+			$exp_bulan = ($bulan - $bulan_tgl_perolehan);
+
+			$akumulasi_depresiasi = ($item->value * ($exp_tahun + $exp_bulan));
+			if ($akumulasi_depresiasi < 0) {
+				$akumulasi_depresiasi = 0;
+			}
+
+			$asset_val = ($item->nilai_asset - $akumulasi_depresiasi);
+			if ($asset_val < 0) {
+				$asset_val = 0;
+			}
+
+			$button = '<button type="button" class="btn btn-info" id="detail" data-id="' . $item->id . '"><i class="fa fa-eye"></i></button>';
+
+			$hasil[] = [
+				'no' => $no,
+				'kode_asset' => $item->kd_asset,
+				'asset_name' => $item->nm_asset,
+				'tgl_perolehan' => date('d-M-Y', strtotime($item->tgl_perolehan)),
+				'category' => $item->nm_category,
+				'kelompok_penyusutan' => $item->id_coa . ' | ' . $item->nm_coa,
+				'depreciation' => number_format($item->depresiasi) . ' Tahun',
+				'aquisition' => number_format($item->nilai_asset, 2),
+				'depreciation_val' => number_format($item->value, 2),
+				'akumulasi_depresiasi' => number_format($akumulasi_depresiasi, 2),
+				'asset_val' => number_format($asset_val, 2),
+				'option' => $button
+			];
+
+			$no++;
+		}
+
+		echo json_encode([
+			'draw' => intval($draw),
+			'recordsTotal' => $get_data_all->num_rows(),
+			'recordsFiltered' => $get_data_all->num_rows(),
+			'data' => $hasil
+		]);
+	}
+
 	public function data_side()
 	{
-		$this->Asset_model->getDataJSON();
+		$this->Assets_depreciation_model->getDataJSON();
 	}
 
 	public function modal_edit()
@@ -63,11 +188,11 @@ class Asset extends Admin_Controller
 		$query = "SELECT a.*, b.nm_dept FROM asset a LEFT JOIN department_center b ON a.cost_center=b.id WHERE a.id='" . $id . "' LIMIT 1 ";
 		$result = $this->db->query($query)->result();
 		$dataArr = array(
-			'list_dept' => $this->Asset_model->getList('department'),
-			'list_catg' => $this->Asset_model->getList('asset_category'),
-			'list_cab' 	=> $this->Asset_model->getList('asset_branch'),
-			'list_pajak' => $this->Asset_model->getList('asset_category_pajak'),
-			'list_coa_asset' => $this->Asset_model->getList(DBACC.'.coa_master'),
+			'list_dept' => $this->Assets_depreciation_model->getList('department'),
+			'list_catg' => $this->Assets_depreciation_model->getList('asset_category'),
+			'list_cab' 	=> $this->Assets_depreciation_model->getList('asset_branch'),
+			'list_pajak' => $this->Assets_depreciation_model->getList('asset_category_pajak'),
+			'list_coa_asset' => $this->Assets_depreciation_model->getList(DBACC . '.coa_master'),
 			'data' 		=> $result
 		);
 
@@ -76,8 +201,8 @@ class Asset extends Admin_Controller
 
 	public function InsertJurnal()
 	{
-		$ArrJurnal_D = $this->Asset_model->getList('asset_jurnal');
-		$ArrJurnal_K = $this->Asset_model->getList('asset_jurnal');
+		$ArrJurnal_D = $this->Assets_depreciation_model->getList('asset_jurnal');
+		$ArrJurnal_K = $this->Assets_depreciation_model->getList('asset_jurnal');
 
 		$ArrDebit = array();
 		$ArrKredit = array();
@@ -185,7 +310,7 @@ class Asset extends Admin_Controller
 		// print_r($dtImplode);
 		// exit;
 
-		$ArrJurnal_D = $this->Asset_model->getList('asset_jurnal');
+		$ArrJurnal_D = $this->Assets_depreciation_model->getList('asset_jurnal');
 		$ArrDebit = array();
 		$ArrKredit = array();
 		$ArrJavh = array();
@@ -287,7 +412,7 @@ class Asset extends Admin_Controller
 		$data			= $this->input->post();
 
 		$session 		= $this->session->userdata('app_session');
-		$nmCategory		= $this->Asset_model->getWhere('asset_category', 'id', $data['category']);
+		$nmCategory		= $this->Assets_depreciation_model->getWhere('asset_category', 'id', $data['category']);
 
 		$category		= $data['category'];
 		$penyusutan		= $data['penyusutan'];
@@ -448,7 +573,7 @@ class Asset extends Admin_Controller
 		$data			= $this->input->post();
 
 		$session 		= $this->session->userdata('app_session');
-		$nmCategory		= $this->Asset_model->getWhere('asset_category', 'id', $data['category']);
+		$nmCategory		= $this->Assets_depreciation_model->getWhere('asset_category', 'id', $data['category']);
 
 		$category		= $data['category'];
 		$KdCategory		= sprintf('%02s', $category);
@@ -515,7 +640,7 @@ class Asset extends Admin_Controller
 		$data			= $this->input->post();
 
 		$session 		= $this->session->userdata('app_session');
-		$nmCategory		= $this->Asset_model->getWhere('asset_category', 'id', $data['category']);
+		$nmCategory		= $this->Assets_depreciation_model->getWhere('asset_category', 'id', $data['category']);
 
 		$kd_asset		= $this->uri->segment(3);
 
@@ -587,7 +712,7 @@ class Asset extends Admin_Controller
 		$helpx			= $data['helpa'];
 
 		if ($helpx == 'Y') {
-			$nmCategory		= $this->Asset_model->getWhere('asset_category', 'id', $data['category']);
+			$nmCategory		= $this->Assets_depreciation_model->getWhere('asset_category', 'id', $data['category']);
 
 			$category		= $data['category'];
 			$kd_asset		= substr($data['kd_asset'], 0, 18);
@@ -680,7 +805,7 @@ class Asset extends Admin_Controller
 		echo json_encode($Arr_Data);
 	}
 
-	public function download_excel_all_default($category = null)
+	public function download_excel_all_default($category = null, $bulan_sp = null, $tahun_sp = null)
 	{
 		//membuat objek PHPExcel
 		set_time_limit(0);
@@ -785,7 +910,7 @@ class Asset extends Admin_Controller
 
 		$Row		= 1;
 		$NewRow		= $Row + 1;
-		$Col_Akhir	= $Cols	= getColsChar(9);
+		$Col_Akhir	= $Cols	= getColsChar(11);
 		$sheet->setCellValue('A' . $Row, 'DATA ASSETS');
 		$sheet->getStyle('A' . $Row . ':' . $Col_Akhir . $NewRow)->applyFromArray($style_header2);
 		$sheet->mergeCells('A' . $Row . ':' . $Col_Akhir . $NewRow);
@@ -798,7 +923,7 @@ class Asset extends Admin_Controller
 		$sheet->mergeCells('A' . $NewRow . ':A' . $NextRow);
 		$sheet->getColumnDimension('A')->setWidth(10);
 
-		$sheet->setCellValue('B' . $NewRow, 'CODE');
+		$sheet->setCellValue('B' . $NewRow, 'KODE ASSET');
 		$sheet->getStyle('B' . $NewRow . ':B' . $NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells('B' . $NewRow . ':B' . $NextRow);
 		$sheet->getColumnDimension('B')->setWidth(20);
@@ -823,29 +948,40 @@ class Asset extends Admin_Controller
 		$sheet->mergeCells('F' . $NewRow . ':F' . $NextRow);
 		$sheet->getColumnDimension('F')->setWidth(10);
 
-		$sheet->setCellValue('G' . $NewRow, 'COSTCENTER');
+		$sheet->setCellValue('G' . $NewRow, 'DEPRESIASI (YEAR)');
 		$sheet->getStyle('G' . $NewRow . ':G' . $NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells('G' . $NewRow . ':G' . $NextRow);
 		$sheet->getColumnDimension('G')->setWidth(10);
 
-		$sheet->setCellValue('H' . $NewRow, 'DEPRESIASI (YEAR)');
+		$sheet->setCellValue('H' . $NewRow, 'AQUISITION');
 		$sheet->getStyle('H' . $NewRow . ':H' . $NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells('H' . $NewRow . ':H' . $NextRow);
 		$sheet->getColumnDimension('H')->setWidth(10);
 
-		$sheet->setCellValue('I' . $NewRow, 'NILAI PEROLEHAN');
+		$sheet->setCellValue('I' . $NewRow, 'DEPRECIATION VAL');
 		$sheet->getStyle('I' . $NewRow . ':I' . $NextRow)->applyFromArray($style_header);
 		$sheet->mergeCells('I' . $NewRow . ':I' . $NextRow);
 		$sheet->getColumnDimension('I')->setWidth(10);
 
+		$sheet->setCellValue('J' . $NewRow, 'AKUMULASI DEPRESIASI');
+		$sheet->getStyle('J' . $NewRow . ':J' . $NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('J' . $NewRow . ':J' . $NextRow);
+		$sheet->getColumnDimension('J')->setWidth(10);
+
+		$sheet->setCellValue('K' . $NewRow, 'ASSET VAL');
+		$sheet->getStyle('K' . $NewRow . ':K' . $NextRow)->applyFromArray($style_header);
+		$sheet->mergeCells('K' . $NewRow . ':K' . $NextRow);
+		$sheet->getColumnDimension('K')->setWidth(10);
+
 		$where_kategori = "";
 		if ($category != '0') {
-			$where_kategori = " AND a.category = '" . $category . "' ";
+			$where_kategori = " AND a.nm_category = '" . $category . "' ";
 		}
 
 		$SQL = "
 		SELECT
 			a.id,
+			a.tgl_perolehan,
 			a.kd_asset,
 			a.nm_asset,
 			a.category,
@@ -877,6 +1013,27 @@ class Asset extends Admin_Controller
 			$awal_row	= $NextRow;
 			$no = 0;
 			foreach ($result as $key => $row_Cek) {
+
+				$tahun_tgl_perolehan = date('y', strtotime($row_Cek['tgl_perolehan']));
+				$tahun = (!empty($tahun_sp)) ? date('y', strtotime($tahun_sp)) : date('y');
+
+				$exp_tahun = (($tahun - $tahun_tgl_perolehan) * 12);
+
+				$bulan_tgl_perolehan = date('m', strtotime($row_Cek['tgl_perolehan']));
+				$bulan = (!empty($bulan_sp)) ? date('m', strtotime('2024-' . sprintf('%02s', $bulan_sp . '-01'))) : date('m');
+
+				$exp_bulan = ($bulan - $bulan_tgl_perolehan);
+
+				$akumulasi_depresiasi = ($row_Cek['value'] * ($exp_tahun + $exp_bulan));
+				if ($akumulasi_depresiasi < 0) {
+					$akumulasi_depresiasi = 0;
+				}
+
+				$asset_val = ($row_Cek['nilai_asset'] - $akumulasi_depresiasi);
+				if ($asset_val < 0) {
+					$asset_val = 0;
+				}
+				
 				$no++;
 				$awal_row++;
 				$awal_col	= 0;
@@ -886,8 +1043,6 @@ class Asset extends Admin_Controller
 				$Cols			= getColsChar($awal_col);
 				$sheet->setCellValue($Cols . $awal_row, $detail_name);
 				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
-
-
 
 				$awal_col++;
 				$kd_asset	= strtoupper($row_Cek['kd_asset']);
@@ -920,21 +1075,33 @@ class Asset extends Admin_Controller
 				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
 
 				$awal_col++;
-				$cost_center		= strtoupper($row_Cek['cost_center']);
-				$Cols		= getColsChar($awal_col);
-				$sheet->setCellValue($Cols . $awal_row, $cost_center);
-				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray3);
-
-				$awal_col++;
 				$depresiasi		= $row_Cek['depresiasi'];
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols . $awal_row, $depresiasi);
 				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray4);
 
 				$awal_col++;
-				$nilai_asset		= $row_Cek['nilai_asset'];
+				$nilai_asset		= number_format($row_Cek['nilai_asset'], 2);
 				$Cols		= getColsChar($awal_col);
 				$sheet->setCellValue($Cols . $awal_row, $nilai_asset);
+				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray4);
+
+				$awal_col++;
+				$value		= number_format($row_Cek['value'], 2);
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols . $awal_row, $value);
+				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray4);
+
+				$awal_col++;
+				$akumulasi_depresiasi = number_format($akumulasi_depresiasi, 2);
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols . $awal_row, $akumulasi_depresiasi);
+				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray4);
+
+				$awal_col++;
+				$asset_val = number_format($asset_val, 2);
+				$Cols		= getColsChar($awal_col);
+				$sheet->setCellValue($Cols . $awal_row, $asset_val);
 				$sheet->getStyle($Cols . $awal_row)->applyFromArray($styleArray4);
 			}
 		}
