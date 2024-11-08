@@ -1751,14 +1751,12 @@ class Purchase_order_non_material extends Admin_Controller
 
 				if ($used[tipe_pr] == 'pr depart') {
 					$get_data_pr = $this->db->query("SELECT IF(qty IS NOT NULL, qty, 0) AS qty_pr FROM rutin_non_planning_detail WHERE id = '" . $used[idpr] . "'")->row();
-				}
-				else if($used[tipe_pr] == 'pr asset') {
+				} else if ($used[tipe_pr] == 'pr asset') {
 					$this->db->select('IF(a.qty IS NOT NULL, a.qty, 0) as qty_pr');
-					$this->db->from('tran_pr_detail a');
+					$this->db->from('asset_planning a');
 					$this->db->where('a.id', $used[idpr]);
 					$get_data_pr = $this->db->get()->row();
-				} 
-				else {
+				} else {
 					$get_data_pr = $this->db->query("SELECT IF(propose_purchase IS NOT NULL, propose_purchase, 0) AS qty_pr FROM material_planning_base_on_produksi_detail WHERE id = '" . $used[idpr] . "'")->row();
 				}
 
