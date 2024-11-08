@@ -118,6 +118,7 @@ $tanggal = date('Y-m-d');
 						</div>
 					</div>
 				</div>
+
 				<div class="form-group row" id="fortombol">
 					<button type='button' class='btn btn-sm btn-success' title='Ambil' id='tbh_ata' onClick="addPO('1');"><i class='fa fa-plus'></i>Add</button>
 				</div>
@@ -127,6 +128,7 @@ $tanggal = date('Y-m-d');
 			</div>
 			<div class='form-group row'>
 				<table class='table table-bordered table-striped'>
+
 					<thead>
 						<tr class='bg-blue'>
 							<th width='5'>Total</th>
@@ -137,7 +139,7 @@ $tanggal = date('Y-m-d');
 							<th width='5'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
 							<th width='3'></th>
 							<th width='5'></th>
-							<th width='5'><input type="text" class="form-control" id="total_incoming" required name="total_incoming"></th>
+							<th width='5'><input type="text" class="form-control" id="total_incoming" required name="total_incoming" readonly></th>
 							<th width='5'></th>
 							<th width='5' hidden></th>
 							<th width='5'></th>
@@ -406,13 +408,15 @@ $tanggal = date('Y-m-d');
 		var dt_width = $("#dt_width_" + id).val();
 		var dt_hargasatuan = $("#dt_hargasatuan_" + id).val();
 		$.ajax({
+
 			type: "GET",
 			url: siteurl + 'incoming/HitungHarga',
 			data: "dt_hargasatuan=" + dt_hargasatuan + "&dt_qty=" + dt_qty + "&id=" + id,
 			success: function(html) {
 				$("#jumlahharga_" + id).html(html);
 			}
-		});
+		}); 
+
 		$.ajax({
 			type: "GET",
 			url: siteurl + 'purchase_order/TotalWeight',
@@ -628,9 +632,17 @@ $tanggal = date('Y-m-d');
 
 	}
 
+	function get_num(nilai = null) {
+        if (nilai !== '' && nilai !== null) {
+            nilai = nilai.split(',').join('');
+            nilai = parseFloat(nilai);
+        } else {
+            nilai = 0;
+        }
 
-
-
+        return nilai;
+    }
+	
 	function cariPanjang(id, no) {
 
 		var beratpackinglist = getNum($("#dt_widthrecive" + id + "_" + no).val().split(",").join(""));
@@ -645,11 +657,22 @@ $tanggal = date('Y-m-d');
 		console.log(density);
 
 
+
 		var panjang = beratpackinglist / (thickness * width * density);
 
 
 
 		$("#dt_panjang2_" + id + "_" + no).val(number_format(panjang * 1000, 2));
+
+
+		var total_incoming = 0;
+		$('.widthrecive').each(function() {
+			var val = get_num($(this).val());
+
+			total_incoming += val;
+		});
+
+		$('#total_incoming').val(total_incoming);
 
 		customerSelect(id, no);
 
@@ -660,10 +683,6 @@ $tanggal = date('Y-m-d');
 
 		var beratpackinglist = getNum($("#dt_widthrecive" + id + "_" + no).val().split(",").join(""));
 		var berataktual = getNum($("#dt_aktual_" + id + "_" + no).val().split(",").join(""));
-
-
-
-
 
 
 		var selisih = beratpackinglist - berataktual
