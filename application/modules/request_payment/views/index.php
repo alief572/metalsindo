@@ -143,10 +143,10 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 
 								$nm_supplier = '';
 
-								$get_ros = $this->db->select('a.nm_supplier')->get_where('tr_ros a', ['a.id' => $record->no_doc])->row();
-								if (!empty($get_ros)) {
-									$nm_supplier = $get_ros->nm_supplier;
-								}
+								// $get_ros = $this->db->select('a.nm_supplier')->get_where('tr_ros a', ['a.id' => $record->no_doc])->row();
+								// if (!empty($get_ros)) {
+								// 	$nm_supplier = $get_ros->nm_supplier;
+								// }
 
 								$get_invoice = $this->db->select('a.no_po')
 									->from('tr_invoice_po a')
