@@ -119,6 +119,7 @@ $tanggal = date('Y-m-d');
 					</div>
 				</div>
 <<<<<<< HEAD
+<<<<<<< HEAD
 				<div class='form-group row' >
 					<table class='table table-bordered table-striped'> 
 =======
@@ -126,9 +127,45 @@ $tanggal = date('Y-m-d');
 					<button type='button' class='btn btn-sm btn-success' title='Ambil' id='tbh_ata' onClick="addPO('1');"><i class='fa fa-plus'></i>Add</button>
 				</div>
 				<div class="form-group row" id="Form_Po">
+=======
+>>>>>>> 8a71c605aea3814d476cbfe69a5cee11c588b463
 
+				<div class='form-group row'>
+					<table class='table table-bordered table-striped'>
+
+						<div class="form-group row" id="fortombol">
+							<button type='button' class='btn btn-sm btn-success' title='Ambil' id='tbh_ata' onClick="addPO('1');"><i class='fa fa-plus'></i>Add</button>
+						</div>
+						<div class="form-group row" id="Form_Po">
+
+						</div>
 				</div>
+				<div class='form-group row'>
+					<table class='table table-bordered table-striped'>
+
+						<thead>
+							<tr class='bg-blue'>
+								<th width='5'>Total</th>
+								<th width='10'></th>
+								<th width='5'></th>
+								<th width='10'></th>
+								<th width='5'> </th>
+								<th width='5'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+								<th width='3'></th>
+								<th width='5'></th>
+								<th width='5'><input type="text" class="form-control" id="total_incoming" required name="total_incoming"></th>
+								<th width='5'></th>
+								<th width='5' hidden></th>
+								<th width='5'></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+				<center>
+					<button type="submit" class="btn btn-success btn-sm" name="save" id="simpan-com"><i class="fa fa-save"></i>Simpan</button>
+				</center>
 			</div>
+<<<<<<< HEAD
 			<div class='form-group row'>
 				<table class='table table-bordered table-striped'>
 >>>>>>> b28c6e1f9a8546a6e81a5dc63ef5f5095b8d3aef
@@ -153,9 +190,10 @@ $tanggal = date('Y-m-d');
 			<center>
 				<button type="submit" class="btn btn-success btn-sm" name="save" id="simpan-com"><i class="fa fa-save"></i>Simpan</button>
 			</center>
+=======
+		</form>
+>>>>>>> 8a71c605aea3814d476cbfe69a5cee11c588b463
 	</div>
-	</form>
-</div>
 </div>
 
 
