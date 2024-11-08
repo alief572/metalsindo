@@ -1087,6 +1087,7 @@ class Incoming extends Admin_Controller
 			'pib'				=> $post['pib'],
 			'no_invoice'		=> $post['no_invoice'],
 			'keterangan'		=> $post['ket'],
+			'sj_supplier'		=> $post['sj_supplier'],
 			'created_date'		=> date('Y-m-d H:i:s')
 		];
 		$ArrDetail	= array();
