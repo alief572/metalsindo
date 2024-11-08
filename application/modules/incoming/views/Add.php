@@ -139,7 +139,7 @@ $tanggal = date('Y-m-d');
 							<th width='5'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
 							<th width='3'></th>
 							<th width='5'></th>
-							<th width='5'><input type="text" class="form-control" id="total_incoming" required name="total_incoming"></th>
+							<th width='5'><input type="text" class="form-control" id="total_incoming" required name="total_incoming" readonly></th>
 							<th width='5'></th>
 							<th width='5' hidden></th>
 							<th width='5'></th>
@@ -631,6 +631,17 @@ $tanggal = date('Y-m-d');
 
 
 	}
+
+	function get_num(nilai = null) {
+        if (nilai !== '' && nilai !== null) {
+            nilai = nilai.split(',').join('');
+            nilai = parseFloat(nilai);
+        } else {
+            nilai = 0;
+        }
+
+        return nilai;
+    }
 	
 	function cariPanjang(id, no) {
 
@@ -652,6 +663,16 @@ $tanggal = date('Y-m-d');
 
 
 		$("#dt_panjang2_" + id + "_" + no).val(number_format(panjang * 1000, 2));
+
+
+		var total_incoming = 0;
+		$('.widthrecive').each(function() {
+			var val = get_num($(this).val());
+
+			total_incoming += val;
+		});
+
+		$('#total_incoming').val(total_incoming);
 
 		customerSelect(id, no);
 
