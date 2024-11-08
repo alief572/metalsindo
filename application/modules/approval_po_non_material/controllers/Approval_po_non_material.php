@@ -408,7 +408,7 @@ class Approval_po_non_material extends Admin_Controller
 				e.qty as propose_purchase,
         '1' as konversi,
         '0' as konversi1,
-        f.code as satuan,
+        'Pcs' as satuan,
         '' as satuan1,
         a.description as description,
         a.note as note,
@@ -418,8 +418,7 @@ class Approval_po_non_material extends Admin_Controller
         '' as packing_unit2
 			FROM
 				dt_trans_po_non_material a
-				JOIN tran_pr_detail e ON e.id = a.idpr
-        LEFT JOIN ms_satuan f ON f.id = e.satuan
+				JOIN asset_planning e ON e.id = a.idpr
 			WHERE
 				a.no_po IN ('".str_replace(",","','",$no_po)."') AND 
 				a.tipe = 'pr asset'

@@ -10,6 +10,7 @@ $ENABLE_DELETE = has_permission('Barang.Delete');
 	}
 </style>
 <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css'); ?>">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" rel="stylesheet" />
 <form action="#" method="POST" id="form_proses_bro" enctype="multipart/form-data">
 	<div class="box">
 		<div class="box-header">
@@ -20,7 +21,7 @@ $ENABLE_DELETE = has_permission('Barang.Delete');
 				<a href="<?php echo site_url('asset/download_excel_all_default/0') ?>" target='_blank' class="btn btn-md btn-info" '>
 					<i class="fa fa-file-excel-o"></i> Download ALL
 				</a>
-				<!--<button type='button' id='jurnal' class="btn btn-primary" title="Buat Jurnal"><i class="fa fa-plus">&nbsp;</i>Buat Jurnal</button>-->
+				<!--<button type=' button' id='jurnal' class="btn btn-primary" title="Buat Jurnal"><i class="fa fa-plus">&nbsp;</i>Buat Jurnal</button>-->
 
 			</div>
 			<div class="box-tool pull-left">
@@ -133,6 +134,7 @@ $ENABLE_DELETE = has_permission('Barang.Delete');
 <script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js'); ?>"></script>
 <script src="<?= base_url('assets/js/jquery.maskMoney.js') ?>"></script>
 <script src="<?= base_url('assets/js/autoNumeric.js') ?>"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
 
 <!-- page script -->
 <script type="text/javascript">
@@ -141,7 +143,7 @@ $ENABLE_DELETE = has_permission('Barang.Delete');
 		var tgl = $('#tanggalx').val();
 		var kategori = $('#kategory').val();
 		DataTables(kdcab, tgl, kategori);
-		$('.chosen-select').select2();
+		$('.chosen-select').chosen();
 	});
 
 	$(document).on('change', '#kdcab', function(e) {
@@ -362,7 +364,7 @@ $ENABLE_DELETE = has_permission('Barang.Delete');
 			dataType: "json",
 			success: function(data) {
 				$(cost_center).html(data.option).trigger("chosen:updated");
-				$('.chosen-select').select2();
+				$('.chosen-select').chosen();
 
 				swal.close();
 			},
@@ -391,7 +393,7 @@ $ENABLE_DELETE = has_permission('Barang.Delete');
 			dataType: "json",
 			success: function(data) {
 				$(cost_center).html(data.option).trigger("chosen:updated");
-				$('.chosen-select').select2();
+				$('.chosen-select').chosen();
 
 				swal.close();
 			},
@@ -457,6 +459,7 @@ $ENABLE_DELETE = has_permission('Barang.Delete');
 		var lokasi_asset = $('#lokasi_asset').val();
 		var cost_center = $('#cost_center').val();
 		var nilai_asset = $('#nilai_asset').val();
+		var kelompok_penyusutan = $('#kelompok_penyusutan').val();
 		var qty = $('#qty').val();
 		// var tanggal			= $('#tanggal').val();
 

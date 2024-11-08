@@ -19,6 +19,11 @@ class Incoming extends Admin_Controller
 	protected $managePermission = 'Incoming.Manage';
 	protected $deletePermission = 'Incoming.Delete';
 
+	protected $viewPermission2 	= 'Request_Pembayaran_AP.View';
+	protected $addPermission2  	= 'Request_Pembayaran_AP.Add';
+	protected $managePermission2 = 'Request_Pembayaran_AP.Manage';
+	protected $deletePermission2 = 'Request_Pembayaran_AP.Delete';
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -69,7 +74,7 @@ class Incoming extends Admin_Controller
 
 	public function index_request_hutang()
 	{
-		$this->auth->restrict($this->viewPermission);
+		$this->auth->restrict($this->viewPermission2);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
 		$data = $this->db->query("SELECT a.*, b.name_suplier as name_suplier FROM tr_incoming as a INNER JOIN master_supplier as b on a.id_suplier=b.id_suplier WHERE (a.status_jurnal='1' AND a.status_logistik='1') OR (a.rec_ap = 1)  ORDER BY a.id_incoming DESC")->result();
@@ -82,7 +87,7 @@ class Incoming extends Admin_Controller
 	public function request()
 	{
 		$id = $this->uri->segment(3);
-		$this->auth->restrict($this->viewPermission);
+		$this->auth->restrict($this->viewPermission2);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-pencil');
 		$aktif = 'active';
@@ -452,7 +457,7 @@ class Incoming extends Admin_Controller
 		
 		<td><input  type='text' 		value='" . $idroll . "'	class='form-control input-sm' id='id_roll_" . $id . "_" . $no . "' 		required name='dt[" . $id . "][detail][" . $no . "][id_roll]' 	readonly></td>
 		
-		<td	><input  type='text' 											class='form-control input-sm text-right autoNumeric' id='dt_widthrecive" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][widthrecive]'  onBlur='cariPanjang($id,$no)'		data-numb1='" . $id . "' data-numb2='" . $no . "'  ></td>
+		<td	><input  type='text' 											class='form-control input-sm text-right autoNumeric widthrecive' id='dt_widthrecive" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][widthrecive]'  onBlur='cariPanjang($id,$no)'		data-numb1='" . $id . "' data-numb2='" . $no . "'  ></td>
 		<td	width ='130'><input  type='text' 											class='form-control input-sm' id='dt_lotno_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][loto]' 		></td>
 		
 		
@@ -547,7 +552,7 @@ class Incoming extends Admin_Controller
 		<td                 	><input  type='text' 		value='" . $idroll . "'	class='form-control input-sm' id='id_roll_" . $id . "_" . $no . "' 		required name='dt[" . $id . "][detail][" . $no . "][id_roll]' 	readonly></td>
 		
 		
-		<td						><input  type='text' 											class='form-control text-right input-sm autoNumeric' id='dt_widthrecive" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][widthrecive]' 	 onBlur='cariPanjang($id,$no)'		data-numb1='" . $id . "' data-numb2='" . $no . "'	></td>
+		<td						><input  type='text' 											class='form-control text-right input-sm autoNumeric widthrecive' id='dt_widthrecive" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][widthrecive]' 	 onBlur='cariPanjang($id,$no)'		data-numb1='" . $id . "' data-numb2='" . $no . "'	></td>
 		
 		<td						><input  type='text' 											class='form-control input-sm ' id='dt_lotno_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][loto]' 		></td>
 		
@@ -1082,6 +1087,7 @@ class Incoming extends Admin_Controller
 			'pib'				=> $post['pib'],
 			'no_invoice'		=> $post['no_invoice'],
 			'keterangan'		=> $post['ket'],
+			'sj_supplier'		=> $post['sj_supplier'],
 			'created_date'		=> date('Y-m-d H:i:s')
 		];
 		$ArrDetail	= array();

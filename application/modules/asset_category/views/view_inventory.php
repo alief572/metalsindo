@@ -1,8 +1,8 @@
 <?php
-    $ENABLE_ADD     = has_permission('Inventory_1.Add');
-    $ENABLE_MANAGE  = has_permission('Inventory_1.Manage');
-    $ENABLE_VIEW    = has_permission('Inventory_1.View');
-    $ENABLE_DELETE  = has_permission('Inventory_1.Delete');
+    $ENABLE_ADD     = has_permission('Assets_Category.Add');
+    $ENABLE_MANAGE  = has_permission('Assets_Category.Manage');
+    $ENABLE_VIEW    = has_permission('Assets_Category.View');
+    $ENABLE_DELETE  = has_permission('Assets_Category.Delete');
 
 ?>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>

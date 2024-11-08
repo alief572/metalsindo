@@ -14,10 +14,10 @@ if (!defined('BASEPATH')) {
 class Asset_category extends Admin_Controller
 {
     //Permission
-    protected $viewPermission 	= 'Asset_category.View';
-    protected $addPermission  	= 'Asset_category.Add';
-    protected $managePermission = 'Asset_category.Manage';
-    protected $deletePermission = 'Asset_category.Delete';
+    protected $viewPermission 	= 'Assets_Category.View';
+    protected $addPermission  	= 'Assets_Category.Add';
+    protected $managePermission = 'Assets_Category.Manage';
+    protected $deletePermission = 'Assets_Category.Delete';
 
     public function __construct()
     {
