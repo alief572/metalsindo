@@ -118,39 +118,44 @@ $tanggal = date('Y-m-d');
 						</div>
 					</div>
 				</div>
-				<div class="form-group row" id="fortombol">
-					<button type='button' class='btn btn-sm btn-success' title='Ambil' id='tbh_ata' onClick="addPO('1');"><i class='fa fa-plus'></i>Add</button>
-				</div>
-				<div class="form-group row" id="Form_Po">
 
+				<div class='form-group row'>
+					<table class='table table-bordered table-striped'>
+
+						<div class="form-group row" id="fortombol">
+							<button type='button' class='btn btn-sm btn-success' title='Ambil' id='tbh_ata' onClick="addPO('1');"><i class='fa fa-plus'></i>Add</button>
+						</div>
+						<div class="form-group row" id="Form_Po">
+
+						</div>
 				</div>
+				<div class='form-group row'>
+					<table class='table table-bordered table-striped'>
+
+						<thead>
+							<tr class='bg-blue'>
+								<th width='5'>Total</th>
+								<th width='10'></th>
+								<th width='5'></th>
+								<th width='10'></th>
+								<th width='5'> </th>
+								<th width='5'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+								<th width='3'></th>
+								<th width='5'></th>
+								<th width='5'><input type="text" class="form-control" id="total_incoming" required name="total_incoming"></th>
+								<th width='5'></th>
+								<th width='5' hidden></th>
+								<th width='5'></th>
+							</tr>
+						</thead>
+					</table>
+				</div>
+				<center>
+					<button type="submit" class="btn btn-success btn-sm" name="save" id="simpan-com"><i class="fa fa-save"></i>Simpan</button>
+				</center>
 			</div>
-			<div class='form-group row'>
-				<table class='table table-bordered table-striped'>
-					<thead>
-						<tr class='bg-blue'>
-							<th width='5'>Total</th>
-							<th width='10'></th>
-							<th width='5'></th>
-							<th width='10'></th>
-							<th width='5'> </th>
-							<th width='5'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-							<th width='3'></th>
-							<th width='5'></th>
-							<th width='5'><input type="text" class="form-control" id="total_incoming" required name="total_incoming"></th>
-							<th width='5'></th>
-							<th width='5' hidden></th>
-							<th width='5'></th>
-						</tr>
-					</thead>
-				</table>
-			</div>
-			<center>
-				<button type="submit" class="btn btn-success btn-sm" name="save" id="simpan-com"><i class="fa fa-save"></i>Simpan</button>
-			</center>
+		</form>
 	</div>
-	</form>
-</div>
 </div>
 
 
