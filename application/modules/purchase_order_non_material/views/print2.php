@@ -437,7 +437,7 @@
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . $final_detail_code . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . $final_detail_nama . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='center'>" . ucfirst($satuan) . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>".$header->matauang." " . number_format($detail->qty / $konversi, 2) . "</td>
+                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . number_format($detail->qty / $konversi, 2) . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . ucfirst($satuan_packing) . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>".$header->matauang." " . $HS . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $detail->qty . "</td>
@@ -453,7 +453,7 @@
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . $final_detail_code . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . $final_detail_nama . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='center'>" . ucfirst($satuan) . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>".$header->matauang."" . number_format($detail->qty / $konversi, 2) . "</td>
+                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . number_format($detail->qty / $konversi, 2) . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . ucfirst($satuan_packing) . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>".$header->matauang." " . $HS . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $detail->qty . "</td>
