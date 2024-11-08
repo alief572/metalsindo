@@ -110,7 +110,8 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 					<tbody class="list_req_payment">
 						<?php
 						if (!empty($data)) {
-							$numb = 0;
+							$hasil = '';
+							$numb = 1;
 							foreach ($data as $record) {
 
 								$sts = '<div class="badge bg-blue">Open</div>';
@@ -120,34 +121,34 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 								if ($record->sts_reject_manage == '1') {
 									$sts = '<div class="badge bg-red">Rejected by Management</div>';
 								}
-
+					
 								$reject_reason = '';
 								if ($record->sts_reject == '1' || $record->sts_reject_manage == '1') {
 									$reject_reason = $record->reject_reason;
 								}
-
+					
 								$no_invoice = (isset($list_no_invoice[$record->no_doc])) ? $list_no_invoice[$record->no_doc] : '';
-
+					
 								$tipe = $record->tipe;
-
+					
 								$currency = '';
 								if ($record->tipe == 'expense') {
 									$get_expense = $this->db->get_where('tr_expense', ['no_doc' => $record->no_doc])->row_array();
 									if ($get_expense['exp_inv_po'] == '1') {
 										$tipe = 'Pembayaran PO';
-
+					
 										$get_inv = $this->db->get_where('tr_invoice_po', ['id' => $record->no_doc])->row_array();
 										$currency = $get_inv['curr'];
 									}
 								}
-
+					
 								$nm_supplier = '';
-
+					
 								// $get_ros = $this->db->select('a.nm_supplier')->get_where('tr_ros a', ['a.id' => $record->no_doc])->row();
 								// if (!empty($get_ros)) {
 								// 	$nm_supplier = $get_ros->nm_supplier;
 								// }
-
+					
 								$get_invoice = $this->db->select('a.no_po')
 									->from('tr_invoice_po a')
 									->where('a.id', $record->no_doc)
@@ -156,30 +157,18 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 								if ($nm_supplier == '' && !empty($get_invoice)) {
 									$nm_supplier = [];
 									$no_po = str_replace(', ', ',', $get_invoice->no_po);
-
+					
 									if (strpos($no_po, 'TR') !== false) {
 										$get_supplier = $this->db->query("
 											SELECT
-												c.nama as nm_supplier
-											FROM
-												tr_incoming_check a 
-												LEFT JOIN tr_purchase_order b ON b.no_po = a.no_ipp
-												LEFT JOIN new_supplier c ON c.kode_supplier = b.id_suplier
-											WHERE
-												a.kode_trans IN ('" . str_replace(",", "','", $no_po) . "')
-											GROUP BY c.nama
-											
-											UNION ALL
-
-											SELECT
-												c.nama as nm_supplier
+												c.name_suplier as nm_supplier
 											FROM
 												warehouse_adjustment a
-												LEFT JOIN tr_purchase_order b ON b.no_po = a.no_ipp
-												LEFT JOIN new_supplier c ON c.kode_supplier = b.id_suplier
+												LEFT JOIN tr_purchase_order_non_material b ON b.no_po = a.no_ipp
+												LEFT JOIN master_supplier c ON c.id_suplier = b.id_suplier
 											WHERE
 												a.kode_trans IN ('" . str_replace(",", "','", $no_po) . "')
-											GROUP BY c.nama
+											GROUP BY c.name_suplier
 										")->result();
 										foreach ($get_supplier as $item_supplier) {
 											$nm_supplier[] = $item_supplier->nm_supplier;
@@ -187,13 +176,13 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 									} else {
 										$get_supplier = $this->db->query("
 											SELECT
-												b.nama as nm_supplier
+												b.name_suplier as nm_supplier
 											FROM
-												tr_purchase_order a
-												LEFT JOIN new_supplier b ON b.kode_supplier = a.id_suplier
+												tr_purchase_order_non_material a
+												LEFT JOIN master_supplier b ON b.id_suplier = a.id_suplier
 											WHERE
 												a.no_surat IN ('" . str_replace(",", "','", $no_po) . "')
-											GROUP BY b.nama
+											GROUP BY b.name_suplier
 										")->result();
 										foreach ($get_supplier as $item_supplier) {
 											$nm_supplier[] = $item_supplier->nm_supplier;
@@ -201,147 +190,151 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 									}
 									$nm_supplier = implode(',', $nm_supplier);
 								}
-
-								$numb++; ?>
-								<tr>
-									<td class="exclass">
-										<?php if ($ENABLE_MANAGE) : ?>
-											<input type="hidden" name="no_doc_<?= $numb ?>" id="no_doc_<?= $numb ?>" value="<?= $record->no_doc ?>">
-											<input type="hidden" name="nama_<?= $numb ?>" id="nama_<?= $numb ?>" value="<?= $record->nama ?>">
-											<input type="hidden" name="tgl_doc_<?= $numb ?>" id="tgl_doc_<?= $numb ?>" value="<?= $record->tgl_doc ?>">
-											<input type="hidden" name="keperluan_<?= $numb ?>" id="keperluan_<?= $numb ?>" value="<?= $record->keperluan ?>">
-											<input type="hidden" name="tipe_<?= $numb ?>" id="tipe_<?= $numb ?>" value="<?= $record->tipe ?>">
-											<input type="hidden" name="jumlah_<?= $numb ?>" id="jumlah_<?= $numb ?>" value="<?= $record->jumlah ?>">
-											<input type="hidden" name="bank_id_<?= $numb ?>" id="bank_id_<?= $numb ?>" value="<?= $record->bank_id ?>">
-											<input type="hidden" name="accnumber_<?= $numb ?>" id="accnumber_<?= $numb ?>" value="<?= $record->accnumber ?>">
-											<input type="hidden" name="accname_<?= $numb ?>" id="accname_<?= $numb ?>" value="<?= $record->accname ?>">
-											<input type="hidden" name="ids_<?= $numb ?>" id="ids_<?= $numb ?>" value="<?= $record->ids ?>">
-											<input type="checkbox" name="status[]" id="status_<?= $numb ?>" value="<?= $numb ?>" class="dtlloop" onclick="cektotal()">
-										<?php endif;
-										if ($record->tipe == 'kasbon') { ?>
-											<a href="<?= base_url('expense/kasbon_view/' . $record->ids) ?>" target="_blank"><i class="fa fa-search pull-right"></i></a>
-										<?php }
-										if ($record->tipe == 'transportasi') { ?>
-											<a href="<?= base_url('expense/transport_req_view/' . $record->ids) ?>" target="_blank"><i class="fa fa-search pull-right"></i></a>
-											<?php }
-										if ($record->tipe == 'expense') {
-											$get_expense = $this->db->get_where('tr_expense', ['id' => $record->ids])->row_array();
-											if ($get_expense['exp_pib'] == '1') {
-											?>
-												<a href="<?= base_url('ros/view/' . $record->no_doc) ?>" target="_blank"><i class="fa fa-search pull-right"></i></a>
-											<?php
-											} else if ($get_expense['exp_inv_po'] == '1') {
-												echo '';
-											} else {
-											?>
-												<a href="<?= base_url('expense/view/' . $record->ids) ?>" target="_blank"><i class="fa fa-search pull-right"></i></a>
-											<?php
-											}
+					
+								$valid = 1;
+					
+								if ($valid == 1) {
+									$hasil .= '<tr>';
+									$hasil .= '<td class="exclass">';
+									if ($ENABLE_MANAGE) {
+										$hasil .= '<input type="hidden" name="no_doc_' . $numb . '" id="no_doc_' . $numb . '" value="' . $record->no_doc . '">';
+										$hasil .= '<input type="hidden" name="nama_' . $numb . '" id="nama_' . $numb . '" value="' . $record->nama . '">';
+										$hasil .= '<input type="hidden" name="tgl_doc_' . $numb . '" id="tgl_doc_' . $numb . '" value="' . $record->tgl_doc . '">';
+										$hasil .= '<input type="hidden" name="keperluan_' . $numb . '" id="keperluan_' . $numb . '" value="' . $record->keperluan . '">';
+										$hasil .= '<input type="hidden" name="tipe_' . $numb . '" id="tipe_' . $numb . '" value="' . $record->tipe . '">';
+										$hasil .= '<input type="hidden" name="jumlah_' . $numb . '" id="jumlah_' . $numb . '" value="' . $record->jumlah . '">';
+										$hasil .= '<input type="hidden" name="bank_id_' . $numb . '" id="bank_id_' . $numb . '" value="' . $record->bank_id . '">';
+										$hasil .= '<input type="hidden" name="accnumber_' . $numb . '" id="accnumber_' . $numb . '" value="' . $record->accnumber . '">';
+										$hasil .= '<input type="hidden" name="accname_' . $numb . '" id="accname_' . $numb . '" value="' . $record->accname . '">';
+										$hasil .= '<input type="hidden" name="ids_' . $numb . '" id="ids_' . $numb . '" value="' . $record->ids . '">';
+										$hasil .= '<input type="checkbox" name="status[]" id="status_' . $numb . '" value="' . $numb . '" class="dtlloop" onclick="cektotal()">';
+									}
+									if ($record->tipe == 'kasbon') {
+										$hasil .= '<a href="' . base_url("expense/kasbon_view/" . $record->ids) . '" target="_blank"><i class="fa fa-search pull-right"></i></a>';
+									}
+									if ($record->tipe == 'transportasi') {
+										$hasil .= '<a href="' . base_url('expense/transport_req_view/' . $record->ids) . '" target="_blank"><i class="fa fa-search pull-right"></i></a>';
+									}
+									if ($record->tipe == 'expense') {
+										$get_expense = $this->db->get_where('tr_expense', ['id' => $record->ids])->row_array();
+										if ($get_expense['exp_pib'] == '1') {
+											$hasil .= '<a href="' . base_url('ros/view/' . $record->no_doc) . '" target="_blank"><i class="fa fa-search pull-right"></i></a>';
+										} else if ($get_expense['exp_inv_po'] == '1') {
+											$hasil .= '';
+										} else {
+											$hasil .= '<a href="' . base_url('expense/view/' . $record->ids) . '" target="_blank"><i class="fa fa-search pull-right"></i></a>';
 										}
-										if ($record->tipe == 'nonpo') { ?>
-											<a href="<?= base_url('purchase_order/non_po/view/' . $record->ids) ?>" target="_blank"><i class="fa fa-search pull-right"></i></a>
-										<?php }
-										if ($record->tipe == 'periodiks') { ?>
-											<a href="<?= base_url('pembayaran_rutin/view/' . $record->ids) ?>" target="_blank"><i class="fa fa-search pull-right"></i></a>
-										<?php }
-										?>
-									</td>
-									<td class=""><?= $numb; ?></td>
-									<td><?= $record->no_doc ?></td>
-									<td><?= $nm_supplier ?></td>
-									<td><?= $record->tgl_doc ?></td>
-									<td><?= $record->keperluan ?></td>
-									<td>
-										<select name="currency_<?= $numb ?>" id="" class="form-control form-control-sm select2">
-											<option value="">- Currency -</option>
-											<?php
-											foreach ($list_curr as $item) {
-												$selected = '';
-												if ($item['kode'] == $currency) {
-													$selected = 'selected';
-												}
-												echo '<option value="' . $item['kode'] . '" ' . $selected . '>' . $item['kode'] . '</option>';
-											}
-											?>
-										</select>
-									</td>
-									<td><?= number_format($record->jumlah) ?></td>
-									<td><?= $sts ?></td>
-									<td>
-										<table class="w-100" border="0" style="border: 0px !important;">
-											<tr>
-												<td>Nilai Pengajuan</td>
-												<td class="text-center">:</td>
-												<td>
-													<input type="text" name="" id="" class="form-control form-control-sm text-right nilai_pengajuan_<?= $numb ?>" value="<?= number_format($record->jumlah, 2) ?>">
-												</td>
-											</tr>
-											<tr>
-												<td>Select PPh</td>
-												<td class="text-center">:</td>
-												<td>
-													<select name="" id="tipe_pph_<?= $numb ?>" class="form-control form-control-sm select_pph_<?= $numb ?>">
-														<option value="">- Select PPh -</option>
-														<option value="1">PPh 23</option>
-														<option value="2">PPh 22</option>
-													</select>
-												</td>
-											</tr>
-											<tr>
-												<td>Admin Charge</td>
-												<td class="text-center">:</td>
-												<td>
-													<input type="text" name="admin_charge_<?= $numb ?>" id="" class="form-control form-control-sm text-right admin_charge_<?= $numb ?> divide" onchange="hitung_net_payment(<?= $numb ?>)">
-												</td>
-											</tr>
-											<tr>
-												<td>Net Payment</td>
-												<td class="text-center">:</td>
-												<td>
-													<input type="text" name="" id="" class="form-control form-control-sm text-right net_payment_<?= $numb ?>" onchange="hitung_net_payment(<?= $numb ?>)" readonly>
-												</td>
-											</tr>
+									}
+									if ($record->tipe == 'nonpo') {
+										$hasil .= '<a href="' . base_url('purchase_order/non_po/view/' . $record->ids) . '" target="_blank"><i class="fa fa-search pull-right"></i></a>';
+									}
+									if ($record->tipe == 'periodiks') {
+										$hasil .= '<a href="' . base_url('pembayaran_rutin/view/' . $record->ids) . '" target="_blank"><i class="fa fa-search pull-right"></i></a>';
+									}
+					
+									$curr = '';
+									$get_curr = $this->db->get_where('tr_invoice_po', ['id' => $record->no_doc])->row();
+									if (!empty($get_curr)) {
+										$curr = $get_curr->curr;
+									}
+					
+									$hasil .= '</td>';
+									$hasil .= '<td class="">' . $numb . '</td>';
+									$hasil .= '<td>' . $record->no_doc . '</td>';
+									$hasil .= '<td>' . $nm_supplier . '</td>';
+									$hasil .= '<td>' . $record->tgl_doc . '</td>';
+									$hasil .= '<td>' . $record->keperluan . '</td>';
+									$hasil .= '<td>';
+									$hasil .= '<select name="currency_' . $numb . '" id="" class="form-control form-control-sm select2">';
+									$hasil .= '<option value="">- Currency -</option>';
+									foreach ($list_curr as $item_curr) {
+										$selected = '';
+										if ($item_curr['kode'] == $curr) {
+											$selected = 'selected';
+										}
+										$hasil .= '<option value="' . $item_curr['kode'] . '" ' . $selected . '>' . $item_curr['kode'] . '</option>';
+									}
+									$hasil .= '</select>';
+									$hasil .= '</td>';
+									$hasil .= '<td>' . number_format($record->jumlah) . '</td>';
+									$hasil .= '<td>' . $sts . '</td>';
+									$hasil .= '<td>';
+									$hasil .= '
+									<table class="w-100" border="0" style="border: 0px !important;">
+										<tr>
+											<td>Nilai Pengajuan</td>
+											<td class="text-center">:</td>
+											<td>
+												<input type="text" name="" id="" class="form-control form-control-sm text-right nilai_pengajuan_' . $numb . '" value="' . number_format($record->jumlah) . '" readonly>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<select name="tipe_pph_' . $numb . '" id="" class="form-control form-control-sm select_pph_' . $numb . '">
+													<option value="">- Select PPh -</option>
+													<option value="1">PPh 23</option>
+													<option value="2">PPh 22</option>
+												</select>
+											</td>
+											<td class="text-center">:</td>
+											<td>
+												<input type="text" name="nilai_pph_' . $numb . '" id="" class="form-control form-control-sm text-right divide nilai_pph_' . $numb . '">
+											</td>
+										</tr>
+										<tr>
+											<td>Admin Charge</td>
+											<td class="text-center">:</td>
+											<td>
+												<input type="text" name="admin_charge_' . $numb . '" id="" class="form-control form-control-sm text-right admin_charge_' . $numb . ' divide" onchange="hitung_net_payment(' . $numb . ')">
+											</td>
+										</tr>
+										<tr>
+											<td>Net Payment</td>
+											<td class="text-center">:</td>
+											<td>
+												<input type="text" name="" id="" class="form-control form-control-sm text-right net_payment_' . $numb . '" onchange="hitung_net_payment(' . $numb . ')" readonly>
+											</td>
+										</tr>
+									
+										<tr>
+											<td>Bank Pengirim</td>
+											<td>:</td>
+											<td>
+												<select name="bank_' . $numb . '" id="" class="form-control form-control-sm select2">
+													<option value="">- Bank -</option>
+												';
+					
+									foreach ($list_coa as $item_coa) {
+										$hasil .= '<option value="' . $item_coa['no_perkiraan'] . ' - ' . $item_coa['nama'] . '">' . $item_coa['no_perkiraan'] . ' - ' . $item_coa['nama'] . '</option>';
+									}
+					
+									$hasil .= '
+												</select>
+											</td>
+										</tr>
+										<tr>
+											<td>Tanggal Rencana Pembayaran</td>
+											<td>:</td>
+											<td>
+												<input type="text" class="form-control tanggal" id="tanggal_' . $numb . '" name="tanggal_' . $numb . '" value="" placeholder="Tanggal">
+											</td>
+										</tr>
+										<tr>
+											<td>Upload Dokumen</td>
+											<td>:</td>
+											<td>
+												<input type="file" name="upload_doc_' . $numb . '" id="" class="form-control form-control-sm">
+											</td>
+										</tr>
+									</table>
+									';
+									$hasil .= '</td>';
+									$hasil .= '</tr>';
+					
+									$numb++;
+								}
 
-											<tr>
-												<td>Bank Pengirim</td>
-												<td>:</td>
-												<td>
-													<select name="bank_<?= $numb ?>" id="" class="form-control form-control-sm select2">
-														<option value="">- Bank Name -</option>
-														<?php
-														foreach ($list_coa as $item) {
-															echo '<option value="' . $item['no_perkiraan'] . ' - ' . $item['nama'] . '">' . $item['no_perkiraan'] . ' - ' . $item['nama'] . '</option>';
-														}
-														?>
-													</select>
-												</td>
-											</tr>
-											<tr>
-												<td>Tanggal Rencana Pembayaran</td>
-												<td>:</td>
-												<td>
-													<input type="text" class="form-control tanggal" id="tanggal_<?= $numb ?>" name="tanggal_<?= $numb ?>" value="" placeholder="Tanggal">
-												</td>
-											</tr>
-											<tr>
-												<td>Tanggal Rencana Pembayaran</td>
-												<td>:</td>
-												<td>
-													<input type="text" class="form-control tanggal" id="tanggal_<?= $numb ?>" name="tanggal_<?= $numb ?>" value="" placeholder="Tanggal">
-												</td>
-											</tr>
-											<tr>
-												<td>Upload Dokumen</td>
-												<td>:</td>
-												<td>
-													<input type="file" name="upload_doc_<?= $numb ?>" id="" class="form-control form-control-sm">
-												</td>
-											</tr>
-										</table>
-									</td>
-
-								</tr>
-						<?php
+								echo $hasil;
 							}
 						}  ?>
 					</tbody>
