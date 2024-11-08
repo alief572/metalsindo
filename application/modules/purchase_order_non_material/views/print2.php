@@ -439,10 +439,10 @@
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='center'>" . ucfirst($satuan) . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . number_format($detail->qty / $konversi, 2) . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . ucfirst($satuan_packing) . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>".$header->matauang." " . $HS . "</td>
+                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $header->matauang . " " . $HS . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $detail->qty . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>".$header->matauang." " . number_format($detail->nilai_disc) . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $JH . "</td>
+                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $header->matauang . " " . number_format($detail->nilai_disc) . "</td>
+                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $header->matauang . " " . $JH . "</td>
                         </tr>";
                         $CIF = "";
                     } else {
@@ -455,9 +455,9 @@
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='center'>" . ucfirst($satuan) . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . number_format($detail->qty / $konversi, 2) . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . ucfirst($satuan_packing) . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>".$header->matauang." " . $HS . "</td>
+                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $header->matauang . " " . $HS . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $detail->qty . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>".$header->matauang." " . $JH . "</td>
+                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $header->matauang . " " . $JH . "</td>
                         </tr>";
                         $CIF = "";
                     }
@@ -480,28 +480,28 @@
                 ?>
                 <tr>
                     <td align="right" colspan='8' style="font-size: 8px;">Total </td>
-                    <td align="right" style="font-size: 8px;"><?= $header->matauang.' '.number_format($header->total_barang, 2) ?></td>
+                    <td align="right" style="font-size: 8px;"><?= $header->matauang . ' ' . number_format($header->total_barang, 2) ?></td>
 
                 </tr>
                 <tr>
                     <td align="right" colspan='8' style="font-size: 8px;">Biaya Kirim </td>
-                    <td align="right" style="font-size: 8px;"><?= $header->matauang.' '.number_format($header->taxtotal, 2) ?></td>
+                    <td align="right" style="font-size: 8px;"><?= $header->matauang . ' ' . number_format($header->taxtotal, 2) ?></td>
 
                 </tr>
 
                 <tr>
                     <td align="right" colspan='8' style="font-size: 8px;">Discount </td>
-                    <td align="right" style="font-size: 8px;"><?= $header->matauang.' '.number_format($header->nilai_disc, 2) ?></td>
+                    <td align="right" style="font-size: 8px;"><?= $header->matauang . ' ' . number_format($header->nilai_disc, 2) ?></td>
                 </tr>
 
                 <tr>
                     <td align="right" colspan='8' style="font-size: 8px;">PPN </td>
-                    <td align="right" style="font-size: 8px;"><?= $header->matauang.' '.number_format($header->total_ppn, 2) ?></td>
+                    <td align="right" style="font-size: 8px;"><?= $header->matauang . ' ' . number_format($header->total_ppn, 2) ?></td>
                 </tr>
 
                 <tr>
                     <td align="right" colspan='8' style="font-size: 8px;">Grand Total </td>
-                    <td align="right" style="font-size: 8px;"><?= $header->matauang.' '.number_format($header->subtotal, 2) ?></td>
+                    <td align="right" style="font-size: 8px;"><?= $header->matauang . ' ' . number_format($header->subtotal, 2) ?></td>
 
                 </tr>
 
