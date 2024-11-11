@@ -300,8 +300,8 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 											  <td>" . $value->satuan . $value->satuan1 . "</td>
 											  ";
 
-											  
-											  if ($value->nm_material1 == "") {
+
+												if ($value->nm_material1 == "") {
 													$konversi = ($value->konversi <= 0) ? 1 : $value->konversi;
 													echo "<td>" . number_format($konversi, 2) . "</td>";
 												} else {
@@ -510,6 +510,7 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 									<tbody class="list_tbody_top">
 										<?php
 										$no = 1;
+										$no_top = 1;
 										foreach ($results['list_top'] as $item_top) {
 											echo '<tr class="top_' . $no . '">';
 
@@ -539,6 +540,7 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 
 											echo '</tr>';
 
+											$no_top++;
 											$no++;
 										}
 										?>
@@ -641,6 +643,16 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 			var supplier = $('#supplier').val()
 
 			var data, xhr;
+
+			var no_top = "<?= $no_top ?>";
+
+			var sts_top = 1;
+			var num_top = $('.num_top').val();
+
+			if(num_top < 1) {
+				swal("Warning", "TOP harus diisi terlebih dahulu !", "error");
+				return false;
+			}
 			if (loi == '' || loi == null) {
 				swal("Warning", "Form Tidak Boleh Kosong :)", "error");
 				return false;
