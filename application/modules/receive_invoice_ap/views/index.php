@@ -14,6 +14,9 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 
 <div class="box">
 	<div class="box-header">
+		<a href="<?= base_url('receive_invoice_ap/add') ?>" class="btn btb-sm btn-success">
+			<i class="fa fa-plus"></i> Add Receiving
+		</a>
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body">
@@ -21,12 +24,9 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 			<thead>
 				<tr>
 					<th class="text-center">No.</th>
-					<th class="text-center">No. Incoming</th>
-					<th class="text-center">No. PO</th>
 					<th class="text-center">No. Invoice</th>
 					<th class="text-center">Supplier</th>
 					<th class="text-center">Nominal Invoice</th>
-					<th class="text-center">Status</th>
 					<th class="text-center">Action</th>
 				</tr>
 			</thead>
@@ -240,22 +240,13 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 					data: 'no'
 				},
 				{
-					data: 'no_incoming'
-				},
-				{
-					data: 'no_po'
-				},
-				{
 					data: 'no_invoice'
 				},
 				{
-					data: 'supplier'
+					data: 'nm_suplier'
 				},
 				{
 					data: 'nominal_invoice'
-				},
-				{
-					data: 'status'
 				},
 				{
 					data: 'option'
