@@ -97,6 +97,7 @@
                     <tr class="bg-blue">
                         <th class="text-center">No. Incoming</th>
                         <th class="text-center">No. PO</th>
+                        <th class="text-center">Tanggal Incoming</th>
                         <th class="text-center">Nama Supplier</th>
                         <th class="text-center">Nilai</th>
                         <th class="text-center">No. Faktur Pajak</th>
@@ -123,6 +124,11 @@
                         echo '<td class="text-center">';
                         echo $item->no_po;
                         echo '<input type="hidden" name="kp[' . $no . '][no_po]" value="' . $item->no_po . '">';
+                        echo '</td>';
+
+                        echo '<td class="text-center">';
+                        echo $item->tanggal_incoming;
+                        echo '<input type="hidden" name="kp[' . $no . '][tanggal_incoming]" value="' . $item->tanggal_incoming . '">';
                         echo '</td>';
 
                         echo '<td class="text-center">';
@@ -632,6 +638,7 @@
         var id_suplier = $(this).data('id_suplier');
         var name_suplier = $(this).data('name_suplier');
         var nilai = $(this).data('nilai');
+        var tanggal_incoming = $(this).data('tanggal_incoming');
         var no = $(this).data('no');
 
         var Rows = '<tr class="tr_inc_add_' + no_list + '">';
@@ -644,6 +651,11 @@
         Rows += '<td class="text-center">';
         Rows += no_po;
         Rows += '<input type="hidden" name="kp[' + no_list + '][no_po]" value="' + no_po + '">';
+        Rows += '</td>';
+
+        Rows += '<td class="text-center">';
+        Rows += tanggal_incoming;
+        Rows += '<input type="hidden" name="kp[' + no_list + '][tanggal_incoming]" value="' + tanggal_incoming + '">';
         Rows += '</td>';
 
         Rows += '<td class="text-center">';

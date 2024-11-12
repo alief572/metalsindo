@@ -149,12 +149,17 @@ class Receive_invoice_ap extends Admin_Controller
 
       $btn_view = '<a href="' . base_url('receive_invoice_ap/view/' . $item->id_rec_inv_ap) . '" class="btn btn-sm btn-info" title="View Receiving Invoice"><i class="fa fa-eye"></i></a>';
 
-      $btn_edit = '<a href="'.base_url('receive_invoice_ap/edit/'.$item->id_rec_inv_ap).'" class="btn btn-sm btn-warning" title="Edit Receiving Invoice" style="margin-left: 0.5rem;"><i class="fa fa-pencil"></i></a>';
+      $btn_edit = '<a href="' . base_url('receive_invoice_ap/edit/' . $item->id_rec_inv_ap) . '" class="btn btn-sm btn-warning" title="Edit Receiving Invoice" style="margin-left: 0.5rem;"><i class="fa fa-pencil"></i></a>';
       if (!has_permission('Receive_Invoice_AP.Manage')) {
         $btn_edit = '';
       }
 
-      $option = $btn_view . $btn_edit;
+      $btn_delete = '<button type="button" class="btn btn-sm btn-danger del_rec_inv" data-id="' . $item->id_rec_inv_ap . '" title="Delete Receiving Invoice" style="margin-left: 0.5rem;"><i class="fa fa-trash"></i></button>';
+      if (!has_permission('Receive_Invoice_AP.Delete')) {
+        $btn_delete = '';
+      }
+
+      $option = $btn_view . $btn_edit . $btn_delete;
 
       $hasil[] = [
         'no' => $no,
@@ -210,7 +215,7 @@ class Receive_invoice_ap extends Admin_Controller
     ]);
   }
 
-  
+
 
   public function view_inv()
   {
@@ -302,6 +307,7 @@ class Receive_invoice_ap extends Admin_Controller
           'id_rec_inv_ap' => $id_rec_inv_ap,
           'id_incoming' => $item['id_incoming'],
           'no_po' => $item['no_po'],
+          'tanggal_incoming' => $item['tanggal_incoming'],
           'id_suplier' => $item['id_suplier'],
           'nm_suplier' => $item['nm_suplier'],
           'nilai' => str_replace(',', '', $item['nilai']),
@@ -372,13 +378,13 @@ class Receive_invoice_ap extends Admin_Controller
     $this->db->trans_begin();
 
     $get_supplier = $this->db->get_where('master_supplier', ['id_suplier' => $post['supplier']])->row();
-    
+
     $this->db->select('a.*');
     $this->db->from('tr_receive_invoice_ap_detail a');
     $this->db->where('a.id_rec_inv_ap', $post['id_rec_inv_ap']);
     $get_detail = $this->db->get()->result();
 
-    foreach($get_detail as $item) {
+    foreach ($get_detail as $item) {
       $this->db->update('tr_incoming', [
         'no_invoice_rec_ap' => null,
         'nilai_invoice' => null,
@@ -409,6 +415,7 @@ class Receive_invoice_ap extends Admin_Controller
           'id_rec_inv_ap' => $post['id_rec_inv_ap'],
           'id_incoming' => $item['id_incoming'],
           'no_po' => $item['no_po'],
+          'tanggal_incoming' => $item['tanggal_incoming'],
           'id_suplier' => $item['id_suplier'],
           'nm_suplier' => $item['nm_suplier'],
           'nilai' => str_replace(',', '', $item['nilai']),
@@ -470,5 +477,42 @@ class Receive_invoice_ap extends Admin_Controller
       'status' => $valid,
       'pesan' => $pesan
     ]);
+  }
+
+  public function del_rec_inv_ap() {
+    $id = $this->input->post('id');
+
+    $this->db->trans_begin();
+
+    $get_detail = $this->db->get_where('tr_receive_invoice_ap_detail', ['id_rec_inv_ap' => $id])->result();
+    foreach($get_detail as $item) {
+      $this->db->update('tr_incoming', [
+        'no_invoice_rec_ap' => null,
+        'nilai_invoice' => 0,
+        'nilai_ppn' => 0,
+        'no_faktur_pajak' => null,
+        'rec_ap' => 0
+      ], ['id_incoming' => $item->id_incoming, 'id_suplier' => $item->id_suplier]);
+    }
+
+    $this->db->delete('tr_receive_invoice_ap_detail', ['id_rec_inv_ap' => $id]);
+    $this->db->delete('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $id]);
+
+    if ($this->db->trans_status() === false) {
+      $this->db->trans_rollback();
+
+      $valid = 0;
+      $pesan = 'Please try again later !';
+    } else {
+      $this->db->trans_commit();
+
+      $valid = 1;
+      $pesan = 'Data has been deleted !';
+    }
+
+    echo json_encode([
+      'status' => $valid,
+      'pesan' => $pesan
+    ]);    
   }
 }

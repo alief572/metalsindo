@@ -8,6 +8,7 @@
                         <tr>
                             <th class="text-center">No. Incoming</th>
                             <th class="text-center">No. PO</th>
+                            <th class="text-center">Tgl Incoming</th>
                             <th class="text-center">Nama Supplier</th>
                             <th class="text-center">Total</th>
                             <th class="text-center">Action</th>
@@ -38,10 +39,11 @@
 
                             echo '<td class="text-center">' . $item->id_incoming . '</td>';
                             echo '<td class="text-center">' . $no_po . '</td>';
+                            echo '<td class="text-center">' . date('d F Y', strtotime($item->tanggal)) . '</td>';
                             echo '<td class="text-center">' . $item->name_suplier . '</td>';
                             echo '<td class="text-right">' . number_format($total_incoming, 2) . '</td>';
                             echo '<td class="text-center">';
-                            echo '<button type="button" class="btn btn-sm btn-warning add_incoming add_incoming_' . $no . '" data-id_incoming="' . $item->id_incoming . '" data-no_po="' . $no_po . '" data-id_suplier="'.$item->id_suplier.'" data-name_suplier="' . $item->name_suplier . '" data-nilai="' . $total_incoming . '" data-no="' . $no . '">';
+                            echo '<button type="button" class="btn btn-sm btn-warning add_incoming add_incoming_' . $no . '" data-id_incoming="' . $item->id_incoming . '" data-no_po="' . $no_po . '" data-id_suplier="'.$item->id_suplier.'" data-name_suplier="' . $item->name_suplier . '" data-nilai="' . $total_incoming . '" data-tanggal_incoming="'.$item->tanggal.'" data-no="' . $no . '">';
                             echo '<i class="fa fa-plus"></i> Add';
                             echo '</button>';
                             echo '</td>';
