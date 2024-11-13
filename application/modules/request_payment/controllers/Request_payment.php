@@ -1835,6 +1835,17 @@ class Request_payment extends Admin_Controller
 				$valid = 1;
 			}
 
+			if($tab == 'po_material') {
+				$valid = 1;
+
+				$this->db->select('a.nm_suplier');
+				$this->db->from('tr_receive_invoice_ap_header a');
+				$this->db->where('a.id_rec_inv_ap', $record->id);
+				$get_suplier = $this->db->get()->row();
+
+				$nm_supplier = (!empty($get_suplier)) ? $get_suplier->nm_suplier : '';
+			}
+
 			if ($valid == 1) {
 				$hasil .= '<tr>';
 				$hasil .= '<td class="exclass">';

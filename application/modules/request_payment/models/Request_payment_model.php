@@ -89,6 +89,18 @@ class Request_payment_model extends BF_Model
             if($tab == 'periodik') {
                 $data = $this->db->query(" SELECT b.id as ids,a.no_doc,c.nm_lengkap nama,a.tanggal_doc as tgl_doc,b.nama as keperluan, 'periodik' as tipe,b.nilai jumlah,null as tanggal,a.no_doc as id, b.bank_id, b.accnumber, b.accname, b.sts_reject, b.sts_reject_manage, b.reject_reason FROM tr_pengajuan_rutin a join tr_pengajuan_rutin_detail b on a.no_doc=b.no_doc left join users c on a.created_by = c.id_user WHERE a.status='1' and (b.id_payment='0' OR b.id_payment IS NULL)" . $where_date3)->result();
             }
+            if($tab == 'po_material') {
+                $this->db->select("a.id_rec_inv_ap as ids, a.id_rec_inv_ap as no_doc, b.nm_lengkap as nama, DATE_FORMAT(a.created_date, '%d-%m-%Y') as tgl_doc, a.keterangan_bayar as keperluan, 'po_material' as tipe, SUM(c.total_nilai) as jumlah, '' as tanggal, a.id_rec_inv_ap as id, ''  as bank_id, '' as accnumber, '' as accname, a.sts_reject as sts_reject, a.sts_reject_manage as sts_reject_manage, a.reject_reason as reject_reason");
+                $this->db->from('tr_receive_invoice_ap_header a');
+                $this->db->join('users b', 'b.id_user = a.created_by', 'left');
+                $this->db->join('tr_receive_invoice_ap_detail c', 'c.id_rec_inv_ap = a.id_rec_inv_ap', 'left');
+                $this->db->where('a.id_request_payment', null);
+                $this->db->group_by('a.id_rec_inv_ap');
+                $data = $this->db->get()->result();
+
+                // print_r($data);
+                // exit;
+            }
         }else{
             $data    = $this->db->query("SELECT a.id as ids,a.no_doc,a.nama,a.tgl_doc,'Transportasi' as keperluan, 'transportasi' as tipe,(SELECT IF(SUM(aa.jumlah_kasbon) IS NULL, 0, SUM(aa.jumlah_kasbon)) FROM tr_transport aa WHERE aa.no_req = a.no_doc AND aa.req_payment = 0) as jumlah,null as tanggal,a.no_doc as id, a.bank_id, a.accnumber, a.accname, a.sts_reject, a.sts_reject_manage, a.reject_reason FROM tr_transport_req a WHERE a.status = 1 ".$where_date1."
             GROUP BY no_doc
