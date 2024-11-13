@@ -688,6 +688,8 @@
         var total = parseFloat(nilai + nilai_ppn);
 
         $('input[name="kp[' + no + '][total]"]').val(number_format(total, 2));
+
+        hitung_grand_total();
     });
 
     // $('#tgl_bayar').datepicker({
