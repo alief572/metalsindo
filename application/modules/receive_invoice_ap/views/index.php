@@ -24,6 +24,7 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 			<thead>
 				<tr>
 					<th class="text-center">No.</th>
+					<th class="text-center">ID Receive Invoice</th>
 					<th class="text-center">No. Invoice</th>
 					<th class="text-center">Supplier</th>
 					<th class="text-center">Nominal Invoice</th>
@@ -151,6 +152,9 @@ $ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
 			},
 			columns: [{
 					data: 'no'
+				},
+				{
+					data: 'no_receive_invoice',
 				},
 				{
 					data: 'no_invoice'

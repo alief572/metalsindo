@@ -44,6 +44,8 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 <!-- <script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script> -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" integrity="sha512-yVvxUQV0QESBt1SyZbNJMAwyKvFTLMyXSyBHDO4BG5t7k/Lw34tyqlSDlKIrIENIzCl+RVUNjmCPG+V/GMesRw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
+
 <div id="alert_edit" class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
 
 <form action="<?= $this->uri->uri_string() ?>" id="frm_data" name="frm_data" class="form-horizontal" enctype="multipart/form-data">
@@ -89,10 +91,11 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 				<li role="presentation" class="kasbon_tab tab_pin"><a href="javascript:void();" onclick="change_tab('kasbon')">Kasbon</a></li>
 				<li role="presentation" class="expense_tab tab_pin"><a href="javascript:void();" onclick="change_tab('expense')">Expense</a></li>
 				<li role="presentation" class="periodik_tab tab_pin"><a href="javascript:void();" onclick="change_tab('periodik')">Periodik</a></li>
-				<li role="presentation" class="pembayaran_po_tab tab_pin"><a href="javascript:void();" onclick="change_tab('pembayaran_po')">Pembayaran PO</a></li>
+				<li role="presentation" class="pembayaran_po_tab tab_pin"><a href="javascript:void();" onclick="change_tab('pembayaran_po')">PO Non Material</a></li>
+				<li role="presentation" class="po_material_tab tab_pin"><a href="javascript:void();" onclick="change_tab('po_material')">PO Material</a></li>
 			</ul>
 			<div class="table-container col-md-12" style="margin-top: 10px;">
-				<table id="" class="table table-bordered">
+				<table id="example1" class="table table-bordered">
 					<thead class="sticky-header">
 						<tr>
 							<th>#</th>
@@ -340,8 +343,8 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 					</tbody>
 					<tbody>
 						<tr class="exclass">
-							<td colspan=7 align=right>Total</td>
-							<td colspan=2><input type="text" class="form-control divide input-sm text-right" name="total_req" id="total_req" value="0" readonly></td>
+							<td colspan="8" align=right>Total</td>
+							<td colspan="2"><input type="text" class="form-control divide input-sm text-right" name="total_req" id="total_req" value="0" readonly></td>
 						</tr>
 					</tbody>
 				</table>
@@ -354,12 +357,17 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 		<!-- /.box-body -->
 	</div>
 </form>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 <script src="<?= base_url('assets/js/autoNumeric.js') ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js" integrity="sha512-rMGGF4wg1R73ehtnxXBt5mbUfN9JUJwbk21KMlnLZDJh7BkPmeovBuddZCENJddHYYMkCh9hPFnPmS9sspki8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script type="text/javascript">
 	load_all_party();
+
+	$(document).ready(function() {
+		$('#example1').DataTable();
+	});
 
 	function load_all_party() {
 		$(".divide").autoNumeric('init');
