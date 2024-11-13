@@ -160,16 +160,18 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 								<?php if ($ENABLE_VIEW) : ?>
 									<a class="btn btn-warning btn-sm" href="<?= base_url('/purchase_order_non_material/view_po/' . $record->no_po) ?>" title="View" data-no_po="<?= $record->no_po ?>"><i class="fa fa-eye"></i></a>
 
-									<a class="btn btn-primary btn-sm" href="<?= base_url('/purchase_order_non_material/PrintH2/' . $record->no_po) ?>" target="_blank" title="Print"><i class="fa fa-print"></i></a>
-								<?php endif; ?>
+									<?php endif; ?>
 								<?php if ($ENABLE_MANAGE && $valid_edit > 0) :
 								?>
 									<a class="btn btn-info btn-sm" href="<?= base_url('/purchase_order_non_material/edit/' . $record->no_po) ?>" title="Edit"><i class="fa fa-edit"></i></a>
 
 								<?php
-								endif; ?>
-
+								endif; 
+								if ($record->status == '2') {?>
+								<a class="btn btn-primary btn-sm" href="<?= base_url('/purchase_order_non_material/PrintH2/' . $record->no_po) ?>" target="_blank" title="Print"><i class="fa fa-print"></i></a>
+								
 								<?php
+								}
 								if ($ENABLE_DELETE) {
 									echo '<button type="button" class="btn btn-sm btn-danger close_po_modal" data-no_po="' . $record->no_po . '" title="Close PO"><i class="fa fa-close"></i></button>';
 								}
