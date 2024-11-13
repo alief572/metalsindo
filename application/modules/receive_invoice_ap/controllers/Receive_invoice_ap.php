@@ -163,6 +163,7 @@ class Receive_invoice_ap extends Admin_Controller
 
       $hasil[] = [
         'no' => $no,
+        'no_receive_invoice' => $item->id_rec_inv_ap,
         'no_invoice' => $item->no_invoice,
         'nm_suplier' => $item->nm_suplier,
         'nominal_invoice' => number_format($nominal_invoice, 2),

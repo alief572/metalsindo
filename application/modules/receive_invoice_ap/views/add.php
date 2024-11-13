@@ -106,6 +106,16 @@
                 </thead>
                 <tbody id="list_item_mutasi">
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="4" class="text-right">Grand Total</th>
+                        <th class="text-right col_ttl_nilai">0.00</th>
+                        <th></th>
+                        <th class="text-right col_ttl_ppn">0.00</th>
+                        <th class="text-right col_ttl_total">0.00</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
             </table>
 
             <br><br>
@@ -475,6 +485,26 @@
         cekall();
     }
 
+    function hitung_grand_total(){
+        var grand_total_nilai = 0;
+        var grand_total_ppn = 0;
+        var grand_total_total = 0;
+
+        for(i = 1; i <= no_list; i++) {
+            var kp_nilai = get_num($('input[name="kp['+i+'][nilai]"]').val());
+            var kp_ppn = get_num($('input[name="kp['+i+'][ppn]"]').val());
+            var kp_total = get_num($('input[name="kp['+i+'][total]"]').val());
+
+            grand_total_nilai += kp_nilai;
+            grand_total_ppn += kp_ppn;
+            grand_total_total += kp_total;
+        }
+
+        $('.col_ttl_nilai').html(number_format(grand_total_nilai, 2));
+        $('.col_ttl_ppn').html(number_format(grand_total_ppn, 2));
+        $('.col_ttl_total').html(number_format(grand_total_total, 2));
+    }
+
     $(document).on('click', '.add', function() {
         var id_suplier = $("#supplier").val();
 
@@ -638,6 +668,8 @@
 
         $('.add_incoming_' + no).html('Added !');
         $('.add_incoming_' + no).attr('disabled', true);
+
+        hitung_grand_total();
 
         no_list = no_list + 1;
     });
