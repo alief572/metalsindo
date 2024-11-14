@@ -184,6 +184,13 @@ class Request_payment extends Admin_Controller
 			$list_no_invoice[$item_no_invoice->id] = $item_no_invoice->invoice_no;
 		}
 
+		$this->db->select('a.id_rec_inv_ap, a.no_invoice');
+		$this->db->from('tr_receive_invoice_ap_header a');
+		$get_invoice_ap = $this->db->get()->result();
+		foreach($get_invoice_ap as $item) {
+			$list_no_invoice[$item->id_rec_inv_ap] = $item->no_invoice;
+		}
+
 		$this->template->set('tingkat_approval', 1);
 		$this->template->set('data', $data);
 		$this->template->set('list_no_invoice', $list_no_invoice);
@@ -201,6 +208,13 @@ class Request_payment extends Admin_Controller
 		$get_invoice_no = $this->db->get()->result();
 		foreach ($get_invoice_no as $item_no_invoice) {
 			$list_no_invoice[$item_no_invoice->id] = $item_no_invoice->invoice_no;
+		}
+
+		$this->db->select('a.id_rec_inv_ap, a.no_invoice');
+		$this->db->from('tr_receive_invoice_ap_header a');
+		$get_invoice_ap = $this->db->get()->result();
+		foreach($get_invoice_ap as $item) {
+			$list_no_invoice[$item->id_rec_inv_ap] = $item->no_invoice;
 		}
 
 		$this->template->set('tingkat_approval', 2);
@@ -261,6 +275,13 @@ class Request_payment extends Admin_Controller
 		if (isset($type) && $type == 'periodik') {
 			$data 			= $this->db->get_where('tr_pengajuan_rutin_detail', ['id' => $id])->row();
 			$data_detail	= $this->db->get_where('tr_pengajuan_rutin_detail', ['id' => $id])->result();
+		}
+
+		// PO Material
+
+		if(isset($type) && $type == 'po_material') {
+			$data = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $id])->row();
+			$data_detail = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $id])->result();
 		}
 
 		// $data_budget 	= $this->All_model->GetComboBudget('', 'EXPENSE', date('Y'));
@@ -338,6 +359,13 @@ class Request_payment extends Admin_Controller
 		if (isset($type) && $type == 'periodik') {
 			$data 			= $this->db->get_where('tr_pengajuan_rutin_detail', ['id' => $id])->row();
 			$data_detail	= $this->db->get_where('tr_pengajuan_rutin_detail', ['id' => $id])->result();
+		}
+
+		// PO Material
+
+		if(isset($type) && $type == 'po_material') {
+			$data = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $id])->row();
+			$data_detail = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $id])->result();
 		}
 
 		// $data_budget 	= $this->All_model->GetComboBudget('', 'EXPENSE', date('Y'));
@@ -611,6 +639,42 @@ class Request_payment extends Admin_Controller
 				$Harga[] 		= $dtl->nilai;
 			}
 
+			if($Data['tipe'] == 'po_material') {
+				$dtl 				= $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $detail['id']])->row();
+
+				$nilai = 0;
+				$this->db->select('a.nilai');
+				$this->db->from('tr_receive_invoice_ap_detail a');
+				$this->db->where('a.id_rec_inv_ap', $detail['id']);
+				$get_nilai_inv = $this->db->get()->result();
+
+				foreach($get_nilai_inv as $item) {
+					$nilai += $item->nilai;
+				}
+
+				$ArrDetail[] 		= [
+					'id' 			=> $id_detail,
+					'payment_id' 	=> $Id,
+					'no_doc' 		=> $dtl->id_rec_inv_ap,
+					'tgl_doc' 		=> date('Y-m-d', strtotime($dtl->created_date)),
+					'deskripsi' 	=> $dtl->keterangan_bayar,
+					'qty' 			=> '1',
+					'harga' 		=> $nilai,
+					'total' 		=> $nilai,
+					'keterangan' 	=> $dtl->keterangan_bayar,
+					'doc_file' 		=> '',
+					'coa' 			=> '',
+					'created_by' 	=> $this->auth->user_name(),
+					'created_on' 	=> date("Y-m-d h:i:s"),
+				];
+
+				$updateDetail[] = [
+					'id_rec_inv_ap' => $dtl->id_rec_inv_ap,
+					'req_payment' 		=> '1',
+				];
+				$Harga[] 		= $nilai;
+			}
+
 			$id_detail++;
 		}
 
@@ -760,6 +824,26 @@ class Request_payment extends Admin_Controller
 				// 	print_r($this->db->error()['message']);
 				// 	exit;
 				// }
+			}
+
+			if($Data['tipe'] == 'po_material') {
+				$this->db->insert_batch('payment_approve_details', $ArrDetail);
+				$this->db->update_batch('tr_receive_invoice_ap_header', $updateDetail, 'id_rec_inv_ap');
+
+				$get_nonpo = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $Data['id']])->row_array();
+
+				$data_request_payment = $this->db->select('id')->get_where('request_payment', ['no_doc' => $get_nonpo['id_rec_inv_ap']])->row_array();
+
+				// if ($countData > $actualPayment) {
+				// 	$this->db->update('request_payment', ['status' => '1'], ['id' => $data_request_payment['id']]);
+				// } elseif (($countData == $actualPayment)) {
+				// 	$this->db->update('request_payment', ['status' => '2'], ['id' => $data_request_payment['id']]);
+				// }
+				$update_request_payment = $this->db->update('request_payment', ['status' => '2'], ['no_doc' => $get_nonpo['id_rec_inv_ap'], 'ids' => $get_nonpo['id_rec_inv_ap']]);
+				if(!$update_request_payment){
+					print_r($this->db->error()['message']);
+					exit;
+				}
 			}
 		}
 
@@ -1891,6 +1975,11 @@ class Request_payment extends Admin_Controller
 					$curr = $get_curr->curr;
 				}
 
+				$tgl_bayar = '';
+				if($record->tipe == 'po_material') {
+					$tgl_bayar = date('Y-m-d', strtotime($record->tgl_bayar));
+				}
+
 				$hasil .= '</td>';
 				$hasil .= '<td class="">' . $numb . '</td>';
 				if ($tab == 'pembayaran_po') {
@@ -1973,7 +2062,7 @@ class Request_payment extends Admin_Controller
 						<td>Tanggal Rencana Pembayaran</td>
 						<td>:</td>
 						<td>
-							<input type="text" class="form-control tanggal" id="tanggal_' . $numb . '" name="tanggal_' . $numb . '" value="" placeholder="Tanggal">
+							<input type="date" class="form-control" id="tanggal_' . $numb . '" name="tanggal_' . $numb . '" value="'.$tgl_bayar.'" placeholder="Tanggal">
 						</td>
 					</tr>
 					<tr>

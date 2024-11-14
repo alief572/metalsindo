@@ -84,11 +84,5 @@ defined('EXIT_DATABASE')       OR define('EXIT_DATABASE', 8); // database error
 defined('EXIT__AUTO_MIN')      OR define('EXIT__AUTO_MIN', 9); // lowest automatically-assigned error code
 defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
-
-<<<<<<< HEAD
-define('DBACC', 'gl_metalsindo_live');
-define('DBERP', 'metalsindo_live');
-=======
 define('DBACC', 'gl_metalsindo_dev');
 define('DBERP', 'metalsindo_dev');
->>>>>>> c278fbb646b099942e3515a206f6e43b74faf7fb
