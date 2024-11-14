@@ -94,7 +94,7 @@ class Request_payment_model extends BF_Model
                 $this->db->from('tr_receive_invoice_ap_header a');
                 $this->db->join('users b', 'b.id_user = a.created_by', 'left');
                 $this->db->join('tr_receive_invoice_ap_detail c', 'c.id_rec_inv_ap = a.id_rec_inv_ap', 'left');
-                $this->db->where('a.id_request_payment', null);
+                $this->db->where('a.req_payment', null);
                 $this->db->group_by('a.id_rec_inv_ap');
                 $data = $this->db->get()->result();
 
