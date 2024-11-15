@@ -437,7 +437,10 @@ class Incoming extends Admin_Controller
 		
 		<td hidden ><input  type='text' 		value='" . $no_surat . "'		        class='form-control input-sm' id='no_surat" . $id . "_" . $no . "' 			        required name='dt[" . $id . "][detail][" . $no . "][no_surat]' 	readonly></td>
 		
-		<td width ='130'><input  type='text' 		value='" . $material->namamaterial . "'	class='form-control input-sm' id='dt_namamaterial_" . $id . "_" . $no . "' 	required name='dt[" . $id . "][detail][" . $no . "][nama_material]' readonly></td>
+		<td width ='130'>
+		
+		" . $material->namamaterial . "
+		<input  type='hidden' 		value='" . $material->namamaterial . "'	class='form-control input-sm' id='dt_namamaterial_" . $id . "_" . $no . "' 	required name='dt[" . $id . "][detail][" . $no . "][nama_material]' readonly></td>
 		
 		<td>
 		Thickness : " . $thick->thickness . " <br>
