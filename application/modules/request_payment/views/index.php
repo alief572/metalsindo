@@ -52,38 +52,7 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 	<div class="box">
 		<div class="box-body">
 			<div class="col-md-12">
-				<div class="row">
-					<div class="col-md-2">
-						<div class="form-group">
-							<label for="">From</label>
-							<input type="date" name="" id="" class="form-control from_date">
-						</div>
-					</div>
-					<div class="col-md-2" style="margin-left: 5px;">
-						<div class="form-group">
-							<label for="">To</label>
-							<input type="date" name="" id="" class="form-control to_date">
-						</div>
-					</div>
-					<div class="col-md-2" style="margin-left: 5px;">
-						<div class="form-group">
-							<label for="">Vendor</label>
-							<select name="vendor" id="" class="form-control form-control-sm vendor">
-								<option value="">- Vendor -</option>
-								<?php
-								foreach ($list_vendor as $item_vendor) :
-									echo '<option value="' . $item_vendor->id_suplier . '">' . $item_vendor->name_suplier . '</option>';
-								endforeach;
-								?>
-							</select>
-						</div>
-					</div>
-					<div class="col-md-1">
-						<button type="button" class="btn btn-sm btn-primary search" style="margin-top: 25px;">
-							<i class="fa fa-search"></i> Search
-						</button>
-					</div>
-				</div>
+				
 			</div>
 			<input type="hidden" name="" class="actived_tab" value="transport">
 			<ul class="nav nav-tabs" role="tablist">

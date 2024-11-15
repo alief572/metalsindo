@@ -1,6 +1,11 @@
 <?php
 $kode_supplier = [];
 $nm_supplier = [];
+
+$tgl_bayar = '';
+$ket_bayar = '';
+$curr = '';
+
 foreach ($results['result_payment'] as $item) {
 
 
@@ -47,6 +52,20 @@ foreach ($results['result_payment'] as $item) {
 			$kode_supplier[$item_supplier->id_suplier] = $item_supplier->id_suplier;
 			$nm_supplier[] = $item_supplier->name_suplier;
 		}
+	}
+
+	if ($item->tipe == 'po_material') {
+		$get_inv_ap = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $item->no_doc])->row();
+
+		$kode_supplier[$get_inv_ap->id_suplier] = $get_inv_ap->id_suplier;
+		$nm_supplier[] = $get_inv_ap->nm_suplier;
+
+		$tgl_bayar = $get_inv_ap->tgl_bayar;
+		$ket_bayar = $get_inv_ap->keterangan_bayar;
+
+		$get_req_payment = $this->db->get_where('request_payment', ['no_doc' => $item->no_doc])->row();
+
+		$curr = $get_req_payment->currency;
 	}
 }
 ?>
@@ -232,9 +251,32 @@ foreach ($results['result_payment'] as $item) {
 							}
 						}
 
+						if ($item->tipe == 'po_material') {
+							$get_inv_ap = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $item->no_doc])->row();
+
+							$nm_supplier[] = $get_inv_ap->nm_suplier;
+						}
+
 						$nm_supplier = implode(', ', $nm_supplier);
 
+						$ppn = 0;
+						if (!empty($get_rec_invoice)) {
+							$ppn = $get_rec_invoice->nilai_ppn;
+						}
+
+						if ($item->tipe == 'po_material') {
+							$get_ppn = $this->db->get_where('tr_receive_invoice_ap_detail', ['id_rec_inv_ap' => $item->no_doc])->result();
+
+							foreach ($get_ppn as $item_ppn) {
+								$ppn += $item_ppn->ppn;
+							}
+						}
+
 						$nilai_ppn = (($nilai_utuh * $persen_progress / 100) * 11 / 100);
+						if($nilai_ppn <= 0) {
+							$nilai_ppn = $ppn;
+						}
+						
 						// if($nilai_ppn <= 0) {
 						// 	$nilai_ppn = ($item->jumlah * 11 / 100);
 						// }

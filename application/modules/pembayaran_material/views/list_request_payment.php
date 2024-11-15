@@ -71,6 +71,15 @@
                         }
                     }
 
+                    if($item->tipe == 'po_material') {
+                        $this->db->select('a.nm_suplier');
+                        $this->db->from('tr_receive_invoice_ap_header a');
+                        $this->db->where('a.id_rec_inv_ap', $item->no_doc);
+                        $get_suplier = $this->db->get()->row();
+
+                        $nm_supplier[] = $get_suplier->nm_suplier;
+                    }
+
                     $nm_supplier = implode(', ', $nm_supplier);
 
                     $get_choosed_payment = $this->db->get_where('tr_choosed_payment', ['id_user' => $this->auth->user_id(), 'id_payment' => $item->id])->result();

@@ -9,6 +9,7 @@ $count_kasbon = 0;
 $count_expense = 0;
 $count_periodik = 0;
 $count_pembayaran_po = 0;
+$count_po_material = 0;
 
 foreach ($data as $item) :
     if ($item->tipe == 'transportasi') {
@@ -26,6 +27,9 @@ foreach ($data as $item) :
     }
     if ($item->tipe == 'periodik') {
         $count_periodik += 1;
+    }
+    if ($item->tipe == 'po_material') {
+        $count_po_material += 1;
     }
 endforeach;
 ?>
@@ -82,7 +86,7 @@ endforeach;
             </div>
             <div class="col-md-4" style="margin-top: 2vh;">
                 <div class="panel panel-default">
-                    <div class="panel-heading bg-light-blue">Pembayaran PO</div>
+                    <div class="panel-heading bg-light-blue">Pembayaran Non Material</div>
                     <div class="panel-body">
                         <h2><?= $count_pembayaran_po ?></h2>
                     </div>
@@ -91,7 +95,19 @@ endforeach;
                     </div>
                 </div>
             </div>
+            <div class="col-md-4" style="margin-top: 2vh;">
+                <div class="panel panel-default">
+                    <div class="panel-heading bg-dark">PO Material</div>
+                    <div class="panel-body">
+                        <h2><?= $count_po_material ?></h2>
+                    </div>
+                    <div class="panel-footer w-100">
+                        <button type="button" class="btn btn-sm btn-primary btn_view_req" style="width: 100%;" data-val="po_material"><i class="fa fa-eye"></i> View</button>
+                    </div>
+                </div>
+            </div>
         </div>
+
         <div class="row">
             <div class="col-md-12 list_transportasi" style="display: none;">
                 <h2>Transportasi</h2>
@@ -336,7 +352,7 @@ endforeach;
                 </table>
             </div>
             <div class="col-md-12 list_pembayaran_po" style="display: none;">
-                <h2>Pembayaran PO</h2>
+                <h2>PO Non Material</h2>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -406,6 +422,71 @@ endforeach;
                     </tbody>
                 </table>
             </div>
+
+            <div class="col-md-12 list_po_material" style="display: none;">
+                <h2>PO Material</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">No Dokumen</th>
+                            <th class="text-center">No Invoice</th>
+                            <th class="text-center">Request By</th>
+                            <th class="text-center">Tanggal</th>
+                            <th class="text-center">Keperluan</th>
+                            <th class="text-center">Tipe</th>
+                            <th class="text-center">Nilai Pengajuan</th>
+                            <th class="text-center">Tanggal Pembayaran</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        foreach ($data as $item_po_material) :
+                            $no_invoice = (isset($list_no_invoice[$item_po_material->no_doc])) ? $list_no_invoice[$item_po_material->no_doc] : '';
+
+                            if ($item_po_material->tipe == 'po_material') {
+                                $tipe = 'PO Material';
+
+                                echo '<tr>';
+                                echo '<td>' . $item_po_material->no_doc . '</td>';
+                                echo '<td>' . $no_invoice . '</td>';
+                                echo '<td>' . $item_po_material->nama . '</td>';
+                                echo '<td>' . $item_po_material->tgl_doc . '</td>';
+                                echo '<td>' . $item_po_material->keperluan . '</td>';
+                                echo '<td>' . $tipe . '</td>';
+                                echo '<td class="text-right">' . number_format($item_po_material->jumlah) . '</td>';
+                                echo '<td>' . $item_po_material->tanggal . '</td>';
+                                echo '<td>';
+                                $get_sts_payment = $this->db->select('status')->get_where('payment_approve', ['no_doc' => $item_po_material->no_doc, 'ids' => $item_po_material->ids])->row_array();
+
+                                if ($item_po_material->status == '0' || empty($get_sts_payment)) {
+                                    if ($item_po_material->status == '9') {
+                                        echo '<label class="label bg-orange">Rejected</label>';
+                                    } else {
+                                        echo '<label class="label bg-aqua">Open</label>';
+                                    }
+                                } elseif ($get_sts_payment['status'] == 1) {
+                                    echo '<label class="label bg-yellow">Process</label>';
+                                } elseif ($get_sts_payment['status'] == 2) {
+                                    echo '<label class="label bg-red">Close</label>';
+                                } else {
+                                    echo '<label class="label bg-gray"><span class="text-muted">Undefined</span></label>';
+                                }
+                                echo '</td>';
+                                echo '<td>';
+                                if ($ENABLE_MANAGE && $get_sts_payment['status'] < 1) : ?>
+                                    <div class="text-center"><a href="<?= base_url($this->uri->segment(1) . '/approval_payment/?type=' . $item_po_material->tipe . '&id=' . $item_po_material->id . '&nilai=' . $item_po_material->jumlah); ?>" name="save" class="btn btn-primary btn-sm"><i class="fa fa-check-square-o">&nbsp;</i>Approve</a></div>
+                                    <!-- <input type="checkbox" name="status[]" id="status_<?= $numb ?>" value="<?= $item_po_material->id ?>"> -->
+                        <?php endif;
+                                echo '</td>';
+                                echo '</tr>';
+                            }
+                        endforeach;
+                        ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -435,30 +516,42 @@ endforeach;
             $(".list_expense").hide();
             $(".list_periodik").hide();
             $('.list_pembayaran_po').hide();
+            $('.list_po_material').hide();
         }
         if (val == "kasbon") {
             $(".list_transportasi").hide();
             $(".list_expense").hide();
             $(".list_periodik").hide();
             $('.list_pembayaran_po').hide();
+            $('.list_po_material').hide();
         }
         if (val == "expense") {
             $(".list_transportasi").hide();
             $(".list_kasbon").hide();
             $(".list_periodik").hide();
             $('.list_pembayaran_po').hide();
+            $('.list_po_material').hide();
         }
         if (val == "periodik") {
             $(".list_transportasi").hide();
             $(".list_kasbon").hide();
             $(".list_expense").hide();
             $('.list_pembayaran_po').hide();
+            $('.list_po_material').hide();
         }
         if (val == "pembayaran_po") {
             $(".list_transportasi").hide();
             $(".list_kasbon").hide();
             $(".list_expense").hide();
             $(".list_periodik").hide();
+            $('.list_po_material').hide();
+        }
+        if (val == "po_material") {
+            $(".list_transportasi").hide();
+            $(".list_kasbon").hide();
+            $(".list_expense").hide();
+            $(".list_periodik").hide();
+            $('.list_pembayaran_po').hide();
         }
     });
 
