@@ -50,7 +50,7 @@ defined('FOPEN_READ_WRITE_CREATE_STRICT')       OR define('FOPEN_READ_WRITE_CREA
 
 /*
 |--------------------------------------------------------------------------
-| Exit Status Codes
+| Exit Status Codes 
 |--------------------------------------------------------------------------
 |
 | Used to indicate the conditions under which the script is exit()ing.
