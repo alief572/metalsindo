@@ -52,7 +52,7 @@ class Pengajuan_rutin extends Admin_Controller
 		$this->template->set('datdept', $datdept);
 		$this->template->set('results', $data);
 		$this->template->set('data_detail', $data_detail);
-		$this->template->title('Pengajuan Pembayaran Periodik');
+		$this->template->title('Approval Pengajuan Pembayaran Periodik');
 		$this->template->render('list');
 	}
 
