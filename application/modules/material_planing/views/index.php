@@ -34,6 +34,7 @@ thead input {
 								<th>No. Aloy</th>
 								<th>Thickness</th>
 								<th>Width</th>
+								<th>Length</th>
 								<th>Delivery Date</th>
 								<th>Total Weight</th>
 								<th>Total SPK</th>
@@ -74,6 +75,7 @@ thead input {
 								<td><?= $record->no_alloy ?></td>
 								<td align='right'><?= number_format($record->thickness,2); ?></td>
 								<td align='right'><?= number_format($record->width,2); ?></td>
+								<td align='right'><?= number_format($record->length,2); ?></td>
 								<td align='right'><?= date('d-M-Y', strtotime($record->delivery)); ?></td> 
 								<td align='right'><?= number_format($record->qty_produk) ?></td>
 								<td align='right'>-</td>

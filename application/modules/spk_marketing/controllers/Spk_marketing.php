@@ -623,6 +623,7 @@ class Spk_marketing extends Admin_Controller
 			<th><input type='text' class='form-control' value='$dt->nama3|$dt->maker' readonly id='dp_noalloy_$loop' required name='dp[$loop][noalloy]'></th>
 			<th><input type='text' class='form-control' value='$dt->thickness' readonly id='dp_thickness_$loop' required name='dp[$loop][thickness]'></th>
 			<th><input type='text' class='form-control' value='$dt->width' id='dp_width_$loop' required name='dp[$loop][width]'></th>
+			<th><input type='text' class='form-control' value='$dt->length' id='dp_length_$loop' required name='dp[$loop][length]'></th>
 			<th id='part_number'><input type='text' class='form-control' value='$dt->lotno' readonly id='dp_part_number_$loop' required name='dp[$loop][part_number]'></th>
 			<th><input type='text' class='form-control' value='$dt->harga_penawaran_cust' readonly id='dp_hgpenwaran_$loop' required name='dp[$loop][hgpenaaran]'></th>
 			<th><input type='text' class='form-control' value='$dt->harga_penawaran_cust' onkeyup='return AksiDetail($loop);' id='dp_hgdeal_$loop' required name='dp[$loop][hgdeal]'></th>
@@ -1094,6 +1095,10 @@ class Spk_marketing extends Admin_Controller
 		//Add Data
 		$this->db->insert('tr_spk_marketing', $data);
 		$numb1 = 0;
+
+		// print_r($_POST['dp']);
+		// exit;
+
 		foreach ($_POST['dp'] as $dp) {
 			$numb1++;
 			$stokpakai =  array(
@@ -1103,7 +1108,8 @@ class Spk_marketing extends Admin_Controller
 				'id_material'		    => $dp[idmaterial],
 				'no_alloy'		        => $dp[noalloy],
 				'thickness'		        => $dp[thickness],
-				'width'		        	=> $dp[width],
+				'width'		        	=> round($dp[width], 2),
+				'length'		        => $dp[length],
 				'harga_penawaran'		=> $dp[hgpenaaran],
 				'harga_deal'		    => $dp[hgdeal],
 				'qty_produk'			=> $dp[qty],

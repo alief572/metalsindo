@@ -90,6 +90,7 @@ $suplier	= $this->db->query("SELECT * FROM master_supplier WHERE id_suplier = '"
 								<th class='text-center'>No PO</th>
 								<th class='text-center'>Material</th>
 								<th class='text-center'>Width</th>
+								<th class='text-center'>Length</th>
 								<th class='text-center'>Qty Order (Kg)</th>
 								<th class='text-center'>Coil</th>
 								<th class='text-center'>Weight Receive (Kg)</th>
@@ -111,6 +112,7 @@ $suplier	= $this->db->query("SELECT * FROM master_supplier WHERE id_suplier = '"
 			<td class='text-left'>" . $no_surat . "</td>
 			<td class='text-left'>" . $material->nama_material . "</td>
 			<td class='text-right'>" . number_format($material->width, 2) . "</td>
+			<td class='text-right'>" . number_format($material->length, 2) . "</td>
 			<td class='text-right'>" . number_format($material->qty_order, 2) . "</td>
 			<td class='text-center'>" . number_format($material->qty_recive) . "</td>
 			<td class='text-right'>" . number_format($material->width_recive, 2) . "</td>
