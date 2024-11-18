@@ -45,7 +45,7 @@ $tanggal = date('Y-m-d');
 										<label for="customer">Tanggal Kedatangan</label>
 									</div>
 									<div class="col-md-8">
-										<input type="date" class="form-control" value="<?= $tanggal ?>" id="tanggal" required name="tanggal">
+										<input type="date" class="form-control" value="<?= $tanggal ?>" id="" required name="tanggal">
 									</div>
 								</div>
 							</div>
@@ -415,7 +415,7 @@ $tanggal = date('Y-m-d');
 			success: function(html) {
 				$("#jumlahharga_" + id).html(html);
 			}
-		}); 
+		});
 
 		$.ajax({
 			type: "GET",
@@ -633,16 +633,16 @@ $tanggal = date('Y-m-d');
 	}
 
 	function get_num(nilai = null) {
-        if (nilai !== '' && nilai !== null) {
-            nilai = nilai.split(',').join('');
-            nilai = parseFloat(nilai);
-        } else {
-            nilai = 0;
-        }
+		if (nilai !== '' && nilai !== null) {
+			nilai = nilai.split(',').join('');
+			nilai = parseFloat(nilai);
+		} else {
+			nilai = 0;
+		}
 
-        return nilai;
-    }
-	
+		return nilai;
+	}
+
 	function cariPanjang(id, no) {
 
 		var beratpackinglist = getNum($("#dt_widthrecive" + id + "_" + no).val().split(",").join(""));

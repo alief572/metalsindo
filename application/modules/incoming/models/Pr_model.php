@@ -79,11 +79,11 @@ class Pr_model extends BF_Model
         $bulan = date('m');
         $tahun = date('Y');
         $blnthn = date('Y-m');
-        $query = $this->db->query("SELECT MAX(id_incoming) as max_id FROM tr_incoming WHERE month(tanggal)='$bulan' and Year(tanggal)='$tahun'");
+        $query = $this->db->query("SELECT MAX(id_incoming) as max_id FROM tr_incoming WHERE id_incoming LIKE '%MP-".date('m')."/".date('Y')."%'");
         $row = $query->row_array();
         $thn = date('T');
         $max_id = $row['max_id'];
-        $max_id1 = (int) substr($max_id, -14, 3);
+        $max_id1 = (int) substr($max_id, 3, 3);
         $counter = $max_id1 + 1;
         $idcust = "IC-" . sprintf("%03s", $counter) . "/MP-" . $bulan . "/" . $tahun;
         return $idcust;

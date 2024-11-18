@@ -50,7 +50,7 @@ defined('FOPEN_READ_WRITE_CREATE_STRICT')       OR define('FOPEN_READ_WRITE_CREA
 
 /*
 |--------------------------------------------------------------------------
-| Exit Status Codes
+| Exit Status Codes 
 |--------------------------------------------------------------------------
 |
 | Used to indicate the conditions under which the script is exit()ing.
@@ -84,6 +84,5 @@ defined('EXIT_DATABASE')       OR define('EXIT_DATABASE', 8); // database error
 defined('EXIT__AUTO_MIN')      OR define('EXIT__AUTO_MIN', 9); // lowest automatically-assigned error code
 defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
-
-define('DBACC', 'gl_metalsindo_live');
-define('DBERP', 'metalsindo_live');
+define('DBACC', 'gl_metalsindo_dev');
+define('DBERP', 'metalsindo_dev');

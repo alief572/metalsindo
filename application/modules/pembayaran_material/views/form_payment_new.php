@@ -1,9 +1,11 @@
 <?php
 $kode_supplier = [];
 $nm_supplier = [];
+
+$tgl_bayar = '';
+$ket_bayar = '';
+$curr = '';
 foreach ($results['result_payment'] as $item) {
-
-
 
 	$get_rec_invoice = $this->db->get_where('tr_invoice_po', ['id' => $item->no_doc])->row();
 
@@ -48,6 +50,20 @@ foreach ($results['result_payment'] as $item) {
 			$nm_supplier[] = $item_supplier->name_suplier;
 		}
 	}
+
+	if ($item->tipe == 'po_material') {
+		$get_inv_ap = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $item->no_doc])->row();
+
+		$kode_supplier[$get_inv_ap->id_suplier] = $get_inv_ap->id_suplier;
+		$nm_supplier[] = $get_inv_ap->nm_suplier;
+
+		$tgl_bayar = $get_inv_ap->tgl_bayar;
+		$ket_bayar = $get_inv_ap->keterangan_bayar;
+
+		$get_req_payment = $this->db->get_where('request_payment', ['no_doc' => $item->no_doc])->row();
+
+		$curr = $get_req_payment->currency;
+	}
 }
 ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" integrity="sha512-yVvxUQV0QESBt1SyZbNJMAwyKvFTLMyXSyBHDO4BG5t7k/Lw34tyqlSDlKIrIENIzCl+RVUNjmCPG+V/GMesRw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -65,7 +81,7 @@ foreach ($results['result_payment'] as $item) {
 					<td width="15%" style="">Tgl Bayar</td>
 					<td width="5%" class="text-center">:</td>
 					<td width="25%">
-						<input type="date" name="tgl_bayar" id="" class="form-control form-control-sm tgl_bayar" required>
+						<input type="date" name="tgl_bayar" id="" class="form-control form-control-sm tgl_bayar" value="<?= $tgl_bayar ?>" required>
 					</td>
 					<td width="15%" style="">Supplier</td>
 					<td width="5%" class="text-center">:</td>
@@ -87,7 +103,7 @@ foreach ($results['result_payment'] as $item) {
 					<td width="15%" style="">Keterangan Pembayaran</td>
 					<td width="5%" class="text-center">:</td>
 					<td width="25%">
-						<textarea name="keterangan_pembayaran" id="" class="form-control form-control-sm keterangan_pembayaran"></textarea>
+						<textarea name="keterangan_pembayaran" id="" class="form-control form-control-sm keterangan_pembayaran"><?= $ket_bayar ?></textarea>
 					</td>
 					<td width="15%" style="">Pilih Bank</td>
 					<td width="5%" class="text-center">:</td>
@@ -96,7 +112,7 @@ foreach ($results['result_payment'] as $item) {
 							<option value="">- Bank -</option>
 							<?php
 							foreach ($results['list_bank'] as $item_bank) {
-								echo '<option value="' . $item_bank->no_perkiraan . '">' . $item_bank->nama . ' - '.$item_bank->no_perkiraan.'</option>';
+								echo '<option value="' . $item_bank->no_perkiraan . '">' . $item_bank->nama . ' - ' . $item_bank->no_perkiraan . '</option>';
 							}
 							?>
 						</select>
@@ -110,7 +126,11 @@ foreach ($results['result_payment'] as $item) {
 							<option value="">- Mata Uang -</option>
 							<?php
 							foreach ($results['list_mata_uang'] as $item_mata_uang) {
-								echo '<option value="' . $item_mata_uang->kode . '">' . $item_mata_uang->kode . '</option>';
+								$selected = '';
+								if ($item_mata_uang->kode == $curr) {
+									$selected = 'selected';
+								}
+								echo '<option value="' . $item_mata_uang->kode . '" ' . $selected . '>' . $item_mata_uang->kode . '</option>';
 							}
 							?>
 						</select>
@@ -167,15 +187,23 @@ foreach ($results['result_payment'] as $item) {
 						// exit;
 						$kurs_invoice = 1;
 
-						if(!empty($get_rec_invoice)) {
-							if($get_rec_invoice->kurs > 0) {
+						if (!empty($get_rec_invoice)) {
+							if ($get_rec_invoice->kurs > 0) {
 								$kurs_invoice = $get_rec_invoice->kurs;
 							}
 						}
-						
+
 						$ppn = 0;
-						if(!empty($get_rec_invoice)) {
+						if (!empty($get_rec_invoice)) {
 							$ppn = $get_rec_invoice->nilai_ppn;
+						}
+
+						if ($item->tipe == 'po_material') {
+							$get_ppn = $this->db->get_where('tr_receive_invoice_ap_detail', ['id_rec_inv_ap' => $item->no_doc])->result();
+
+							foreach ($get_ppn as $item_ppn) {
+								$ppn += $item_ppn->ppn;
+							}
 						}
 
 						$nilai_utuh = 0;
@@ -259,9 +287,15 @@ foreach ($results['result_payment'] as $item) {
 							}
 						}
 
+						if ($item->tipe == 'po_material') {
+							$get_inv_ap = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $item->no_doc])->row();
+
+							$nm_supplier[] = $get_inv_ap->nm_suplier;
+						}
+
 						$nm_supplier = implode(', ', $nm_supplier);
 
-						if ($ppn != 0) {
+						if ($ppn > 0) {
 							$nilai_ppn = $ppn;
 						} else {
 							$nilai_ppn = 0;

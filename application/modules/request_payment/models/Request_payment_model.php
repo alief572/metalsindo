@@ -90,11 +90,11 @@ class Request_payment_model extends BF_Model
                 $data = $this->db->query(" SELECT b.id as ids,a.no_doc,c.nm_lengkap nama,a.tanggal_doc as tgl_doc,b.nama as keperluan, 'periodik' as tipe,b.nilai jumlah,null as tanggal,a.no_doc as id, b.bank_id, b.accnumber, b.accname, b.sts_reject, b.sts_reject_manage, b.reject_reason FROM tr_pengajuan_rutin a join tr_pengajuan_rutin_detail b on a.no_doc=b.no_doc left join users c on a.created_by = c.id_user WHERE a.status='1' and (b.id_payment='0' OR b.id_payment IS NULL)" . $where_date3)->result();
             }
             if($tab == 'po_material') {
-                $this->db->select("a.id_rec_inv_ap as ids, a.id_rec_inv_ap as no_doc, b.nm_lengkap as nama, DATE_FORMAT(a.created_date, '%d-%m-%Y') as tgl_doc, a.keterangan_bayar as keperluan, 'po_material' as tipe, SUM(c.total_nilai) as jumlah, '' as tanggal, a.id_rec_inv_ap as id, ''  as bank_id, '' as accnumber, '' as accname, a.sts_reject as sts_reject, a.sts_reject_manage as sts_reject_manage, a.reject_reason as reject_reason");
+                $this->db->select("a.id_rec_inv_ap as ids, a.id_rec_inv_ap as no_doc, b.nm_lengkap as nama, DATE_FORMAT(a.created_date, '%Y-%m-%d') as tgl_doc, a.keterangan_bayar as keperluan, 'po_material' as tipe, SUM(c.total_nilai) as jumlah, DATE_FORMAT(a.tgl_bayar, '%Y-%m-%d') as tanggal, a.id_rec_inv_ap as id, ''  as bank_id, '' as accnumber, '' as accname, a.sts_reject as sts_reject, a.sts_reject_manage as sts_reject_manage, a.reject_reason as reject_reason, a.tgl_bayar as tgl_bayar");
                 $this->db->from('tr_receive_invoice_ap_header a');
                 $this->db->join('users b', 'b.id_user = a.created_by', 'left');
                 $this->db->join('tr_receive_invoice_ap_detail c', 'c.id_rec_inv_ap = a.id_rec_inv_ap', 'left');
-                $this->db->where('a.id_request_payment', null);
+                $this->db->where('a.req_payment', null);
                 $this->db->group_by('a.id_rec_inv_ap');
                 $data = $this->db->get()->result();
 

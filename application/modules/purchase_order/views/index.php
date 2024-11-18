@@ -65,7 +65,6 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 									<a class="btn btn-warning btn-sm view" href="javascript:void(0)" title="View" data-no_po="<?= $record->no_po ?>"><i class="fa fa-eye"></i>
 									</a>
 									<a class="btn btn-primary btn-sm" href="<?= base_url('/purchase_order/PrintH2/' . $record->no_po) ?>" target="_blank" title="Print"><i class="fa fa-print"></i></a>
-								
 								<?php endif; ?>
 								<?php if ($ENABLE_MANAGE) :
 									if ($record->status == '1') { ?>
