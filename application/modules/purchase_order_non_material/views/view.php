@@ -146,16 +146,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		</div>
 		</div> -->
 						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="customer">Payment Term</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="term" onkeyup required name="term" value="<?= $results['get_po']->term ?>">
-									</div>
-								</div>
-							</div>
+						
 							<div class="col-sm-6">
 								<div class="form-group row">
 									<div class="col-md-4">
@@ -512,7 +503,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 											if($item_top->tipe_top == '60_hari') {
 												$selected5 = 'selected';
 											}
-											
+
 											echo '<tr class="top_' . $no . '">';
 
 											echo '<td>';
