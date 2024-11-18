@@ -528,7 +528,7 @@ class Non_rutin extends Admin_Controller
 				$title_tingkat = 'Management';
 			endif;
 
-			$get_list_coa = $this->db->get(DBACC . '.coa_master')->result_array();
+			$get_list_coa = $this->db->select('a.*')->from(DBACC.'.coa_master a')->order_by('a.no_perkiraan', 'asc')->get()->result_array();
 
 			$get_departement = $this->db->get_where('ms_department', ['deleted_by' => null])->result();
 			$data = array(
