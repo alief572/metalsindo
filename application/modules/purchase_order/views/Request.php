@@ -22,7 +22,7 @@ $suplier	= $this->db->query("SELECT * FROM master_supplier WHERE id_suplier = '"
 										<label for="customer">No.Dokumen</label>
 									</div>
 									<div class="col-md-4">
-										<input type="text" id="no_surat" name="no_surat" class="form-control" value="<?= $po->no_surat ?>">
+										<input type="text" id="no_surat" name="no_surat" class="form-control" value="<?= $po->no_surat ?>" readonly>
 										<input type="hidden" id="no_po" name="no_po" class="form-control" value="<?= $po->no_po ?>">
 									</div>
 								</div>
@@ -46,7 +46,7 @@ $suplier	= $this->db->query("SELECT * FROM master_supplier WHERE id_suplier = '"
 										<label for="customer">Tgl. Transaksi</label>
 									</div>
 									<div class="col-md-4">
-										<input type="text" id="tanggal" name="tanggal" class="form-control" value="<?= date('d F Y', strtotime($po->tanggal)); ?>">
+										<input type="text" id="tanggal" name="tanggal" class="form-control" value="<?= date('d F Y', strtotime($po->tanggal)); ?>" readonly>
 									</div>
 								</div>
 							</div>
@@ -91,7 +91,7 @@ $suplier	= $this->db->query("SELECT * FROM master_supplier WHERE id_suplier = '"
 										<label for="kurs">PPN</label>
 									</div>
 									<div class="col-md-4">
-										<input type="text" id="ppn" name="ppn" class="form-control sm divide">
+										<input type="text" id="ppn" name="ppn" class="form-control sm divide" onchange="hitung_total_invoice();">
 									</div>
 								</div>
 							</div>
@@ -104,24 +104,36 @@ $suplier	= $this->db->query("SELECT * FROM master_supplier WHERE id_suplier = '"
 							<div class="col-sm-6">
 								<div class="form-group row">
 									<div class="col-md-4">
-										<label for="customer">Nilai Request USD</label>
+										<label for="customer">Nilai Down Payment</label>
 									</div>
 									<div class="col-md-4">
-										<input type="text" id="request_kurs" name="request_kurs" class="form-control sm divide">
+										<input type="text" id="nilai_down_payment" name="nilai_down_payment" class="form-control sm divide" onchange="hitung_total_invoice();">
 									</div>
 								</div>
 							</div>
 							<div class="col-sm-6">
 								<div class="form-group row">
 									<div class="col-md-4">
-										<label for="customer">Nilai Request</label>
+										<label for="customer">DPP</label>
 									</div>
 									<div class="col-md-4">
-										<input type="text" id="request" name="request" class="form-control sm divide">
+										<input type="text" id="dpp" name="dpp" class="form-control text-right sm divide" readonly>
 									</div>
 								</div>
 							</div>
+						</div>
 
+						<div class="col-sm-12">
+							<div class="col-sm-6">
+								<div class="form-group row">
+									<div class="col-md-4">
+										<label for="customer">Kurs</label>
+									</div>
+									<div class="col-md-4">
+										<input type="text" id="kurs" name="kurs" class="form-control sm divide" onchange="hitung_total_invoice();">
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 
@@ -145,10 +157,20 @@ $suplier	= $this->db->query("SELECT * FROM master_supplier WHERE id_suplier = '"
 			<div class="col-sm-6">
 				<div class="form-group row">
 					<div class="col-md-4">
-						<label for="nilai_invoice">Nilai Invoice</label>
+						<label for="total_invoice">Total Invoice</label>
 					</div>
 					<div class="col-md-4">
-						<input type="text" id="nilai_invoice" name="nilai_invoice" class="form-control sm text-right divide" required>
+						<input type="text" id="total_invoice" name="total_invoice" class="form-control sm text-right divide" readonly>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<div class="form-group row">
+					<div class="col-md-4">
+						<label for="no_faktur_pajak">No Faktur Pajak</label>
+					</div>
+					<div class="col-md-4">
+						<input type="text" id="no_faktur_pajak" name="no_faktur_pajak" class="form-control sm" required>
 					</div>
 				</div>
 			</div>
@@ -173,7 +195,7 @@ $suplier	= $this->db->query("SELECT * FROM master_supplier WHERE id_suplier = '"
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		$(".divide").divide();
+		$(".divide").autoNumeric();
 	});
 
 	$(document).on('blur', '.selisih', function(e) {
@@ -592,7 +614,36 @@ $suplier	= $this->db->query("SELECT * FROM master_supplier WHERE id_suplier = '"
 	function getNum(val) {
 		if (isNaN(val) || val == '') {
 			return 0;
+		} else {
+			val = val.split(',').join('');
+
+			return parseFloat(val);
 		}
-		return parseFloat(val);
+	}
+
+	function get_num(nilai = null) {
+		if (nilai !== '' && nilai !== null) {
+			nilai = nilai.split(',').join('');
+			nilai = parseFloat(nilai);
+		} else {
+			nilai = 0;
+		}
+
+		return nilai;
+	}
+
+	function hitung_total_invoice() {
+		var persen_ppn = get_num($('#ppn').val());
+		var nilai_down_payment = get_num($('#nilai_down_payment').val());
+		var kurs = get_num($('#kurs').val());
+
+		var nilai_dpp = parseFloat(nilai_down_payment * kurs);
+
+		var nilai_ppn = parseFloat(nilai_dpp * persen_ppn / 100);
+
+		var total_invoice = parseFloat(nilai_dpp + nilai_ppn);
+
+		$('#dpp').val(number_format(nilai_dpp, 2));
+		$('#total_invoice').val(number_format(total_invoice, 2));
 	}
 </script>

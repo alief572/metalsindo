@@ -2084,6 +2084,9 @@ class Purchase_order extends Admin_Controller
 		$this->db->trans_begin();
 
 		$ppn = $post['ppn'];
+		$nilai_down_payment = str_replace(',','', $post['nilai_down_payment']);
+
+		$nilai_ppn = ($nilai_down_payment * $ppn / 100);
 
 		$data = array(
 			'no_request'			=> $this->Pr_model->generate_request(),
@@ -2092,19 +2095,24 @@ class Purchase_order extends Admin_Controller
 			'no_surat'		        => $post['no_surat'],
 			'id_suplier'		    => $post['id_supplier'],
 			'loi'		        	=> $post['loi'],
-			'nilai_invoice_kurs'    => str_replace(",", "", $post['request_kurs']),
-			'nilai_invoice'			=> str_replace(",", "", $post['request']),
-			'nilai_ppn'				=> str_replace(",", "", $post['ppn']),
-			'grand_total_kurs'		=> str_replace(",", "", $post['request_kurs']),
-			'grand_total'			=> str_replace(",", "", $post['request']) + $ppn,
-			'sisa_invoice_kurs'     => str_replace(",", "", $post['request_kurs']),
-			'sisa_invoice_idr'		=> str_replace(",", "", $post['request']) + $ppn,
+			'nilai_invoice_kurs'    => str_replace(",", "", $post['kurs']),
+			'nilai_invoice'			=> str_replace(",", "", $post['total_invoice']),
+			'ppn'				=> str_replace(",", "", $post['ppn']),
+			'nilai_ppn' => $nilai_ppn,
+			'grand_total_kurs'		=> str_replace(",", "", $post['kurs']),
+			'grand_total'			=> str_replace(",", "", $post['total_invoice']),
+			'sisa_invoice_kurs'     => str_replace(",", "", $post['kurs']),
+			'sisa_invoice_idr'		=> str_replace(",", "", $post['total_invoice']),
 			'kategori'				=> 'uangmuka',
 			'created_by'			=> $this->auth->user_id(),
 			'created_on'			=> date('Y-m-d H:i:s'),
 			'keterangan'			=> $post['keterangan'],
 			'tgl_terima_invoice'			=> $post['tgl_terima_invoice'],
-			'nilai_invoice_est'			=> str_replace(',', '', $post['nilai_invoice_est'])
+			'nilai_invoice_est'			=> str_replace(',', '', $post['total_invoice']),
+			'dpp' => str_replace(',', '', $post['dpp']),
+			'nilai_down_payment' => str_replace(',', '', $post['nilai_down_payment']),
+			'total_invoice' => str_replace(",", "", $post['total_invoice']),
+			'no_faktur_pajak' => $post['no_faktur_pajak']
 		);
 		$this->db->insert('tr_request', $data);
 
