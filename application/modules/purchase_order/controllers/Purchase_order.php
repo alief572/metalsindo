@@ -50,7 +50,7 @@ class Purchase_order extends Admin_Controller
 		$this->template->page_icon('fa fa-users');
 		$data = $this->db->query("SELECT a.*, b.name_suplier as namesup FROM tr_purchase_order as a INNER JOIN master_supplier as b on a.id_suplier = b.id_suplier ORDER BY a.no_po DESC")->result();
 		$this->template->set('results', $data);
-		$this->template->title('Request Pembayaran Uang Muka');
+		$this->template->title('Receive Invoice & Request Payment Uang Muka');
 		$this->template->render('index_purchase');
 	}
 
@@ -2070,7 +2070,7 @@ class Purchase_order extends Admin_Controller
 			'po' => $po,
 		];
 		$this->template->set('results', $data);
-		$this->template->title('Request Pembayaran Uang Muka');
+		$this->template->title('Receive Invoice & Request Payment Uang Muka');
 		$this->template->render('Request');
 	}
 

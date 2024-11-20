@@ -13,7 +13,7 @@ $suplier	= $this->db->query("SELECT * FROM master_supplier WHERE id_suplier = '"
 				<div class="input_fields_wrap2">
 					<div class="row">
 						<center><label for="customer">
-								<h3>Request Pembayaran Uang Muka</h3>
+								<h3>Receive Invoice & Request Payment Uang Muka</h3>
 							</label></center>
 						<div class="col-sm-12">
 							<div class="col-sm-6">
