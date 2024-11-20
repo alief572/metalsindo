@@ -2083,10 +2083,7 @@ class Purchase_order extends Admin_Controller
 
 		$this->db->trans_begin();
 
-		$ppn = $post['ppn'];
-		$nilai_down_payment = str_replace(',','', $post['nilai_down_payment']);
-
-		$nilai_ppn = ($nilai_down_payment * $ppn / 100);
+		$nilai_ppn = str_replace(',', '', $post['nilai_ppn']);
 
 		$data = array(
 			'no_request'			=> $this->Pr_model->generate_request(),

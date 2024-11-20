@@ -134,6 +134,16 @@ $suplier	= $this->db->query("SELECT * FROM master_supplier WHERE id_suplier = '"
 									</div>
 								</div>
 							</div>
+							<div class="col-sm-6">
+								<div class="form-group row">
+									<div class="col-md-4">
+										<label for="customer">Nominal PPN</label>
+									</div>
+									<div class="col-md-4">
+										<input type="text" id="nilai_ppn" name="nilai_ppn" class="form-control text-right sm divide" readonly>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 
@@ -644,6 +654,7 @@ $suplier	= $this->db->query("SELECT * FROM master_supplier WHERE id_suplier = '"
 		var total_invoice = parseFloat(nilai_dpp + nilai_ppn);
 
 		$('#dpp').val(number_format(nilai_dpp, 2));
+		$('#nilai_ppn').val(number_format(nilai_ppn, 2));
 		$('#total_invoice').val(number_format(total_invoice, 2));
 	}
 </script>
