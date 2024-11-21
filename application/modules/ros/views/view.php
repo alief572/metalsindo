@@ -20,6 +20,7 @@ $no_pengajuan_pib = (isset($header_ros)) ? $header_ros['no_pengajuan_pib'] : nul
 $no_billing = (isset($header_ros)) ? $header_ros['no_biling'] : null;
 $link_doc = (isset($header_ros)) ? $header_ros['link_doc'] : null;
 $keterangan = (isset($header_ros)) ? $header_ros['keterangan'] : null;
+$standard_logic_cost = (isset($header_ros)) ? $header_ros['standard_logic_cost'] : null;
 ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style type="text/css">
@@ -104,6 +105,11 @@ $keterangan = (isset($header_ros)) ? $header_ros['keterangan'] : null;
                 <div class="col-md-6">
                     <label for="">Kurs PIB</label>
                     <input type="text" name="kurs_pib" id="" class="form-control form-control-sm auto_num kurs_pib" value="<?= $kurs_pib ?>" readonly>
+                </div>
+                <div class="col-md-6"></div>
+                <div class="col-md-6">
+                    <label for="">Standard Logic Cost</label>
+                    <input type="number" name="standard_logic_cost" id="" class="form-control form-control-sm auto_num standard_logic_cost" value="<?= $standard_logic_cost ?>" step="0.000001" readonly>
                 </div>
             </div>
 
