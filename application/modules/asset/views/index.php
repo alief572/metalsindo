@@ -60,9 +60,9 @@ $ENABLE_DELETE = has_permission('Barang.Delete');
 						<th class="text-center">Category</th>
 						<th class="text-center">Tgl Perolehan</th>
 						<th class="text-center">Depresiasi</th>
-						<th class="text-center">Nilai&nbsp;Perolehan</th>
-						<th class="text-center">Penyusutan</th>
-						<th class="text-center">Nilai&nbsp;Asset</th>
+						<th class="text-center">Acquisition</th>
+						<th class="text-center">Akumulasi&nbsp;Depresiasi</th>
+						<th class="text-center">Asset&nbsp;Value</th>
 						<th class="text-center" class='no-sort'>#</th>
 					</tr>
 				</thead>

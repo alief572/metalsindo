@@ -80,6 +80,29 @@ class Asset_model extends BF_Model{
                 $nomor = ($total_data - $start_dari) - $urut2;
             }
 
+			$tahun_tgl_perolehan = date('y', strtotime($row['tgl_perolehan']));
+			$tahun = date('y');
+
+			$exp_tahun = (($tahun - $tahun_tgl_perolehan) * 12);
+
+			$bulan_tgl_perolehan = date('m', strtotime($row['tgl_perolehan']));
+			$bulan = date('m');
+
+			$exp_bulan = ($bulan - $bulan_tgl_perolehan);
+
+			$akumulasi_depresiasi = ($row['value'] * ($exp_tahun + $exp_bulan));
+			if ($akumulasi_depresiasi < 0) {
+				$akumulasi_depresiasi = 0;
+			}
+			if($akumulasi_depresiasi > $row['nilai_asset']) { 
+				$akumulasi_depresiasi = $row['nilai_asset'];
+			}
+
+			$asset_val = ($row['nilai_asset'] - $akumulasi_depresiasi);
+			if ($asset_val < 0) {
+				$asset_val = 0;
+			}
+
 			$nestedData 	= array();
 			$nestedData[]	= "<div align='center'>".$nomor."</div>";
 			$nestedData[]	= "<div align='left'>".strtoupper(strtolower($row['kd_manual']))."</div>";
@@ -88,8 +111,8 @@ class Asset_model extends BF_Model{
 			$nestedData[]	= "<div align='right'>".date('d F Y', strtotime($row['tgl_perolehan']))."</div>";
 			$nestedData[]	= "<div align='center'>".$row['depresiasi']." Tahun</div>"; 
 			$nestedData[]	= number_format($row['nilai_asset']);
-			$nestedData[]	= number_format($row['value']);
-			$nestedData[]	= number_format($row['sisa_nilai']);
+			$nestedData[]	= number_format($akumulasi_depresiasi);
+			$nestedData[]	= number_format($row['nilai_asset'] - $akumulasi_depresiasi);
 			
 				$updX = "<button type='button' class='btn btn-sm btn-success edit' title='Pindahkan Asset' data-id='".$row['id']."' data-role='qtip'><i class='fa fa-exchange'></i></button>";
 				$delX = "<button type='button' class='btn btn-sm btn-danger delete_asset' title='Hapus Asset' data-id='".$row['kd_asset']."' data-role='qtip'><i class='fa fa-trash'></i></button>";
