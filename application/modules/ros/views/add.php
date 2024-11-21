@@ -18,6 +18,9 @@ $freight_cost_persen = (isset($header_ros)) ? $header_ros['freight_cost'] : 0;
 $no_pengajuan_pib = (isset($header_ros)) ? $header_ros['no_pengajuan_pib'] : null;
 $no_billing = (isset($header_ros)) ? $header_ros['no_biling'] : null;
 $id_supplier = (isset($header_ros)) ? $header_ros['id_supplier'] : null;
+$standard_logic_cost = (isset($header_ros)) ? $header_ros['standard_logic_cost'] : 0.125;
+
+$edit = ($no_ros !== 'new') ? 1 : 0;
 ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style type="text/css">
@@ -27,6 +30,8 @@ $id_supplier = (isset($header_ros)) ? $header_ros['id_supplier'] : null;
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
 <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
+
+<input type="hidden" name="edit" class="edit" value="<?= $edit ?>">
 
 <div class="box">
     <div class="box-body">
@@ -51,7 +56,7 @@ $id_supplier = (isset($header_ros)) ? $header_ros['id_supplier'] : null;
                             </table>
                         <?php
                         } else {
-                            echo '<input type="text" name="no_po" class="form-control form-control-sm" value="' . str_replace(',', ', ', $no_po) . '" readonly>';
+                            echo '<input type="text" name="no_po" class="form-control form-control-sm no_po" value="' . str_replace(',', ', ', $no_po) . '" readonly>';
                         }
                         ?>
                     </div>
@@ -59,15 +64,26 @@ $id_supplier = (isset($header_ros)) ? $header_ros['id_supplier'] : null;
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="">Supplier Name</label>
-                        <select name="supplier_name" id="" class="form-control form-control-sm select2 get_supplier" <?= ($no_ros !== 'new') ? 'disabled' : '' ?>>
-                            <option value="">- Supplier Name -</option>
+                        <select name="supplier_name" id="" class="form-control form-control-sm select2 get_supplier">
                             <?php
+
+                            if($no_ros == 'new') {
+                                echo '<option value="">- Supplier Name -</option>';
+                            }
+
                             foreach ($list_supplier as $item) {
                                 $selected = '';
                                 if ($item->id_suplier == $id_supplier) {
                                     $selected = 'selected';
                                 }
-                                echo '<option value="' . $item->id_suplier . '" ' . $selected . '>' . $item->name_suplier . '</option>';
+
+                                if ($no_ros !== 'new') {
+                                    if ($selected !== '') {
+                                        echo '<option value="' . $item->id_suplier . '" ' . $selected . '>' . $item->name_suplier . '</option>';
+                                    }
+                                } else {
+                                    echo '<option value="' . $item->id_suplier . '" ' . $selected . '>' . $item->name_suplier . '</option>';
+                                }
                             }
                             ?>
                         </select>
@@ -109,7 +125,12 @@ $id_supplier = (isset($header_ros)) ? $header_ros['id_supplier'] : null;
                 <div class="col-md-6"></div>
                 <div class="col-md-6">
                     <label for="">Kurs PIB</label>
-                    <input type="text" name="kurs_pib" id="" class="form-control form-control-sm auto_num kurs_pib" value="<?= $kurs_pib ?>">
+                    <input type="text" name="kurs_pib" id="" class="form-control form-control-sm auto_num kurs_pib" value="<?= $kurs_pib ?>" <?= ($no_ros !== 'new') ? 'readonly' : '' ?>>
+                </div>
+                <div class="col-md-6"></div>
+                <div class="col-md-6">
+                    <label for="">Standard Logic Cost</label>
+                    <input type="number" name="standard_logic_cost" id="" class="form-control form-control-sm standard_logic_cost" step="0.000001" value="<?= $standard_logic_cost ?>" <?= ($no_ros !== 'new') ? 'readonly' : '' ?>>
                 </div>
             </div>
 
@@ -124,16 +145,17 @@ $id_supplier = (isset($header_ros)) ? $header_ros['id_supplier'] : null;
                                 <th class="text-center">Currency</th>
                                 <th class="text-center">Price/Unit</th>
                                 <th class="text-center">Price/Unit (Rp)</th>
-                                <th class="text-center">Qty PO</th>
-                                <th class="text-center">Delivered</th>
-                                <th class="text-center">Sisa</th>
-                                <th class="text-center">Qty Packing List</th>
+                                <th class="text-center">Weight</th>
+                                <th class="text-center">Bea Masuk</th>
+                                <th class="text-center">Freight</th>
                                 <th class="text-center">Total Price (Rp)</th>
                             </tr>
                         </thead>
                         <tbody class="list_detail_po">
                             <?php
                             $ttl_price_detail = 0;
+                            $ttl_bm = 0;
+                            $ttl_freight = 0;
                             if (isset($detail_ros)) {
                                 $no = 1;
                                 foreach ($detail_ros as $item) {
@@ -151,35 +173,43 @@ $id_supplier = (isset($header_ros)) ? $header_ros['id_supplier'] : null;
                                     echo '<td class="text-center">' . $no . '</td>';
                                     echo '<td class="text-center">' . $item['nm_barang'] . '</td>';
                                     echo '<td class="text-center">' . ucfirst($item['unit_satuan']) . '</td>';
-                                    echo '<td class="text-center">' . $item['currency'] . '</td>';
-                                    echo '<td class="text-right">' . number_format($item['price_unit']) . '</td>';
-                                    echo '<td class="text-right">' . number_format($item['price_unit'] * $kurs_pib) . '</td>';
+                                    echo '<td class="text-center">' . strtoupper($item['currency']) . '</td>';
+                                    echo '<td class="text-right">' . number_format($item['price_unit'], 2) . '</td>';
+                                    echo '<td class="text-right">' . number_format($item['price_unit'] * $kurs_pib, 2) . '</td>';
                                     echo '<td class="text-center">' . $item['qty_po'] . '</td>';
-                                    echo '<td class="text-center">' . number_format($nilai_pengurang, 2) . '</td>';
-                                    echo '<td class="text-center">' . number_format($item['qty_packing_list'] - $nilai_pengurang, 2) . '</td>';
-                                    echo '<td class="text-center">
-                                        <input type="text" name="qty_packing_list_' . $item['id_po_detail'] . '" id="" class="form-control form-control-sm auto_num text-right qty_packing_list" value="' . $item['qty_packing_list'] . '" data-id="' . $item['id_po_detail'] . '" data-harga_satuan="' . $item['price_unit'] . '">
-                                    </td>';
-                                    echo '<td class="text-right total_price_' . $item['id_po_detail'] . '">' . number_format(($item['price_unit'] * $kurs_pib) * $item['qty_packing_list']) . '</td>';
+                                    echo '<td>';
+                                    echo '<input type="hidden" class="total_price" value="'.(($item['price_unit'] * $kurs_pib) * $item['qty_packing_list']).'">';
+                                    echo '<input type="hidden" name="weight_' . $item['id_po_detail'] . '" class="weight_' . $no . '" value="' . $item['qty_packing_list'] . '">';
+                                    echo '<input type="text" class="form-control form-control-sm text-right auto_num nilai_bm" name="nilai_bm_' . $item['id_po_detail'] . '" value="' . $item['nilai_bm'] . '">';
+                                    echo '</td>';
+                                    echo '<td>';
+                                    echo '<input type="text" class="form-control form-control-sm text-right auto_num nilai_freight" name="nilai_freight_' . $item['id_po_detail'] . '" value="' . $item['nilai_freight'] . '" readonly>';
+                                    echo '</td>';
+                                    echo '<td class="text-right total_price_' . $item['id_po_detail'] . '">' . number_format(($item['price_unit'] * $kurs_pib) * $item['qty_packing_list'], 2) . '</td>';
                                     echo '</tr>';
 
                                     $ttl_price_detail += (($item['price_unit'] * $kurs_pib) * $item['qty_packing_list']);
+                                    $ttl_bm += $item['nilai_bm'];
+                                    $ttl_freight += $item['nilai_freight'];
                                     $no++;
                                 }
                             }
                             ?>
                         </tbody>
-                        <tbody>
+                        <tfoot>
                             <tr>
-                                <td colspan="10" align="right">
+                                <td colspan="7" align="right">
                                     <b>Grand Total</b>
                                 </td>
+                                <td align="right" class="ttl_bm_col"><?= number_format($ttl_bm, 2) ?></td>
+                                <td align="right" class="ttl_freight_col"><?= number_format($ttl_freight, 2) ?></td>
                                 <td align="right" class="ttl_price_detail_col"><?= number_format($ttl_price_detail, 2) ?></td>
                             </tr>
-                        </tbody>
+                        </tfoot>
                     </table>
 
                     <input type="hidden" name="ttl_total_price" class="ttl_total_price" value="<?= $ttl_price_detail ?>">
+                    <input type="hidden" name="ttl_freight_cost" class="ttl_freight_cost" value="<?= $ttl_freight ?>">
                 </div>
             </div>
 
@@ -202,7 +232,7 @@ $id_supplier = (isset($header_ros)) ? $header_ros['id_supplier'] : null;
                                 <td class="text-center">1</td>
                                 <td class="text-center">BM</td>
                                 <td class="">
-                                    <input type="text" name="cost_bm" id="" class="form-control form-control-sm input_bm text-right auto_num" value="<?= $cost_bm ?>">
+                                    <input type="text" name="cost_bm" id="" class="form-control form-control-sm input_bm text-right auto_num" value="<?= $cost_bm ?>" readonly>
                                 </td>
                                 <td></td>
                             </tr>
@@ -308,38 +338,7 @@ $id_supplier = (isset($header_ros)) ? $header_ros['id_supplier'] : null;
                     </div>
                 </div>
                 <div class="col-md-10"></div>
-                <div class="col-md-5">
-                    <h4>Freight Cost Forecast</h4>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th class="text-center">No.</th>
-                                <th class="text-center">Item Pembiayaan</th>
-                                <th class="text-center">%</th>
-                                <th class="text-center">Total Cost</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="text-center">1</td>
-                                <td class="text-center">Freight Cost</td>
-                                <td class="">
-                                    <input type="text" name="freight_cost_persen" id="" class="form-control form-control-sm freight_cost_persen" value="<?= $freight_cost_persen ?>">
-                                    <input type="hidden" name="freight_cost" class="freight_cost">
-                                </td>
-                                <td class="text-right freight_cost_val">
-                                    <?php
-                                    if ($freight_cost_persen > 0) {
-                                        echo number_format($ttl_price_detail * $freight_cost_persen / 100);
-                                    } else {
-                                        echo '0';
-                                    }
-                                    ?>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+
                 <div class="col-md-12">
                     <a href="<?= base_url('./ros') ?>" class="btn btn-sm btn-danger"><i class="fa fa-arrow-left"></i> Back</a>
                     <button type="submit" class="btn btn-sm btn-success" name="save"><i class="fa fa-save"></i> Save</button>
@@ -600,25 +599,45 @@ $id_supplier = (isset($header_ros)) ? $header_ros['id_supplier'] : null;
                 kurs_pib = parseFloat(kurs_pib);
             }
 
-            var ttl_price = 0;
-            $('.qty_packing_list').each(function() {
-                var qty_pack = $(this).val();
-                var hargasatuan = $(this).data('harga_satuan');
+            var valid = 0;
 
-                if (qty_pack == '' || qty_pack == null) {
-                    qty_pack = 0;
+            var test_bm = 0;
+            $('.nilai_bm').each(function() {
+                var nilai = $(this).val();
+
+                if (nilai !== '') {
+                    nilai = nilai.split(',').join();
+                    nilai = parseFloat(nilai);
                 } else {
-                    qty_pack = qty_pack.split(',').join('');
-                    qty_pack = parseFloat(qty_pack);
+                    nilai = 0;
                 }
 
-                ttl_price += ((hargasatuan * kurs_pib) * qty_pack);
+                test_bm += nilai;
             });
 
-            if (ttl_price <= 0) {
+            var test_freight = 0;
+            $('.nilai_freight').each(function() {
+                var nilai = $(this).val();
+
+                if (nilai !== '') {
+                    nilai = nilai.split(',').join();
+                    nilai = parseFloat(nilai);
+                } else {
+                    nilai = 0;
+                }
+
+                test_freight += nilai;
+            });
+
+            if (test_bm > 0 && test_freight > 0) {
+                valid = 1;
+            }
+
+
+            if (valid <= 0) {
                 swal({
                     title: 'Warning !',
-                    text: 'Please input the data correctly before save !',
+                    text: 'Please make sure all BM and Freight Cost has been inputed !',
                     type: 'warning'
                 });
             } else {
@@ -673,24 +692,34 @@ $id_supplier = (isset($header_ros)) ? $header_ros['id_supplier'] : null;
                         }
                     });
             }
-        })
+        });
+
+        $(document).on('change', '.nilai_bm', function() {
+            ttl_price();
+        });
 
         function get_list_detail_po(no_po = null, kurs_pib = 1) {
+            var standard_logic_cost = $('.standard_logic_cost').val();
+            
+            var edit = $('.edit').val();
+
             $.ajax({
                 type: "POST",
                 url: siteurl + active_controller + 'get_no_po_detail',
                 data: {
                     'no_po': no_po,
-                    'kurs_pib': kurs_pib
+                    'kurs_pib': kurs_pib,
+                    'standard_logic_cost': standard_logic_cost,
+                    'edit': edit
                 },
                 cache: false,
                 dataType: 'json',
                 success: function(result) {
                     $('.list_detail_po').html(result.list_detail_pr);
-                    $('.ttl_price_detail_col').html(result.ttl_price_detail.toLocaleString('en-US', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }));
+                    $('.ttl_price_detail_col').html(number_format(result.ttl_price_detail, 2));
+
+                    $('.ttl_freight_col').html(number_format(result.ttl_nilai_freight, 2));
+                    $('.ttl_freight_cost').val(result.ttl_nilai_freight);
 
                     $('.auto_num').autoNumeric();
                 },
@@ -702,6 +731,8 @@ $id_supplier = (isset($header_ros)) ? $header_ros['id_supplier'] : null;
                     });
                 }
             });
+
+            ttl_price();
         }
 
         function hitung_pib() {
@@ -802,24 +833,97 @@ $id_supplier = (isset($header_ros)) ? $header_ros['id_supplier'] : null;
             }
 
             var ttl_price = 0;
-            $('.qty_packing_list').each(function() {
-                var qty_pack = $(this).val();
-                var hargasatuan = $(this).data('harga_satuan');
+            $('.total_price').each(function() {
+                var total_price = $(this).val();
 
-                if (qty_pack == '' || qty_pack == null) {
-                    qty_pack = 0;
+                if (total_price == '') {
+                    total_price = 0;
                 } else {
-                    qty_pack = qty_pack.split(',').join('');
-                    qty_pack = parseFloat(qty_pack);
+                    total_price = total_price.split(',').join('');
+                    total_price = parseFloat(total_price);
                 }
 
-                ttl_price += ((hargasatuan * kurs_pib) * qty_pack);
+                ttl_price += total_price;
             });
+
+            var ttl_bm = 0;
+            $('.nilai_bm').each(function() {
+                var nilai = $(this).val();
+
+                if (nilai !== '') {
+                    nilai = nilai.split(',').join('');
+                    nilai = parseFloat(nilai);
+                } else {
+                    nilai = 0;
+                }
+
+                ttl_bm += nilai;
+            });
+
+            var ttl_freight = 0;
+            $('.nilai_freight').each(function() {
+                var nilai = $(this).val();
+
+                if (nilai !== '') {
+                    nilai = nilai.split(',').join('');
+                    nilai = parseFloat(nilai);
+                } else {
+                    nilai = 0;
+                }
+
+                ttl_freight += nilai;
+            });
+
+            // alert(ttl_freight);
 
             $('.ttl_total_price').val(ttl_price);
             $('.ttl_price_detail_col').html(ttl_price.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             }));
+
+            $('.ttl_bm_col').html(ttl_bm.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }));
+
+            $('.ttl_freight_col').html(ttl_freight.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }));
+
+
+            $('.ttl_freight_cost').val(ttl_freight);
+
+            $('.input_bm').val(ttl_bm.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }));
+
+            hitung_pib();
+        }
+
+        function number_format(number, decimals, dec_point, thousands_sep) {
+            // Strip all characters but numerical ones.
+            number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+            var n = !isFinite(+number) ? 0 : +number,
+                prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+                sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+                dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+                s = '',
+                toFixedFix = function(n, prec) {
+                    var k = Math.pow(10, prec);
+                    return '' + Math.round(n * k) / k;
+                };
+            // Fix for IE parseFloat(0.55).toFixed(0) = 0;
+            s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+            if (s[0].length > 3) {
+                s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+            }
+            if ((s[1] || '').length < prec) {
+                s[1] = s[1] || '';
+                s[1] += new Array(prec - s[1].length + 1).join('0');
+            }
+            return s.join(dec);
         }
     </script>
