@@ -70,7 +70,7 @@ $this->load->view('include/side_menu');
                     </div>
                     <label class='label-control col-sm-2'><b>Date Transaksi</b></label>
 					<div class='col-sm-4'>              
-						<input type="text" name="tanggal_trans" id="tanggal_trans" class='form-control input-sm' data-role="datepicker_lost" readonly value='<?=date('Y-m-d');?>'>
+						<input type="text" name="tanggal_trans" id="tanggal_trans" class='form-control input-sm' data-role="datepicker_lost" value='<?=date('Y-m-d');?>'>
 					</div>
                 </div>
                 <div class='form-group row' hidden>
