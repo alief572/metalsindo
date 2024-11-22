@@ -599,39 +599,39 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
                 kurs_pib = parseFloat(kurs_pib);
             }
 
-            var valid = 0;
+            var valid = 1;
 
-            var test_bm = 0;
-            $('.nilai_bm').each(function() {
-                var nilai = $(this).val();
+            // var test_bm = 0;
+            // $('.nilai_bm').each(function() {
+            //     var nilai = $(this).val();
 
-                if (nilai !== '') {
-                    nilai = nilai.split(',').join();
-                    nilai = parseFloat(nilai);
-                } else {
-                    nilai = 0;
-                }
+            //     if (nilai !== '') {
+            //         nilai = nilai.split(',').join();
+            //         nilai = parseFloat(nilai);
+            //     } else {
+            //         nilai = 0;
+            //     }
 
-                test_bm += nilai;
-            });
+            //     test_bm += nilai;
+            // });
 
-            var test_freight = 0;
-            $('.nilai_freight').each(function() {
-                var nilai = $(this).val();
+            // var test_freight = 0;
+            // $('.nilai_freight').each(function() {
+            //     var nilai = $(this).val();
 
-                if (nilai !== '') {
-                    nilai = nilai.split(',').join();
-                    nilai = parseFloat(nilai);
-                } else {
-                    nilai = 0;
-                }
+            //     if (nilai !== '') {
+            //         nilai = nilai.split(',').join();
+            //         nilai = parseFloat(nilai);
+            //     } else {
+            //         nilai = 0;
+            //     }
 
-                test_freight += nilai;
-            });
+            //     test_freight += nilai;
+            // });
 
-            if (test_bm > 0 && test_freight > 0) {
-                valid = 1;
-            }
+            // if (test_bm > 0 && test_freight > 0) {
+            //     valid = 1;
+            // }
 
 
             if (valid <= 0) {
