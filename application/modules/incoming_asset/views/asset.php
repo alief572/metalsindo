@@ -77,7 +77,7 @@ $ENABLE_DELETE  = has_permission('Incoming_Asset.Delete');
 						</div>
 						<label class='label-control col-sm-2'><b>Date Transaksi</b></label>
 						<div class='col-sm-4'>
-							<input type="text" name="tanggal_trans" id="tanggal_trans" class='form-control input-sm' data-role="datepicker_lost" readonly value='<?= date('Y-m-d'); ?>'>
+							<input type="date" name="tanggal_trans" id="tanggal_trans" class='form-control input-sm' data-role="datepicker_lost" value='<?= date('Y-m-d'); ?>'>
 						</div>
 					</div>
 
