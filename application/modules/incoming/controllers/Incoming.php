@@ -385,6 +385,7 @@ class Incoming extends Admin_Controller
 		$material = $this->db->query("SELECT * FROM dt_trans_po WHERE no_po = '" . $no_po . "' AND close_po = 'N' ")->result();
 		$customer	= $this->db->query("select * FROM master_customers ")->result();
 		$gudang	= $this->db->query("select * FROM ms_gudang WHERE id_gudang IN(1,3,5) ")->result();
+		$list_tipe_material = $this->db->select('a.*')->from('ms_bentuk a')->where_in('a.id_bentuk', ['B2000001', 'B2000002'])->where('a.deleted', 0)->get()->result();
 		foreach ($material as $material) {
 			$no_pr  = $material->idpr;
 			$id_dt_po  = $material->id_dt_po;
@@ -423,8 +424,8 @@ class Incoming extends Admin_Controller
 		
 		<td				hidden	><input  type='date' 		value='" . $tanggal . "'				class='form-control input-sm' id='dt_tanggal_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][tanggal]' >
 		<input  type='text' 		value='" . $no_po . "'		            class='form-control input-sm' id='no_po" . $id . "_" . $no . "' 			        required name='dt[" . $id . "][detail][" . $no . "][no_po]' 	readonly>
-		<input  type='text' 		value='" . $material->id_dt_po . "'		class='form-control input-sm' id='dt_iddtpo_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][iddtpo]' 	readonly>
 		<input  type='text' 		value='" . $material->idmaterial . "'	class='form-control input-sm' id='dt_idmaterial_" . $id . "_" . $no . "' 		required name='dt[" . $id . "][detail][" . $no . "][id_material]' 	readonly>
+		<input  type='text' 		value='" . $material->id_dt_po . "'		class='form-control input-sm' id='dt_iddtpo_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][iddtpo]' 	readonly>
 		<input  type='text' 		value='" . $material->panjang . "'		class='form-control input-sm text-right' id='dt_length_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][length]' 		readonly>
 		<input  type='number' 		value='" . $material->lebar . "'		class='form-control input-sm text-right' id='dt_width_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][width]'  		readonly>
 		<input  type='text' 		value='" . number_format($material->width, 2) . "'		class='form-control input-sm text-right' id='dt_weight_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][weight]' 		readonly>
@@ -446,6 +447,7 @@ class Incoming extends Admin_Controller
 		Thickness : " . $thick->thickness . " <br>
 		Density   : " . $dens->density . " <br>
 		Width     : " . number_format($material->width, 2) . " <br>
+		Length     : " . number_format($material->panjang, 2) . " <br>
 		Ttl PO    : " . number_format($material->totalwidth, 2) . "<br>
 		Blm Diterima: " . number_format(($material->totalwidth - $incoming->incoming) * -1, 2) . " <br>
 
@@ -486,7 +488,18 @@ class Incoming extends Admin_Controller
 		
 		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_selisih_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][selisih]' 	readonly	></td>
 		<td				       hidden ><input  type='text' 		value='" . number_format($material->hargasatuan, 3) . "'									class='form-control input-sm text-right' id='dt_hargasatuan_" . $id . "_" . $no . "' 		required name='dt[" . $id . "][detail][" . $no . "][hargasatuan]' 	></td>
-		
+		<td align='left'>
+			<select class='form-control' name='dt[" . $id . "][detail][" . $no . "][tipe_material]' required>
+				<option value=''>- Select Tipe Material -</option>
+				";
+
+			foreach ($list_tipe_material as $item_tipe_material) {
+				echo '<option value="' . $item_tipe_material->id_bentuk . '">' . $item_tipe_material->nm_bentuk . '</option>';
+			}
+
+			echo "
+			</select>
+		</td>
 		<td align='center'>
 			<button type='button' class='btn btn-sm btn-danger cancelSubPart' data-no1='" . $id . "' data-no2='" . $no . "' title='Delete Part'><i class='fa fa-close'></i></button>
 			<button type='button' class='btn btn-sm btn-primary repeatSubPart' data-no1='" . $id . "' data-no2='" . $no . "'  data-lot='" . $roll . "' data-id='" . $material->id_dt_po . "' id='tombol" . $no . "' 		 title='Repeat Part'><i class='fa fa-retweet'></i></button>
@@ -512,6 +525,7 @@ class Incoming extends Admin_Controller
 		$gudang	= $this->db->query("select * FROM ms_gudang WHERE id_gudang IN(1,3,5)")->result();
 		$customer	= $this->db->query("select * FROM master_customers ")->result();
 		$material = $this->db->query("SELECT * FROM dt_trans_po WHERE id_dt_po = '" . $no_po_id . "'  ")->result();
+		$list_tipe_material = $this->db->select('a.*')->from('ms_bentuk a')->where_in('a.id_bentuk', ['B2000001', 'B2000002'])->where('a.deleted', 0)->get()->result();
 		foreach ($material as $material) {
 			$no_pr  = $material->idpr;
 			$id_material = $material->idmaterial;
@@ -587,6 +601,19 @@ class Incoming extends Admin_Controller
 		
 		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_selisih_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][selisih]'  	readonly	></td>
 		<td				       hidden ><input  type='text' 		value='" . number_format($material->hargasatuan, 3) . "'									class='form-control input-sm text-right' id='dt_hargasatuan_" . $id . "_" . $no . "' 		required name='dt[" . $id . "][detail][" . $no . "][hargasatuan]' 	></td>
+
+		<td align='left'>
+			<select class='form-control' name='dt[" . $id . "][detail][" . $no . "][tipe_material]' required>
+				<option value=''>- Select Tipe Material -</option>
+				";
+
+			foreach ($list_tipe_material as $item_tipe_material) {
+				echo '<option value="' . $item_tipe_material->id_bentuk . '">' . $item_tipe_material->nm_bentuk . '</option>';
+			}
+
+			echo "
+			</select>
+		</td>
 		
 		<td align='center'>
 			<button type='button' class='btn btn-sm btn-danger cancelSubPart' data-no1='" . $id . "' data-no2='" . $no . "' title='Delete Part'><i class='fa fa-close'></i></button>
@@ -740,14 +767,15 @@ class Incoming extends Admin_Controller
 			<th width='5' hidden>No PO</th>					 
 			<th width='10'>Material</th> 
 			<th width='5'>Keterangan</th>
-			<th width='10'>Id Coil</th>
-			<th width='5'>Berat / Coil </th>
+			<th width='10'>Id</th>
+			<th width='5'>Berat</th>
 			<th width='5'>Nomor Lot &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
 			<th width='3'>Gudang</th>
 			<th width='5'>Customer</th>
 			<th width='5'>Berat Aktual</th>
 			<th width='5'>Selisih</th>
 			<th width='5' hidden>Harga Satuan</th>
+			<th width='5'>Tipe Material</th>
 			<th width='5'>Action</th>
 			</tr>
 			</thead>
@@ -1125,6 +1153,7 @@ class Incoming extends Admin_Controller
 				$ArrDetail2[$val2 . $val]['actual_berat'] 		= $valx2['aktual'];
 				$ArrDetail2[$val2 . $val]['selisih'] 			    = $valx2['selisih'];
 				$ArrDetail2[$val2 . $val]['thickness'] 			= str_replace(',', '', $valx2['thickness']);
+				$ArrDetail2[$val2 . $val]['tipe_material'] 			= $valx2['tipe_material'];
 
 				$id_dt_po = $valx2['iddtpo'];
 				$cek = $this->db->query("SELECT totalwidth, qty_terima, berat_terima FROM dt_trans_po WHERE id_dt_po ='$id_dt_po'")->row();
@@ -1170,6 +1199,7 @@ class Incoming extends Admin_Controller
 				$ArrStok[$val2 . $val]['sisa_spk'] 			= str_replace(',', '', $valx2['widthrecive']);
 				$ArrStok[$val2 . $val]['customer'] 			= $valx2['customer'];
 				$ArrStok[$val2 . $val]['no_surat'] 			= 'INCOMING';
+				$ArrStok[$val2 . $val]['tipe_material'] 			= $valx2['tipe_material'];
 			}
 		}
 
@@ -1186,10 +1216,10 @@ class Incoming extends Admin_Controller
 		}
 
 
-		if (!empty($ArrDetail)) {
+		if (!empty($ArrDetail) && !empty($ArrDetail2)) {
 			$this->db->insert_batch('dt_incoming', $ArrDetail2);
 		}
-		if (!empty($ArrDetail)) {
+		if (!empty($ArrDetail) && !empty($ArrStok)) {
 			$this->db->insert_batch('stock_material', $ArrStok);
 		}
 		$this->db->trans_complete();

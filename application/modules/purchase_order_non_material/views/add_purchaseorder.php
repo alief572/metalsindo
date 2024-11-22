@@ -130,16 +130,6 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 							<div class="col-sm-6">
 								<div class="form-group row">
 									<div class="col-md-4">
-										<label for="customer">Payment Term</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="term" onkeyup required name="term">
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
 										<label for="id_customer">Supplier</label>
 									</div>
 									<div class="col-md-8">
@@ -479,6 +469,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 									<thead class="bg-blue">
 										<tr>
 											<th class="text-center">Group TOP</th>
+											<th class="text-center">Tipe TOP</th>
 											<th class="text-center">Progress (%)</th>
 											<th class="text-center">Value</th>
 											<th class="text-center">Keterangan</th>
@@ -952,9 +943,19 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 				Rows += '</select>';
 				Rows += '</td>';
 
+				Rows += '<td>';
+				Rows += '<select class="form-control form-control-sm chosen-select" name="tipe_top_'+num_top+'">';
+				Rows += '<option value="">- Tipe TOP -</option>';
+				Rows += '<option value="1">CBD</option>';
+				Rows += '<option value="2">2 Minggu</option>';
+				Rows += '<option value="3">30 Hari</option>';
+				Rows += '<option value="4">45 Hari</option>';
+				Rows += '<option value="5">60 Hari</option>';
+				Rows += '</select>';
+				Rows += '</td>';
+
 				Rows += '<td class="">';
 				Rows += '<input type="text" class="form-control form-control-sm input_progress progress_' + num_top + ' auto_num" name="progress_' + num_top + '" data-no="' + num_top + '">';
-				Rows += '</select>';
 				Rows += '</td>';
 
 				Rows += '<td class="text-right">';

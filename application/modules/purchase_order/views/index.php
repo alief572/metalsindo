@@ -64,7 +64,8 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 								<?php if ($ENABLE_VIEW) : ?>
 									<a class="btn btn-warning btn-sm view" href="javascript:void(0)" title="View" data-no_po="<?= $record->no_po ?>"><i class="fa fa-eye"></i>
 									</a>
-									<?php endif; ?>
+									<a class="btn btn-primary btn-sm" href="<?= base_url('/purchase_order/PrintH2/' . $record->no_po) ?>" target="_blank" title="Print"><i class="fa fa-print"></i></a>
+								<?php endif; ?>
 								<?php if ($ENABLE_MANAGE) :
 									if ($record->status == '1') { ?>
 										<a class="btn btn-info btn-sm" href="<?= base_url('/purchase_order/edit/' . $record->no_po) ?>" title="Edit"><i class="fa fa-edit"></i></a>
@@ -74,11 +75,6 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 									if ($record->status == '1') { ?>
 										<a class="btn btn-success btn-sm Approve" href="javascript:void(0)" title="Approval PO" data-no_po="<?= $record->no_po ?>"><i class="fa fa-check"></i>
 										</a>
-								<?php }
-								endif; ?>
-								<?php if ($ENABLE_MANAGE) :
-									if ($record->status == '2') { ?>
-										<a class="btn btn-primary btn-sm" href="<?= base_url('/purchase_order/PrintH2/' . $record->no_po) ?>" target="_blank" title="Print"><i class="fa fa-print"></i></a>
 								<?php }
 								endif; ?>
 							</td>

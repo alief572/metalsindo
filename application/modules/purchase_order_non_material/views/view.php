@@ -146,16 +146,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		</div>
 		</div> -->
 						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="customer">Payment Term</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="term" onkeyup required name="term" value="<?= $results['get_po']->term ?>">
-									</div>
-								</div>
-							</div>
+						
 							<div class="col-sm-6">
 								<div class="form-group row">
 									<div class="col-md-4">
@@ -482,6 +473,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 									<thead class="bg-blue">
 										<tr>
 											<th class="text-center">Group TOP</th>
+											<th class="text-center">Tipe TOP</th>
 											<th class="text-center">Progress (%)</th>
 											<th class="text-center">Value</th>
 											<th class="text-center">Keterangan</th>
@@ -491,6 +483,27 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 										<?php
 										$no = 1;
 										foreach ($results['list_top'] as $item_top) {
+
+											if($item_top->tipe_top == 'cbd') {
+												$selected1 = 'selected';
+											}
+
+											if($item_top->tipe_top == '2_minggu') {
+												$selected2 = 'selected';
+											}
+
+											if($item_top->tipe_top == '30_hari') {
+												$selected3 = 'selected';
+											}
+
+											if($item_top->tipe_top == '45_hari') {
+												$selected4 = 'selected';
+											}
+
+											if($item_top->tipe_top == '60_hari') {
+												$selected5 = 'selected';
+											}
+
 											echo '<tr class="top_' . $no . '">';
 
 											echo '<td>';
@@ -502,6 +515,17 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 												}
 												echo '<option value="' . $item_group_top->id . '" ' . $selected . '>' . strtoupper($item_group_top->name) . '</option>';
 											}
+											echo '</select>';
+											echo '</td>';
+
+											echo '<td>';
+											echo '<select class="tipe_top_'.$no.'" >';
+											echo '<option value="">- Tipe TOP -</option>';
+											echo '<option value="cbd" '.$selected1.'>CBD</option>';
+											echo '<option value="2_minggu" '.$selected2.'>2 Minggu</option>';
+											echo '<option value="30_hari" '.$selected3.'>30 Hari</option>';
+											echo '<option value="45_hari" '.$selected4.'>45 Hari</option>';
+											echo '<option value="60_hari" '.$selected5.'>60 Hari</option>';
 											echo '</select>';
 											echo '</td>';
 

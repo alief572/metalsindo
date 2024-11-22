@@ -1438,7 +1438,6 @@ class Purchase_order_non_material extends Admin_Controller
 				'nominal_kurs'		=> str_replace(',', '', $post['nominal_kurs']),
 				'tanggal'			=> $post['tanggal'],
 				'expect_tanggal'	=> date('Y-m-d', strtotime($post['expect_tanggal'])),
-				'term'				=> $post['term'],
 				'cif'				=> $post['cif'],
 				'note'				=> $post['note_ket'],
 				'no_pr'				=> $post['no_pr'],
@@ -1469,7 +1468,6 @@ class Purchase_order_non_material extends Admin_Controller
 				'nominal_kurs'		=> str_replace(',', '', $post['nominal_kurs']),
 				'tanggal'			=> $post['tanggal'],
 				'expect_tanggal'	=> date('Y-m-d', strtotime($post['expect_tanggal'])),
-				'term'				=> $post['term'],
 				'cif'				=> $post['cif'],
 				'note'				=> $post['note_ket'],
 				'no_pr'				=> $post['no_pr'],
@@ -1500,7 +1498,6 @@ class Purchase_order_non_material extends Admin_Controller
 				'nominal_kurs'		=> str_replace(',', '', $post['nominal_kurs']),
 				'tanggal'			=> $post['tanggal'],
 				'expect_tanggal'	=> date('Y-m-d', strtotime($post['expect_tanggal'])),
-				'term'				=> $post['term'],
 				'cif'				=> $post['cif'],
 				'note'				=> $post['note_ket'],
 				'no_pr'				=> $post['no_pr'],
@@ -1636,6 +1633,7 @@ class Purchase_order_non_material extends Admin_Controller
 			for ($i = 1; $i <= $num_top; $i++) {
 				if (isset($post['group_top_' . $i])) {
 					$group_top = $this->input->post('group_top_' . $i);
+					$tipe_top = $this->input->post('tipe_top_' . $i);
 					$progress = $this->input->post('progress_' . $i);
 					$nilai_top = $this->input->post('nilai_top_' . $i);
 					$keterangan_top = $this->input->post('keterangan_top_' . $i);
@@ -1645,6 +1643,7 @@ class Purchase_order_non_material extends Admin_Controller
 					$insert_top = $this->db->insert('tr_top_po', [
 						'no_po' => $code,
 						'group_top' => $group_top,
+						'tipe_top' => $tipe_top,
 						'progress' => str_replace(',', '', $progress),
 						'nilai' => str_replace(',', '', $nilai_top),
 						'keterangan' => $keterangan_top,
@@ -1704,7 +1703,6 @@ class Purchase_order_non_material extends Admin_Controller
 			'nominal_kurs'		=> str_replace(',', '', $post['nominal_kurs']),
 			'tanggal'			=> $post['tanggal'],
 			'expect_tanggal'	=> date('Y-m-d', strtotime($post['expect_tanggal'])),
-			'term'				=> $post['term'],
 			'cif'				=> $post['cif'],
 			'note'				=> $post['note_ket'],
 			'no_pr'				=> $post['no_pr'],
@@ -1795,6 +1793,7 @@ class Purchase_order_non_material extends Admin_Controller
 			for ($i = 1; $i <= $num_top; $i++) {
 				if (isset($post['group_top_' . $i])) {
 					$group_top = $this->input->post('group_top_' . $i);
+					$tipe_top = $this->input->post('tipe_top_' . $i);
 					$progress = $this->input->post('progress_' . $i);
 					$nilai_top = $this->input->post('nilai_top_' . $i);
 					$keterangan_top = $this->input->post('keterangan_top_' . $i);
@@ -1804,6 +1803,7 @@ class Purchase_order_non_material extends Admin_Controller
 					$insert_top = $this->db->insert('tr_top_po', [
 						'no_po' => $post['no_po'],
 						'group_top' => $group_top,
+						'tipe_top' => $tipe_top,
 						'progress' => str_replace(',', '', $progress),
 						'nilai' => str_replace(',', '', $nilai_top),
 						'keterangan' => $keterangan_top,
@@ -1856,7 +1856,6 @@ class Purchase_order_non_material extends Admin_Controller
 			'nominal_kurs'		=> str_replace(',', '', $post['nominal_kurs']),
 			'tanggal'			=> $post['tanggal'],
 			'expect_tanggal'	=> date('Y-m-d', strtotime($post['expect_tanggal'])),
-			'term'				=> $post['term'],
 			'cif'				=> $post['cif'],
 			'note'				=> $post['note_ket'],
 			'no_pr'				=> $post['no_pr'],

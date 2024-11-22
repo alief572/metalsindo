@@ -129,16 +129,6 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 							<div class="col-sm-6">
 								<div class="form-group row">
 									<div class="col-md-4">
-										<label for="customer">Payment Term</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="term" onkeyup required name="term" value="<?= (isset($results['header_po'])) ? $results['header_po']->term : null ?>" readonly>
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
 										<label for="id_customer">Supplier</label>
 									</div>
 									<div class="col-md-8">
@@ -502,6 +492,7 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 									<thead class="bg-blue">
 										<tr>
 											<th class="text-center">Group TOP</th>
+											<th class="text-center">Tipe TOP</th>
 											<th class="text-center">Progress (%)</th>
 											<th class="text-center">Value</th>
 											<th class="text-center">Keterangan</th>
@@ -512,6 +503,32 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 										$no = 1;
 										$no_top = 1;
 										foreach ($results['list_top'] as $item_top) {
+											$selected1 = '';
+											$selected2 = '';
+											$selected3 = '';
+											$selected4 = '';
+											$selected5 = '';
+
+											if($item_top->tipe_top == '1') {
+												$selected1 = 'selected';
+											}
+
+											if($item_top->tipe_top == '2') {
+												$selected2 = 'selected';
+											}
+
+											if($item_top->tipe_top == '3') {
+												$selected3 = 'selected';
+											}
+
+											if($item_top->tipe_top == '4') {
+												$selected4 = 'selected';
+											}
+
+											if($item_top->tipe_top == '5') {
+												$selected5 = 'selected';
+											}
+
 											echo '<tr class="top_' . $no . '">';
 
 											echo '<td>';
@@ -523,6 +540,17 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 												}
 												echo '<option value="' . $item_group_top->id . '" ' . $selected . '>' . strtoupper($item_group_top->name) . '</option>';
 											}
+											echo '</select>';
+											echo '</td>';
+											
+											echo '<td>';
+											echo '<select class="tipe_top_'.$no.'" >';
+											echo '<option value="">- Tipe TOP -</option>';
+											echo '<option value="1" '.$selected1.'>CBD</option>';
+											echo '<option value="2" '.$selected2.'>2 Minggu</option>';
+											echo '<option value="3" '.$selected3.'>30 Hari</option>';
+											echo '<option value="4" '.$selected4.'>45 Hari</option>';
+											echo '<option value="5" '.$selected5.'>60 Hari</option>';
 											echo '</select>';
 											echo '</td>';
 

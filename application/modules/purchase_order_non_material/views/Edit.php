@@ -149,16 +149,6 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 							<div class="col-sm-6">
 								<div class="form-group row">
 									<div class="col-md-4">
-										<label for="customer">Payment Term</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="term" onkeyup required name="term" value="<?= $results['get_po']->term ?>">
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
 										<label for="id_customer">Supplier</label>
 									</div>
 									<div class="col-md-8">
@@ -484,6 +474,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 									<thead class="bg-blue">
 										<tr>
 											<th class="text-center">Group TOP</th>
+											<th class="text-center">Tipe TOP</th>
 											<th class="text-center">Progress (%)</th>
 											<th class="text-center">Value</th>
 											<th class="text-center">Keterangan</th>
@@ -494,6 +485,33 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 										<?php
 										$no = 1;
 										foreach ($results['list_top'] as $item_top) {
+
+											$selected1 = '';
+											$selected2 = '';
+											$selected3 = '';
+											$selected4 = '';
+											$selected5 = '';
+
+											if($item_top->tipe_top == '1') {
+												$selected1 = 'selected';
+											}
+
+											if($item_top->tipe_top == '2') {
+												$selected2 = 'selected';
+											}
+
+											if($item_top->tipe_top == '3') {
+												$selected3 = 'selected';
+											}
+
+											if($item_top->tipe_top == '4') {
+												$selected4 = 'selected';
+											}
+
+											if($item_top->tipe_top == '5') {
+												$selected5 = 'selected';
+											}
+
 											echo '<tr class="top_' . $no . '">';
 
 											echo '<td>';
@@ -505,6 +523,17 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 												}
 												echo '<option value="' . $item_group_top->id . '" ' . $selected . '>' . strtoupper($item_group_top->name) . '</option>';
 											}
+											echo '</select>';
+											echo '</td>';
+
+											echo '<td>';
+											echo '<select name="tipe_top_'.$no.'" class="tipe_top_'.$no.'" >';
+											echo '<option value="">- Tipe TOP -</option>';
+											echo '<option value="1" '.$selected1.'>CBD</option>';
+											echo '<option value="2" '.$selected2.'>2 Minggu</option>';
+											echo '<option value="3" '.$selected3.'>30 Hari</option>';
+											echo '<option value="4" '.$selected4.'>45 Hari</option>';
+											echo '<option value="5" '.$selected5.'>60 Hari</option>';
 											echo '</select>';
 											echo '</td>';
 
@@ -839,9 +868,19 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 				Rows += '</select>';
 				Rows += '</td>';
 
+				Rows += '<td>';
+				Rows += '<select class="form-control form-control-sm chosen-select" name="tipe_top_'+num_top+'">';
+				Rows += '<option value="">- Tipe TOP -</option>';
+				Rows += '<option value="cbd">CBD</option>';
+				Rows += '<option value="2_minggu">2 Minggu</option>';
+				Rows += '<option value="30_hari">30 Hari</option>';
+				Rows += '<option value="45_hari">45 Hari</option>';
+				Rows += '<option value="60_hari">60 Hari</option>';
+				Rows += '</select>';
+				Rows += '</td>';
+
 				Rows += '<td class="">';
 				Rows += '<input type="text" class="form-control form-control-sm input_progress progress_' + num_top + ' auto_num" name="progress_' + num_top + '" data-no="' + num_top + '">';
-				Rows += '</select>';
 				Rows += '</td>';
 
 				Rows += '<td class="text-right">';
