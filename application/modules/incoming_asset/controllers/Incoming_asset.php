@@ -820,8 +820,8 @@ class Incoming_asset extends Admin_Controller
 				'pesan'		=> 'Save process success. Thanks ...',
 				'status'	=> 1
 			);
-			insert_jurnal_department($ArrJurnal, NULL, NULL, $kode_trans, 'incoming asset', 'incoming asset', 'incoming asset');
-			history($histHlp);
+			// insert_jurnal_department($ArrJurnal, NULL, NULL, $kode_trans, 'incoming asset', 'incoming asset', 'incoming asset');
+			// history($histHlp);
 
 			$valid = 1;
 		}
