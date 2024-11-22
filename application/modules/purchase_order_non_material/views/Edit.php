@@ -492,23 +492,23 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 											$selected4 = '';
 											$selected5 = '';
 
-											if($item_top->tipe_top == 'cbd') {
+											if($item_top->tipe_top == '1') {
 												$selected1 = 'selected';
 											}
 
-											if($item_top->tipe_top == '2_minggu') {
+											if($item_top->tipe_top == '2') {
 												$selected2 = 'selected';
 											}
 
-											if($item_top->tipe_top == '30_hari') {
+											if($item_top->tipe_top == '3') {
 												$selected3 = 'selected';
 											}
 
-											if($item_top->tipe_top == '45_hari') {
+											if($item_top->tipe_top == '4') {
 												$selected4 = 'selected';
 											}
 
-											if($item_top->tipe_top == '60_hari') {
+											if($item_top->tipe_top == '5') {
 												$selected5 = 'selected';
 											}
 
@@ -529,11 +529,11 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 											echo '<td>';
 											echo '<select class="tipe_top_'.$no.'" >';
 											echo '<option value="">- Tipe TOP -</option>';
-											echo '<option value="cbd" '.$selected1.'>CBD</option>';
-											echo '<option value="2_minggu" '.$selected2.'>2 Minggu</option>';
-											echo '<option value="30_hari" '.$selected3.'>30 Hari</option>';
-											echo '<option value="45_hari" '.$selected4.'>45 Hari</option>';
-											echo '<option value="60_hari" '.$selected5.'>60 Hari</option>';
+											echo '<option value="1" '.$selected1.'>CBD</option>';
+											echo '<option value="2" '.$selected2.'>2 Minggu</option>';
+											echo '<option value="3" '.$selected3.'>30 Hari</option>';
+											echo '<option value="4" '.$selected4.'>45 Hari</option>';
+											echo '<option value="5" '.$selected5.'>60 Hari</option>';
 											echo '</select>';
 											echo '</td>';
 
@@ -871,11 +871,11 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 				Rows += '<td>';
 				Rows += '<select class="form-control form-control-sm chosen-select" name="tipe_top_'+num_top+'">';
 				Rows += '<option value="">- Tipe TOP -</option>';
-				Rows += '<option value="cbd">CBD</option>';
-				Rows += '<option value="2_minggu">2 Minggu</option>';
-				Rows += '<option value="30_hari">30 Hari</option>';
-				Rows += '<option value="45_hari">45 Hari</option>';
-				Rows += '<option value="60_hari">60 Hari</option>';
+				Rows += '<option value="1">CBD</option>';
+				Rows += '<option value="2">2 Minggu</option>';
+				Rows += '<option value="3">30 Hari</option>';
+				Rows += '<option value="4">45 Hari</option>';
+				Rows += '<option value="5">60 Hari</option>';
 				Rows += '</select>';
 				Rows += '</td>';
 

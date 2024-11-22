@@ -509,23 +509,23 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 											$selected4 = '';
 											$selected5 = '';
 
-											if($item_top->tipe_top == 'cbd') {
+											if($item_top->tipe_top == '1') {
 												$selected1 = 'selected';
 											}
 
-											if($item_top->tipe_top == '2_minggu') {
+											if($item_top->tipe_top == '2') {
 												$selected2 = 'selected';
 											}
 
-											if($item_top->tipe_top == '30_hari') {
+											if($item_top->tipe_top == '3') {
 												$selected3 = 'selected';
 											}
 
-											if($item_top->tipe_top == '45_hari') {
+											if($item_top->tipe_top == '4') {
 												$selected4 = 'selected';
 											}
 
-											if($item_top->tipe_top == '60_hari') {
+											if($item_top->tipe_top == '5') {
 												$selected5 = 'selected';
 											}
 
@@ -546,11 +546,11 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 											echo '<td>';
 											echo '<select class="tipe_top_'.$no.'" >';
 											echo '<option value="">- Tipe TOP -</option>';
-											echo '<option value="cbd" '.$selected1.'>CBD</option>';
-											echo '<option value="2_minggu" '.$selected2.'>2 Minggu</option>';
-											echo '<option value="30_hari" '.$selected3.'>30 Hari</option>';
-											echo '<option value="45_hari" '.$selected4.'>45 Hari</option>';
-											echo '<option value="60_hari" '.$selected5.'>60 Hari</option>';
+											echo '<option value="1" '.$selected1.'>CBD</option>';
+											echo '<option value="2" '.$selected2.'>2 Minggu</option>';
+											echo '<option value="3" '.$selected3.'>30 Hari</option>';
+											echo '<option value="4" '.$selected4.'>45 Hari</option>';
+											echo '<option value="5" '.$selected5.'>60 Hari</option>';
 											echo '</select>';
 											echo '</td>';
 
