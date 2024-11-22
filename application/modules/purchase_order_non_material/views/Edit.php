@@ -871,11 +871,11 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 				Rows += '<td>';
 				Rows += '<select class="form-control form-control-sm chosen-select" name="tipe_top_'+num_top+'">';
 				Rows += '<option value="">- Tipe TOP -</option>';
-				Rows += '<option value="cbd">CBD</option>';
-				Rows += '<option value="2_minggu">2 Minggu</option>';
-				Rows += '<option value="30_hari">30 Hari</option>';
-				Rows += '<option value="45_hari">45 Hari</option>';
-				Rows += '<option value="60_hari">60 Hari</option>';
+				Rows += '<option value="1">CBD</option>';
+				Rows += '<option value="2">2 Minggu</option>';
+				Rows += '<option value="3">30 Hari</option>';
+				Rows += '<option value="4">45 Hari</option>';
+				Rows += '<option value="5">60 Hari</option>';
 				Rows += '</select>';
 				Rows += '</td>';
 
