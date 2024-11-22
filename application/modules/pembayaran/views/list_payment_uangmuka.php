@@ -4,11 +4,12 @@
     $ENABLE_VIEW    = has_permission('Penerimaan.View');
     $ENABLE_DELETE  = has_permission('Penerimaan.Delete');
 ?>
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css">
 <form action="#" method="POST" id="form_proses_bro" enctype="multipart/form-data"> 
 	<div class="box box-primary">
 		
 		<div class="box-body">
-			<table class="table table-bordered table-striped" id="example1" width='100%'> 
+			<table class="table table-bordered table-striped" id="my-grid" width='100%'> 
 				<thead>
 					<tr class='bg-blue'>
 						<th class="text-center" width='4%'>No</th>
@@ -120,10 +121,11 @@
   </div>
 </div>
 </form>
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 <script>
 	$(document).ready(function(){
 		$('#spinnerx').hide();
-		DataTables();
+		$('#my-grid').DataTable();
 	});
 	$(document).on('click', '.buktip', function(e){
 		e.preventDefault();
