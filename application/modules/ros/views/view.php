@@ -20,6 +20,7 @@ $no_pengajuan_pib = (isset($header_ros)) ? $header_ros['no_pengajuan_pib'] : nul
 $no_billing = (isset($header_ros)) ? $header_ros['no_biling'] : null;
 $link_doc = (isset($header_ros)) ? $header_ros['link_doc'] : null;
 $keterangan = (isset($header_ros)) ? $header_ros['keterangan'] : null;
+$standard_logic_cost = (isset($header_ros)) ? $header_ros['standard_logic_cost'] : null;
 ?>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style type="text/css">
@@ -55,8 +56,8 @@ $keterangan = (isset($header_ros)) ? $header_ros['keterangan'] : null;
                             </select>
 
                         <?php
-                        }else{
-                            echo '<input type="text" name="no_po" class="form-control form-control-sm" value="'.$no_po.'" readonly>';
+                        } else {
+                            echo '<input type="text" name="no_po" class="form-control form-control-sm" value="' . $no_po . '" readonly>';
                         }
                         ?>
                     </div>
@@ -105,13 +106,18 @@ $keterangan = (isset($header_ros)) ? $header_ros['keterangan'] : null;
                     <label for="">Kurs PIB</label>
                     <input type="text" name="kurs_pib" id="" class="form-control form-control-sm auto_num kurs_pib" value="<?= $kurs_pib ?>" readonly>
                 </div>
+                <div class="col-md-6"></div>
+                <div class="col-md-6">
+                    <label for="">Standard Logic Cost</label>
+                    <input type="number" name="standard_logic_cost" id="" class="form-control form-control-sm auto_num standard_logic_cost" value="<?= $standard_logic_cost ?>" step="0.000001" readonly>
+                </div>
             </div>
 
             <div class="row">
-                
+
                 <div class="col-md-12" style="margin-top: 1vh;">
                     <table class="table table-bordered">
-                        <thead>
+                    <thead>
                             <tr>
                                 <th class="text-center">No.</th>
                                 <th class="text-center">Nama Barang</th>
@@ -119,41 +125,65 @@ $keterangan = (isset($header_ros)) ? $header_ros['keterangan'] : null;
                                 <th class="text-center">Currency</th>
                                 <th class="text-center">Price/Unit</th>
                                 <th class="text-center">Price/Unit (Rp)</th>
-                                <th class="text-center">Qty PO</th>
-                                <th class="text-center">Qty Packing List</th>
+                                <th class="text-center">Weight</th>
+                                <th class="text-center">Bea Masuk</th>
+                                <th class="text-center">Freight</th>
                                 <th class="text-center">Total Price (Rp)</th>
                             </tr>
                         </thead>
                         <tbody class="list_detail_po">
                             <?php
                             $ttl_price_detail = 0;
+                            $ttl_bm = 0;
+                            $ttl_freight = 0;
                             if (isset($detail_ros)) {
                                 $no = 1;
                                 foreach ($detail_ros as $item) {
+                                    $nilai_pengurang = 0;
+                                    $this->db->select('IF(SUM(a.qty_packing_list) IS NULL, 0, SUM(a.qty_packing_list)) as nilai_pengurang');
+                                    $this->db->from('tr_ros_detail a');
+                                    $this->db->where('a.id_po_detail', $item['id_po_detail']);
+                                    $this->db->where('a.no_ros <>', $item['no_ros']);
+                                    $get_nilai_ros_used = $this->db->get()->row_array();
+                                    if (!empty($get_nilai_ros_used)) {
+                                        $nilai_pengurang += $get_nilai_ros_used['nilai_pengurang'];
+                                    }
+
                                     echo '<tr>';
                                     echo '<td class="text-center">' . $no . '</td>';
                                     echo '<td class="text-center">' . $item['nm_barang'] . '</td>';
                                     echo '<td class="text-center">' . ucfirst($item['unit_satuan']) . '</td>';
-                                    echo '<td class="text-center">' . $item['currency'] . '</td>';
-                                    echo '<td class="text-right">' . number_format($item['price_unit']) . '</td>';
-                                    echo '<td class="text-right">' . number_format($item['price_unit'] * $kurs_pib) . '</td>';
+                                    echo '<td class="text-center">' . strtoupper($item['currency']) . '</td>';
+                                    echo '<td class="text-right">' . number_format($item['price_unit'], 2) . '</td>';
+                                    echo '<td class="text-right">' . number_format($item['price_unit'] * $kurs_pib, 2) . '</td>';
                                     echo '<td class="text-center">' . $item['qty_po'] . '</td>';
-                                    echo '<td class="text-center">' . number_format($item['qty_packing_list']) . '</td>';
-                                    echo '<td class="text-right total_price_' . $item['id_po_detail'] . '">' . number_format(($item['price_unit'] * $kurs_pib) * $item['qty_packing_list']) . '</td>';
+                                    echo '<td class="text-right">';
+                                    echo number_format($item['nilai_bm'], 2);
+                                    echo '</td>';
+                                    echo '<td class="text-right">';
+                                    echo number_format($item['nilai_freight'], 2);
+                                    echo '</td>';
+                                    echo '<td class="text-right total_price_' . $item['id_po_detail'] . '">' . number_format(($item['price_unit'] * $kurs_pib) * $item['qty_packing_list'], 2) . '</td>';
                                     echo '</tr>';
 
                                     $ttl_price_detail += (($item['price_unit'] * $kurs_pib) * $item['qty_packing_list']);
+                                    $ttl_bm += $item['nilai_bm'];
+                                    $ttl_freight += $item['nilai_freight'];
                                     $no++;
                                 }
                             }
                             ?>
                         </tbody>
-                        <tbody>
-                            <td colspan="8" align="right">
-                                <b>Grand Total</b>
-                            </td>
-                            <td align="right"><?= number_format($ttl_price_detail, 2) ?></td>
-                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="7" align="right">
+                                    <b>Grand Total</b>
+                                </td>
+                                <td align="right" class="ttl_bm_col"><?= number_format($ttl_bm, 2) ?></td>
+                                <td align="right" class="ttl_freight_col"><?= number_format($ttl_freight, 2) ?></td>
+                                <td align="right" class="ttl_price_detail_col"><?= number_format($ttl_price_detail, 2) ?></td>
+                            </tr>
+                        </tfoot>
                     </table>
 
                     <input type="hidden" name="ttl_total_price" class="ttl_total_price" value="<?= $ttl_price_detail ?>">
@@ -240,10 +270,10 @@ $keterangan = (isset($header_ros)) ? $header_ros['keterangan'] : null;
                             <th>Upload PIB</th>
                             <th>
                                 <input type="file" name="upload_pib" id="" class="form-control form-control-sm" readonly>
-                                <?php 
-                                    if(file_exists($link_doc) && $link_doc !== '') {
-                                        echo '<a href="'.base_url($link_doc).'" class="btn btn-sm btn-primary"><i class="fa fa-download"></i></a>';
-                                    }
+                                <?php
+                                if (file_exists($link_doc) && $link_doc !== '') {
+                                    echo '<a href="' . base_url($link_doc) . '" class="btn btn-sm btn-primary"><i class="fa fa-download"></i></a>';
+                                }
                                 ?>
                             </th>
                         </tr>
@@ -271,40 +301,9 @@ $keterangan = (isset($header_ros)) ? $header_ros['keterangan'] : null;
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-md-10"></div>
-                <div class="col-md-5">
-                    <h4>Freight Cost Forecast</h4>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th class="text-center">No.</th>
-                                <th class="text-center">Item Pembiayaan</th>
-                                <th class="text-center">%</th>
-                                <th class="text-center">Total Cost</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="text-center">1</td>
-                                <td class="text-center">Freight Cost</td>
-                                <td class="">
-                                    <input type="text" name="freight_cost_persen" id="" class="form-control form-control-sm freight_cost_persen" value="<?= $freight_cost_persen ?>" readonly>
-                                    <input type="hidden" name="freight_cost" class="freight_cost">
-                                </td>
-                                <td class="text-right freight_cost_val">
-                                    <?php
-                                    if ($freight_cost_persen > 0) {
-                                        echo number_format($ttl_price_detail * $freight_cost_persen / 100);
-                                    } else {
-                                        echo '0';
-                                    }
-                                    ?>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                
                 <div class="col-md-12">
                     <a href="<?= base_url('ros') ?>" class="btn btn-sm btn-danger"><i class="fa fa-arrow-left"></i> Back</a>
                 </div>
