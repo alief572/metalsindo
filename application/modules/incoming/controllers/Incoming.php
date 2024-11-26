@@ -750,7 +750,7 @@ class Incoming extends Admin_Controller
 					<label >No. PO</label>
 		</div>
 		<div class='col-md-4'>
-				<select id='dt_nopo_" . $id . "' name='dt[" . $id . "][nopo]' class='form-control input-md chosen-select' onchange='return TambahMaterial(" . $id . ")' required>
+				<select id='dt_nopo_" . $id . "' name='dt[" . $id . "][nopo]' class='form-control input-md chosen-select check_ros' onchange='return TambahMaterial(" . $id . ")' required>
 						<option value=''>--Pilih--</option>";
 		foreach ($listpo as $listpo) {
 			$check_ros = $this->db->select('a.id')->from('tr_ros a')->like('a.no_po', $listpo->no_surat, 'both')->get()->num_rows();
@@ -2819,5 +2819,30 @@ class Incoming extends Admin_Controller
 		$this->template->set('results', $data);
 		$this->template->title('INCOMING');
 		$this->template->render('ViewCustomer');
+	}
+
+	public function check_ros() {
+		$post = $this->input->post();
+
+		$get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $post['no_po']])->row();
+
+		$no_surat = $get_po->no_surat;
+
+		$get_ros = $this->db->select('a.*')->from('tr_ros a')->like('a.no_po', $no_surat, 'both')->get()->row();
+		
+		$get_ros_detail = $this->db
+		->select('SUM(a.qty_packing_list) as total_incoming')
+		->from('tr_ros_detail a')
+		->where('a.no_ros', $get_ros->id)
+		->get()
+		->row();
+
+		$total_incoming = $get_ros_detail->total_incoming;
+
+		echo json_encode([
+			'total_incoming' => $total_incoming,
+			'no_pib' => $get_ros->no_pengajuan_pib
+		]);
+
 	}
 }
