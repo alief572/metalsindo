@@ -37,6 +37,7 @@ class Ros extends Admin_Controller
         $this->db->select('a.*');
         $this->db->from('master_supplier a');
         $this->db->where('a.deleted', 0);
+        $this->db->where('a.suplier_location', 'international');
         $this->db->order_by('a.name_suplier', 'asc');
         $list_supplier = $this->db->get()->result();
 
@@ -213,7 +214,6 @@ class Ros extends Admin_Controller
             $this->db->select('IF(SUM(a.qty_packing_list) IS NULL, 0, SUM(a.qty_packing_list)) as nilai_pengurang');
             $this->db->from('tr_ros_detail a');
             $this->db->where('a.id_po_detail', $item_po['id']);
-            $this->db->where('a.tipe_po', $item_po['tipe_po']);
             $get_nilai_ros_used = $this->db->get()->row_array();
             if (!empty($get_nilai_ros_used)) {
                 $nilai_pengurang += $get_nilai_ros_used['nilai_pengurang'];
@@ -221,12 +221,12 @@ class Ros extends Admin_Controller
 
             $valids = 1;
 
-            if(($item_po['totalwidth'] - $nilai_pengurang) <= 0) {
+            if (($item_po['totalwidth'] - $nilai_pengurang) <= 0) {
                 $valids = 0;
             }
 
-            if($post['edit'] == '1') {
-                $valids = 1; 
+            if ($post['edit'] == '1') {
+                $valids = 1;
             }
 
             if ($valids > 0) {
@@ -242,20 +242,34 @@ class Ros extends Admin_Controller
                 $hasil .= '<td class="text-right">' . number_format($item_po['hargasatuan'] * $post['kurs_pib'], 2) . '</td>';
                 $hasil .= '<td class="text-center">' . number_format($item_po['totalwidth'], 2) . '</td>';
                 $hasil .= '<td class="text-center">';
+                $hasil .= number_format($nilai_pengurang, 2);
+                $hasil .= '<input type="hidden" name="in_qty_' . $item_po['id'] . '" value="' . $nilai_pengurang . '">';
+                $hasil .= '</td>';
+                $hasil .= '<td class="text-center">';
+                $hasil .= number_format(($item_po['totalwidth'] - $nilai_pengurang), 2);
+                $hasil .= '<input type="hidden" name="sisa_qty_' . $item_po['id'] . '" value="' . ($item_po['totalwidth'] - $nilai_pengurang) . '">';
+                $hasil .= '</td>';
+                $hasil .= '<td class="text-center">';
+                $hasil .= '<input type="text" class="form-control form-control-sm text-right weight_packing auto_num" name="weight_packing_' . $item_po['id'] . '" value="' . ($item_po['totalwidth'] - $nilai_pengurang) . '" data-id="' . $item_po['id'] . '">';
+                $hasil .= '<input type="hidden" name="harga_satuan_' . $item_po['id'] . '" value="' . $item_po['hargasatuan'] . '">';
+                $hasil .= '<input type="hidden" class="grand_total grand_total_' . $item_po['id'] . '" value="' . ((($item_po['totalwidth'] - $nilai_pengurang) * $item_po['hargasatuan']) * $post['kurs_pib']) . '">';
+                $hasil .= '</td>';
+                $hasil .= '<td class="text-center">';
                 $hasil .= '<input type="hidden" class="total_price" value="' . ($item_po['jumlahharga'] * $post['kurs_pib']) . '">';
                 $hasil .= '<input type="text" class="form-control form-control-sm text-right auto_num nilai_bm" name="nilai_bm_' . $item_po['id'] . '">';
-
                 $hasil .= '</td>';
                 $hasil .= '<td class="text-center">';
                 $hasil .= '<input type="hidden" name="weight_' . $item_po['id'] . '" class="weight_' . $no . '" value="' . $item_po['totalwidth'] . '">';
                 $hasil .= '<input type="text" class="form-control form-control-sm text-right auto_num nilai_freight" name="nilai_freight_' . $item_po['id'] . '" value="' . number_format($nilai_freight, 2) . '" data-no="' . $no . '" readonly>';
 
                 $hasil .= '</td>';
-                $hasil .= '<td class="text-right total_price_' . $item_po['id'] . '">' . number_format($item_po['jumlahharga'] * $post['kurs_pib'], 2) . '</td>';
+                $hasil .= '<td class="text-right total_price_' . $item_po['id'] . '">';
+                $hasil .= number_format((($item_po['totalwidth'] - $nilai_pengurang) * $item_po['hargasatuan']) * $post['kurs_pib'], 2);
+                $hasil .= '</td>';
                 $hasil .= '</tr>';
                 $no++;
 
-                $ttl_price_detail += ($item_po['jumlahharga'] * $post['kurs_pib']);
+                $ttl_price_detail += ((($item_po['totalwidth'] - $nilai_pengurang) * $item_po['hargasatuan']) * $post['kurs_pib']);
                 $ttl_nilai_freight += $nilai_freight;
             }
         }
@@ -454,7 +468,9 @@ class Ros extends Admin_Controller
                     'currency' => $mata_uang,
                     'price_unit' => $po_detail['hargasatuan'],
                     'qty_po' => $post['weight_' . $po_detail['id']],
-                    'qty_packing_list' => $post['weight_' . $po_detail['id']],
+                    'in_qty' => str_replace(',', '', $post['in_qty_' . $po_detail['id']]),
+                    'sisa_qty' => str_replace(',', '', $post['sisa_qty_' . $po_detail['id']]),
+                    'qty_packing_list' => str_replace(',', '', $post['weight_packing_' . $po_detail['id']]),
                     'nilai_bm' => str_replace(',', '', $post['nilai_bm_' . $po_detail['id']]),
                     'nilai_freight' => str_replace(',', '', $post['nilai_freight_' . $po_detail['id']]),
                     'tipe_po' => 'PO Material',
@@ -540,7 +556,9 @@ class Ros extends Admin_Controller
                     'currency' => $mata_uang,
                     'price_unit' => $po_detail['hargasatuan'],
                     'qty_po' => $post['weight_' . $po_detail['id']],
-                    'qty_packing_list' => $post['weight_' . $po_detail['id']],
+                    'qty_packing_list' => str_replace(',', '', $post['weight_packing_' . $po_detail['id']]),
+                    'in_qty' => str_replace(',', '', $post['in_qty_' . $po_detail['id']]),
+                    'sisa_qty' => str_replace(',', '', $post['sisa_qty_' . $po_detail['id']]),
                     'nilai_bm' => str_replace(',', '', $post['nilai_bm_' . $po_detail['id']]),
                     'nilai_freight' => str_replace(',', '', $post['nilai_freight_' . $po_detail['id']]),
                     'created_by' => $this->auth->user_id(),
@@ -717,15 +735,13 @@ class Ros extends Admin_Controller
     {
         $kode_supplier = $this->input->post('supplier');
 
-
-
-
         $this->db->select('a.no_surat, a.no_po, "PO Material" as tipe_po');
         $this->db->from('tr_purchase_order a');
         $this->db->join('tr_ros b', 'b.no_po = a.no_surat', 'left');
-        $this->db->where('b.no_po', null);
         $this->db->where('a.id_suplier', $kode_supplier);
         $this->db->where('a.loi', 'Import');
+        $this->db->where('a.status', '2');
+        $this->db->order_by('a.no_surat', 'desc');
         $query1 = $this->db->get_compiled_select();
 
         // $this->db->select('a.no_surat, a.no_po, "PO Non Material" as tipe_po');
@@ -744,31 +760,33 @@ class Ros extends Admin_Controller
         foreach ($list_po as $item) {
 
             $nilai_sisa = 0;
-            if ($item['tipe_po'] == 'PO Material') {
-                $get_po_detail = $this->db->get_where('dt_trans_po', ['no_po' => $item['no_po']])->result_array();
-                foreach ($get_po_detail as $item2) {
+            // if ($item['tipe_po'] == 'PO Material') {
 
-                    $berat_terima = ($item2['berat_terima'] !== null) ? $item2['berat_terima'] : 0;
+            // } else {
+            //     $get_po_detail = $this->db->get_where('dt_trans_po_non_material', ['no_po' => $item['no_po']])->result_array();
+            //     foreach ($get_po_detail as $item2) {
+            //         $nilai_sisa += $item2['qty'];
 
-                    $nilai_sisa += $berat_terima;
+            //         $get_used_ros_detail = $this->db->get_where('tr_ros_detail', ['id_po_detail' => $item2['id']])->result_array();
+            //         if (!empty($get_used_ros_detail)) {
+            //             foreach ($get_used_ros_detail as $item3) {
+            //                 $nilai_sisa -= $item3['qty_packing_list'];
+            //             }
+            //         }
+            //     }
+            // }
 
-                    $get_used_ros_detail = $this->db->get_where('tr_ros_detail', ['id_po_detail' => $item2['id']])->result_array();
-                    if (!empty($get_used_ros_detail)) {
-                        foreach ($get_used_ros_detail as $item3) {
-                            $nilai_sisa -= $item3['qty_packing_list'];
-                        }
-                    }
-                }
-            } else {
-                $get_po_detail = $this->db->get_where('dt_trans_po_non_material', ['no_po' => $item['no_po']])->result_array();
-                foreach ($get_po_detail as $item2) {
-                    $nilai_sisa += $item2['qty'];
+            $get_po_detail = $this->db->get_where('dt_trans_po', ['no_po' => $item['no_po']])->result_array();
+            foreach ($get_po_detail as $item2) {
 
-                    $get_used_ros_detail = $this->db->get_where('tr_ros_detail', ['id_po_detail' => $item2['id']])->result_array();
-                    if (!empty($get_used_ros_detail)) {
-                        foreach ($get_used_ros_detail as $item3) {
-                            $nilai_sisa -= $item3['qty_packing_list'];
-                        }
+                $berat_terima = ($item2['totalwidth'] !== null) ? $item2['totalwidth'] : 0;
+
+                $nilai_sisa += $berat_terima;
+
+                $get_used_ros_detail = $this->db->get_where('tr_ros_detail', ['id_po_detail' => $item2['id']])->result_array();
+                if (!empty($get_used_ros_detail)) {
+                    foreach ($get_used_ros_detail as $item3) {
+                        $nilai_sisa -= $item3['qty_packing_list'];
                     }
                 }
             }
@@ -780,13 +798,13 @@ class Ros extends Admin_Controller
 
 
 
-            // if ($nilai_sisa > 0) {
-            $hasil .= '<tr>';
-            $hasil .= '<td class="text-center">' . $item['no_surat'] . '</td>';
-            $hasil .= '<td class="text-center">' . $item['tipe_po'] . '</td>';
-            $hasil .= '<td class="text-center"><input type="checkbox" name="no_po[]" class="no_po" value="' . $item['no_surat'] . '"></td>';
-            $hasil .= '</tr>';
-            // }
+            if ($nilai_sisa > 0) {
+                $hasil .= '<tr>';
+                $hasil .= '<td class="text-center">' . $item['no_surat'] . '</td>';
+                $hasil .= '<td class="text-center">' . $item['tipe_po'] . '</td>';
+                $hasil .= '<td class="text-center"><input type="checkbox" name="no_po[]" class="no_po" value="' . $item['no_surat'] . '"></td>';
+                $hasil .= '</tr>';
+            }
         }
 
         echo $hasil;
