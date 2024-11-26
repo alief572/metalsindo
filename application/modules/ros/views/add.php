@@ -67,7 +67,7 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
                         <select name="supplier_name" id="" class="form-control form-control-sm select2 get_supplier">
                             <?php
 
-                            if($no_ros == 'new') {
+                            if ($no_ros == 'new') {
                                 echo '<option value="">- Supplier Name -</option>';
                             }
 
@@ -146,6 +146,9 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
                                 <th class="text-center">Price/Unit</th>
                                 <th class="text-center">Price/Unit (Rp)</th>
                                 <th class="text-center">Weight</th>
+                                <th class="text-center">In</th>
+                                <th class="text-center">Sisa</th>
+                                <th class="text-center">Weight Packing</th>
                                 <th class="text-center">Bea Masuk</th>
                                 <th class="text-center">Freight</th>
                                 <th class="text-center">Total Price (Rp)</th>
@@ -177,8 +180,21 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
                                     echo '<td class="text-right">' . number_format($item['price_unit'], 2) . '</td>';
                                     echo '<td class="text-right">' . number_format($item['price_unit'] * $kurs_pib, 2) . '</td>';
                                     echo '<td class="text-center">' . $item['qty_po'] . '</td>';
+                                    echo '<td class="text-center">';
+                                    echo number_format($item['in_qty'], 2);
+                                    echo '<input type="hidden" name="in_qty_' . $item['id_po_detail'] . '" value="' . $item['in_qty'] . '">';
+                                    echo '</td>';
+                                    echo '<td class="text-center">';
+                                    echo number_format($item['sisa_qty'], 2);
+                                    echo '<input type="hidden" name="sisa_qty_' . $item['id_po_detail'] . '" value="' . $item['sisa_qty'] . '">';
+                                    echo '</td>';
+                                    echo '<td class="text-center">';
+                                    echo '<input type="text" class="form-control form-control-sm text-right weight_packing auto_num" name="weight_packing_' . $item['id_po_detail'] . '" value="' . $item['qty_packing_list'] . '" data-id="' . $item['id_po_detail'] . '">';
+                                    echo '<input type="hidden" name="harga_satuan_' . $item['id_po_detail'] . '" value="' . ($item['price_unit']) . '">';
+                                    echo '<input type="hidden" class="grand_total grand_total_' . $item['id_po_detail'] . '" value="' . (($item['qty_packing_list'] * $item['price_unit']) * $kurs_pib) . '">';
+                                    echo '</td>';
                                     echo '<td>';
-                                    echo '<input type="hidden" class="total_price" value="'.(($item['price_unit'] * $kurs_pib) * $item['qty_packing_list']).'">';
+                                    echo '<input type="hidden" class="total_price" value="' . (($item['price_unit'] * $kurs_pib) * $item['qty_packing_list']) . '">';
                                     echo '<input type="hidden" name="weight_' . $item['id_po_detail'] . '" class="weight_' . $no . '" value="' . $item['qty_packing_list'] . '">';
                                     echo '<input type="text" class="form-control form-control-sm text-right auto_num nilai_bm" name="nilai_bm_' . $item['id_po_detail'] . '" value="' . $item['nilai_bm'] . '">';
                                     echo '</td>';
@@ -198,7 +214,7 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="7" align="right">
+                                <td colspan="10" align="right">
                                     <b>Grand Total</b>
                                 </td>
                                 <td align="right" class="ttl_bm_col"><?= number_format($ttl_bm, 2) ?></td>
@@ -698,9 +714,46 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
             ttl_price();
         });
 
+        $(document).on('change', '.weight_packing', function() {
+            var id = $(this).data('id');
+
+            var weight_packing = $(this).val();
+            if (weight_packing !== '') {
+                weight_packing = weight_packing.split(',').join('');
+                weight_packing = parseFloat(weight_packing);
+            } else {
+                weight_packing = 0;
+            }
+
+            var harga_satuan = $('input[name="harga_satuan_' + id + '"]').val();
+
+            var kurs_pib = $('.kurs_pib').val();
+            if (kurs_pib !== '') {
+                kurs_pib = kurs_pib.split(',').join('');
+                kurs_pib = parseFloat(kurs_pib);
+            } else {
+                kurs_pib = 0;
+            }
+
+            var grand_total = ((harga_satuan * kurs_pib) * weight_packing);
+
+            $('.total_price_' + id).html(number_format(grand_total, 2));
+            $('.grand_total_' + id).val(grand_total);
+
+            var ttl_grand_total = 0;
+            $('.grand_total').each(function() {
+                var nilai = $(this).val();
+                nilai = parseFloat(nilai);
+
+                ttl_grand_total += nilai;
+            });
+
+            $('.ttl_price_detail_col').html(number_format(ttl_grand_total, 2));
+        })
+
         function get_list_detail_po(no_po = null, kurs_pib = 1) {
             var standard_logic_cost = $('.standard_logic_cost').val();
-            
+
             var edit = $('.edit').val();
 
             $.ajax({
@@ -710,6 +763,7 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
                     'no_po': no_po,
                     'kurs_pib': kurs_pib,
                     'standard_logic_cost': standard_logic_cost,
+                    'weight_packing': 0,
                     'edit': edit
                 },
                 cache: false,

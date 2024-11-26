@@ -168,7 +168,7 @@ class Incoming extends Admin_Controller
 		$gudang	= $this->db->query("select * FROM ms_gudang ")->result();
 		$suplier	= $this->db->query("select * FROM master_supplier WHERE deleted = '0' ")->result();
 		$suplier2	= $this->db->query("select a.id_suplier, b.name_suplier FROM tr_purchase_order a
-		                                inner join master_supplier b on a.id_suplier = b.id_suplier GROUP BY a.id_suplier  ")->result();
+		                                inner join master_supplier b on a.id_suplier = b.id_suplier GROUP BY a.id_suplier ORDER BY b.name_suplier ASC ")->result();
 		$data = [
 			'po' => $po,
 			'gudang' => $gudang,
@@ -735,7 +735,8 @@ class Incoming extends Admin_Controller
 		// $listpo = $this->db->query("SELECT a.no_po, a.no_surat FROM tr_purchase_order a WHERE a.id_suplier='".$id_suplier."' ")->result();
 		$listpo = $this->db->query("SELECT 
 										a.no_po, 
-										a.no_surat 
+										a.no_surat,
+										a.loi
 									FROM 
 										dt_trans_po b 
 										LEFT JOIN tr_purchase_order a ON b.no_po=a.no_po 
@@ -752,7 +753,14 @@ class Incoming extends Admin_Controller
 				<select id='dt_nopo_" . $id . "' name='dt[" . $id . "][nopo]' class='form-control input-md chosen-select' onchange='return TambahMaterial(" . $id . ")' required>
 						<option value=''>--Pilih--</option>";
 		foreach ($listpo as $listpo) {
-			echo "<option value='$listpo->no_po' >$listpo->no_surat</option>";
+			$check_ros = $this->db->select('a.id')->from('tr_ros a')->like('a.no_po', $listpo->no_surat, 'both')->get()->num_rows();
+			if ($listpo->loi == 'Import') {
+				if ($check_ros > 0) {
+					echo "<option value='$listpo->no_po' >$listpo->no_surat</option>";
+				}
+			} else {
+				echo "<option value='$listpo->no_po' >$listpo->no_surat</option>";
+			}
 		}
 		echo "</select>
 		</div>
