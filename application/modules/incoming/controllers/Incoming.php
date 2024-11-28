@@ -168,7 +168,7 @@ class Incoming extends Admin_Controller
 		$gudang	= $this->db->query("select * FROM ms_gudang ")->result();
 		$suplier	= $this->db->query("select * FROM master_supplier WHERE deleted = '0' ")->result();
 		$suplier2	= $this->db->query("select a.id_suplier, b.name_suplier FROM tr_purchase_order a
-		                                inner join master_supplier b on a.id_suplier = b.id_suplier GROUP BY a.id_suplier  ")->result();
+		                                inner join master_supplier b on a.id_suplier = b.id_suplier GROUP BY a.id_suplier ORDER BY b.name_suplier ASC ")->result();
 		$data = [
 			'po' => $po,
 			'gudang' => $gudang,
@@ -735,7 +735,8 @@ class Incoming extends Admin_Controller
 		// $listpo = $this->db->query("SELECT a.no_po, a.no_surat FROM tr_purchase_order a WHERE a.id_suplier='".$id_suplier."' ")->result();
 		$listpo = $this->db->query("SELECT 
 										a.no_po, 
-										a.no_surat 
+										a.no_surat,
+										a.loi
 									FROM 
 										dt_trans_po b 
 										LEFT JOIN tr_purchase_order a ON b.no_po=a.no_po 
@@ -749,10 +750,17 @@ class Incoming extends Admin_Controller
 					<label >No. PO</label>
 		</div>
 		<div class='col-md-4'>
-				<select id='dt_nopo_" . $id . "' name='dt[" . $id . "][nopo]' class='form-control input-md chosen-select' onchange='return TambahMaterial(" . $id . ")' required>
+				<select id='dt_nopo_" . $id . "' name='dt[" . $id . "][nopo]' class='form-control input-md chosen-select check_ros' onchange='return TambahMaterial(" . $id . ")' required>
 						<option value=''>--Pilih--</option>";
 		foreach ($listpo as $listpo) {
-			echo "<option value='$listpo->no_po' >$listpo->no_surat</option>";
+			$check_ros = $this->db->select('a.id')->from('tr_ros a')->like('a.no_po', $listpo->no_surat, 'both')->get()->num_rows();
+			if ($listpo->loi == 'Import') {
+				if ($check_ros > 0) {
+					echo "<option value='$listpo->no_po' >$listpo->no_surat</option>";
+				}
+			} else {
+				echo "<option value='$listpo->no_po' >$listpo->no_surat</option>";
+			}
 		}
 		echo "</select>
 		</div>
@@ -2811,5 +2819,30 @@ class Incoming extends Admin_Controller
 		$this->template->set('results', $data);
 		$this->template->title('INCOMING');
 		$this->template->render('ViewCustomer');
+	}
+
+	public function check_ros() {
+		$post = $this->input->post();
+
+		$get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $post['no_po']])->row();
+
+		$no_surat = $get_po->no_surat;
+
+		$get_ros = $this->db->select('a.*')->from('tr_ros a')->like('a.no_po', $no_surat, 'both')->get()->row();
+		
+		$get_ros_detail = $this->db
+		->select('SUM(a.qty_packing_list) as total_incoming')
+		->from('tr_ros_detail a')
+		->where('a.no_ros', $get_ros->id)
+		->get()
+		->row();
+
+		$total_incoming = $get_ros_detail->total_incoming;
+
+		echo json_encode([
+			'total_incoming' => $total_incoming,
+			'no_pib' => $get_ros->no_pengajuan_pib
+		]);
+
 	}
 }

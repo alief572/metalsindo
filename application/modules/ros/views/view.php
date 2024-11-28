@@ -126,6 +126,9 @@ $standard_logic_cost = (isset($header_ros)) ? $header_ros['standard_logic_cost']
                                 <th class="text-center">Price/Unit</th>
                                 <th class="text-center">Price/Unit (Rp)</th>
                                 <th class="text-center">Weight</th>
+                                <th class="text-center">In</th>
+                                <th class="text-center">Sisa</th>
+                                <th class="text-center">Weight Packing</th>
                                 <th class="text-center">Bea Masuk</th>
                                 <th class="text-center">Freight</th>
                                 <th class="text-center">Total Price (Rp)</th>
@@ -156,7 +159,10 @@ $standard_logic_cost = (isset($header_ros)) ? $header_ros['standard_logic_cost']
                                     echo '<td class="text-center">' . strtoupper($item['currency']) . '</td>';
                                     echo '<td class="text-right">' . number_format($item['price_unit'], 2) . '</td>';
                                     echo '<td class="text-right">' . number_format($item['price_unit'] * $kurs_pib, 2) . '</td>';
-                                    echo '<td class="text-center">' . $item['qty_po'] . '</td>';
+                                    echo '<td class="text-center">' . number_format($item['qty_po'], 2) . '</td>';
+                                    echo '<td class="text-center">' . number_format($item['in_qty'], 2) . '</td>';
+                                    echo '<td class="text-center">' . number_format($item['sisa_qty'], 2) . '</td>';
+                                    echo '<td class="text-center">' . number_format($item['qty_packing_list'], 2) . '</td>';
                                     echo '<td class="text-right">';
                                     echo number_format($item['nilai_bm'], 2);
                                     echo '</td>';
@@ -176,7 +182,7 @@ $standard_logic_cost = (isset($header_ros)) ? $header_ros['standard_logic_cost']
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="7" align="right">
+                                <td colspan="10" align="right">
                                     <b>Grand Total</b>
                                 </td>
                                 <td align="right" class="ttl_bm_col"><?= number_format($ttl_bm, 2) ?></td>

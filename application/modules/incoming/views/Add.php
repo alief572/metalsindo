@@ -319,6 +319,29 @@ $tanggal = date('Y-m-d');
 
 	});
 
+	$(document).on('change', '.check_ros', function() {
+		var no_po = $(this).val();
+		var total_incoming = parseFloat($('#total').val());
+
+		if (no_po !== '') {
+			$.ajax({
+				type: 'post',
+				url: siteurl + active_controller + '/check_ros',
+				data: {
+					'no_po': no_po,
+				},
+				cache: false,
+				dataType: 'json',
+				success: function(result) {
+					ttl_total_incoming = parseFloat(result.total_incoming);
+					$('#total').val(ttl_total_incoming);
+
+					$('#pib').val(result.no_pib);
+				}
+			});
+		}
+	});
+
 	function get_material() {
 		var jumlah = $('#data_request').find('tr').length;
 		var no_po = $("#no_po").val();

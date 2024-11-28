@@ -128,8 +128,8 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 						</div>
 					</div>
 
-					<!-- <h4>Kasbon PR Non PO</h4> -->
-					<div class="form-group" style="display: none;">
+					<h4>Kasbon PR Non PO</h4>
+					<div class="form-group" >
 						<div class="col-md-1 control-label">
 							No. PR
 						</div>
@@ -159,7 +159,7 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 							<label for="">*Note: Klik enter jika sudah</label>
 						</div>
 					</div>
-					<div class="col-md-12" style="display: none;">
+					<div class="col-md-12" >
 						<table class="table table-striped">
 							<thead>
 								<tr>
