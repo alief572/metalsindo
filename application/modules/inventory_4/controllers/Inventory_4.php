@@ -79,8 +79,6 @@ class Inventory_4 extends Admin_Controller
 		$id_surface = $this->Inventory_4_model->get_data('ms_surface');
 		$dt_suplier = $this->Inventory_4_model->get_data('child_inven_suplier', 'id_category3', $id);
 
-
-
 		$data = [
 			'inventory_1' => $inventory_1,
 			'inventory_2' => $inventory_2,
@@ -315,11 +313,17 @@ class Inventory_4 extends Admin_Controller
 	public function saveNewInventory()
 	{
 		$this->auth->restrict($this->addPermission);
+		$post = $this->input->post();
 		$session = $this->session->userdata('app_session');
 		$code = $this->Inventory_4_model->generate_id();
 		$this->db->trans_begin();
 		$id_bentuk = $_POST['hd1']['1']['id_bentuk'];
 		$numb1 = 0;
+		$weight_kg = 0;
+		if(isset($post['weight_kg'])) {
+			$weight_kg = $post['weight_kg'];
+		}
+		
 		//$head = $_POST['hd1'];
 		foreach ($_POST['hd1'] as $h1) {
 			$numb1++;
@@ -366,6 +370,7 @@ class Inventory_4 extends Admin_Controller
 				'nama'		        	=> $h1[nama],
 				'alloy'		        	=> $alloy,
 				'negara'		        => $h1[maker],
+				'total_weight'				=> $weight_kg
 			);
 			//Add Data
 			$this->db->insert('ms_inventory_category3', $header1);
@@ -455,11 +460,16 @@ class Inventory_4 extends Admin_Controller
 	public function saveEditInventory()
 	{
 		$this->auth->restrict($this->addPermission);
+		$post = $this->input->post();
 		$session = $this->session->userdata('app_session');
 		$code = $this->Inventory_4_model->generate_id();
 		$this->db->trans_begin();
 		$id = $_POST['hd1']['1']['id_category3'];
 		$id_bentuk = $_POST['hd1']['1']['id_bentuk'];
+		$weight_kg = 0;
+		if(isset($post['weight_kg'])) {
+			$weight_kg = $post['weight_kg'];
+		}
 		$numb1 = 0;
 		foreach ($_POST['hd1'] as $h1) {
 			$numb1++;
@@ -491,6 +501,7 @@ class Inventory_4 extends Admin_Controller
 				'thickness'				=> $_POST['dimens']['1']['nilai_dimensi'],
 				'nama'		        	=> $h1[nama],
 				'alloy'		        	=> $alloy,
+				'total_weight'				=> $weight_kg
 			);
 			$this->db->where('id_category3', $id)->update("ms_inventory_category3", $header1);
 			$bookp =  array(
