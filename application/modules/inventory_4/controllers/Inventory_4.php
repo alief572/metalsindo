@@ -320,10 +320,10 @@ class Inventory_4 extends Admin_Controller
 		$id_bentuk = $_POST['hd1']['1']['id_bentuk'];
 		$numb1 = 0;
 		$weight_kg = 0;
-		if(isset($post['weight_kg'])) {
+		if (isset($post['weight_kg'])) {
 			$weight_kg = $post['weight_kg'];
 		}
-		
+
 		//$head = $_POST['hd1'];
 		foreach ($_POST['hd1'] as $h1) {
 			$numb1++;
@@ -467,7 +467,7 @@ class Inventory_4 extends Admin_Controller
 		$id = $_POST['hd1']['1']['id_category3'];
 		$id_bentuk = $_POST['hd1']['1']['id_bentuk'];
 		$weight_kg = 0;
-		if(isset($post['weight_kg'])) {
+		if (isset($post['weight_kg'])) {
 			$weight_kg = $post['weight_kg'];
 		}
 		$numb1 = 0;

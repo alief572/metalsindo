@@ -21,6 +21,7 @@ if ($inven->spek != '') {
 }
 
 ?>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" integrity="sha512-yVvxUQV0QESBt1SyZbNJMAwyKvFTLMyXSyBHDO4BG5t7k/Lw34tyqlSDlKIrIENIzCl+RVUNjmCPG+V/GMesRw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <div class="box box-primary">
 	<div class="box-body">
 		<form id="data-form" method="post">
@@ -178,21 +179,21 @@ if ($inven->spek != '') {
 											$class_hitung = 'hitung_all';
 										}
 
-										if($dimensi->nm_dimensi !== '' && $dimensi->nm_dimensi !== null) {
-											?>
-												<tr>
-													<td hidden align='left'>
-														<input type='text' name='dimens[<?= $numb ?>][id_dimensi]' readonly class='form-control' value='<?= $dimensi->id_dimensi ?>'>
-													</td>
-													<td align='left'>
-														<?= $dimensi->nm_dimensi ?>
+										if ($dimensi->nm_dimensi !== '' && $dimensi->nm_dimensi !== null) {
+									?>
+											<tr>
+												<td hidden align='left'>
+													<input type='text' name='dimens[<?= $numb ?>][id_dimensi]' readonly class='form-control' value='<?= $dimensi->id_dimensi ?>'>
+												</td>
+												<td align='left'>
+													<?= $dimensi->nm_dimensi ?>
 
-													</td>
-													<td align='left'>
-														<input type='text' id="dimensi<?= $numb ?>" name='dimens[<?= $numb ?>][nilai_dimensi]' class='form-control <?= $class_hitung ?>' value='<?= $dimensi->nilai_dimensi ?>'>
-													</td>
-												</tr>
-											<?php
+												</td>
+												<td align='left'>
+													<input type='text' id="dimensi<?= $numb ?>" name='dimens[<?= $numb ?>][nilai_dimensi]' class='form-control <?= $class_hitung ?>' value='<?= $dimensi->nilai_dimensi ?>'>
+												</td>
+											</tr>
+									<?php
 										}
 									}
 
@@ -288,12 +289,12 @@ if ($inven->spek != '') {
 								?>
 									<tr id="tr_<?= $loop ?>">
 										<td align="left">
-											<select id="id_supplier" name="data1[<?= $loop ?>][id_supplier]" id="data1_<?= $loop ?>_id_supplier" class="form-control select" required>
+											<select id="id_supplier" name="data1[<?= $loop ?>][id_supplier]" id="data1_<?= $loop ?>_id_supplier" class="form-control select chosen_select" required>
 												<option value="">-- Pilih Type --</option>
 												<?php foreach ($results["id_supplier"] as $id_supplier) {
 													$select = $dt_suplier->id_suplier == $id_supplier->id_suplier ? 'selected' : '';
 												?>
-													<option value="<?= $id_supplier->id_suplier ?>" <?= $select ?>><?= ucfirst(strtolower($id_supplier->name_suplier)) ?></option>
+													<option value="<?= $id_supplier->id_suplier ?>" <?= $select ?>><?= strtoupper($id_supplier->name_suplier) ?></option>
 												<?php } ?>
 											</select>
 										</td>
@@ -326,11 +327,16 @@ if ($inven->spek != '') {
 	</div>
 </div>
 
-
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js" integrity="sha512-rMGGF4wg1R73ehtnxXBt5mbUfN9JUJwbk21KMlnLZDJh7BkPmeovBuddZCENJddHYYMkCh9hPFnPmS9sspki8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script type="text/javascript">
 	//$('#input-kendaraan').hide();
+
+	$(document).ready(function() {
+		$('.chosen_select').chosen({
+			width: '100%'
+		});
+	});
 
 	$(document).on('keyup', '#dimensi1', function() {
 		cariThickness();
@@ -401,10 +407,10 @@ if ($inven->spek != '') {
 			}
 			Template = '<tr id="tr_' + loop + '">';
 			Template += '<td align="left">';
-			Template += '<select id="id_supplier" name="data1[' + loop + '][id_supplier]" id="data1_' + loop + '_id_supplier" class="form-control select" required>';
+			Template += '<select id="id_supplier" name="data1[' + loop + '][id_supplier]" id="data1_' + loop + '_id_supplier" class="form-control select chosen_select_'+loop+'" required>';
 			Template += '<option value="">-- Pilih Type --</option>';
 			Template += '<?php foreach ($results["id_supplier"] as $id_supplier) { ?>';
-			Template += '<option value="<?= $id_supplier->id_suplier ?>"><?= ucfirst(strtolower($id_supplier->name_suplier)) ?></option>';
+			Template += '<option value="<?= $id_supplier->id_suplier ?>"><?= strtoupper($id_supplier->name_suplier) ?></option>';
 			Template += '<?php } ?>';
 			Template += '</select>';
 			Template += '</td>';
@@ -420,6 +426,10 @@ if ($inven->spek != '') {
 			$('input[data-role="tglbayar"]').datepicker({
 				format: 'dd-mm-yyyy',
 				autoclose: true
+			});
+
+			$('.chosen_select_' + loop).chosen({
+				width: '100%'
 			});
 		});
 
@@ -528,29 +538,29 @@ if ($inven->spek != '') {
 	});
 
 	$(document).on('change', '.hitung_all', function() {
- 		var total_dimensi = 1;
- 		$('.hitung_all').each(function() {
- 			var nilai = $(this).val();
- 			if (nilai !== '') {
- 				nilai = nilai.split(',').join('');
- 				nilai = parseFloat(nilai);
- 			} else {
- 				nilai = 1;
- 			}
+		var total_dimensi = 1;
+		$('.hitung_all').each(function() {
+			var nilai = $(this).val();
+			if (nilai !== '') {
+				nilai = nilai.split(',').join('');
+				nilai = parseFloat(nilai);
+			} else {
+				nilai = 1;
+			}
 
- 			total_dimensi = (total_dimensi * nilai);
- 		});
+			total_dimensi = (total_dimensi * nilai);
+		});
 
- 		total_dimensi = ((total_dimensi) / 1000000);
- 		if (total_dimensi == 1) {
- 			total_dimensi = 0;
- 		}
+		total_dimensi = ((total_dimensi) / 1000000);
+		if (total_dimensi == 1) {
+			total_dimensi = 0;
+		}
 
- 		$('.weight_kg').val(total_dimensi.toLocaleString('en-US', {
- 			'minimumFractionDigits': 2,
- 			'maximumFractionDigits': 2
- 		}));
- 	});
+		$('.weight_kg').val(total_dimensi.toLocaleString('en-US', {
+			'minimumFractionDigits': 2,
+			'maximumFractionDigits': 2
+		}));
+	});
 
 	function get_inv2() {
 		var inventory_1 = $("#inventory_1").val();
