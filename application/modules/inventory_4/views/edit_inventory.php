@@ -177,20 +177,23 @@ if ($inven->spek != '') {
 										if ($inven->id_bentuk == 'B2000002') {
 											$class_hitung = 'hitung_all';
 										}
-									?>
-										<tr>
-											<td hidden align='left'>
-												<input type='text' name='dimens[<?= $numb ?>][id_dimensi]' readonly class='form-control' value='<?= $dimensi->id_dimensi ?>'>
-											</td>
-											<td align='left'>
-												<?= $dimensi->nm_dimensi ?>
 
-											</td>
-											<td align='left'>
-												<input type='text' id="dimensi<?= $numb ?>" name='dimens[<?= $numb ?>][nilai_dimensi]' class='form-control <?= $class_hitung ?>' value='<?= $dimensi->nilai_dimensi ?>'>
-											</td>
-										</tr>
-									<?php
+										if($dimensi->nm_dimensi !== '' && $dimensi->nm_dimensi !== null) {
+											?>
+												<tr>
+													<td hidden align='left'>
+														<input type='text' name='dimens[<?= $numb ?>][id_dimensi]' readonly class='form-control' value='<?= $dimensi->id_dimensi ?>'>
+													</td>
+													<td align='left'>
+														<?= $dimensi->nm_dimensi ?>
+
+													</td>
+													<td align='left'>
+														<input type='text' id="dimensi<?= $numb ?>" name='dimens[<?= $numb ?>][nilai_dimensi]' class='form-control <?= $class_hitung ?>' value='<?= $dimensi->nilai_dimensi ?>'>
+													</td>
+												</tr>
+											<?php
+										}
 									}
 
 									if ($class_hitung !== '') {

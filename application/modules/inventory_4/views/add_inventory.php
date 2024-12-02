@@ -146,19 +146,23 @@
 											if ($results['id_bentuk'][0]->id_bentuk == 'B2000002') {
 												$class_hitung = 'hitung_all';
 											}
+
+											if ($ensi->nm_dimensi !== '' && $ensi->nm_dimensi !== null) {
 										?>
- 										<tr>
- 											<td align='left' hidden>
- 												<input type='text' name='dimens[<?= $numensi ?>][id_dimensi]' readonly class='form-control' value='<?= $ensi->id_dimensi ?>'>
- 											</td>
- 											<td align='left'>
- 												<?= $ensi->nm_dimensi ?>
- 											</td>
- 											<td align='left'>
- 												<input type='text' id="dimensi<?= $numensi ?>" name='dimens[<?= $numensi ?>][nilai_dimensi]' class='form-control <?= $class_hitung ?>'>
- 											</td>
- 										</tr>
- 									<?php }
+ 											<tr>
+ 												<td align='left' hidden>
+ 													<input type='text' name='dimens[<?= $numensi ?>][id_dimensi]' readonly class='form-control' value='<?= $ensi->id_dimensi ?>'>
+ 												</td>
+ 												<td align='left'>
+ 													<?= $ensi->nm_dimensi ?>
+ 												</td>
+ 												<td align='left'>
+ 													<input type='text' id="dimensi<?= $numensi ?>" name='dimens[<?= $numensi ?>][nilai_dimensi]' class='form-control <?= $class_hitung ?>'>
+ 												</td>
+ 											</tr>
+ 									<?php
+											}
+										}
 										if ($class_hitung !== '') {
 											echo '<tr>';
 											echo '<td>';
