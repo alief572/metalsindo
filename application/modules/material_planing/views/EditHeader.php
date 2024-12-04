@@ -1,28 +1,28 @@
 <?php
-    $ENABLE_ADD     = has_permission('Trans_inquiry.Add');
-    $ENABLE_MANAGE  = has_permission('Trans_inquiry.Manage');
-    $ENABLE_VIEW    = has_permission('Trans_inquiry.View');
-    $ENABLE_DELETE  = has_permission('Trans_inquiry.Delete');
-	$tanggal = date('Y-m-d');
+$ENABLE_ADD     = has_permission('Trans_inquiry.Add');
+$ENABLE_MANAGE  = has_permission('Trans_inquiry.Manage');
+$ENABLE_VIEW    = has_permission('Trans_inquiry.View');
+$ENABLE_DELETE  = has_permission('Trans_inquiry.Delete');
+$tanggal = date('Y-m-d');
 ?>
 <form id="data-form" method="post">
-<input type="hidden" name='id_material' value='<?=$results['header'][0]->id_material;?>'>
-<input type="hidden" name='id_customer' value='<?=$results['header'][0]->id_customer;?>'>
+	<input type="hidden" name='id_material' value='<?= $results['header'][0]->id_material; ?>'>
+	<input type="hidden" name='id_customer' value='<?= $results['header'][0]->id_customer; ?>'>
 
-<input type="hidden" name='width' value='<?=$results['width'];?>'>
-<input type="hidden" name='id_dt_spkmarketing' value='<?=$results['header'][0]->id_dt_spkmarketing;?>'>
-<input type="hidden" id='order' name='order' value='<?=$results['header'][0]->qty_produk;?>'>
+	<input type="hidden" name='width' value='<?= $results['width']; ?>'>
+	<input type="hidden" name='id_dt_spkmarketing' value='<?= $results['header'][0]->id_dt_spkmarketing; ?>'>
+	<input type="hidden" id='order' name='order' value='<?= $results['header'][0]->qty_produk; ?>'>
 	<div class="box box-primary">
-		<div class="box-body">	
+		<div class="box-body">
 			<div class="col-sm-12">
 				<div class="form-group row">
 					<div class="col-md-2">
 						<label for="customer"><b>No SPK Marketing</b></label>
 					</div>
 					<div class="col-md-8" id='max_qty'>
-					<input type="text" name='no_surat' value='<?=$results['header'][0]->no_surat;?>' readonly>
+						<input type="text" name='no_surat' value='<?= $results['header'][0]->no_surat; ?>' readonly>
 					</div>
-						</div>
+				</div>
 			</div>
 			<div class="col-sm-12">
 				<div class="form-group row">
@@ -30,7 +30,7 @@
 						<label for="customer"><b>Alloy Number</b></label>
 					</div>
 					<div class="col-md-8">
-						<?= $results['header'][0]->no_alloy;?>
+						<?= $results['header'][0]->no_alloy; ?>
 					</div>
 				</div>
 			</div>
@@ -39,15 +39,15 @@
 					<div class="col-md-2">
 						<label for="customer"><b>Total SPK Marketing</b></label>
 					</div>
-					<div class="col-md-8" id='max_qty'><?= number_format($results['header'][0]->qty_produk);?>  Kg</div>
-						</div>
+					<div class="col-md-8" id='max_qty'><?= number_format($results['header'][0]->qty_produk); ?> Kg</div>
+				</div>
 			</div>
 			<div class="col-sm-12">
 				<div class="form-group row">
 					<div class="col-md-2">
 						<label for="customer"><b>Proses PO-PR</b></label>
 					</div>
-					<div class="col-md-8"><?= $results['get_po_pr'];?> Kg</div>
+					<div class="col-md-8"><?= $results['get_po_pr']; ?> Kg</div>
 				</div>
 			</div>
 			<div class="col-sm-12">
@@ -55,10 +55,10 @@
 					<div class="col-md-2">
 						<label for="width"><b>Width</b></label>
 					</div>
-					<div class="col-md-8"><?= number_format($results['header'][0]->width,2);?></div>
+					<div class="col-md-8"><?= number_format($results['header'][0]->width, 2); ?></div>
 				</div>
 			</div>
-			
+
 			<div class="col-sm-12">
 				<div class="form-group row">
 					<div class="col-md-2">
@@ -67,9 +67,9 @@
 					<div class="col-md-8"></div>
 				</div>
 			</div>
-			
+
 			<div class="col-sm-12">
-				<div class="form-group row" >
+				<div class="form-group row">
 					<table class='table table-bordered table-striped'>
 						<thead>
 							<tr>
@@ -85,21 +85,21 @@
 						</thead>
 						<tbody id="list_penawaran_slot">
 							<?php
-							if(!empty($results['stok'])){
-							$loop=0;
-							$SUM = 0;
-							$BOOK = 0;
-							$BALL = 0;
-							foreach($results['stok'] as $stok){
-								$loop++;
-								$SUM += $stok->totalweight - $stok->booking;
-								$BOOK += $stok->booking;
+							if (!empty($results['stok'])) {
+								$loop = 0;
+								$SUM = 0;
+								$BOOK = 0;
+								$BALL = 0;
+								foreach ($results['stok'] as $stok) {
+									$loop++;
+									$SUM += $stok->totalweight - $stok->booking;
+									$BOOK += $stok->booking;
 
-								$balance = $stok->totalweight - $stok->booking;
+									$balance = $stok->totalweight - $stok->booking;
 
-								$BALL += $balance;
+									$BALL += $balance;
 
-								echo "
+									echo "
 								<tr id='tabel_penawaran_$loop'>
 									<td>$stok->lotno</td>
 									<td align='right'>$stok->width</td>
@@ -107,65 +107,65 @@
 									<td align='right'>$stok->weight</td>
 									<td align='right'>$stok->totalweight</td>
 								</tr>";
-							};?>
-							<tr>
-								<td colspan='4'>TOTAL</td>
-								<td align='right'><?=number_format($SUM,2);?></td>
-							</tr>
-							<?php }else{ ?>
+								}; ?>
+								<tr>
+									<td colspan='4'>TOTAL</td>
+									<td align='right'><?= number_format($SUM, 2); ?></td>
+								</tr>
+							<?php } else { ?>
 								<tr>
 									<td colspan='5'>Data not found.</td>
 								</tr>
 							<?php } ?>
 						</tbody>
-						<?php if($results['viewx'] != 'onlyview'){ ?>
-						<thead>
-							<tr>
-								<th colspan='7'>FINISH GOOD</th>
-							</tr>
-							<tr class='bg-blue'>
-								<th>No Lot</th>
-								<th>Width</th>
-								<th>Qty</th>
-								<th>Berat Coil</th>
-								<th>Total Berat</th>
-								<th>Kirim</th>
-								<th>Booking</th>								
-								<th>Keterangan</th>
-								<th>Customer</th>
-							</tr>
-						</thead>
-						<tbody id="list_penawaran_slot">
-							<?php 
-							if(!empty($results['stok_fg'])){
-							$loop=0;
-							$SUM = 0;
-							foreach($results['stok_fg'] as $stok){
-								if($stok->totalweight - $stok->booking > 0){
-									$loop++;
-									$SUM += $stok->totalweight - $stok->booking;
-									echo "
+						<?php if ($results['viewx'] != 'onlyview') { ?>
+							<thead>
+								<tr>
+									<th colspan='7'>FINISH GOOD</th>
+								</tr>
+								<tr class='bg-blue'>
+									<th>No Lot</th>
+									<th>Width</th>
+									<th>Qty</th>
+									<th>Berat Coil</th>
+									<th>Total Berat</th>
+									<th>Kirim</th>
+									<th>Booking</th>
+									<th>Keterangan</th>
+									<th>Customer</th>
+								</tr>
+							</thead>
+							<tbody id="list_penawaran_slot">
+								<?php
+								if (!empty($results['stok_fg'])) {
+									$loop = 0;
+									$SUM = 0;
+									foreach ($results['stok_fg'] as $stok) {
+										if ($stok->totalweight - $stok->booking > 0) {
+											$loop++;
+											$SUM += $stok->totalweight - $stok->booking;
+											echo "
 									<tr id='tabel_penawaran_$loop'>
 										<td>$stok->lotno</td>
 										<td align='right'>$stok->width</td>
 										<td align='center'>$stok->qty</td>
 										<td align='right'>$stok->weight</td>
-										<td align='right' id='weight_$stok->id_stock'>".number_format($stok->totalweight - $stok->booking,2)."</td>";
-										echo "<td align='center'>";
-										
-										
-											echo "<input type='checkbox' class='chk_personal2' id='ch2_$loop' name='detail[$loop][id2]' value='".$stok->id_stock."'>";
-										
-										
-										echo "</td>";
-										echo "<td align='center'>";
-										
-										
-											echo "<input type='checkbox' class='chk_personal' id='ch_$loop' name='detail[$loop][id]' value='".$stok->id_stock."'>";
-										
-										echo "</td>";
-										
-										echo "
+										<td align='right' id='weight_$stok->id_stock'>" . number_format($stok->totalweight - $stok->booking, 2) . "</td>";
+											echo "<td align='center'>";
+
+
+											echo "<input type='checkbox' class='chk_personal2' id='ch2_$loop' name='detail[$loop][id2]' value='" . $stok->id_stock . "'>";
+
+
+											echo "</td>";
+											echo "<td align='center'>";
+
+
+											echo "<input type='checkbox' class='chk_personal' id='ch_$loop' name='detail[$loop][id]' value='" . $stok->id_stock . "'>";
+
+											echo "</td>";
+
+											echo "
 										<td>
 											<input type='text' class='form-control input-sm' name='detail[$loop][keterangan]'>
 											<input type='hidden' class='form-control' name='detail[$loop][id_stock]' value='$stok->id_stock'>
@@ -176,36 +176,36 @@
 										</td>
 										<td align='left'>$stok->customer</td>
 									</tr>";
-								}
-							};?>
-							<tr>
-								<td colspan='4'>TOTAL PAKAI FINISHGOOD</td>
-								<td align='right' id='total_check'></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td colspan='4'>TOTAL SPK MARKETING</td>
-								<td align='right' id='total_spk'></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<tr>
-								<td colspan='4'>TOTAL PAKAI RAW MATERIAL</td>
-								<td align='right' id='total_raw'></td>
-								<td></td>
-								<td></td>
-							</tr>
-							<?php }else{ ?>
-								<tr>
-									<td colspan='5'>Data not found.</td>
-									<td></td>
-									<td></td>
-								</tr>
-							<?php } ?>
-						</tbody>
+										}
+									}; ?>
+									<tr>
+										<td colspan='4'>TOTAL PAKAI FINISHGOOD</td>
+										<td align='right' id='total_check'></td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td colspan='4'>TOTAL SPK MARKETING</td>
+										<td align='right' id='total_spk'></td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td colspan='4'>TOTAL PAKAI RAW MATERIAL</td>
+										<td align='right' id='total_raw'></td>
+										<td></td>
+										<td></td>
+									</tr>
+								<?php } else { ?>
+									<tr>
+										<td colspan='5'>Data not found.</td>
+										<td></td>
+										<td></td>
+									</tr>
+								<?php } ?>
+							</tbody>
 						<?php } ?>
-						
+
 						<!--
 						<thead>
 							<tr>
@@ -221,22 +221,22 @@
 						</thead>
 						<tbody id="list_penawaran_slot">
 							<?php
-							if(!empty($results['stok_book'])){
-							$loop=0;
-							$SUM = 0;
-							$BOOK = 0;
-							$BALL = 0;
-							foreach($results['stok_book'] as $stok){
-								if($stok->booking >0){
-									$loop++;
-									$SUM += $stok->totalweight - $stok->booking;
-									$BOOK += $stok->booking;
+							if (!empty($results['stok_book'])) {
+								$loop = 0;
+								$SUM = 0;
+								$BOOK = 0;
+								$BALL = 0;
+								foreach ($results['stok_book'] as $stok) {
+									if ($stok->booking > 0) {
+										$loop++;
+										$SUM += $stok->totalweight - $stok->booking;
+										$BOOK += $stok->booking;
 
-									$balance = $stok->totalweight - $stok->booking;
+										$balance = $stok->totalweight - $stok->booking;
 
-									$BALL += $balance;
+										$BALL += $balance;
 
-									echo "
+										echo "
 									<tr id='tabel_penawaran_$loop'>
 										<td>$stok->lotno</td>
 										<td align='right'>$stok->width</td>
@@ -244,13 +244,13 @@
 										<td align='right'>$stok->weight</td>
 										<td align='right'>$stok->booking</td>
 									</tr>";
-								}
-							};?>
+									}
+								}; ?>
 							<tr>
 								<td colspan='4'>TOTAL</td>
-								<td align='right'><?=number_format($BOOK,2);?></td>
+								<td align='right'><?= number_format($BOOK, 2); ?></td>
 							</tr>
-							<?php }else{ ?>
+							<?php } else { ?>
 								<tr>
 									<td colspan='5'>Data not found.</td>
 								</tr>
@@ -258,36 +258,36 @@
 						</tbody>-->
 
 					</table>
-					<?php if($results['viewx'] != 'onlyview'){ ?>
-					<button type='button' class='btn btn-md btn-primary' id='save_fg'>Save</button>
+					<?php if ($results['viewx'] != 'onlyview') { ?>
+						<button type='button' class='btn btn-md btn-primary' id='save_fg'>Save</button>
 					<?php } ?>
 				</div>
 			</div>
 		</div>
-	</div>	
-</form>	
-				  
-				  
-				  
-<script type="text/javascript">
-	var base_url			= '<?php echo base_url(); ?>';
-	var active_controller	= '<?php echo($this->uri->segment(1)); ?>';
-	$(document).ready(function(){	
-		var max_fields2      = 10; //maximum input boxes allowed
-		var wrapper2         = $(".input_fields_wrap2"); //Fields wrapper
-		var add_button2      = $(".add_field_button2"); //Add button ID		
+	</div>
+</form>
 
-		$('#save_fg').click(function(e){
+
+
+<script type="text/javascript">
+	var base_url = '<?php echo base_url(); ?>';
+	var active_controller = '<?php echo ($this->uri->segment(1)); ?>';
+	$(document).ready(function() {
+		var max_fields2 = 10; //maximum input boxes allowed
+		var wrapper2 = $(".input_fields_wrap2"); //Fields wrapper
+		var add_button2 = $(".add_field_button2"); //Add button ID		
+
+		$('#save_fg').click(function(e) {
 			e.preventDefault();
-			if($('.chk_personal:checked').length == 0 && $('.chk_personal2:checked').length == 0){
+			if ($('.chk_personal:checked').length == 0 && $('.chk_personal2:checked').length == 0) {
 				swal({
-					title	: "Error Message!",
-					text	: 'Checklist minimal satu ...',
-					type	: "warning"
+					title: "Error Message!",
+					text: 'Checklist minimal satu ...',
+					type: "warning"
 				});
 				return false;
 			}
-			
+
 			var data, xhr;
 			swal({
 					title: "Are you sure?",
@@ -303,110 +303,107 @@
 				function(isConfirm) {
 					if (isConfirm) {
 						var formData = new FormData($('#data-form')[0]);
-						var baseurl = siteurl + active_controller+'/SaveEditHeaderNew';
+						var baseurl = siteurl + active_controller + '/SaveEditHeaderNew';
 						$.ajax({
-							url			: baseurl,
-							type		: "POST",
-							data		: formData,
-							cache		: false,
-							dataType	: 'json',
-							processData	: false, 
-							contentType	: false,				
-							success		: function(data){								
-								if(data.status == 1){											
+							url: baseurl,
+							type: "POST",
+							data: formData,
+							cache: false,
+							dataType: 'json',
+							processData: false,
+							contentType: false,
+							success: function(data) {
+								if (data.status == 1) {
 									swal({
-											title	: "Save Success!",
-											text	: data.pesan,
-											type	: "success",
-											timer	: 7000,
-											showCancelButton	: false,
-											showConfirmButton	: false,
-											allowOutsideClick	: false
-										});
+										title: "Save Success!",
+										text: data.pesan,
+										type: "success",
+										timer: 7000,
+										showCancelButton: false,
+										showConfirmButton: false,
+										allowOutsideClick: false
+									});
 									window.location.href = base_url + active_controller;
-								}
-								else{
+								} else {
 									swal({
-										title	: "Save Failed!",
-										text	: data.pesan,
-										type	: "warning",
-										timer	: 7000,
-										showCancelButton	: false,
-										showConfirmButton	: false,
-										allowOutsideClick	: false
+										title: "Save Failed!",
+										text: data.pesan,
+										type: "warning",
+										timer: 7000,
+										showCancelButton: false,
+										showConfirmButton: false,
+										allowOutsideClick: false
 									});
 								}
 							},
 							error: function() {
-								
+
 								swal({
-									title				: "Error Message !",
-									text				: 'An Error Occured During Process. Please try again..',						
-									type				: "warning",								  
-									timer				: 7000,
-									showCancelButton	: false,
-									showConfirmButton	: false,
-									allowOutsideClick	: false
+									title: "Error Message !",
+									text: 'An Error Occured During Process. Please try again..',
+									type: "warning",
+									timer: 7000,
+									showCancelButton: false,
+									showConfirmButton: false,
+									allowOutsideClick: false
 								});
 							}
 						});
 					} else {
-					swal("Cancelled", "Data can be process again :)", "error");
-					return false;
+						swal("Cancelled", "Data can be process again :)", "error");
+						return false;
 					}
-			});
+				});
 		});
-		
-		$(document).on('click','.chk_personal2', function(){
+
+		$(document).on('click', '.chk_personal2', function() {
 			if ($(this).is(':checked')) {
 				changeChecked();
-			}
-			else{
+			} else {
 				changeChecked();
 			}
 		});
 
-		$(document).on('click','.chk_personal', function(){
+		$(document).on('click', '.chk_personal', function() {
 			if ($(this).is(':checked')) {
 				changeChecked();
-			}
-			else{
+			} else {
 				changeChecked();
 			}
 		});
 	});
 
-	function changeChecked(){
+	function changeChecked() {
 		let max_qty = getNum($('#order').val().split(",").join(""));
 		let SUM = 0;
 		let SUM2 = 0;
 		let SUMTOTAL = 0;
 		let TOTALRAW = 0;
-		
-		$(".chk_personal" ).each(function() {
+
+		$(".chk_personal").each(function() {
 			if ($(this).is(':checked')) {
-				let id 		= $(this).val();
-				SUM 		+= Number($('#weight_'+id).html().split(",").join(""));
+				let id = $(this).val();
+				SUM += Number($('#weight_' + id).html().split(",").join(""));
 			}
 		});
-		
-		
-		$(".chk_personal2" ).each(function() {
+
+
+		$(".chk_personal2").each(function() {
 			if ($(this).is(':checked')) {
-				let id 		= $(this).val();
-				SUM2 		+= Number($('#weight_'+id).html().split(",").join(""));
+				let id = $(this).val();
+				SUM2 += Number($('#weight_' + id).html().split(",").join(""));
 			}
 		});
-		
-		SUMTOTAL   = Number(SUM) + Number(SUM2);
-		TOTALRAW   = Number(max_qty) - Number(SUMTOTAL);
-		
-		$('#total_check').html(number_format(SUMTOTAL,2));
-		$('#total_spk').html(number_format(max_qty,2));
-		$('#total_raw').html(number_format(TOTALRAW,2));
+
+		SUMTOTAL = Number(SUM) + Number(SUM2);
+		TOTALRAW = Number(max_qty) - Number(SUMTOTAL);
+
+		$('#total_check').html(number_format(SUMTOTAL, 2));
+		$('#total_spk').html(number_format(max_qty, 2));
+		$('#total_raw').html(number_format(TOTALRAW, 2));
 	}
 
-	function number_format (number, decimals, dec_point, thousands_sep) {
+	function number_format(number, decimals, dec_point, thousands_sep) {
 		// Strip all characters but numerical ones.
 		number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
 		var n = !isFinite(+number) ? 0 : +number,
@@ -414,7 +411,7 @@
 			sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
 			dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
 			s = '',
-			toFixedFix = function (n, prec) {
+			toFixedFix = function(n, prec) {
 				var k = Math.pow(10, prec);
 				return '' + Math.round(n * k) / k;
 			};
