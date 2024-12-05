@@ -159,7 +159,7 @@ if ($type == 'po_material') {
 
 
 
-								$gTotal += ($data_req_payment['jumlah'] + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']); ?>
+								$gTotal += ($dtl->expense + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']); ?>
 								<tr>
 									<td><?= $n; ?></td>
 									<td><?= $dtl->coa . ' - ' . $nm_coa; ?></td>
@@ -173,7 +173,7 @@ if ($type == 'po_material') {
 												<td>Nilai Pengajuan</td>
 												<td class="text-center" style="min-width: 50px;">:</td>
 												<td class="text-right">
-													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($data_req_payment['jumlah'], 2) ?>" readonly>
+													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($dtl->expense, 2) ?>" readonly>
 												</td>
 											</tr>
 											<tr>
@@ -194,7 +194,7 @@ if ($type == 'po_material') {
 												<td>Net Payment</td>
 												<td class="text-center" style="min-width: 50px;">:</td>
 												<td class="text-right">
-													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format(($data_req_payment['jumlah'] + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']), 2) ?>" readonly>
+													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format(($dtl->expense + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']), 2) ?>" readonly>
 												</td>
 											</tr>
 										</table>
