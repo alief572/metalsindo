@@ -539,9 +539,6 @@ class Delivery_order extends Admin_Controller
 		$id_customer 	= $dt1[0]->id_customer;
 
 		$nomor			= $this->db->query("SELECT * FROM tr_spk_marketing WHERE id_spkmarketing = '$no_penawaran' ")->row();
-
-
-
 		$dtl				= $this->db->get_where('view_dt_spkmarketing', array('id_spkmarketing' => $no_penawaran, 'deal' => 1, 'id_child_penawaran <>' => NULL))->result();
 
 		$dt             = $this->db->query("SELECT * FROM view_dt_spkmarketing WHERE id_spkmarketing = '$no_penawaran' AND deal=1 AND id_child_penawaran IS NOT NULL AND status_do='OPN'")->result();
@@ -553,7 +550,7 @@ class Delivery_order extends Admin_Controller
 		foreach ($dt as $dt) {
 			$loop++;
 			$id_category3	= $dt->id_material;
-			$lot			= $this->db->query("SELECT * FROM stock_material WHERE id_gudang = '3' AND id_category3='$id_category3' AND width = $dt->width AND no_surat like '%%$nomor->no_surat%%' AND status_do='OPN' ")->result();
+			$lot			= $this->db->query("SELECT * FROM stock_material WHERE id_gudang = '3' AND id_category3='$id_category3' AND width = $dt->width AND length = $dt->length AND no_surat like '%%$nomor->no_surat%%' AND status_do='OPN' ")->result();
 
 			$totqty = 0;
 			$totbrt = 0;
