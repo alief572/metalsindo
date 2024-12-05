@@ -1455,6 +1455,7 @@ class Purchase_order_non_material extends Admin_Controller
 				'note' => $post['note'],
 				'delivery_date' => $post['delivery_date'],
 				'id_dept' => implode(',', $post['dept']),
+				'receiving_person' => $post['receiving_person'],
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
 				'tipe'		=> 'pr depart'
@@ -1721,7 +1722,8 @@ class Purchase_order_non_material extends Admin_Controller
 			'nilai_disc'	=> str_replace(',', '', $post['totaldisc']),
 			'id_dept' => implode(',', $post['dept']),
 			'delivery_date' => $post['delivery_date'],
-			'note' => $post['note']
+			'note' => $post['note'],
+			'receiving_person' => $post['receiving_person']
 		];
 		//Add Data
 		$this->db->update('tr_purchase_order_non_material', $data, ['no_po' => $post['no_po']]);

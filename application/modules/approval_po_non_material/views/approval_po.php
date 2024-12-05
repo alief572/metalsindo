@@ -146,6 +146,16 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 									</div>
 								</div>
 							</div>
+							<div class="col-sm-6">
+								<div class="form-group row">
+									<div class="col-md-4">
+										<label for="id_customer">PIC</label>
+									</div>
+									<div class="col-md-8">
+										<input type="text" name="" id="" class="form-control input-md" value="<?= $results['header_po']->receiving_person ?>" readonly>
+									</div>
+								</div>
+							</div>
 							<div class="col-sm-6" hidden>
 								<div class="form-group row">
 									<div class="col-md-4">

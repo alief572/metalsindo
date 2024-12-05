@@ -29,6 +29,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 											<?php } ?>
 										</select>
 									</div>
+									
 								</div>
 							</div> -->
 							<div class="col-sm-6">
@@ -141,6 +142,16 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 												<option value="<?= $supplier->id_suplier ?>" <?= $selected; ?>><?= strtoupper(strtolower($supplier->name_suplier)) ?></option>
 											<?php } ?>
 										</select>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group row">
+									<div class="col-md-4">
+										<label for="">PIC</label>
+									</div>
+									<div class="col-md-8">
+										<input type="text" name="receiving_person" id="" class="form-control input-md">
 									</div>
 								</div>
 							</div>
