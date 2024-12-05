@@ -194,7 +194,8 @@
                 </td>
                 <td style='width: 50%; text-align:right; vertical-align:top;'>
                     <p>
-                        PO No : <?= $header->no_surat ?>
+                        PO. No : <?= $header->no_surat ?> <br><br>
+                        PR. No : <?= (isset($no_pr)) ? implode(',', $no_pr) : '' ?>
                     </p>
                 </td>
             </tr>
@@ -250,11 +251,11 @@
     <table class='gridtable' cellpadding='0' cellspacing='0' style='vertical-align:top;'>
         <tbody>
             <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
-                <td align="center" width='180'>Material</td>
+                <td align="center" width='150'>Material</td>
                 <td align="center" width='30'>Width</td>
                 <td align="center" width='30'>Length</td>
-                <td align="center" width='50'>Total Weight</td>
-                <td align="center" width='50'>Unit Price<?= $matauang; ?></td>
+                <td align="center" width='40'>Total Weight</td>
+                <td align="center" width='30'>Unit Price<?= $matauang; ?></td>
                 <td align="center" width='80'>Amount<?= $matauang; ?><br><?= $header->cif; ?></td>
                 <td align="center" width='130'>Remarks</td>
             </tr>
@@ -272,11 +273,11 @@
                 if ($jumlahdata <= '30') {
                     echo "	
                     <tr >
-                        <td width='180'>" . $detail->nama . "</td>
+                        <td width='150'>" . $detail->nama . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
 						<td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($detail->totalwidth, 2) . "</td>
-                        <td width='50' align='right'>" . $HS . "</td>
+                        <td width='40' align='right'>" . number_format($detail->totalwidth, 2) . "</td>
+                        <td width='30' align='right'>" . $HS . "</td>
                         <td width='80' align='right'>" . $JH . "</td>
                         <td width='130'>" . $detail->description . "</td>
                     </tr>";
@@ -284,11 +285,11 @@
                 } else {
                     echo "	
                     <tr >
-                        <td width='180'>" . $detail->namamaterial . "</td>
+                        <td width='150'>" . $detail->namamaterial . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
 						<td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($detail->totalwidth, 2) . "</td>
-                        <td width='50' align='right'>" . $HS . "</td>
+                        <td width='40' align='right'>" . number_format($detail->totalwidth, 2) . "</td>
+                        <td width='30' align='right'>" . $HS . "</td>
                         <td width='80' align='right'>" . $JH . "</td>
                         <td width='130'>" . $detail->description . "</td>
                     </tr>";
@@ -334,16 +335,22 @@
                     };
                     ?>
                 </td>
-                <td colspan=3' align="center" width='50'>Eta Date</td>
+                <td colspan=3' align="center" width='40'>Eta Date</td>
             </tr>
             <tr style='vertical-align:middle;'>
                 <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->tanggal)) ?></td>
                 <td colspan='3' align="center">PT Metalsindo Pacific<br>Cikarang, Indonesia</td>
-                <td colspan='2' rowspan='2' align="center"><?= date('d-M-Y', strtotime($header->expect_tanggal)) ?></td>
+                <td colspan='2' align="center"><?= date('d-M-Y', strtotime($header->expect_tanggal)) ?></td>
             </tr>
             <tr style='vertical-align:middle;'>
-                <td colspan='3' align="center" width='50'>Payment Term</td>
-                <td colspan='3' align="center" width='50'><?= $header->term ?></td>
+                <td align="center" colspan="3">Date Required :</td>
+                <td align="center" colspan="3">Terms :</td>
+                <td align="center">Delivery Date :</td>
+            </tr>
+            <tr style='vertical-align:middle;'>
+                <td align="center" colspan="3"><?= date('d-M-Y', strtotime($date_required)) ?></td>
+                <td align="center" colspan="3"><?= $header->term ?></td>
+                <td align="center"><?= date('d-M-Y', strtotime($header->delivery_date)) ?></td>
             </tr>
         </tbody>
     </table>
@@ -356,22 +363,30 @@
         </tr>
     </table>
     <br>
-    <table class='gridtableX2' width='100%' cellpadding='0' cellspacing='0' border='0' align='right'>
+    <table class='gridtableX2' width='100%' cellpadding='0' cellspacing='0' border='0' align='left'>
         <tr>
+            <td width="15"></td>
+            <td align='center' width="80">Received</td>
+            <td width='400'></td>
             <td align='center'>Approved</td>
-            <td width='50'></td>
         </tr>
         <tr>
+            <td width="15"></td>
             <td height='50' align='center'></td>
             <td></td>
+            <td></td>
         </tr>
         <tr>
+            <td width="15"></td>
+            <td><?= ($header->receiving_person !== '' && $header->receiving_person !== null) ? '(' . strtoupper($header->receiving_person) . ')' : '' ?></td>
+            <td></td>
             <td align='center'><u>HARRY WIDJAJA</u></td>
-            <td></td>
         </tr>
         <tr>
-            <td align='center'>President Director</td>
+            <td width="15"></td>
             <td></td>
+            <td></td>
+            <td align='center'>President Director</td>
         </tr>
     </table>
 
