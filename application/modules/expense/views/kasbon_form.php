@@ -423,6 +423,7 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 					$('.list_barang_pr').html(result.hasil);
 					$('#tipe_pr').val(result.tipe_pr);
 					$('.autonum').autoNumeric();
+					hitung_total_pr();
 				} else {
 					swal({
 						title: 'Error !',
@@ -465,6 +466,8 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 		var total = parseFloat(nilai * qty);
 
 		$('.grand_total_' + no).autoNumeric('set', total);
+
+		hitung_total_pr();
 	})
 
 	$(function() {
@@ -604,5 +607,23 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 					});
 
 			});
+	}
+
+	function hitung_total_pr() {
+		var total_pr = 0;
+
+		$('.grand_total').each(function() {
+			var nilai = $(this).val();
+			if(nilai !== '') {
+				nilai = nilai.split(',').join('');
+				nilai = parseFloat(nilai);
+			} else {
+				nilai = 0;
+			}
+
+			total_pr += nilai;
+		});
+
+		$('#jumlah_kasbon').val(total_pr);
 	}
 </script>
