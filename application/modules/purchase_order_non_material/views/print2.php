@@ -328,7 +328,8 @@
                     </td>
                     <td style='width: 50%; text-align:right; vertical-align:top;'>
                         <p style="font-size: 10px;">
-                            PO No : <?= $header->no_surat ?>
+                            PO No : <?= $header->no_surat ?> <br><br>
+                            PR No : <?= $no_pr ?>
                         </p>
                     </td>
                 </tr>
@@ -550,24 +551,32 @@
 
         <br>
 
-        <table class='gridtableX2' width='100%' cellpadding='0' cellspacing='0' border='0' align='right'>
-            <tr>
-                <td align='center'>Approved</td>
-                <td width='50'></td>
-            </tr>
-            <tr>
-                <td height='50' align='center'></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td align='center'><u>HARRY WIDJAJA</u></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td align='center'>President Director</td>
-                <td></td>
-            </tr>
-        </table>
+        <table class='gridtableX2' width='100%' cellpadding='0' cellspacing='0' border='0' align='left'>
+        <tr>
+            <td width="15"></td>
+            <td align='center' width="80">Received</td>
+            <td width='400'></td>
+            <td align='center'>Approved</td>
+        </tr>
+        <tr>
+            <td width="15"></td>
+            <td height='50' align='center'></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td width="15"></td>
+            <td><?= ($header->receiving_person !== '' && $header->receiving_person !== null) ? '(' . strtoupper($header->receiving_person) . ')' : '' ?></td>
+            <td></td>
+            <td align='center'><u>HARRY WIDJAJA</u></td>
+        </tr>
+        <tr>
+            <td width="15"></td>
+            <td></td>
+            <td></td>
+            <td align='center'>President Director</td>
+        </tr>
+    </table>
 
     </body>
 

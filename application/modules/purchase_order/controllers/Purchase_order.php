@@ -1214,6 +1214,8 @@ class Purchase_order extends Admin_Controller
 			'taxtotal'			=> str_replace(',', '', $post['taxtotal']),
 			'subtotal'			=> str_replace(',', '', $post['subtotal']),
 			'status'			=> '1',
+			'delivery_date'		=> $post['delivery_date'],
+			'receiving_person'	=> $post['receiving_person'],
 			'created_on'		=> date('Y-m-d H:i:s'),
 			'created_by'		=> $this->auth->user_id(),
 			'tahun'					=> date('Y-m-d')
@@ -1290,6 +1292,8 @@ class Purchase_order extends Admin_Controller
 			'taxtotal'			=> str_replace(',', '', $post['taxtotal']),
 			'subtotal'			=> str_replace(',', '', $post['subtotal']),
 			'status'			=> '1',
+			'delivery_date'		=> $post['delivery_date'],
+			'receiving_person'	=> $post['receiving_person'],
 			'created_on'		=> date('Y-m-d H:i:s'),
 			'created_by'		=> $this->auth->user_id()
 		];
@@ -1371,6 +1375,26 @@ class Purchase_order extends Admin_Controller
 		INNER JOIN ms_inventory_category3 b ON b.id_category3 = a.idmaterial 
 		WHERE a.no_po = '" . $id . "' ")->result();
 		$data['detailsum'] = $this->db->query("SELECT AVG(width) as totalwidth, AVG(qty) as totalqty FROM dt_trans_po WHERE no_po = '" . $id . "' ")->result();
+
+		$no_pr = [];
+
+		$this->db->select('c.no_surat, c.tanggal');
+		$this->db->from('dt_trans_po a');
+		$this->db->join('dt_trans_pr b', 'b.id_dt_pr = a.idpr', 'left');
+		$this->db->join('tr_purchase_request c', 'c.no_pr = b.no_pr', 'left');
+		$this->db->where('a.no_po', $id);
+		$this->db->group_by('c.no_surat');
+		$get_no_pr = $this->db->get()->result();
+
+		foreach($get_no_pr as $item) {
+			$no_pr[] = $item->no_surat;
+		}
+
+		$data['no_pr'] = $no_pr;
+		$data['date_required'] = $get_no_pr[0]->tanggal;
+
+		
+
 		$this->load->view('print2', $data);
 		$html = ob_get_contents();
 
