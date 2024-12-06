@@ -2257,33 +2257,12 @@ class Expense extends Admin_Controller
 
 		$tipe_pr = '';
 
-		// print_r(count($get_detail_pr_stok_material));
-		// print_r(count($get_detail_pr_departemen));
-		// exit;
 		$valid = 1;
 		$hasil = '';
 		if (count($get_detail_pr_stok_material) < 1 && count($get_detail_pr_departemen) < 1) {
 			$valid = 0;
 		} else {
 			$no = 1;
-			// if (count($get_detail_pr_stok_material) > 0) {
-			// 	foreach ($get_detail_pr_stok_material as $detail_pr) :
-			// 		if ($tipe_pr == '') {
-			// 			$tipe_pr = $detail_pr['tipe_pr'];
-			// 		}
-
-			// 		$hasil .= '<tr class="detail_pr_' . $detail_pr['id'] . '">';
-			// 		$hasil .= '<td class="text-center">' . $no . '</td>';
-			// 		$hasil .= '<td class="text-center">' . $detail_pr['material_name'] . '</td>';
-			// 		$hasil .= '<td class="text-center">' . number_format($detail_pr['qty']) . ' <input type="hidden" class="qty_' . $detail_pr['id'] . '" value="' . $detail_pr['qty'] . '"></td>';
-			// 		$hasil .= '<td class="text-center">' . $detail_pr['unit'] . '</td>';
-			// 		$hasil .= '<td class="text-center"><input type="text" name="price_input_' . $detail_pr['id'] . '" class="form-control form-control-sm text-right price_input price_input_' . $detail_pr['id'] . ' autonum" data-no="' . $detail_pr['id'] . '"></td>';
-			// 		$hasil .= '<td class="text-center"><input type="text" name="grand_total_' . $detail_pr['id'] . '" class="form-control form-control-sm text-right grand_total_' . $detail_pr['id'] . ' autonum"></td>';
-			// 		$hasil .= '<td class="text-center"><button type="button" class="btn btn-sm btn-danger del_detail" data-no="' . $detail_pr['id'] . '"><i class="fa fa-trash"></i></button></td>';
-			// 		$hasil .= '</tr>';
-			// 		$no++;
-			// 	endforeach;
-			// }
 
 			if (count($get_detail_pr_departemen) > 0) {
 				foreach ($get_detail_pr_departemen as $detail_pr) :
@@ -2297,7 +2276,7 @@ class Expense extends Admin_Controller
 					$hasil .= '<td class="text-center">' . number_format($detail_pr['qty']) . ' <input type="hidden" class="qty_' . $detail_pr['id'] . '" value="' . $detail_pr['qty'] . '"></td>';
 					$hasil .= '<td class="text-center">' . $detail_pr['unit'] . '</td>';
 					$hasil .= '<td class="text-center"><input type="text" name="price_input_' . $detail_pr['id'] . '" class="form-control form-control-sm text-right price_input price_input_' . $detail_pr['id'] . ' autonum" data-no="' . $detail_pr['id'] . '" value="' . $detail_pr['price'] . '"></td>';
-					$hasil .= '<td class="text-center"><input type="text" name="grand_total_' . $detail_pr['id'] . '" class="form-control form-control-sm text-right grand_total_' . $detail_pr['id'] . ' autonum" value="' . $detail_pr['total_price'] . '"></td>';
+					$hasil .= '<td class="text-center"><input type="text" name="grand_total_' . $detail_pr['id'] . '" class="form-control form-control-sm text-right grand_total grand_total_' . $detail_pr['id'] . ' autonum" value="' . $detail_pr['total_price'] . '"></td>';
 					$hasil .= '<td class="text-center"><button type="button" class="btn btn-sm btn-danger del_detail" data-no="' . $detail_pr['id'] . '"><i class="fa fa-trash"></i></button></td>';
 					$hasil .= '</tr>';
 					$no++;
