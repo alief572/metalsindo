@@ -71,7 +71,7 @@ class Request_payment extends Admin_Controller
 			];
 		}
 
-		$data_bank = $this->db->select('no_perkiraan, nama')->fron(DBACC.'.coa_master')->result();
+		$data_bank = $this->db->select('no_perkiraan, nama')->fron(DBACC . '.coa_master')->result();
 		$this->template->set('data', $data);
 		$this->template->set('data_bank', $data_bank);
 		$this->template->set('list_tgl_pengajuan_pembayaran', $list_tgl_pengajuan_pembayaran);
@@ -187,7 +187,7 @@ class Request_payment extends Admin_Controller
 		$this->db->select('a.id_rec_inv_ap, a.no_invoice');
 		$this->db->from('tr_receive_invoice_ap_header a');
 		$get_invoice_ap = $this->db->get()->result();
-		foreach($get_invoice_ap as $item) {
+		foreach ($get_invoice_ap as $item) {
 			$list_no_invoice[$item->id_rec_inv_ap] = $item->no_invoice;
 		}
 
@@ -213,7 +213,7 @@ class Request_payment extends Admin_Controller
 		$this->db->select('a.id_rec_inv_ap, a.no_invoice');
 		$this->db->from('tr_receive_invoice_ap_header a');
 		$get_invoice_ap = $this->db->get()->result();
-		foreach($get_invoice_ap as $item) {
+		foreach ($get_invoice_ap as $item) {
 			$list_no_invoice[$item->id_rec_inv_ap] = $item->no_invoice;
 		}
 
@@ -279,7 +279,7 @@ class Request_payment extends Admin_Controller
 
 		// PO Material
 
-		if(isset($type) && $type == 'po_material') {
+		if (isset($type) && $type == 'po_material') {
 			$data = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $id])->row();
 			$data_detail = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $id])->result();
 		}
@@ -363,7 +363,7 @@ class Request_payment extends Admin_Controller
 
 		// PO Material
 
-		if(isset($type) && $type == 'po_material') {
+		if (isset($type) && $type == 'po_material') {
 			$data = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $id])->row();
 			$data_detail = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $id])->result();
 		}
@@ -639,7 +639,7 @@ class Request_payment extends Admin_Controller
 				$Harga[] 		= $dtl->nilai;
 			}
 
-			if($Data['tipe'] == 'po_material') {
+			if ($Data['tipe'] == 'po_material') {
 				$dtl 				= $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $detail['id']])->row();
 
 				$nilai = 0;
@@ -648,7 +648,7 @@ class Request_payment extends Admin_Controller
 				$this->db->where('a.id_rec_inv_ap', $detail['id']);
 				$get_nilai_inv = $this->db->get()->result();
 
-				foreach($get_nilai_inv as $item) {
+				foreach ($get_nilai_inv as $item) {
 					$nilai += $item->nilai;
 				}
 
@@ -826,7 +826,7 @@ class Request_payment extends Admin_Controller
 				// }
 			}
 
-			if($Data['tipe'] == 'po_material') {
+			if ($Data['tipe'] == 'po_material') {
 				$this->db->insert_batch('payment_approve_details', $ArrDetail);
 				$this->db->update_batch('tr_receive_invoice_ap_header', $updateDetail, 'id_rec_inv_ap');
 
@@ -840,7 +840,7 @@ class Request_payment extends Admin_Controller
 				// 	$this->db->update('request_payment', ['status' => '2'], ['id' => $data_request_payment['id']]);
 				// }
 				$update_request_payment = $this->db->update('request_payment', ['status' => '2'], ['no_doc' => $get_nonpo['id_rec_inv_ap'], 'ids' => $get_nonpo['id_rec_inv_ap']]);
-				if(!$update_request_payment){
+				if (!$update_request_payment) {
 					print_r($this->db->error()['message']);
 					exit;
 				}
@@ -1919,7 +1919,7 @@ class Request_payment extends Admin_Controller
 				$valid = 1;
 			}
 
-			if($tab == 'po_material') {
+			if ($tab == 'po_material') {
 				$valid = 1;
 
 				$this->db->select('a.nm_suplier');
@@ -1976,7 +1976,7 @@ class Request_payment extends Admin_Controller
 				}
 
 				$tgl_bayar = '';
-				if($record->tipe == 'po_material') {
+				if ($record->tipe == 'po_material') {
 					$tgl_bayar = date('Y-m-d', strtotime($record->tgl_bayar));
 				}
 
@@ -2062,7 +2062,7 @@ class Request_payment extends Admin_Controller
 						<td>Tanggal Rencana Pembayaran</td>
 						<td>:</td>
 						<td>
-							<input type="date" class="form-control" id="tanggal_' . $numb . '" name="tanggal_' . $numb . '" value="'.$tgl_bayar.'" placeholder="Tanggal">
+							<input type="date" class="form-control" id="tanggal_' . $numb . '" name="tanggal_' . $numb . '" value="' . $tgl_bayar . '" placeholder="Tanggal">
 						</td>
 					</tr>
 					<tr>
