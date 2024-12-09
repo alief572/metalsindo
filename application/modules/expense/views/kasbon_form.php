@@ -187,7 +187,7 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 										echo '<td class="text-center">' . number_format($detail_pr['qty']) . ' <input type="hidden" class="qty_' . $detail_pr['id_detail'] . '" value="' . $detail_pr['qty'] . '"></td>';
 										echo '<td class="text-center">' . $detail_pr['satuan'] . '</td>';
 										echo '<td class="text-center"><input type="text" name="price_input_' . $detail_pr['id_detail'] . '" class="form-control form-control-sm text-right price_input price_input_' . $detail_pr['id_detail'] . ' autonum" data-no="' . $detail_pr['id_detail'] . '" value="' . $detail_pr['harga'] . '" ' . $readonly . '></td>';
-										echo '<td class="text-center"><input type="text" name="grand_total_' . $detail_pr['id_detail'] . '" class="form-control form-control-sm text-right grand_total_' . $detail_pr['id_detail'] . ' autonum" value="' . $detail_pr['total_harga'] . '" ' . $readonly . '></td>';
+										echo '<td class="text-center"><input type="text" name="grand_total_' . $detail_pr['id_detail'] . '" class="form-control form-control-sm text-right grand_total grand_total_' . $detail_pr['id_detail'] . ' autonum" value="' . $detail_pr['total_harga'] . '" ' . $readonly . '></td>';
 										echo '<td class="text-center">';
 										if (($mod == '_fin' || $mod == '_mgt')) {
 										} else {

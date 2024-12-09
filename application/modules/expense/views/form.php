@@ -7,6 +7,10 @@ $app = '';
 $bank_id = '';
 $accnumber = '';
 $accname = '';
+
+$nilai_ppn = (isset($data)) ? $data->nilai_ppn : 0;
+$nilai_pph = (isset($data)) ? $data->nilai_pph : 0;
+
 if (!isset($data->departement)) {
 	$data_user = $this->db->get_where('users', ['id_user' => $this->auth->user_id()])->row();
 	$data_employee = $this->db->get_where('employee', ['id' => $data_user->employee_id])->row();
@@ -202,13 +206,27 @@ if (!isset($data->departement)) {
 						</tbody>
 						<tfoot>
 							<tr>
+								<td colspan="5" class="text-right">PPN</td>
+								<td>
+									<input type="text" name="nilai_ppn" id="" class="form-control form-control-sm text-right divide nilai_ppn" onchange="cektotal()" value="<?= $nilai_ppn ?>">
+								</td>
+								<td colspan="2"></td>
+							</tr>
+							<tr>
+								<td colspan="5" class="text-right">PPH</td>
+								<td>
+									<input type="text" name="nilai_pph" id="" class="form-control form-control-sm text-right divide nilai_pph" onchange="cektotal()" value="<?= $nilai_pph ?>">
+								</td>
+								<td colspan="2"></td>
+							</tr>
+							<tr>
 								<td colspan="5" align=right>TOTAL</td>
-								<td><input type="text" class="form-control divide input-sm" id="total_expense" name="total_expense" value="<?= $total_expense ?>" placeholder="Total Expense" tabindex="-1" readonly style='width:100px;'></td>
-								<td><input type="text" class="form-control divide input-sm" id="total_kasbon" name="total_kasbon" value="<?= $total_kasbon ?>" placeholder="Total Kasbon" tabindex="-1" readonly style='width:100px;'></td>
+								<td><input type="text" class="form-control text-right divide input-sm" id="total_expense" name="total_expense" value="<?= $total_expense ?>" placeholder="Total Expense" tabindex="-1" readonly style='width:100px;'></td>
+								<td><input type="text" class="form-control text-right divide input-sm" id="total_kasbon" name="total_kasbon" value="<?= $total_kasbon ?>" placeholder="Total Kasbon" tabindex="-1" readonly style='width:100px;'></td>
 								<td align=right colspan=2>
 									<div class="row">
 										<div class="col-md-2">Saldo</div>
-										<div class="col-md-10"><input type="text" class="form-control divide input-sm" id="grand_total" name="grand_total" value="<?= $grand_total ?>" placeholder="Grand Total" tabindex="-1" readonly></div>
+										<div class="col-md-10"><input type="text" class="form-control text-right divide input-sm" id="grand_total" name="grand_total" value="<?= $grand_total ?>" placeholder="Grand Total" tabindex="-1" readonly></div>
 									</div>
 								</td>
 							</tr>
@@ -429,15 +447,36 @@ if (!isset($data->departement)) {
 			});
 		});
 
-		function cektotal(id) {
-			var sqty = $("#qty_" + id).val();
-			var pref = $("#harga_" + id).val();
-			var subtotal = (parseFloat(sqty) * parseFloat(pref));
-			$("#expense_" + id).val(subtotal);
+		function cektotal(id = null) {
+			if (id !== null) {
+				var sqty = $("#qty_" + id).val();
+				var pref = $("#harga_" + id).val();
+				var subtotal = (parseFloat(sqty) * parseFloat(pref));
+				$("#expense_" + id).val(subtotal);
+			}
 			var sum = 0;
 			$('.subtotal').each(function() {
 				sum += Number($(this).val());
 			});
+
+			var nilai_ppn = $('.nilai_ppn').val();
+			if (nilai_ppn !== '') {
+				nilai_ppn = nilai_ppn.split(',').join('');
+				nilai_ppn = parseFloat(nilai_ppn);
+			} else {
+				nilai_ppn = 0;
+			}
+
+			var nilai_pph = $('.nilai_pph').val();
+			if (nilai_pph !== '') {
+				nilai_pph = nilai_pph.split(',').join('');
+				nilai_pph = parseFloat(nilai_pph);
+			} else {
+				nilai_pph = 0;
+			}
+
+			sum = (sum + nilai_ppn - nilai_pph);
+
 			$("#total_expense").val(sum);
 			var sumkasbon = 0;
 			$('.subkasbon').each(function() {
