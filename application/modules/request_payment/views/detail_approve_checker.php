@@ -146,6 +146,9 @@ if ($type == 'po_material') {
 					<?php
 					if (!empty($details)) {
 						$n = $gTotal = 0;
+
+						$nilai_pph = $data_req_payment['total_pph'];
+						$bank_charge = $data_req_payment['admin_bank'];
 						foreach ($details as $dtl) : $n++;
 							if($type == 'po_material') {
 								$nm_coa = '';
@@ -175,27 +178,6 @@ if ($type == 'po_material') {
 												<td class="text-center" style="min-width: 50px;">:</td>
 												<td class="text-right">
 													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($dtl->expense, 2) ?>" readonly>
-												</td>
-											</tr>
-											<tr>
-												<td>Nilai PPh</td>
-												<td class="text-center" style="min-width: 50px;">:</td>
-												<td class="text-right">
-													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($data_req_payment['total_pph'], 2) ?>" readonly>
-												</td>
-											</tr>
-											<tr>
-												<td>Bank Charge</td>
-												<td class="text-center" style="min-width: 50px;">:</td>
-												<td class="text-right">
-													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($data_req_payment['admin_bank'], 2) ?>" readonly>
-												</td>
-											</tr>
-											<tr>
-												<td>Net Payment</td>
-												<td class="text-center" style="min-width: 50px;">:</td>
-												<td class="text-right">
-													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format(($dtl->expense + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']), 2) ?>" readonly>
 												</td>
 											</tr>
 										</table>
@@ -329,7 +311,7 @@ if ($type == 'po_material') {
 								<?php
 								}
 								?>
-							<?php elseif ($type == 'transportasi') :
+								<?php elseif ($type == 'transportasi') :
 								$gTotal += ($dtl->jumlah_kasbon + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']); ?>
 								<tr>
 									<td><?= $n; ?></td>
@@ -390,7 +372,7 @@ if ($type == 'po_material') {
 									</td>
 								</tr>
 
-							<?php elseif ($type == 'nonpo') :
+								<?php elseif ($type == 'nonpo') :
 								$gTotal += ($dtl->total_request + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']); ?>
 								<tr>
 									<td><?= $n; ?></td>
@@ -445,7 +427,7 @@ if ($type == 'po_material') {
 									</td>
 								</tr>
 
-							<?php elseif ($type == 'periodik') :
+								<?php elseif ($type == 'periodik') :
 								$gTotal += ($data_req_payment['jumlah'] + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']); ?>
 								<tr>
 									<td><?= $n; ?></td>
@@ -557,6 +539,25 @@ if ($type == 'po_material') {
 					}  ?>
 				</tbody>
 				<tfoot>
+					<?php 
+						if($type == 'expense') {
+							echo '
+								<tr class="bg-blue">
+									<th colspan="6" class="text-right">Nilai PPh</th>
+									<th class="text-right">'.number_format($nilai_pph).'</th>
+									<th colspan="3" class="text-center"></th>
+								</tr>
+							';
+
+							echo '
+								<tr class="bg-blue">
+									<th colspan="6" class="text-right">Bank Charge</th>
+									<th class="text-right">'.number_format($bank_charge).'</th>
+									<th colspan="3" class="text-center"></th>
+								</tr>
+							';
+						}
+					?>
 					<tr class="bg-blue">
 						<th colspan="6" class="text-right">Total</th>
 						<th class="text-right"><?= number_format($gTotal); ?></th>

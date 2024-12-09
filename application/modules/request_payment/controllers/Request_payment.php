@@ -1834,6 +1834,9 @@ class Request_payment extends Admin_Controller
 				$sts = '<div class="badge bg-red">Rejected by Management</div>';
 			}
 
+			$nilai_pph = 0;
+			$nilai_ppn = 0;
+
 			$reject_reason = '';
 			if ($record->sts_reject == '1' || $record->sts_reject_manage == '1') {
 				$reject_reason = $record->reject_reason;
@@ -1852,6 +1855,9 @@ class Request_payment extends Admin_Controller
 					$get_inv = $this->db->get_where('tr_invoice_po', ['id' => $record->no_doc])->row_array();
 					$currency = $get_inv['curr'];
 				}
+
+				$nilai_pph = $get_expense['nilai_pph'];
+				$nilai_ppn = $get_expense['nilai_ppn'];
 			}
 
 			$nm_supplier = '';
@@ -2002,7 +2008,7 @@ class Request_payment extends Admin_Controller
 				}
 				$hasil .= '</select>';
 				$hasil .= '</td>';
-				$hasil .= '<td>' . number_format($record->jumlah) . '</td>';
+				$hasil .= '<td>' . number_format($record->jumlah + $nilai_pph - $nilai_ppn) . '</td>';
 				$hasil .= '<td>' . $sts . '</td>';
 				$hasil .= '<td>';
 				$hasil .= '
@@ -2011,7 +2017,7 @@ class Request_payment extends Admin_Controller
 						<td>Nilai Pengajuan</td>
 						<td class="text-center">:</td>
 						<td>
-							<input type="text" name="" id="" class="form-control form-control-sm text-right nilai_pengajuan_' . $numb . '" value="' . number_format($record->jumlah) . '" readonly>
+							<input type="text" name="" id="" class="form-control form-control-sm text-right nilai_pengajuan_' . $numb . '" value="' . number_format($record->jumlah + $nilai_pph - $nilai_ppn) . '" readonly>
 						</td>
 					</tr>
 					<tr>
@@ -2024,7 +2030,7 @@ class Request_payment extends Admin_Controller
 						</td>
 						<td class="text-center">:</td>
 						<td>
-							<input type="text" name="nilai_pph_' . $numb . '" id="" class="form-control form-control-sm text-right divide nilai_pph_' . $numb . '">
+							<input type="text" name="nilai_pph_' . $numb . '" id="" class="form-control form-control-sm text-right divide nilai_pph_' . $numb . '" value="' . $nilai_pph . '">
 						</td>
 					</tr>
 					<tr>
