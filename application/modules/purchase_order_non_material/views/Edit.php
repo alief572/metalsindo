@@ -537,7 +537,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 											echo '</td>';
 
 											echo '<td>';
-											echo '<select class="tipe_top_' . $no . '" >';
+											echo '<select name="tipe_top_'.$no.'" class="tipe_top_'.$no.'" >';
 											echo '<option value="">- Tipe TOP -</option>';
 											echo '<option value="1" ' . $selected1 . '>CBD</option>';
 											echo '<option value="2" ' . $selected2 . '>2 Minggu</option>';
