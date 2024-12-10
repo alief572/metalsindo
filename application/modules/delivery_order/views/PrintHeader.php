@@ -118,7 +118,7 @@
                 foreach($detail as $detail){
 				$no++;
 				$bentuk = $detail->bentuk;
-				$lot			= $this->db->query("SELECT * FROM dt_delivery_order_child WHERE id_material='$dt->id_material' AND width = $dt->width AND id_delivery_order = '$dt->id_delivery_order' ")->result();	
+				$lot			= $this->db->query("SELECT * FROM dt_delivery_order_child WHERE id_material='$dt->id_material' AND width = $dt->width AND length = $dt->length AND id_delivery_order = '$dt->id_delivery_order' ")->result();	
 				
 				if(!empty($lot)){
 					$numb = 0;

@@ -260,6 +260,7 @@
             <?php
             $id_material = "";
             $width       = "";
+            $length      = "";
             $i = 0;
             foreach ($dt as $dtl) {
 
@@ -284,7 +285,7 @@
                         $qty = 0;
                         $berat = 0;
                     } else {
-                        if ($width != $dtl->width) {
+                        if ($width != $dtl->width || $length != $dtl->length) {
                         ?>
 
                             <tr>
@@ -321,7 +322,7 @@
 
 
 
-                $spec = number_format($dtl->thickness, 2) . ' x ' . floatval($dtl->width) . ' x ' . $coil;
+                $spec = number_format($dtl->thickness, 2) . ' x ' . floatval($dtl->width) . ' x ' . $length;
                 ?>
                 <tr>
                     <td width="8" align="center"><?= $loop ?></td>
@@ -338,6 +339,7 @@
             <?php
 
                 $width = $dtl->width;
+                $length = $dtl->length;
                 $id_material = $dtl->id_material;
                 $qty = $qty + $dtl->qty_mat;
                 $berat = $berat + $dtl->weight_mat;
