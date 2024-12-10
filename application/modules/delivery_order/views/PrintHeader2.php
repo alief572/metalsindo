@@ -326,7 +326,7 @@
                 ?>
                 <tr>
                     <td width="8" align="center"><?= $loop ?></td>
-                    <td width="100"><?= $dtl->nm_material . ',' . $dtl->part_number ?></td>
+                    <td width="180"><?= $dtl->nm_material . ',' . $dtl->part_number ?></td>
                     <td width="55"><?= $spec ?></td>
                     <td width="145" align="left"><?= $dtl->lotno ?></td>
                     <td width="20" align="center"><?= number_format($dtl->qty_mat, 0); ?></td>
