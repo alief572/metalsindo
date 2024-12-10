@@ -587,11 +587,8 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		TotalSemua()
 
 		$('.auto_num').autoNumeric('init', {
-			decimalPlaces: 0, // Set decimal places to 0
-			decimalCharacter: '.', // Define the decimal separator (optional)
-			digitGroupSeparator: ',', // Define the group separator (optional)
-			minimumValue: 0, // Optional: Set a minimum value (can be adjusted)
-			maximumValue: 999999999 // Optional: Set a maximum value (can be adjusted)
+			vMin: 0,
+			vMax: 999999999999999
 		});
 
 		var max_fields2 = 10; //maximum input boxes allowed
