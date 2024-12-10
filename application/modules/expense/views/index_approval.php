@@ -34,7 +34,7 @@ $ENABLE_DELETE  = has_permission('Expense_Approval.Delete');
 								<td><?= $record->tgl_doc ?></td>
 								<td><?= $record->nmuser ?></td>
 								<td><?= $record->informasi ?></td>
-								<td class="text-right"><?= number_format($record->nominal) ?></td>
+								<td class="text-right"><?= number_format($record->nominal + $record->nilai_ppn - $record->nilai_pph) ?></td>
 								<td><?= $status[$record->status] ?></td>
 								<td>
 									<?php if ($ENABLE_VIEW) : ?>

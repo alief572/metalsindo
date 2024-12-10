@@ -52,7 +52,7 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 	<div class="box">
 		<div class="box-body">
 			<div class="col-md-12">
-				
+
 			</div>
 			<input type="hidden" name="" class="actived_tab" value="transport">
 			<ul class="nav nav-tabs" role="tablist">
@@ -93,34 +93,34 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 								if ($record->sts_reject_manage == '1') {
 									$sts = '<div class="badge bg-red">Rejected by Management</div>';
 								}
-					
+
 								$reject_reason = '';
 								if ($record->sts_reject == '1' || $record->sts_reject_manage == '1') {
 									$reject_reason = $record->reject_reason;
 								}
-					
+
 								$no_invoice = (isset($list_no_invoice[$record->no_doc])) ? $list_no_invoice[$record->no_doc] : '';
-					
+
 								$tipe = $record->tipe;
-					
+
 								$currency = '';
 								if ($record->tipe == 'expense') {
 									$get_expense = $this->db->get_where('tr_expense', ['no_doc' => $record->no_doc])->row_array();
 									if ($get_expense['exp_inv_po'] == '1') {
 										$tipe = 'Pembayaran PO';
-					
+
 										$get_inv = $this->db->get_where('tr_invoice_po', ['id' => $record->no_doc])->row_array();
 										$currency = $get_inv['curr'];
 									}
 								}
-					
+
 								$nm_supplier = '';
-					
+
 								// $get_ros = $this->db->select('a.nm_supplier')->get_where('tr_ros a', ['a.id' => $record->no_doc])->row();
 								// if (!empty($get_ros)) {
 								// 	$nm_supplier = $get_ros->nm_supplier;
 								// }
-					
+
 								$get_invoice = $this->db->select('a.no_po')
 									->from('tr_invoice_po a')
 									->where('a.id', $record->no_doc)
@@ -129,7 +129,7 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 								if ($nm_supplier == '' && !empty($get_invoice)) {
 									$nm_supplier = [];
 									$no_po = str_replace(', ', ',', $get_invoice->no_po);
-					
+
 									if (strpos($no_po, 'TR') !== false) {
 										$get_supplier = $this->db->query("
 											SELECT
@@ -162,9 +162,9 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 									}
 									$nm_supplier = implode(',', $nm_supplier);
 								}
-					
+
 								$valid = 1;
-					
+
 								if ($valid == 1) {
 									$hasil .= '<tr>';
 									$hasil .= '<td class="exclass">';
@@ -203,13 +203,13 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 									if ($record->tipe == 'periodiks') {
 										$hasil .= '<a href="' . base_url('pembayaran_rutin/view/' . $record->ids) . '" target="_blank"><i class="fa fa-search pull-right"></i></a>';
 									}
-					
+
 									$curr = '';
 									$get_curr = $this->db->get_where('tr_invoice_po', ['id' => $record->no_doc])->row();
 									if (!empty($get_curr)) {
 										$curr = $get_curr->curr;
 									}
-					
+
 									$hasil .= '</td>';
 									$hasil .= '<td class="">' . $numb . '</td>';
 									$hasil .= '<td>' . $record->no_doc . '</td>';
@@ -275,11 +275,11 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 												<select name="bank_' . $numb . '" id="" class="form-control form-control-sm select2">
 													<option value="">- Bank -</option>
 												';
-					
+
 									foreach ($list_coa as $item_coa) {
 										$hasil .= '<option value="' . $item_coa['no_perkiraan'] . ' - ' . $item_coa['nama'] . '">' . $item_coa['no_perkiraan'] . ' - ' . $item_coa['nama'] . '</option>';
 									}
-					
+
 									$hasil .= '
 												</select>
 											</td>
@@ -302,7 +302,7 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 									';
 									$hasil .= '</td>';
 									$hasil .= '</tr>';
-					
+
 									$numb++;
 								}
 

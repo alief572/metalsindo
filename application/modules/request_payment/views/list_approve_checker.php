@@ -253,6 +253,8 @@ endforeach;
                                 if (strpos($item_expense->no_doc, 'ROS') === true) {
                                     $tipe = 'Pembayaran PIB';
                                 }
+
+
                                 if (strpos($item_expense->no_doc, 'ER-') !== false || strpos($item_expense->no_doc, 'ROS-') !== false) {
                                     echo '<tr>';
                                     echo '<td>' . $item_expense->no_doc . '</td>';
@@ -260,7 +262,7 @@ endforeach;
                                     echo '<td>' . $item_expense->tgl_doc . '</td>';
                                     echo '<td>' . $item_expense->keperluan . '</td>';
                                     echo '<td>' . $tipe . '</td>';
-                                    echo '<td class="text-right">' . number_format($item_expense->jumlah) . '</td>';
+                                    echo '<td class="text-right">' . number_format($item_expense->jumlah + $get_expense['nilai_pph'] - $get_expense['nilai_ppn']) . '</td>';
                                     echo '<td>' . $item_expense->tanggal . '</td>';
                                     echo '<td>';
                                     $get_sts_payment = $this->db->select('status')->get_where('payment_approve', ['no_doc' => $item_expense->no_doc, 'ids' => $item_expense->ids])->row_array();

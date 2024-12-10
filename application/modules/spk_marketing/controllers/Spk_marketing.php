@@ -2010,7 +2010,7 @@ class Spk_marketing extends Admin_Controller
 		$id = $this->uri->segment(3);
 		$data['header'] 	= $this->db->get_where('tr_spk_marketing', array('id_spkmarketing' => $id))->result();
 		$data['detail']  	= $this->db
-			->select('a.*, b.thickness, b.width, b.length, c.hardness, c.spek as aloy, d.nama AS item, e.nm_surface')
+			->select('a.*, b.thickness, b.width, a.length, c.hardness, c.spek as aloy, d.nama AS item, e.nm_surface')
 			->from('dt_spkmarketing a')
 			->join('child_penawaran b', 'a.id_child_penawaran=b.id_child_penawaran')
 			->join('ms_inventory_category3 c', 'c.id_category3=b.id_category3')

@@ -194,6 +194,7 @@ foreach ($results['result_payment'] as $item) {
 						}
 
 						$ppn = 0;
+						$pph = 0;
 						if (!empty($get_rec_invoice)) {
 							$ppn = $get_rec_invoice->nilai_ppn;
 						}
@@ -203,6 +204,15 @@ foreach ($results['result_payment'] as $item) {
 
 							foreach ($get_ppn as $item_ppn) {
 								$ppn += $item_ppn->ppn;
+							}
+						}
+
+						if($item->tipe == 'expense') {
+							$get_ppn = $this->db->get_where('tr_expense', ['no_doc' => $item->no_doc])->result();
+
+							foreach ($get_ppn as $item_ppn) {
+								$ppn += $item_ppn->nilai_ppn;
+								$pph += $item_ppn->nilai_pph;
 							}
 						}
 
@@ -301,6 +311,12 @@ foreach ($results['result_payment'] as $item) {
 							$nilai_ppn = 0;
 						}
 
+						if ($pph > 0) {
+							$nilai_pph = $pph;
+						} else {
+							$nilai_pph = 0;
+						}
+
 						// if($nilai_ppn <= 0) {
 						// 	$nilai_ppn = ($item->jumlah * 11 / 100);
 						// }
@@ -326,7 +342,7 @@ foreach ($results['result_payment'] as $item) {
 						echo '<td>';
 						echo '<input type="hidden" class="nilai_utuh_' . $item->id . '" value="' . $nilai_utuh . '">';
 						echo '<input type="hidden" class="persen_progress_' . $item->id . '" value="' . $persen_progress . '">';
-						echo '<input type="text" class="form-control form-control-sm auto_num nilai_pph change_nilai_pph" name="dt[' . $no . '][nilai_pph]" data-id="' . $item->id . '">';
+						echo '<input type="text" class="form-control form-control-sm auto_num nilai_pph change_nilai_pph" name="dt[' . $no . '][nilai_pph]" data-id="' . $item->id . '" value="'.$nilai_pph.'">';
 						echo '</td>';
 						echo '<td class="text-right"><input type="hidden" name="dt[' . $no . '][nilai_ppn]" class="nilai_ppn_' . $item->id . '" value="' . $nilai_ppn . '">' . number_format($nilai_ppn, 2) . '</td>';
 						echo '<td class="text-right payment_col_' . $item->id . '">' . number_format($item->jumlah - $nilai_ppn, 2) . '</td>';
@@ -336,6 +352,8 @@ foreach ($results['result_payment'] as $item) {
 						$total_ppn += ($nilai_ppn);
 						$total_payment_bank += ($item->jumlah);
 						$ttl_bank_charge += ($item->admin_bank);
+
+						$total_pph += $nilai_pph;
 
 						$no++;
 					}

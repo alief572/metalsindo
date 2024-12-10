@@ -106,6 +106,7 @@ class Expense extends Admin_Controller
 		$project		= $this->input->post("project");
 		$no_pr		= $this->input->post("no_pr");
 		$tipe_pr		= $this->input->post("tipe_pr");
+		
 		$metode_pembayaran = 1;
 
 
@@ -868,6 +869,7 @@ class Expense extends Admin_Controller
 	public function save()
 	{
 		$post = $this->input->post();
+
 		$id             = $this->input->post("id");
 		$tgl_doc  		= $this->input->post("tgl_doc");
 		$no_doc		    = $this->input->post("no_doc");
@@ -897,6 +899,9 @@ class Expense extends Admin_Controller
 		$grand_total		= $this->input->post("grand_total");
 		$id_expense_detail		= $this->input->post("id_expense_detail");
 
+		$nilai_ppn = str_replace(',', '', $post['nilai_ppn']);
+		$nilai_pph = str_replace(',', '', $post['nilai_pph']);
+
 		$pengembalian = $this->input->post('pengembalian');
 		if (!isset($pengembalian)) {
 			$pengembalian = '';
@@ -922,6 +927,8 @@ class Expense extends Admin_Controller
 				'pettycash' => $pettycash,
 				'tipe_pengembalian' => $pengembalian,
 				'tipe_penggantian' => $penggantian,
+				'nilai_ppn' => $nilai_ppn,
+				'nilai_pph' => $nilai_pph,
 				'modified_by' => $this->auth->user_name(),
 				'modified_on' => date("Y-m-d h:i:s")
 			);
@@ -1156,6 +1163,8 @@ class Expense extends Admin_Controller
 				'jumlah' => $grand_total,
 				'tipe_penggantian' => $penggantian,
 				'tipe_pengembalian' => $pengembalian,
+				'nilai_ppn' => $nilai_ppn,
+				'nilai_pph' => $nilai_pph,
 				'created_by' => $this->auth->user_name(),
 				'created_on' => date("Y-m-d h:i:s")
 			);
