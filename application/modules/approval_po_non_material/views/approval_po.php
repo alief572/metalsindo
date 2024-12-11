@@ -303,10 +303,10 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 
 												if ($value->nm_material1 == "") {
 													$konversi = ($value->konversi <= 0) ? 1 : $value->konversi;
-													echo "<td>" . number_format($konversi, 2) . "</td>";
+													echo "<td>" . number_format($konversi) . "</td>";
 												} else {
 													$konversi = ($value->konversi <= 0) ? 1 : $value->konversi1;
-													echo "<td>" . number_format($konversi, 2) . "</td>";
+													echo "<td>" . number_format($konversi) . "</td>";
 												}
 
 												echo "
@@ -326,7 +326,7 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 														</td>
 												<td hidden><input type='text' class='form-control input-sm autoNumeric3' id='dt_alloyprice_" . $key . "' " . $disabled . " data-decimal='.' data-thousand='' data-precision='0' data-allow-zero='' name='dt[" . $key . "][alloyprice]' onkeyup='HitAmmount(" . $key . ")'></td>
 												<td hidden><input type='text' class='form-control input-sm autoNumeric3' id='dt_fabcost_" . $key . "' " . $disabled . " name='dt[" . $key . "][fabcost]' onkeyup='HitAmmount(" . $key . ")'></td>
-												<td><input type='text' class='form-control input-sm autoNumeric3' id='dt_hargasatuan_" . $key . "' name='dt[" . $key . "][hargasatuan]' onkeyup='HitAmmount(" . $key . ")' value='" . number_format($value->hargasatuan, 2) . "' readonly></td>
+												<td><input type='text' class='form-control input-sm autoNumeric3' id='dt_hargasatuan_" . $key . "' name='dt[" . $key . "][hargasatuan]' onkeyup='HitAmmount(" . $key . ")' value='" . number_format($value->hargasatuan) . "' readonly></td>
 											  <td>
 													<select class='form-control input-sm' id='dt_ppn_" . $key . "' name='dt[" . $key . "][ppn]' onchange='CariPPN(" . $key . ")' disabled>
 														<option value=''>SELECT</option>
@@ -337,15 +337,15 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 												<td hidden><input type='text' class='form-control input-sm autoNumeric pajak' id='dt_pajak_" . $key . "' name='dt[" . $key . "][pajak]' onkeyup='HitAmmount(" . $key . ")'></td>
 												<td hidden><input type='text' class='form-control input-sm autoNumeric3' id='dt_diskon_" . $key . "' " . $disabled . " name='dt[" . $key . "][diskon]' onkeyup='HitAmmount(" . $key . ")'></td>
 											
-											  <td><input type='text' class='form-control input-sm ch_jumlah_ex' id='dt_jumlahharga_" . $key . "' readonly name='dt[" . $key . "][jumlahharga]' value='" . number_format($total, 2) . "'></td>
+											  <td><input type='text' class='form-control input-sm ch_jumlah_ex' id='dt_jumlahharga_" . $key . "' readonly name='dt[" . $key . "][jumlahharga]' value='" . number_format($total) . "'></td>
 											  	<td>
 													<input type='text' name='dt[" . $key . "][disc_persen]' class='form-control form-control-sm auto_num disc_persen' id='disc_persen_" . $key . "' placeholder='Discount (%)' data-key='" . $key . "' onkeyup='HitAmmount(" . $key . ")' value='" . $value->persen_disc . "' readonly>
 													<br>
 													<input type='text' name='dt[" . $key . "][disc_num]' class='form-control form-control-sm auto_num disc_num' id='disc_num_" . $key . "' data-key='" . $key . "' placeholder='- Discount ($) -' onkeyup='HitAmmount(" . $key . ")' value='" . $value->nilai_disc . "' readonly>
 												</td>
-												<td><input type='text' class='form-control auto_num input-sm ch_ppn cng_nilai_ppn' id='dt_nilai_ppn_" . $key . "' name='dt[" . $key . "][nilai_ppn]' data-key='" . $key . "' placeholder='Nilai PPN' value='" . number_format($value->ppn, 2) . "' readonly>
-												<input type='text' class='form-control input-sm ch_per_ppn cng_persen_ppn' id='dt_persen_ppn_" . $key . "' name='dt[" . $key . "][persen_ppn]' data-key='" . $key . "' placeholder='Persen PPN' value='" . number_format($value->ppn_persen, 2) . "%' readonly></td>
-												<td><input type='text' class='form-control input-sm ch_jumlah_ex2' id='dt_totalharga_" . $key . "' readonly name='dt[" . $key . "][totalharga]' value='" . number_format($total - $value->nilai_disc + $value->ppn, 2) . "'></td>
+												<td><input type='text' class='form-control auto_num input-sm ch_ppn cng_nilai_ppn' id='dt_nilai_ppn_" . $key . "' name='dt[" . $key . "][nilai_ppn]' data-key='" . $key . "' placeholder='Nilai PPN' value='" . number_format($value->ppn) . "' readonly>
+												<input type='text' class='form-control input-sm ch_per_ppn cng_persen_ppn' id='dt_persen_ppn_" . $key . "' name='dt[" . $key . "][persen_ppn]' data-key='" . $key . "' placeholder='Persen PPN' value='" . number_format($value->ppn_persen) . "%' readonly></td>
+												<td><input type='text' class='form-control input-sm ch_jumlah_ex2' id='dt_totalharga_" . $key . "' readonly name='dt[" . $key . "][totalharga]' value='" . number_format($total - $value->nilai_disc + $value->ppn) . "'></td>
 												<td><input type='text' class='form-control input-sm' id='dt_note_" . $key . "' name='dt[" . $key . "][note]' value='" . $value->note . "' readonly></td>
 												<td>
 															
@@ -519,23 +519,23 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 											$selected4 = '';
 											$selected5 = '';
 
-											if($item_top->tipe_top == '1') {
+											if ($item_top->tipe_top == '1') {
 												$selected1 = 'selected';
 											}
 
-											if($item_top->tipe_top == '2') {
+											if ($item_top->tipe_top == '2') {
 												$selected2 = 'selected';
 											}
 
-											if($item_top->tipe_top == '3') {
+											if ($item_top->tipe_top == '3') {
 												$selected3 = 'selected';
 											}
 
-											if($item_top->tipe_top == '4') {
+											if ($item_top->tipe_top == '4') {
 												$selected4 = 'selected';
 											}
 
-											if($item_top->tipe_top == '5') {
+											if ($item_top->tipe_top == '5') {
 												$selected5 = 'selected';
 											}
 
@@ -552,24 +552,24 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 											}
 											echo '</select>';
 											echo '</td>';
-											
+
 											echo '<td>';
-											echo '<select class="tipe_top_'.$no.'" >';
+											echo '<select class="tipe_top_' . $no . '" >';
 											echo '<option value="">- Tipe TOP -</option>';
-											echo '<option value="1" '.$selected1.'>CBD</option>';
-											echo '<option value="2" '.$selected2.'>2 Minggu</option>';
-											echo '<option value="3" '.$selected3.'>30 Hari</option>';
-											echo '<option value="4" '.$selected4.'>45 Hari</option>';
-											echo '<option value="5" '.$selected5.'>60 Hari</option>';
+											echo '<option value="1" ' . $selected1 . '>CBD</option>';
+											echo '<option value="2" ' . $selected2 . '>2 Minggu</option>';
+											echo '<option value="3" ' . $selected3 . '>30 Hari</option>';
+											echo '<option value="4" ' . $selected4 . '>45 Hari</option>';
+											echo '<option value="5" ' . $selected5 . '>60 Hari</option>';
 											echo '</select>';
 											echo '</td>';
 
 											echo '<td>';
-											echo '<input type="text" class="form-control form-control-sm input_progress progress_' . $no . ' auto_num" name="progress_' . $no . '" data-no="' . $no . '" value="' . number_format($item_top->progress, 2) . '">';
+											echo '<input type="text" class="form-control form-control-sm input_progress progress_' . $no . ' auto_num" name="progress_' . $no . '" data-no="' . $no . '" value="' . $item_top->progress . '">';
 											echo '</td>';
 
 											echo '<td class="text-right">';
-											echo '<input type="text" class="form-control form-control-sm nilai_top nilai_top_' . $no . ' auto_num" name="nilai_top_' . $no . '" data-no="' . $no . '" value="' . number_format($item_top->nilai, 2) . '">';
+											echo '<input type="text" class="form-control form-control-sm nilai_top nilai_top_' . $no . ' auto_num" name="nilai_top_' . $no . '" data-no="' . $no . '" value="' . $item_top->nilai . '">';
 											echo '</td>';
 
 											echo '<td>';
@@ -613,7 +613,10 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 
 		TotalSemua()
 
-		$('.auto_num').autoNumeric('init');
+		$('.auto_num').autoNumeric('init', {
+			vMin: 0,
+			vMax: 99999999999999
+		});
 
 		var max_fields2 = 10; //maximum input boxes allowed
 		var wrapper2 = $(".input_fields_wrap2"); //Fields wrapper
@@ -657,9 +660,13 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 					$('#data_request').html(data.list_mat);
 					$(".bilangan-desimal").maskMoney();
 					$('.autoNumeric3').autoNumeric('init', {
-						vMin: 0
+						vMin: 0,
+						vMax: 99999999999999
 					});
-					$('.autoNumeric').autoNumeric();
+					$('.autoNumeric').autoNumeric('init', {
+						vMin: 0,
+						vMax: 99999999999999
+					});
 					$('#expect_tanggal').val(data.min_date);
 				}
 			});
@@ -687,7 +694,7 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 			var sts_top = 1;
 			var num_top = $('.num_top').val();
 
-			if(num_top < 1) {
+			if (num_top < 1) {
 				swal("Warning", "TOP harus diisi terlebih dahulu !", "error");
 				return false;
 			}
@@ -934,7 +941,7 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 
 		var nilai_ppn = parseFloat((hargasatuan * qty) * persen / 100);
 
-		$("#dt_nilai_ppn_" + key).autoNumeric('set', nilai_ppn.toFixed(2));
+		$("#dt_nilai_ppn_" + key).autoNumeric('set', nilai_ppn);
 
 
 		HitAmmount(key);
@@ -947,7 +954,7 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 		var qty = getNum($('#dt_qty_' + key).val().split(',').join(''));
 
 		var disc_num = ((hargasatuan * qty) * disc_persen / 100);
-		$('#disc_num_' + key).val(number_format(disc_num, 2));
+		$('#disc_num_' + key).val(number_format(disc_num));
 
 		HitAmmount(key);
 	});
@@ -959,7 +966,7 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 		var qty = getNum($('#dt_qty_' + key).val().split(',').join(''));
 
 		var disc_persen = (disc_num / (hargasatuan * qty) * 100);
-		$('#disc_persen_' + key).val(number_format(disc_persen, 2));
+		$('#disc_persen_' + key).val(number_format(disc_persen));
 
 		HitAmmount(key);
 	});
@@ -970,7 +977,7 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 
 		var disc = (total * persen_disc / 100);
 
-		$("#totaldisc").val(number_format(disc, 2));
+		$("#totaldisc").val(number_format(disc));
 		cariTotal();
 	});
 
@@ -979,7 +986,7 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 		var disc = getNum($("#totaldisc").val().split(",").join(""));
 
 		var persen_disc = (disc / total * 100);
-		$("#persendisc").val(number_format(persen_disc, 2));
+		$("#persendisc").val(number_format(persen_disc));
 
 		cariTotal();
 	});
@@ -1005,7 +1012,8 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 						width: '100%'
 					});
 					$('.autoNumeric3').autoNumeric('init', {
-						vMin: 0
+						vMin: 0,
+						vMax: 99999999999999
 					});
 				}
 			});
@@ -1168,7 +1176,8 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 			success: function(html) {
 				// $("#dt_hargasatuan_"+id).val(html); 
 				$('.autoNumeric3').autoNumeric('init', {
-					vMin: 0
+					vMin: 0,
+					vMax: 99999999999999
 				});
 				HitAmmount(id)
 			}
@@ -1475,12 +1484,12 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 		var tot_jumlah = totalharga - tot_diskon + tot_pajak;
 
 		var nilai_ppn = parseFloat(((hargasatuan - (hargasatuan * disc_persen / 100)) * qty) * persen_ppn / 100);
-		$("#dt_nilai_ppn_" + id).val(number_format(nilai_ppn, 2));
+		$("#dt_nilai_ppn_" + id).val(number_format(nilai_ppn));
 
 
 
-		$("#dt_jumlahharga_" + id).val(number_format(jumlah, 2));
-		$("#dt_totalharga_" + id).val(number_format(totalharga, 2));
+		$("#dt_jumlahharga_" + id).val(number_format(jumlah));
+		$("#dt_totalharga_" + id).val(number_format(totalharga));
 
 		$("#dt_ch_pajak_" + id).val(tot_pajak);
 		$("#dt_ch_diskon_" + id).val(tot_diskon);
@@ -1518,12 +1527,12 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 			SUM_DISC += Number($(this).val().split(",").join(""));
 		});
 
-		$("#hargatotal").val(number_format(SUM_JMX, 2));
-		$("#totalppn").val(number_format(SUM_PPN, 2));
-		$("#totaldisc").val(number_format(SUM_DISC, 2));
+		$("#hargatotal").val(number_format(SUM_JMX));
+		$("#totalppn").val(number_format(SUM_PPN));
+		$("#totaldisc").val(number_format(SUM_DISC));
 		$("#diskontotal").val(number_format(SUM_DIS));
 		$("#taxtotal").val(number_format(SUM_PJK));
-		$("#subtotal").val(number_format(SUM_JML, 2));
+		$("#subtotal").val(number_format(SUM_JML));
 
 	}
 
@@ -1538,17 +1547,17 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 
 		// if (persen_disc > 0 && persen_disc !== null) {	
 		// 	var disc = parseFloat(total * persen_disc / 100);
-		// 	$("#totaldisc").val(number_format(disc, 2));
+		// 	$("#totaldisc").val(number_format(disc));
 		// }
 
 		if (persen_ppn > 0 && persen_ppn !== null) {
 			var ppn = parseFloat(total * persen_ppn / 100);
-			$("#totalppn").val(number_format(ppn, 2));
+			$("#totalppn").val(number_format(ppn));
 		}
 
 		var grandtotal = kirim + total - disc + ppn;
-		$("#kirim").val(number_format(kirim, 2));
-		$("#subtotal").val(number_format(grandtotal, 2));
+		$("#kirim").val(number_format(kirim));
+		$("#subtotal").val(number_format(grandtotal));
 
 	}
 
@@ -1624,10 +1633,10 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 
 		// alert(SUM_JMX);
 
-		$("#hargatotal").val(number_format(SUM_JMX, 2));
-		$("#diskontotal").val(number_format(SUM_DIS, 2));
-		$("#taxtotal").val(number_format(SUM_PJK, 2));
-		$("#subtotal").val(number_format((SUM_JMX - totaldisc + totalppn + biaya_kirim), 2));
+		$("#hargatotal").val(number_format(SUM_JMX));
+		$("#diskontotal").val(number_format(SUM_DIS));
+		$("#taxtotal").val(number_format(SUM_PJK));
+		$("#subtotal").val(number_format((SUM_JMX - totaldisc + totalppn + biaya_kirim)));
 
 	}
 
