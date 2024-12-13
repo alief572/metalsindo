@@ -9,6 +9,7 @@ $no_so 			= (!empty($header)) ? $header[0]->no_so : '';
 $project_name 	= (!empty($header)) ? $header[0]->project_name : '';
 $pr_coa 	= (!empty($header)) ? $header[0]->coa : '';
 $tingkat_pr = (!empty($header)) ? $header[0]->tingkat_pr : '';
+$tgl_dibutuhkan = (!empty($header)) ? $header[0]->tgl_dibutuhkan : '';
 
 // Detail Approval
 $alasan_reject1 = (!empty($header)) ? $header[0]->reject_reason1 : '';
@@ -144,7 +145,13 @@ $disabled3		= ($approve == 'view') ? 'readonly' : '';
 						<option value="2" <?= ($tingkat_pr == '2') ? 'selected' : null ?>>Urgent</option>
 					</select>
 				</div>
+				<label class='label-control col-sm-2'><b>Tgl Dibutuhkan</b></label>
+				<div class='col-sm-4 text-right'>
+					<input type="date" name="tgl_dibutuhkan" id="" class="form-control input-md" value="<?= $tgl_dibutuhkan ?>">
+
+				</div>
 			</div>
+			
 
 			<div class="form-group row">
 				<div class="col-md-8">
@@ -244,7 +251,6 @@ $disabled3		= ($approve == 'view') ? 'readonly' : '';
 						<th class='text-center' style='width: 8%;'>Satuan</th>
 						<th class='text-center' style='width: 9%;'>Est Harga</th>
 						<th class='text-center' style='width: 9%;'>Est Total Harga</th>
-						<th class='text-center' style='width: 9%;'>Tanggal Dibutuhkan</th>
 						<th class='text-center' style='width: 15%;'>Keterangan</th>
 						<?php
 						if (empty($approve)) {
@@ -275,7 +281,6 @@ $disabled3		= ($approve == 'view') ? 'readonly' : '';
 									</td>";
 							echo "<td align='left'><input type='text' " . $disabled2 . " id='harga_" . $nomor . "' name='detail[" . $nomor . "][harga]' class='form-control input-md text-right maskM sum_tot harga_" . $nomor . "' value='" . $valx['harga'] . "' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''></td>";
 							echo "<td align='left'><input type='text' " . $disabled2 . " id='total_harga_" . $nomor . "' name='detail[" . $nomor . "][total_harga]' class='form-control input-md text-right maskM jumlah_all total_harga_" . $nomor . "' value='" . number_format($valx['qty'] * $valx['harga'], 2) . "' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero='' readonly></td>";
-							echo "<td align='left'><input type='text' " . $disabled3 . " name='detail[" . $nomor . "][tanggal]' class='form-control input-md text-center datepicker tgl_dibutuhkan tanggal_" . $nomor . "' readonly value='" . strtoupper($valx['tanggal']) . "'></td>";
 							echo "<td align='left'><input type='text' " . $disabled3 . " name='detail[" . $nomor . "][keterangan]' class='form-control input-md keterangan_" . $nomor . "' value='" . strtoupper($valx['keterangan']) . "'></td>";
 							if (empty($approve)) {
 								echo "<td align='center'><button type='button' class='btn btn-sm btn-warning edit_detail edit_detail_" . $nomor . "' data-id='" . $valx['id'] . "' data-nomor='" . $nomor . "' style='margin-right: 0.5em;'><i class='fa fa-pencil'></i>

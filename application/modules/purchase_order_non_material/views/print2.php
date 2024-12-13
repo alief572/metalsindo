@@ -510,9 +510,15 @@
             <tfoot>
                 <tr>
                     <td align="center" colspan="2">DELIVERY TO :</td>
-                    <td align="center" colspan="3">PT. METALSINDO PACIFIC, CIKARANG</td>
-                    <td align="center" colspan="2">DELIVERY DATE</td>
-                    <td align="center" colspan="3"><?= date('d-M-y', strtotime($header->delivery_date)) ?></td>
+                    <td align="center" colspan="2">DELIVERY DATE :</td>
+                    <td align="center" colspan="2">TERMS :</td>
+                    <td align="center" colspan="3">DATE REQUIRED :</td>
+                </tr>
+                <tr>
+                    <td align="center" colspan="2">PT. METALSINDO PACIFIC, CIKARANG</td>
+                    <td align="center" colspan="2"><?= date('d-M-y', strtotime($header->delivery_date)) ?></td>
+                    <td align="center" colspan="2"><?= $terms ?></td>
+                    <td align="center" colspan="3"><?= (!empty($tgl_dibutuhkan)) ? date('d-M-y', strtotime($tgl_dibutuhkan)) : ''; ?></td>
                 </tr>
             </tfoot>
         </table>

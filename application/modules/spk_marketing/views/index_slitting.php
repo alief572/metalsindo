@@ -67,7 +67,7 @@ thead input {
 			<?php if($ENABLE_VIEW) : ?>
 				<a class="btn btn-primary btn-sm view" href="javascript:void(0)" title="View" data-id_spkmarketing="<?=$record->id_spkmarketing?>"><i class="fa fa-eye"></i>
 				</a>
-			    <a class="btn btn-success btn-sm" href="<?= base_url('/spk_marketing/PrintH2slitting/'.$record->id_spkmarketing) ?>" target="_blank"title="Print" ><i class="fa fa-print"></i></a>
+			    <a class="btn btn-success btn-sm" href="<?= base_url('/spk_marketing/PrintH2/'.$record->id_spkmarketing) ?>" target="_blank"title="Print" ><i class="fa fa-print"></i></a>
 			<?php endif; ?>
 			<?php if($ENABLE_MANAGE AND $record->status_revisi == '2') : ?>
 				<a class="btn btn-primary btn-sm" href="<?= base_url('/spk_marketing/revisiHeader/'.$record->id_spkmarketing) ?>" title="Revisi" data-no_inquiry="<?=$record->no_inquiry?>"><i class="fa fa-list"></i>
