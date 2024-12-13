@@ -2030,6 +2030,14 @@ class Purchase_order_non_material extends Admin_Controller
 				}
 			}
 
+			if($data['header'][0]->tipe == 'pr depart') {
+				$get_tgl_dibutuhkan = $this->db->select('a.tgl_dibutuhkan')->from('rutin_non_planning_header a')->where_in('a.no_pr', $list_no_pr)->order_by('a.id', 'asc')->limit(1)->get()->row();
+
+				$data['tgl_dibutuhkan'] = (!empty($get_tgl_dibutuhkan)) ? $get_tgl_dibutuhkan->tgl_dibutuhkan : '';
+			}
+
+			
+
 
 			$data['no_pr'] = implode(', ', $list_no_pr);
 
@@ -2113,6 +2121,12 @@ class Purchase_order_non_material extends Admin_Controller
 		}
 
 		$data['nm_depart'] = $nm_depart;
+
+		$get_terms = $this->db->select('a.keterangan')->from('tr_top_po a')->where('a.no_po', $id)->order_by('a.id', 'asc')->limit(1)->get()->row();
+
+		$data['terms'] = $get_terms->keterangan;
+
+
 
 		$this->load->view('print2', $data);
 		$html = ob_get_contents();

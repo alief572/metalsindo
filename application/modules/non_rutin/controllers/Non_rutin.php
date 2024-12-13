@@ -98,6 +98,7 @@ class Non_rutin extends Admin_Controller
 			$tanda        	= $data['tanda'];
 			$approve        = $data['approve'];
 			$tingkat_approval = $data['tingkat_approval'];
+			$tgl_dibutuhkan = $data['tgl_dibutuhkan'];
 			$coa = $data['coa'];
 			$code_planx  	= $data['id'];
 			if (empty($code_planx)) :
@@ -156,7 +157,6 @@ class Non_rutin extends Admin_Controller
 						$ArrDetail[$val]['qty'] 			= $qty;
 						$ArrDetail[$val]['harga'] 			= $harga;
 						$ArrDetail[$val]['keterangan'] 		= strtolower($valx['keterangan']);
-						$ArrDetail[$val]['tanggal'] 		= $valx['tanggal'];
 						$ArrDetail[$val]['created_by'] 		= $this->auth->user_id();
 						$ArrDetail[$val]['created_date'] 	= $dateTime;
 					}
@@ -285,7 +285,6 @@ class Non_rutin extends Admin_Controller
 						$ArrDetailPR[$val]['nm_barang'] 	= strtolower($valx['nm_barang'] . ' - ' . $valx['spec']);
 						$ArrDetailPR[$val]['qty'] 			= $qty;
 						$ArrDetailPR[$val]['nilai_pr'] 		= $harga;
-						$ArrDetailPR[$val]['tgl_dibutuhkan'] = $valx['tanggal'];
 						$ArrDetailPR[$val]['satuan']		= $valx['satuan'];
 						$ArrDetailPR[$val]['app_status'] 	= 'Y';
 						$ArrDetailPR[$val]['app_reason']	= strtolower($valx['keterangan']);
@@ -392,6 +391,7 @@ class Non_rutin extends Admin_Controller
 						'id_dept' 		=> $id_dept,
 						'no_pengajuan' 	=> $code_plan,
 						'project_name'	=> $project_name,
+						'tgl_dibutuhkan' => $tgl_dibutuhkan,
 						'qty' 			=> $SUM_QTY,
 						'harga' 		=> $SUM_HARGA,
 						'document' 		=> $file_name,
@@ -404,6 +404,7 @@ class Non_rutin extends Admin_Controller
 					$ArrHeader		= [
 						'id_dept' 		=> $id_dept,
 						'project_name'	=> $project_name,
+						'tgl_dibutuhkan' => $tgl_dibutuhkan,
 						'qty' 			=> $SUM_QTY,
 						'harga' 		=> $SUM_HARGA,
 						'document' 		=> $file_name,
@@ -570,7 +571,6 @@ class Non_rutin extends Admin_Controller
 		$d_Header .= "	</select></td>";
 		$d_Header .= "<td align='left'><input type='text' id='harga_" . $id . "' name='detail[" . $id . "][harga]' class='form-control input-md text-right maskM sum_tot' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero=''></td>";
 		$d_Header .= "<td align='left'><input type='text' id='total_harga_" . $id . "' name='detail[" . $id . "][total_harga]' class='form-control input-md text-right maskM jumlah_all' data-decimal='.' data-thousand='' data-precision='0' data-allow-zero='' readonly></td>";
-		$d_Header .= "<td align='left'><input type='text' name='detail[" . $id . "][tanggal]' class='form-control input-md text-center datepicker tgl_dibutuhkan' readonly></td>";
 		$d_Header .= "<td align='left'><input type='text' name='detail[" . $id . "][keterangan]' class='form-control input-md'></td>";
 		$d_Header .= "<td align='center'>";
 		$d_Header .= "&nbsp;<button type='button' class='btn btn-sm btn-danger delPart' title='Delete Part'><i class='fa fa-close'></i></button>";
