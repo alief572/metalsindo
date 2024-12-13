@@ -83,20 +83,20 @@ class Ros extends Admin_Controller
         $this->db->group_by('a.id');
         $query1 = $this->db->get_compiled_select();
 
-        // $this->db->select('a.*, IF(d.nama IS NULL, f.nama, d.nama) as unit_satuan');
-        // $this->db->from('tr_ros_detail a');
-        // $this->db->join('dt_trans_po_non_material b', 'b.id = a.id_po_detail', 'left');
-        // $this->db->join('rutin_non_planning_detail c', 'c.id = b.idpr', 'left');
-        // $this->db->join('ms_satuan d', 'd.id = c.satuan', 'left');
-        // $this->db->join('accessories e', 'e.id = a.id_barang', 'left');
-        // $this->db->join('ms_satuan f', 'f.id = e.id_unit_gudang', 'left');
-        // $this->db->where('a.no_ros', $no_ros);
-        // $this->db->group_by('a.id');
-        // $query2 = $this->db->get_compiled_select();
+        $this->db->select('a.*, IF(d.nama IS NULL, IF(f.nama IS NULL, "Pcs", f.nama), d.nama) as unit_satuan');
+        $this->db->from('tr_ros_detail a');
+        $this->db->join('dt_trans_po_non_material b', 'b.id = a.id_po_detail', 'left');
+        $this->db->join('rutin_non_planning_detail c', 'c.id = b.idpr', 'left');
+        $this->db->join('ms_satuan d', 'd.id = c.satuan', 'left');
+        $this->db->join('accessories e', 'e.id = a.id_barang', 'left');
+        $this->db->join('ms_satuan f', 'f.id = e.id_unit_gudang', 'left');
+        $this->db->where('a.no_ros', $no_ros);
+        $this->db->group_by('a.id');
+        $query2 = $this->db->get_compiled_select();
 
-        // $sql_query = $query1 . ' UNION ALL ' . $query2;
+        $sql_query = $query1 . ' UNION ALL ' . $query2;
 
-        $sql_query = $query1;
+        // $sql_query = $query1;
 
         $get_ros_detail = $this->db->query($sql_query)->result_array();
 
@@ -177,19 +177,19 @@ class Ros extends Admin_Controller
         $this->db->group_by('a.id');
         $query1 = $this->db->get_compiled_select();
 
-        // $this->db->select('a.id, a.no_po, a.id_dt_po, a.idpr, a.idmaterial, a.namamaterial, a.description, a.width, a.qty, a.hargasatuan, a.jumlahharga, b.matauang, IF(h.nama IS NULL, "Pcs", h.nama) as unit_satuan, "PO Non Material" as tipe_po');
-        // $this->db->from('dt_trans_po_non_material a');
-        // $this->db->join('tr_purchase_order_non_material b', 'b.no_po = a.no_po');
-        // $this->db->join('accessories d', 'd.id = a.idmaterial', 'left');
-        // $this->db->join('rutin_non_planning_detail e', 'e.id = a.idpr', 'left');
-        // $this->db->join('ms_satuan h', 'h.id = e.satuan', 'left');
-        // $this->db->where_in('b.no_surat', explode(',', $post['no_po']));
-        // $this->db->group_by('a.id');
-        // $query2 = $this->db->get_compiled_select();
+        $this->db->select('a.id, a.no_po, a.id_dt_po, a.idpr, a.idmaterial, a.namamaterial, a.description, a.width, a.qty, a.hargasatuan, a.jumlahharga, b.matauang, IF(h.nama IS NULL, "Pcs", h.nama) as unit_satuan, "PO Non Material" as tipe_po');
+        $this->db->from('dt_trans_po_non_material a');
+        $this->db->join('tr_purchase_order_non_material b', 'b.no_po = a.no_po');
+        $this->db->join('accessories d', 'd.id = a.idmaterial', 'left');
+        $this->db->join('rutin_non_planning_detail e', 'e.id = a.idpr', 'left');
+        $this->db->join('ms_satuan h', 'h.id = e.satuan', 'left');
+        $this->db->where_in('b.no_surat', explode(',', $post['no_po']));
+        $this->db->group_by('a.id');
+        $query2 = $this->db->get_compiled_select();
 
-        // $sql_query = $query1 .' UNION ALL '.$query2;
+        $sql_query = $query1 . ' UNION ALL ' . $query2;
 
-        $sql_query = $query1;
+        // $sql_query = $query1;
 
         // $this->db->select('a.*, IF(f.code IS NULL, IF(g.code IS NULL, IF(h.code IS NULL, "Pcs", h.code), g.code), f.code) as unit_satuan');
         // $this->db->from('dt_trans_po a');
@@ -221,8 +221,19 @@ class Ros extends Admin_Controller
 
             $valids = 1;
 
-            if (($item_po['totalwidth'] - $nilai_pengurang) <= 0) {
-                $valids = 0;
+            if ($item_po['tipe_po'] == 'PO Material') {
+                if (($item_po['totalwidth'] - $nilai_pengurang) <= 0) {
+                    $valids = 0;
+                }
+            } else {
+                if (($item_po['qty'] - $nilai_pengurang) <= 0) {
+                    $valids = 0;
+                }
+            }
+
+            $totalwidth = $item_po['totalwidth'];
+            if ($item_po['tipe_po'] !== 'PO Material') {
+                $totalwidth = $item_po['qty'];
             }
 
             if ($post['edit'] == '1') {
@@ -231,7 +242,7 @@ class Ros extends Admin_Controller
 
             if ($valids > 0) {
 
-                $nilai_freight = (($item_po['totalwidth'] * $post['standard_logic_cost']) * $post['kurs_pib']);
+                $nilai_freight = (($totalwidth * $post['standard_logic_cost']) * $post['kurs_pib']);
 
                 $hasil .= '<tr>';
                 $hasil .= '<td class="text-center">' . $no . '</td>';
@@ -240,36 +251,36 @@ class Ros extends Admin_Controller
                 $hasil .= '<td class="text-center">' . strtoupper($item_po['matauang']) . '</td>';
                 $hasil .= '<td class="text-right">' . number_format($item_po['hargasatuan'], 2) . '</td>';
                 $hasil .= '<td class="text-right">' . number_format($item_po['hargasatuan'] * $post['kurs_pib'], 2) . '</td>';
-                $hasil .= '<td class="text-center">' . number_format($item_po['totalwidth'], 2) . '</td>';
+                $hasil .= '<td class="text-center">' . number_format($totalwidth, 2) . '</td>';
                 $hasil .= '<td class="text-center">';
                 $hasil .= number_format($nilai_pengurang, 2);
                 $hasil .= '<input type="hidden" name="in_qty_' . $item_po['id'] . '" value="' . $nilai_pengurang . '">';
                 $hasil .= '</td>';
                 $hasil .= '<td class="text-center">';
-                $hasil .= number_format(($item_po['totalwidth'] - $nilai_pengurang), 2);
-                $hasil .= '<input type="hidden" name="sisa_qty_' . $item_po['id'] . '" value="' . ($item_po['totalwidth'] - $nilai_pengurang) . '">';
+                $hasil .= number_format(($totalwidth - $nilai_pengurang), 2);
+                $hasil .= '<input type="hidden" name="sisa_qty_' . $item_po['id'] . '" value="' . ($totalwidth - $nilai_pengurang) . '">';
                 $hasil .= '</td>';
                 $hasil .= '<td class="text-center">';
-                $hasil .= '<input type="text" class="form-control form-control-sm text-right weight_packing auto_num" name="weight_packing_' . $item_po['id'] . '" value="' . ($item_po['totalwidth'] - $nilai_pengurang) . '" data-id="' . $item_po['id'] . '">';
+                $hasil .= '<input type="text" class="form-control form-control-sm text-right weight_packing auto_num" name="weight_packing_' . $item_po['id'] . '" value="' . ($totalwidth - $nilai_pengurang) . '" data-id="' . $item_po['id'] . '">';
                 $hasil .= '<input type="hidden" name="harga_satuan_' . $item_po['id'] . '" value="' . $item_po['hargasatuan'] . '">';
-                $hasil .= '<input type="hidden" class="grand_total grand_total_' . $item_po['id'] . '" value="' . ((($item_po['totalwidth'] - $nilai_pengurang) * $item_po['hargasatuan']) * $post['kurs_pib']) . '">';
+                $hasil .= '<input type="hidden" class="grand_total grand_total_' . $item_po['id'] . '" value="' . ((($totalwidth - $nilai_pengurang) * $item_po['hargasatuan']) * $post['kurs_pib']) . '">';
                 $hasil .= '</td>';
                 $hasil .= '<td class="text-center">';
                 $hasil .= '<input type="hidden" class="total_price" value="' . ($item_po['jumlahharga'] * $post['kurs_pib']) . '">';
                 $hasil .= '<input type="text" class="form-control form-control-sm text-right auto_num nilai_bm" name="nilai_bm_' . $item_po['id'] . '">';
                 $hasil .= '</td>';
                 $hasil .= '<td class="text-center">';
-                $hasil .= '<input type="hidden" name="weight_' . $item_po['id'] . '" class="weight_' . $no . '" value="' . $item_po['totalwidth'] . '">';
+                $hasil .= '<input type="hidden" name="weight_' . $item_po['id'] . '" class="weight_' . $no . '" value="' . $totalwidth . '">';
                 $hasil .= '<input type="text" class="form-control form-control-sm text-right auto_num nilai_freight" name="nilai_freight_' . $item_po['id'] . '" value="' . number_format($nilai_freight, 2) . '" data-no="' . $no . '" readonly>';
 
                 $hasil .= '</td>';
                 $hasil .= '<td class="text-right total_price_' . $item_po['id'] . '">';
-                $hasil .= number_format((($item_po['totalwidth'] - $nilai_pengurang) * $item_po['hargasatuan']) * $post['kurs_pib'], 2);
+                $hasil .= number_format((($totalwidth - $nilai_pengurang) * $item_po['hargasatuan']) * $post['kurs_pib'], 2);
                 $hasil .= '</td>';
                 $hasil .= '</tr>';
                 $no++;
 
-                $ttl_price_detail += ((($item_po['totalwidth'] - $nilai_pengurang) * $item_po['hargasatuan']) * $post['kurs_pib']);
+                $ttl_price_detail += ((($totalwidth - $nilai_pengurang) * $item_po['hargasatuan']) * $post['kurs_pib']);
                 $ttl_nilai_freight += $nilai_freight;
             }
         }
@@ -523,13 +534,13 @@ class Ros extends Admin_Controller
             $this->db->where_in('b.no_surat', $post['no_po']);
             $query1 = $this->db->get_compiled_select();
 
-            // $this->db->select('a.no_po, a.id, a.qty, a.idmaterial, a.namamaterial, a.hargasatuan, "PO Non Material" as tipe_po');
-            // $this->db->from('dt_trans_po_non_material a');
-            // $this->db->join('tr_purchase_order_non_material b', 'b.no_po = a.no_po', 'left');
-            // $this->db->where_in('b.no_surat', $post['no_po']);
-            // $query2 = $this->db->get_compiled_select();
+            $this->db->select('a.no_po, a.id, a.qty, a.idmaterial, a.namamaterial, a.hargasatuan, "PO Non Material" as tipe_po');
+            $this->db->from('dt_trans_po_non_material a');
+            $this->db->join('tr_purchase_order_non_material b', 'b.no_po = a.no_po', 'left');
+            $this->db->where_in('b.no_surat', $post['no_po']);
+            $query2 = $this->db->get_compiled_select();
 
-            $sql_query = $query1;
+            $sql_query = $query1 . ' UNION ALL ' . $query2;
 
             $get_po_detail = $this->db->query($sql_query)->result_array();
 
@@ -808,5 +819,161 @@ class Ros extends Admin_Controller
         }
 
         echo $hasil;
+    }
+
+    public function get_no_po()
+    {
+        $post = $this->input->post();
+
+        $draw = $post['draw']; // Counter for DataTable request
+        $start = $post['start']; // Starting record for pagination
+        $length = $post['length']; // Number of records per page
+        $searchValue = $post['search']['value']; // Search term entered by user
+
+        $kode_supplier = $post['id_supplier'];
+
+        $this->db->select('a.no_surat, a.no_po, "PO Material" as tipe_po');
+        $this->db->from('tr_purchase_order a');
+        $this->db->join('tr_ros b', 'b.no_po = a.no_surat', 'left');
+        $this->db->where('a.id_suplier', $kode_supplier);
+        $this->db->where('a.loi', 'Import');
+        $this->db->where('a.status', '2');
+        if (!empty($searchValue)) {
+            $this->db->group_start();
+            $this->db->like('a.no_surat', $searchValue, 'both');
+            $this->db->group_end();
+        }
+        // $this->db->order_by('a.no_surat', 'desc');
+        $query1 = $this->db->get_compiled_select();
+
+        $this->db->select('a.no_surat, a.no_po, "PO Non Material" as tipe_po');
+        $this->db->from('tr_purchase_order_non_material a');
+        $this->db->join('tr_ros b', 'b.no_po = a.no_surat', 'left');
+        $this->db->where('a.id_suplier', $kode_supplier);
+        $this->db->where('a.loi', 'Import');
+        if (!empty($searchValue)) {
+            $this->db->group_start();
+            $this->db->like('a.no_surat', $searchValue, 'both');
+            $this->db->group_end();
+        }
+        // $this->db->order_by('a.no_surat', 'desc');
+        $query2 = $this->db->get_compiled_select();
+
+        $sql_query = $query1 . ' UNION ALL ' . $query2 . ' LIMIT ' . $length . ' OFFSET ' . $start;
+        // $sql_query = $query1;
+
+        $list_po = $this->db->query($sql_query)->result_array();
+
+        // $this->db->select('a.no_surat, a.no_po, "PO Material" as tipe_po');
+        // $this->db->from('tr_purchase_order a');
+        // $this->db->join('tr_ros b', 'b.no_po = a.no_surat', 'left');
+        // $this->db->where('a.id_suplier', $kode_supplier);
+        // $this->db->where('a.loi', 'Import');
+        // $this->db->where('a.status', '2');
+        // if(!empty($searchValue)) {
+        //     $this->db->group_start();
+        //     $this->db->like('a.no_surat', $searchValue, 'both');
+        //     $this->db->group_end();
+        // }
+        // $this->db->order_by('a.no_surat', 'desc');
+        // $query1 = $this->db->get()->result();
+
+        $hasil = [];
+
+        foreach ($list_po as $item) {
+
+            $nilai_sisa = 0;
+
+            if ($item['tipe_po'] == 'PO Material') {
+                $get_po_detail = $this->db->get_where('dt_trans_po', ['no_po' => $item['no_po']])->result_array();
+                foreach ($get_po_detail as $item2) {
+
+                    $berat_terima = ($item2['totalwidth'] !== null) ? $item2['totalwidth'] : 0;
+
+                    $nilai_sisa += $berat_terima;
+
+                    $get_used_ros_detail = $this->db->get_where('tr_ros_detail', ['id_po_detail' => $item2['id']])->result_array();
+                    if (!empty($get_used_ros_detail)) {
+                        foreach ($get_used_ros_detail as $item3) {
+                            $nilai_sisa -= $item3['qty_packing_list'];
+                        }
+                    }
+                }
+            } else {
+                $get_po_detail = $this->db->get_where('dt_trans_po_non_material', ['no_po' => $item['no_po']])->result_array();
+                foreach ($get_po_detail as $item2) {
+
+                    $berat_terima = ($item2['qty'] !== null) ? $item2['qty'] : 0;
+
+                    $nilai_sisa += $berat_terima;
+
+                    $get_used_ros_detail = $this->db->get_where('tr_ros_detail', ['id_po_detail' => $item2['id']])->result_array();
+                    if (!empty($get_used_ros_detail)) {
+                        foreach ($get_used_ros_detail as $item3) {
+                            $nilai_sisa -= $item3['qty_packing_list'];
+                        }
+                    }
+                }
+            }
+
+            // if($item['no_surat'] == 'PO-004/MP/03/2024'){
+            //     print_r($nilai_sisa);
+            //     exit;
+            // }
+
+            if ($nilai_sisa > 0) {
+                $hasil[] = [
+                    'no_po' => $item['no_surat'],
+                    'tipe_po' => $item['tipe_po'],
+                    'option' => '<input type="checkbox" name="no_po[]" class="no_po" value="' . $item['no_surat'] . '">'
+                ];
+            }
+        }
+
+        $no = 1;
+
+        $this->db->select('a.no_surat, a.no_po, "PO Material" as tipe_po');
+        $this->db->from('tr_purchase_order a');
+        $this->db->join('tr_ros b', 'b.no_po = a.no_surat', 'left');
+        $this->db->where('a.id_suplier', $kode_supplier);
+        $this->db->where('a.loi', 'Import');
+        $this->db->where('a.status', '2');
+        if (!empty($searchValue)) {
+            $this->db->group_start();
+            $this->db->like('a.no_surat', $searchValue, 'both');
+            $this->db->group_end();
+        }
+        $this->db->order_by('a.no_surat', 'desc');
+        $get_data_all = $this->db->get()->result_array();
+
+        foreach ($get_data_all as $item) {
+            $nilai_sisa = 0;
+
+            $get_po_detail = $this->db->get_where('dt_trans_po', ['no_po' => $item['no_po']])->result_array();
+            foreach ($get_po_detail as $item2) {
+
+                $berat_terima = ($item2['totalwidth'] !== null) ? $item2['totalwidth'] : 0;
+
+                $nilai_sisa += $berat_terima;
+
+                $get_used_ros_detail = $this->db->get_where('tr_ros_detail', ['id_po_detail' => $item2['id']])->result_array();
+                if (!empty($get_used_ros_detail)) {
+                    foreach ($get_used_ros_detail as $item3) {
+                        $nilai_sisa -= $item3['qty_packing_list'];
+                    }
+                }
+            }
+
+            if ($nilai_sisa > 0) {
+                $no++;
+            }
+        }
+
+        echo json_encode([
+            'draw' => intval($draw),
+            'recordsTotal' => $no,
+            'recordsFiltered' => $no,
+            'data' => $hasil
+        ]);
     }
 }
