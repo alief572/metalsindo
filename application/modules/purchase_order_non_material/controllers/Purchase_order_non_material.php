@@ -2036,6 +2036,12 @@ class Purchase_order_non_material extends Admin_Controller
 				$data['tgl_dibutuhkan'] = (!empty($get_tgl_dibutuhkan)) ? $get_tgl_dibutuhkan->tgl_dibutuhkan : '';
 			}
 
+			if($data['header'][0]->tipe == 'pr asset') {
+				$get_tgl_dibutuhkan = $this->db->select('a.tgl_dibutuhkan')->from('tran_pr_detail a')->where_in('a.no_pr', $list_no_pr)->order_by('a.id', 'asc')->limit(1)->get()->row();
+
+				$data['tgl_dibutuhkan'] = (!empty($get_tgl_dibutuhkan)) ? $get_tgl_dibutuhkan->tgl_dibutuhkan : '';
+			}
+
 			
 
 
