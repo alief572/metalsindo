@@ -507,6 +507,14 @@
                 </tr>
 
             </tbody>
+            <tfoot>
+                <tr>
+                    <td align="center" colspan="2">DELIVERY TO :</td>
+                    <td align="center" colspan="3">PT. METALSINDO PACIFIC, CIKARANG</td>
+                    <td align="center" colspan="2">DELIVERY DATE</td>
+                    <td align="center" colspan="3"><?= date('d-M-y', strtotime($header->delivery_date)) ?></td>
+                </tr>
+            </tfoot>
         </table>
 
         <br>

@@ -2021,7 +2021,7 @@ class Spk_marketing extends Admin_Controller
 			->get()
 			->result_array();
 		$data['detailsum'] 	= array();
-		$this->load->view('print2', $data);
+		$this->load->view('print2slitting', $data);
 		$html = ob_get_contents();
 
 		require_once('./assets/html2pdf/html2pdf/html2pdf.class.php');
