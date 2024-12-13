@@ -43,7 +43,7 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
                         <?php
                         if ($no_ros == 'new') {
                         ?>
-                            <table class="table table-bordered">
+                            <table id="myTable" class="table table-bordered">
                                 <thead>
                                     <tr>
                                         <th class="text-center">No. PO</th>
@@ -64,7 +64,7 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="">Supplier Name</label>
-                        <select name="supplier_name" id="" class="form-control form-control-sm select2 get_supplier">
+                        <select name="supplier_name" id="" class="form-control form-control-sm select2 get_supplier" onchange="DataTables_no_po()">
                             <?php
 
                             if ($no_ros == 'new') {
@@ -580,29 +580,29 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
             }));
         });
 
-        $(document).on('change', '.get_supplier', function() {
-            var supplier = $(this).val();
+        // $(document).on('change', '.get_supplier', function() {
+        //     var supplier = $(this).val();
 
-            $.ajax({
-                type: 'POST',
-                url: siteurl + active_controller + 'get_po_by_supplier',
-                data: {
-                    'supplier': supplier
-                },
-                cache: false,
-                success: function(result) {
-                    $('.no_po').html(result);
-                    // $('.select2').select2();
-                },
-                error: function(result) {
-                    swal({
-                        title: 'Error !',
-                        text: 'Please try again later !',
-                        type: 'error'
-                    });
-                }
-            });
-        });
+        //     $.ajax({
+        //         type: 'POST',
+        //         url: siteurl + active_controller + 'get_po_by_supplier',
+        //         data: {
+        //             'supplier': supplier
+        //         },
+        //         cache: false,
+        //         success: function(result) {
+        //             $('.no_po').html(result);
+        //             // $('.select2').select2();
+        //         },
+        //         error: function(result) {
+        //             swal({
+        //                 title: 'Error !',
+        //                 text: 'Please try again later !',
+        //                 type: 'error'
+        //             });
+        //         }
+        //     });
+        // });
 
         $(document).on('submit', '#frm-data', function(e) {
             e.preventDefault();
@@ -979,5 +979,36 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
                 s[1] += new Array(prec - s[1].length + 1).join('0');
             }
             return s.join(dec);
+        }
+
+        function DataTables_no_po() {
+            var supplier = $('.get_supplier').val();
+
+            var DataTables = $('#myTable').dataTable({
+                ajax: {
+                    url: siteurl + active_controller + 'get_no_po',
+                    type: "POST",
+                    dataType: "JSON",
+                    data: function(d) {
+                        d.id_supplier = supplier;
+                    }
+                },
+                columns: [{
+                        data: 'no_po',
+                    },
+                    {
+                        data: 'tipe_po'
+                    },
+                    {
+                        data: 'option'
+                    }
+                ],
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                stateSave: true,
+                destroy: true,
+                paging: true
+            });
         }
     </script>
