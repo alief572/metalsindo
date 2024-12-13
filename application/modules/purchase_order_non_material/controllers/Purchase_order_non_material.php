@@ -2100,6 +2100,10 @@ class Purchase_order_non_material extends Admin_Controller
 				}
 			}
 
+			$get_tgl_dibutuhkan = $this->db->select('a.tgl_dibutuhkan')->from('material_planning_base_on_produksi a')->where_in('a.no_pr', $list_no_pr)->order_by('a.id', 'asc')->limit(1)->get()->row();
+
+			$data['tgl_dibutuhkan'] = (!empty($get_tgl_dibutuhkan)) ? $get_tgl_dibutuhkan->tgl_dibutuhkan : '';
+
 			$data['no_pr'] = implode(', ', $list_no_pr);
 		}
 
