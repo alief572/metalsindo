@@ -138,7 +138,9 @@ if ($header[0]->sts_app == 'Y') $sts_app = 'Y';
 				<td class="mid" width='15%'>Department</td>
 				<td class="mid" width='2%'>:</td>
 				<td class="mid" width='33%'><?= $header[0]->nm_dept; ?></td>
-				<td colspan="3"></td>
+				<td class="mid" width='15%'>Tgl Dibutuhkan</td>
+				<td class="mid" width='2%'>:</td>
+				<td class="mid" width='33%'><?= ($header[0]->tgl_dibutuhkan !== '') ? date('d-M-Y', strtotime($header[0]->tgl_dibutuhkan)) : '' ?></td>
 			</tr>
 			<tr>
 				<td class="mid" width='15%'>Requestto</td>
@@ -164,7 +166,6 @@ if ($header[0]->sts_app == 'Y') $sts_app = 'Y';
 				<th class='text-center' style='width: 7%;'>Satuan</th>
 				<th class='text-center' style='width: 8%;'>Est Harga</th>
 				<th class='text-center' style='width: 8%;'>Est Total Harga</th>
-				<th class='text-center' style='width: 10%;'>Tgl Dibutuhkan</th>
 				<th class='text-center' style='width: 15%;'>Keterangan</th>
 			</tr>
 		</thead>
@@ -177,7 +178,7 @@ if ($header[0]->sts_app == 'Y') $sts_app = 'Y';
 
 					$get_satuan		= $this->db->get_where('ms_satuan', array('id' => $valx['satuan']))->row();
 					$nm_satuan = (!empty($get_satuan)) ? strtoupper($get_satuan->code) : '';
-					$tgl_dibutuhkan = ($valx['tanggal'] <> '0000-00-00' and $valx['tanggal'] != NULL) ? date('d-M-Y', strtotime($valx['tanggal'])) : 'not set';
+
 					echo "<tr class='header_" . $nomor . "'>";
 					echo "<td align='center'>" . $nomor . "</td>";
 					echo "<td align='left'>" . strtoupper($valx['nm_barang']) . "</td>";
@@ -186,7 +187,6 @@ if ($header[0]->sts_app == 'Y') $sts_app = 'Y';
 					echo "<td align='center'>" . $nm_satuan . "</td>";
 					echo "<td align='right'>" . number_format($valx['harga']) . "</td>";
 					echo "<td align='right'>" . number_format($valx['qty'] * $valx['harga']) . "</td>";
-					echo "<td align='center'>" . $tgl_dibutuhkan . "</td>";
 					echo "<td align='left'>" . strtoupper($valx['keterangan']) . "</td>";
 					echo "</tr>";
 				}
