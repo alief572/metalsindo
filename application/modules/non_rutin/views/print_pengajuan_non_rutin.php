@@ -129,18 +129,18 @@ if ($header[0]->sts_app == 'Y') $sts_app = 'Y';
 			<tr>
 				<td class="mid">No Transaksi</td>
 				<td class="mid">:</td>
-				<td class="mid" colspan='4'><?= ($header[0]->no_pr == '' || $header[0]->no_pr == null) ? $header[0]->no_pengajuan : $header[0]->no_pr ?></td>
+				<td class="mid" colspan="4"><?= ($header[0]->no_pr == '' || $header[0]->no_pr == null) ? $header[0]->no_pengajuan : $header[0]->no_pr ?></td>
 				<td class="mid">Tingkat PR</td>
 				<td class="mid">:</td>
 				<td class="mid"><?= ($header[0]->tingkat_pr == 2) ? 'Urgent' : 'Normal' ?></td>
 			</tr>
 			<tr>
-				<td class="mid" width='15%'>Department</td>
-				<td class="mid" width='2%'>:</td>
-				<td class="mid" width='33%'><?= $header[0]->nm_dept; ?></td>
-				<td class="mid" width='15%'>Tgl Dibutuhkan</td>
-				<td class="mid" width='2%'>:</td>
-				<td class="mid" width='33%'><?= ($header[0]->tgl_dibutuhkan !== '') ? date('d-M-Y', strtotime($header[0]->tgl_dibutuhkan)) : '' ?></td>
+				<td class="mid" >Department</td>
+				<td class="mid" >:</td>
+				<td class="mid" colspan="4"><?= $header[0]->nm_dept; ?></td>
+				<td class="mid" >Tgl Dibutuhkan</td>
+				<td class="mid" >:</td>
+				<td class="mid" ><?= ($header[0]->tgl_dibutuhkan !== '') ? date('d-M-Y', strtotime($header[0]->tgl_dibutuhkan)) : '' ?></td>
 			</tr>
 			<tr>
 				<td class="mid" width='15%'>Requestto</td>
