@@ -342,16 +342,6 @@
                 <td colspan='3' align="center">PT Metalsindo Pacific<br>Cikarang, Indonesia</td>
                 <td colspan='2' align="center"><?= date('d-M-Y', strtotime($header->expect_tanggal)) ?></td>
             </tr>
-            <tr style='vertical-align:middle;'>
-                <td align="center" colspan="3">Date Required :</td>
-                <td align="center" colspan="3">Terms :</td>
-                <td align="center">Delivery Date :</td>
-            </tr>
-            <tr style='vertical-align:middle;'>
-                <td align="center" colspan="3"><?= date('d-M-Y', strtotime($date_required)) ?></td>
-                <td align="center" colspan="3"><?= $header->term ?></td>
-                <td align="center"><?= date('d-M-Y', strtotime($header->delivery_date)) ?></td>
-            </tr>
         </tbody>
     </table>
     <br>
