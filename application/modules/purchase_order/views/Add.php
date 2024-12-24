@@ -1002,7 +1002,7 @@ $tanggal = date('Y-m-d');
 			SUM_JMX += Number($(this).val().split(",").join(""));
 		});
 
-		$("#hargatotal").val(number_format(SUM_JMX));
+		$("#hargatotal").val(number_format(SUM_JMX, 2));
 		$("#diskontotal").val(number_format(SUM_DIS));
 		$("#taxtotal").val(number_format(SUM_PJK));
 		$("#subtotal").val(number_format(SUM_JML));
@@ -1031,7 +1031,7 @@ $tanggal = date('Y-m-d');
 			SUM_JMX += Number($(this).val().split(",").join(""));
 		});
 
-		$("#hargatotal").val(number_format(SUM_JMX));
+		$("#hargatotal").val(number_format(SUM_JMX, 2));
 		$("#diskontotal").val(number_format(SUM_DIS));
 		$("#taxtotal").val(number_format(SUM_PJK));
 		$("#subtotal").val(number_format(SUM_JML));
