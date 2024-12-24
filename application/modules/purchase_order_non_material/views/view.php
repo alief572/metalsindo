@@ -146,7 +146,6 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		</div>
 		</div> -->
 						<div class="col-sm-12">
-
 							<div class="col-sm-6">
 								<div class="form-group row">
 									<div class="col-md-4">
@@ -170,10 +169,10 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 							<div class="col-sm-6">
 								<div class="form-group row">
 									<div class="col-md-4">
-										<label for="id_customer">PIC</label>
+										<label for="">PIC</label>
 									</div>
 									<div class="col-md-8">
-										<input type="text" name="" id="" class="form-control input-md" value="<?= $results['get_po']->receiving_person ?>" readonly>
+										<input type="text" name="receiving_person" id="" class="form-control input-md" value="<?= $results['get_po']->receiving_person ?>">
 									</div>
 								</div>
 							</div>
@@ -288,10 +287,10 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 															<input type='hidden' class='form-control input-sm' id='dt_panjang_" . $key . "' name='dt[" . $key . "][panjang]'>
 															<input type='hidden' class='form-control input-sm' id='dt_lebar_" . $key . "' name='dt[" . $key . "][lebar]'>
 							
-															<input type='hidden' class='form-control input-sm ch_diskon' id='dt_ch_diskon_" . $key . "'>
+															<input type='hidden' class='form-control input-sm ch_diskon' id='dt_ch_diskon_" . $key . "' value='" . $value->nilai_disc . "'>
 															<input type='hidden' class='form-control input-sm ch_pajak' id='dt_ch_pajak_" . $key . "'>
-															<input type='hidden' class='form-control input-sm ch_jumlah' id='dt_ch_jumlah_" . $key . "'>
-															<input type='hidden' class='form-control input-sm ch_ppn' id='dt_ch_ppn_" . $key . "'>
+															<input type='hidden' class='form-control input-sm ch_jumlah' id='dt_ch_jumlah_" . $key . "' value='" . $value->harga_total . "'>
+															<input type='hidden' class='form-control input-sm ch_ppn' id='dt_ch_ppn_" . $key . "' value='" . $value->ppn . "'>
 							
 														</td>
 											  
@@ -304,7 +303,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 												<td hidden><input type='hidden' class='form-control input-sm autoNumeric' name='dt[" . $key . "][width]' id='dt_width_" . $key . "'  value='" . $value->width . "'></td>
 												<td hidden><input type='hidden' class='form-control input-sm autoNumeric' name='dt[" . $key . "][length]' id='dt_length_" . $key . "'  value='" . $value->length . "'></td>
 												<td><input type='hidden' class='form-control input-sm autoNumeric' name='dt[" . $key . "][totalweight]' id='dt_totalweight_" . $key . "' value='" . $value->totalweight . "'  onkeyup='HitAmmount(" . $key . ")'>
-																	<input type='text' class='form-control input-sm' id='dt_qty_" . $key . "' name='dt[" . $key . "][qty]' value='" . $value->qty . "' onkeyup='HitAmmount(" . $key . ")'>
+																	<input type='text' class='form-control input-sm' id='dt_qty_" . $key . "' name='dt[" . $key . "][qty]' value='" . number_format($value->qty) . "' onkeyup='HitAmmount(" . $key . ")'>
 															
 														</td>
 														<td class='text-center'>" . ucfirst($value->unit_measure) . "</td>
@@ -319,7 +318,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 														</td>
 												<td hidden><input type='text' class='form-control input-sm autoNumeric3' id='dt_alloyprice_" . $key . "' " . $disabled . " data-decimal='.' data-thousand='' data-precision='0' data-allow-zero='' name='dt[" . $key . "][alloyprice]' onkeyup='HitAmmount(" . $key . ")'></td>
 												<td hidden><input type='text' class='form-control input-sm autoNumeric3' id='dt_fabcost_" . $key . "' " . $disabled . " name='dt[" . $key . "][fabcost]' onkeyup='HitAmmount(" . $key . ")'></td>
-												<td><input type='text' class='form-control input-sm autoNumeric3' id='dt_hargasatuan_" . $key . "' name='dt[" . $key . "][hargasatuan]' onkeyup='HitAmmount(" . $key . ")' value='" . $value->hargasatuan . "'></td>
+												<td><input type='text' class='form-control input-sm autoNumeric3' id='dt_hargasatuan_" . $key . "' name='dt[" . $key . "][hargasatuan]' onkeyup='HitAmmount(" . $key . ")' value='" . number_format($value->hargasatuan) . "'></td>
 											  <td>
 													<select class='form-control input-sm' id='dt_ppn_" . $key . "' name='dt[" . $key . "][ppn]' onchange='CariPPN(" . $key . ")'>
 														<option value=''>SELECT</option>
@@ -332,9 +331,9 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 											
 											  <td><input type='text' class='form-control input-sm ch_jumlah_ex auto_num' id='dt_jumlahharga_" . $key . "' readonly name='dt[" . $key . "][jumlahharga]' value='" . $total . "'></td>
 											  	<td>
-													<input type='text' name='dt[" . $key . "][disc_persen]' class='form-control form-control-sm auto_num disc_persen' id='disc_persen_" . $key . "' placeholder='Discount (%)' data-key='" . $key . "' onkeyup='HitAmmount(" . $key . ")' value='" . $value->persen_disc . "'>
+													<input type='text' name='dt[" . $key . "][disc_persen]' class='form-control form-control-sm auto_num disc_persen' id='disc_persen_" . $key . "' placeholder='Discount (%)' data-key='" . $key . "' value='" . $value->persen_disc . "'>
 													<br>
-													<input type='text' name='dt[" . $key . "][disc_num]' class='form-control form-control-sm auto_num disc_num' id='disc_num_" . $key . "' data-key='" . $key . "' placeholder='- Discount ($) -' onkeyup='HitAmmount(" . $key . ")' value='" . $value->nilai_disc . "'>
+													<input type='text' name='dt[" . $key . "][disc_num]' class='form-control form-control-sm auto_num disc_num' id='disc_num_" . $key . "' data-key='" . $key . "' placeholder='- Discount ($) -' value='" . $value->nilai_disc . "'>
 												</td>
 												<td><input type='text' class='form-control auto_num input-sm ch_ppn cng_nilai_ppn' id='dt_nilai_ppn_" . $key . "' name='dt[" . $key . "][nilai_ppn]' data-key='" . $key . "' placeholder='Nilai PPN' " . (($value->ppn > 0) ? '' : 'readonly') . " value='" . (($value->ppn > 0) ? $value->ppn : null) . "'>
 												<input type='text' class='form-control input-sm ch_per_ppn cng_persen_ppn' id='dt_persen_ppn_" . $key . "' name='dt[" . $key . "][persen_ppn]' data-key='" . $key . "' placeholder='Persen PPN' " . (($value->ppn > 0) ? '' : 'readonly') . " value='" . (($value->ppn > 0) ? $value->ppn_persen : null) . "'></td>
@@ -413,8 +412,8 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 										<span>($)</span>
 									</div>
 									<div class="col-md-7" id="ForHarga">
-										<input type="text" class="form-control auto_num" id="persendisc" onkeyup required name="persendisc" onblur="cariTotal()" placeholder="Persen Disc (%)" value="<?= number_format($results['get_po']->persen_disc) ?>">
-										<input type="text" class="form-control auto_num" id="totaldisc" onkeyup required name="totaldisc" onblur="cariTotal()" placeholder="Nilai Disc" value="<?= number_format($results['get_po']->nilai_disc) ?>">
+										<input type="text" class="form-control auto_num" id="persendisc" onkeyup required name="persendisc" onblur="cariTotal()" placeholder="Persen Disc (%)" value="<?= $results['get_po']->persen_disc ?>">
+										<input type="text" class="form-control auto_num" id="totaldisc" onkeyup required name="totaldisc" onblur="cariTotal()" placeholder="Nilai Disc" value="<?= $results['get_po']->nilai_disc ?>">
 									</div>
 								</div>
 							</div>
@@ -431,8 +430,8 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 									<span>($)</span>
 								</div>
 								<div class="col-md-7" id="ForHarga">
-									<input type="text" class="form-control auto_num" id="persenppn" onkeyup required name="persenppn" onblur="cariTotal()" placeholder="Persen PPN (%)" value="<?= number_format($results['get_po']->total_ppn_persen) ?>">
-									<input type="text" class="form-control auto_num" id="totalppn" onkeyup required name="totalppn" onblur="cariTotal()" placeholder="Nilai PPN" value="<?= number_format($results['get_po']->total_ppn) ?>">
+									<input type="text" class="form-control" id="persenppn" onkeyup required name="persenppn" onblur="cariTotal()" placeholder="Persen PPN (%)" value="<?= $results['get_po']->total_ppn_persen ?>">
+									<input type="text" class="form-control" id="totalppn" onkeyup required name="totalppn" onblur="cariTotal()" placeholder="Nilai PPN" value="<?= $results['get_po']->total_ppn ?>">
 								</div>
 							</div>
 						</div>
@@ -478,7 +477,9 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 						<div class="row">
 							<div class="col-sm-12">
 								<input type="hidden" name="num_top" class="num_top" value="<?= $results['num_po'] ?>">
-
+								<button type="button" class="btn btn-sm btn-primary add_top">
+									<i class="fa fa-plus"></i> Add TOP
+								</button>
 								<table class="table table-bordered">
 									<thead class="bg-blue">
 										<tr>
@@ -487,6 +488,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 											<th class="text-center">Progress (%)</th>
 											<th class="text-center">Value</th>
 											<th class="text-center">Keterangan</th>
+											<th class="text-center">Action</th>
 										</tr>
 									</thead>
 									<tbody class="list_tbody_top">
@@ -494,23 +496,29 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 										$no = 1;
 										foreach ($results['list_top'] as $item_top) {
 
-											if ($item_top->tipe_top == 'cbd') {
+											$selected1 = '';
+											$selected2 = '';
+											$selected3 = '';
+											$selected4 = '';
+											$selected5 = '';
+
+											if ($item_top->tipe_top == '1') {
 												$selected1 = 'selected';
 											}
 
-											if ($item_top->tipe_top == '2_minggu') {
+											if ($item_top->tipe_top == '2') {
 												$selected2 = 'selected';
 											}
 
-											if ($item_top->tipe_top == '30_hari') {
+											if ($item_top->tipe_top == '3') {
 												$selected3 = 'selected';
 											}
 
-											if ($item_top->tipe_top == '45_hari') {
+											if ($item_top->tipe_top == '4') {
 												$selected4 = 'selected';
 											}
 
-											if ($item_top->tipe_top == '60_hari') {
+											if ($item_top->tipe_top == '5') {
 												$selected5 = 'selected';
 											}
 
@@ -529,26 +537,30 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 											echo '</td>';
 
 											echo '<td>';
-											echo '<select class="tipe_top_' . $no . '" >';
+											echo '<select name="tipe_top_' . $no . '" class="tipe_top_' . $no . '" >';
 											echo '<option value="">- Tipe TOP -</option>';
-											echo '<option value="cbd" ' . $selected1 . '>CBD</option>';
-											echo '<option value="2_minggu" ' . $selected2 . '>2 Minggu</option>';
-											echo '<option value="30_hari" ' . $selected3 . '>30 Hari</option>';
-											echo '<option value="45_hari" ' . $selected4 . '>45 Hari</option>';
-											echo '<option value="60_hari" ' . $selected5 . '>60 Hari</option>';
+											echo '<option value="1" ' . $selected1 . '>CBD</option>';
+											echo '<option value="2" ' . $selected2 . '>2 Minggu</option>';
+											echo '<option value="3" ' . $selected3 . '>30 Hari</option>';
+											echo '<option value="4" ' . $selected4 . '>45 Hari</option>';
+											echo '<option value="5" ' . $selected5 . '>60 Hari</option>';
 											echo '</select>';
 											echo '</td>';
 
 											echo '<td>';
-											echo '<input type="text" class="form-control form-control-sm input_progress progress_' . $no . ' auto_num" name="progress_' . $no . '" data-no="' . $no . '" value="' . ($item_top->progress) . '">';
+											echo '<input type="text" class="form-control form-control-sm input_progress progress_' . $no . ' auto_num" name="progress_' . $no . '" data-no="' . $no . '" value="' . number_format($item_top->progress) . '">';
 											echo '</td>';
 
 											echo '<td class="text-right">';
-											echo '<input type="text" class="form-control form-control-sm nilai_top nilai_top_' . $no . ' auto_num" name="nilai_top_' . $no . '" data-no="' . $no . '" value="' . ($item_top->nilai) . '">';
+											echo '<input type="text" class="form-control form-control-sm nilai_top nilai_top_' . $no . ' auto_num" name="nilai_top_' . $no . '" data-no="' . $no . '" value="' . $item_top->nilai . '">';
 											echo '</td>';
 
 											echo '<td>';
 											echo '<textarea name="keterangan_top_' . $no . '" class="form-control form-control-sm">' . $item_top->keterangan . '</textarea>';
+											echo '</td>';
+
+											echo '<td class="text-center">';
+											
 											echo '</td>';
 
 											echo '</tr>';
@@ -574,11 +586,12 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js" integrity="sha512-rMGGF4wg1R73ehtnxXBt5mbUfN9JUJwbk21KMlnLZDJh7BkPmeovBuddZCENJddHYYMkCh9hPFnPmS9sspki8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="<?= base_url('assets/js/autoNumeric.js') ?>"></script>
+
 <script type="text/javascript">
 	//$('#input-kendaraan').hide();
 	var base_url = '<?php echo base_url(); ?>';
 	var active_controller = '<?php echo ($this->uri->segment(1)); ?>';
+	var num_top = getNum($('.num_top').val());
 	$(document).ready(function() {
 
 		$('.form-control').prop('readonly', true);
@@ -587,9 +600,18 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		TotalSemua()
 
 		$('.auto_num').autoNumeric('init', {
-			vMin: 0,
-			vMax: 999999999999999
+
 		});
+
+		$('#totalppn').autoNumeric('init', {
+			vMin: 0,
+			vMax: 99999999999
+		});
+		$('#persenppn').autoNumeric('init', {
+			vMin: 0,
+			vMax: 99999999999
+		});
+
 
 		var max_fields2 = 10; //maximum input boxes allowed
 		var wrapper2 = $(".input_fields_wrap2"); //Fields wrapper
@@ -605,7 +627,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 			let id_suplier = $('#id_suplier').val();
 			$.ajax({
 				type: "POST",
-				url: siteurl + 'purchase_order/getPR',
+				url: siteurl + 'purchase_order_non_material/getPR',
 				data: {
 					'id_suplier': id_suplier
 				},
@@ -622,7 +644,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 			let no_pr = $(this).val();
 			$.ajax({
 				type: "POST",
-				url: siteurl + 'purchase_order/AddMaterial_Direct',
+				url: siteurl + 'purchase_order_non_material/AddMaterial_Direct',
 				data: {
 					'loi': loi,
 					'no_pr': no_pr
@@ -633,12 +655,10 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 					$('#data_request').html(data.list_mat);
 					$(".bilangan-desimal").maskMoney();
 					$('.autoNumeric3').autoNumeric('init', {
-						vMin: 0,
-						vMax: 999999999999999
+
 					});
-					$('.autoNumeric').autoNumeric('init', {
-						vMin: 0,
-						vMax: 999999999999999
+					$('.autoNumeric').autoNumeric({
+
 					});
 					$('#expect_tanggal').val(data.min_date);
 				}
@@ -660,6 +680,17 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 			var pajak = $('.pajak').val();
 			var supplier = $('#supplier').val()
 
+			var ttl_persen_top = 0;
+			$('.input_progress').each(function() {
+				var progress = $(this).val();
+				if (progress !== '') {
+					progress = progress.split(',').join('');
+					progress = parseFloat(progress);
+
+					ttl_persen_top += progress;
+				}
+			});
+
 			var data, xhr;
 			if (loi == '' || loi == null) {
 				swal("Warning", "Form Tidak Boleh Kosong :)", "error");
@@ -669,6 +700,9 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 				return false;
 			} else if (supplier == '' || supplier == null) {
 				swal("Warning", "Supplier tidak boleh kosong  :)", "error");
+				return false;
+			} else if (ttl_persen_top > 100) {
+				swal("Warning", "Total TOP tidak boleh lebih dari 100%", "error");
 				return false;
 			} else {
 				swal({
@@ -686,7 +720,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 						if (isConfirm) {
 
 							var formData = new FormData($('#data-form')[0]);
-							var baseurl = siteurl + 'purchase_order/SaveEditPO';
+							var baseurl = siteurl + 'purchase_order_non_material/SaveEditPO';
 							$.ajax({
 								url: baseurl,
 								type: "POST",
@@ -805,26 +839,26 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		HitAmmount(key);
 	});
 
-	$(document).on('keyup', '.disc_persen', function() {
+	$(document).on('change', '.disc_persen', function() {
 		var key = $(this).data('key');
 		var disc_persen = getNum($(this).val().split(',').join(''));
 		var hargasatuan = getNum($('#dt_hargasatuan_' + key).val().split(',').join(''));
 		var qty = getNum($('#dt_qty_' + key).val().split(',').join(''));
 
 		var disc_num = ((hargasatuan * qty) * disc_persen / 100);
-		$('#disc_num_' + key).val(number_format(disc_num));
+		$('#disc_num_' + key).val(number_format(disc_num, 2));
 
 		HitAmmount(key);
 	});
 
-	$(document).on('keyup', '.disc_num', function() {
+	$(document).on('change', '.disc_num', function() {
 		var key = $(this).data('key');
 		var disc_num = getNum($(this).val().split(',').join(''));
 		var hargasatuan = getNum($('#dt_hargasatuan_' + key).val().split(',').join(''));
 		var qty = getNum($('#dt_qty_' + key).val().split(',').join(''));
 
 		var disc_persen = (disc_num / (hargasatuan * qty) * 100);
-		$('#disc_persen_' + key).val(number_format(disc_persen));
+		$('#disc_persen_' + key).val(number_format(disc_persen, 2));
 
 		HitAmmount(key);
 	});
@@ -835,7 +869,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 
 		var disc = (total * persen_disc / 100);
 
-		$("#totaldisc").val(number_format(disc));
+		$("#totaldisc").val(number_format(disc, 2));
 		cariTotal();
 	});
 
@@ -844,9 +878,134 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		var disc = getNum($("#totaldisc").val().split(",").join(""));
 
 		var persen_disc = (disc / total * 100);
-		$("#persendisc").val(number_format(persen_disc));
+		$("#persendisc").val(number_format(persen_disc, 2));
 
 		cariTotal();
+	});
+
+	$(document).on('click', '.add_top', function() {
+		$.ajax({
+			type: "POST",
+			url: siteurl + active_controller + '/add_top_po',
+			cache: false,
+			dataType: 'JSON',
+			success: function(result) {
+				num_top++;
+				var Rows = '<tr class="top_' + num_top + '">';
+
+				Rows += '<td class="">';
+				Rows += '<select class="form-control chosen-select" name="group_top_' + num_top + '">';
+				Rows += result.list_top_group;
+				Rows += '</select>';
+				Rows += '</td>';
+
+				Rows += '<td>';
+				Rows += '<select class="form-control form-control-sm chosen-select" name="tipe_top_' + num_top + '">';
+				Rows += '<option value="">- Tipe TOP -</option>';
+				Rows += '<option value="1">CBD</option>';
+				Rows += '<option value="2">2 Minggu</option>';
+				Rows += '<option value="3">30 Hari</option>';
+				Rows += '<option value="4">45 Hari</option>';
+				Rows += '<option value="5">60 Hari</option>';
+				Rows += '</select>';
+				Rows += '</td>';
+
+				Rows += '<td class="">';
+				Rows += '<input type="text" class="form-control form-control-sm input_progress progress_' + num_top + ' auto_num" name="progress_' + num_top + '" data-no="' + num_top + '">';
+				Rows += '</td>';
+
+				Rows += '<td class="text-right">';
+				Rows += '<input type="text" class="form-control form-control-sm nilai_top nilai_top_' + num_top + ' auto_num" name="nilai_top_' + num_top + '" data-no="' + num_top + '">';
+				Rows += '</td>';
+
+				Rows += '<td class="">';
+				Rows += '<textarea name="keterangan_top_' + num_top + '" class="form-control form-control-sm"></textarea>';
+				Rows += '</td>';
+
+				Rows += '<td class="text-center">';
+				Rows += '<button type="button" class="btn btn-sm btn-danger del_top" data-top_no="' + num_top + '"><i class="fa fa-trash"></i></button>';
+				Rows += '</td>';
+
+				Rows += '</tr>';
+
+
+
+
+				$('.num_top').val(num_top);
+				$('.list_tbody_top').append(Rows);
+
+				$('.chosen-select').chosen({
+					width: "100%"
+				});
+			},
+			error: function(result) {
+				swal({
+					title: 'Error !',
+					text: 'Please try again later !',
+					type: 'error'
+				});
+			}
+		});
+	});
+
+	$(document).on('change', '.input_progress', function() {
+		var no = $(this).data('no');
+		var subtotal = $('#subtotal').val();
+		if (subtotal == '' || subtotal == null) {
+			subtotal = 0;
+		} else {
+			subtotal = subtotal.split(',').join('');
+			subtotal = parseFloat(subtotal);
+		}
+
+		var progress = $(this).val();
+		if (progress == '' || progress == null) {
+			progress = 0;
+		} else {
+			progress = progress.split(',').join('');
+			progress = parseFloat(progress);
+		}
+
+		var nilai_top = (subtotal * progress / 100);
+
+		$('.nilai_top_' + no).val(nilai_top.toLocaleString('en-US', {
+			maximumFractionDigits: 2
+		}));
+	});
+
+	$(document).on('change', '.nilai_top', function() {
+		var no = $(this).data('no');
+
+		var subtotal = $('#subtotal').val();
+		if (subtotal == '' || subtotal == null) {
+			subtotal = 0;
+		} else {
+			subtotal = subtotal.split(',').join('');
+			subtotal = parseFloat(subtotal);
+		}
+
+		var nilai_top = $(this).val();
+		if (nilai_top == '' || nilai_top == null) {
+			nilai_top = 0;
+		} else {
+			nilai_top = nilai_top.split(',').join('');
+			nilai_top = parseFloat(nilai_top);
+		}
+
+		var progress = (nilai_top / subtotal * 100);
+
+		$(this).val(nilai_top.toLocaleString('en-US', {
+			maximumFractionDigits: 2
+		}));
+		$('.progress_' + no).val(progress.toLocaleString('en-US', {
+			maximumFractionDigits: 2
+		}));
+	});
+
+	$(document).on('click', '.del_top', function() {
+		var top_no = $(this).data('top_no');
+
+		$('.top_' + top_no).remove();
 	});
 
 
@@ -861,7 +1020,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		} else {
 			$.ajax({
 				type: "GET",
-				url: siteurl + 'purchase_order/AddMaterial',
+				url: siteurl + 'purchase_order_non_material/AddMaterial',
 				data: "jumlah=" + jumlah + "&id_suplier=" + id_suplier + "&loi=" + loi,
 				success: function(html) {
 					$("#data_request").append(html);
@@ -870,14 +1029,13 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 						width: '100%'
 					});
 					$('.autoNumeric3').autoNumeric('init', {
-						vMin: 0,
-						vMax: 999999999999999
+
 					});
 				}
 			});
 			$.ajax({
 				type: "GET",
-				url: siteurl + 'purchase_order/UbahImport',
+				url: siteurl + 'purchase_order_non_material/UbahImport',
 				data: "loi=" + loi,
 				success: function(html) {
 					$("ubahloi").html(html);
@@ -892,7 +1050,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		var dt_hargasatuan = $("#dt_hargasatuan_" + id).val();
 		// $.ajax({
 		// type:"GET",
-		// url:siteurl+'purchase_order/HitungHarga',
+		// url:siteurl+'purchase_order_non_material/HitungHarga',
 		// data:"dt_hargasatuan="+dt_hargasatuan+"&dt_qty="+dt_qty+"&id="+id,
 		// success:function(html){
 		// $("#jumlahharga_"+id).html(html);
@@ -900,7 +1058,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		// });
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/TotalWeight',
+			url: siteurl + 'purchase_order_non_material/TotalWeight',
 			data: "dt_width=" + dt_width + "&dt_qty=" + dt_qty + "&id=" + id,
 			success: function(html) {
 				$("#totalwidth_" + id).html(html);
@@ -917,7 +1075,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		} else {
 			$.ajax({
 				type: "GET",
-				url: siteurl + 'purchase_order/CariPrice',
+				url: siteurl + 'purchase_order_non_material/CariPrice',
 				data: "dt_ratelme=" + dt_ratelme + "&dt_idmaterial=" + dt_idmaterial + "&id=" + id,
 				success: function(html) {
 					$("#dt_alloyprice_" + id).val(html);
@@ -959,7 +1117,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		} else {
 			$.ajax({
 				type: "GET",
-				url: siteurl + 'purchase_order/CariPPN',
+				url: siteurl + 'purchase_order_non_material/CariPPN',
 				data: "harga=" + harga + "&id=" + id,
 				success: function(html) {
 					$("#dt_nilai_ppn_" + id).attr('readonly', false);
@@ -977,7 +1135,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		// var loi = $("#loi").val();
 		// $.ajax({
 		// 	type: "GET",
-		// 	url: siteurl + 'purchase_order/FormInputKurs',
+		// 	url: siteurl + 'purchase_order_non_material/FormInputKurs',
 		// 	data: "loi=" + loi,
 		// 	success: function(html) {
 		// 		$("#input_kurs").html(html);
@@ -999,7 +1157,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		// console.log(dt_width)
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/HitungUP',
+			url: siteurl + 'purchase_order_non_material/HitungUP',
 			data: "fabcost=" + fabcost + "&alloyprice=" + alloyprice + "&hargasatuan=" + hargasatuan + "&loi=" + loi,
 			success: function(html) {
 				// $("#dt_hargasatuan_"+id).val(html); 
@@ -1008,7 +1166,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		// $.ajax({
 		// type:"GET",
-		// url:siteurl+'purchase_order/Hitjumlah',
+		// url:siteurl+'purchase_order_non_material/Hitjumlah',
 		// data:"fabcost="+fabcost+"&alloyprice="+alloyprice+"&pajak="+pajak+"&diskon="+diskon+"&qty="+qty+"&hargasatuan="+hargasatuan+"&loi="+loi+"&dt_width="+dt_width,
 		// success:function(html){
 		// $("#dt_jumlahharga_"+id).val(html); 
@@ -1029,7 +1187,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		// console.log(dt_width)
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/HitungUP',
+			url: siteurl + 'purchase_order_non_material/HitungUP',
 			data: "fabcost=" + fabcost + "&alloyprice=" + alloyprice + "&hargasatuan=" + hargasatuan + "&loi=" + loi,
 			success: function(html) {
 				// $("#dt_hargasatuan_"+id).val(html); 
@@ -1045,7 +1203,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		// $.ajax({
 		// type:"GET",
-		// url:siteurl+'purchase_order/Hitjumlah',
+		// url:siteurl+'purchase_order_non_material/Hitjumlah',
 		// data:"fabcost="+fabcost+"&alloyprice="+alloyprice+"&pajak="+pajak+"&diskon="+diskon+"&qty="+qty+"&hargasatuan="+hargasatuan+"&loi="+loi+"&dt_width="+dt_width,
 		// success:function(html){
 		// $("#dt_jumlahharga_"+id).val(html); 
@@ -1057,7 +1215,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		var idpr = $("#dt_idpr_" + id).val();
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariIdMaterial',
+			url: siteurl + 'purchase_order_non_material/CariIdMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#idmaterial_" + id).html(html);
@@ -1065,7 +1223,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariNamaMaterial',
+			url: siteurl + 'purchase_order_non_material/CariNamaMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#namaterial_" + id).html(html);
@@ -1073,7 +1231,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariPanjangMaterial',
+			url: siteurl + 'purchase_order_non_material/CariPanjangMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#panjang_" + id).html(html);
@@ -1081,7 +1239,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariLebarMaterial',
+			url: siteurl + 'purchase_order_non_material/CariLebarMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#lebar_" + id).html(html);
@@ -1089,7 +1247,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariDescripitionMaterial',
+			url: siteurl + 'purchase_order_non_material/CariDescripitionMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#description_" + id).html(html);
@@ -1097,7 +1255,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariQtyMaterial',
+			url: siteurl + 'purchase_order_non_material/CariQtyMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#qty_" + id).html(html);
@@ -1105,7 +1263,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 		// $.ajax({
 		// type:"GET",
-		// url:siteurl+'purchase_order/CariweightMaterial',
+		// url:siteurl+'purchase_order_non_material/CariweightMaterial',
 		// data:"idpr="+idpr+"&id="+id,
 		// success:function(html){
 		// $("#width_"+id).html(html);
@@ -1113,7 +1271,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		// });
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariTweightMaterial',
+			url: siteurl + 'purchase_order_non_material/CariTweightMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#totalwidth_" + id).html(html);
@@ -1122,7 +1280,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariWidthMaterial',
+			url: siteurl + 'purchase_order_non_material/CariWidthMaterial',
 			data: "idpr=" + idpr + "&id=" + id,
 			success: function(html) {
 				$("#width_" + id).html(html);
@@ -1137,7 +1295,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		}
 		$.ajax({
 			type: "POST",
-			url: siteurl + 'purchase_order/getDateExp',
+			url: siteurl + 'purchase_order_non_material/getDateExp',
 			data: {
 				'id_pr': ArrList
 			},
@@ -1148,128 +1306,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		});
 	}
 
-	function LockMaterial(id) {
-		var idpr = $("#dt_idpr_" + id).val();
-		var idmaterial = $("#dt_idmaterial_" + id).val();
-		var namaterial = $("#dt_namamaterial_" + id).val();
-		var description = $("#dt_description_" + id).val();
-		var qty = $("#dt_qty_" + id).val();
-		var width = $("#dt_width_" + id).val();
-		var totalwidth = $("#dt_totalweight_" + id).val();
-		var hargasatuan = $("#dt_hargasatuan_" + id).val();
-		var diskon = $("#dt_diskon_" + id).val();
-		var pajak = $("#dt_pajak_" + id).val();
-		var ratelme = $("#dt_ratelme_" + id).val();
-		var alloyprice = $("#dt_alloyprice_" + id).val();
-		var fabcost = $("#dt_fabcost_" + id).val();
-		var panjang = $("#dt_panjang_" + id).val();
-		var lebar = $("#dt_lebar_" + id).val();
-		var jumlahharga = $("#dt_jumlahharga_" + id).val();
-		var note = $("#dt_note_" + id).val();
-		var subtotal = $("#subtotal").val();
-		var hargatotal = $("#hargatotal").val();
-		var diskontotal = $("#diskontotal").val();
-		var taxtotal = $("#taxtotal").val();
-		if (qty == '' || qty == null || hargasatuan == '' || hargasatuan == null) {
-			swal("Warning", "Form Tidak Boleh Kosong :)", "error");
-			return false;
-		} else {
-			$.ajax({
-				type: "GET",
-				url: siteurl + 'purchase_order/LockMatrial',
-				data: "idpr=" + idpr + "&id=" + id + "&idmaterial=" + idmaterial + "&width=" + width + "&ratelme=" + ratelme + "&alloyprice=" + alloyprice + "&fabcost=" + fabcost + "&panjang=" + panjang + "&lebar=" + lebar + "&totalwidth=" + totalwidth + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-				success: function(html) {
-					$("#trmaterial_" + id).html(html);
-				}
-			});
-			$.ajax({
-				type: "GET",
-				url: siteurl + 'purchase_order/CariTHarga',
-				data: "idpr=" + idpr + "&id=" + id + "&hargatotal=" + hargatotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-				success: function(html) {
-					$("#ForHarga").html(html);
-				}
-			});
-			$.ajax({
-				type: "GET",
-				url: siteurl + 'purchase_order/CariTDiskon',
-				data: "idpr=" + idpr + "&id=" + id + "&diskontotal=" + diskontotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-				success: function(html) {
-					$("#ForDiskon").html(html);
-				}
-			});
-			$.ajax({
-				type: "GET",
-				url: siteurl + 'purchase_order/CariTPajak',
-				data: "idpr=" + idpr + "&id=" + id + "&taxtotal=" + taxtotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-				success: function(html) {
-					$("#ForTax").html(html);
-				}
-			});
-			$.ajax({
-				type: "GET",
-				url: siteurl + 'purchase_order/CariTSum',
-				data: "idpr=" + idpr + "&id=" + id + "&hargatotal=" + hargatotal + "&diskontotal=" + diskontotal + "&taxtotal=" + taxtotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-				success: function(html) {
-					$("#ForSum").html(html);
-				}
-			});
-		}
-	}
 
-	function CancelItem(id) {
-		var idpr = $("#dt_idpr_" + id).val();
-		var idmaterial = $("#dt_idmaterial_" + id).val();
-		var namaterial = $("#dt_namamaterial_" + id).val();
-		var description = $("#dt_description_" + id).val();
-		var qty = $("#dt_qty_" + id).val();
-		var hargasatuan = $("#dt_hargasatuan_" + id).val();
-		var diskon = $("#dt_diskon_" + id).val();
-		var pajak = $("#dt_pajak_" + id).val();
-		var jumlahharga = $("#dt_jumlahharga_" + id).val();
-		var note = $("#dt_note_" + id).val();
-		var subtotal = $("#subtotal").val();
-		var hargatotal = $("#hargatotal").val();
-		var diskontotal = $("#diskontotal").val();
-		var taxtotal = $("#taxtotal").val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariMinHarga',
-			data: "idpr=" + idpr + "&id=" + id + "&hargatotal=" + hargatotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-			success: function(html) {
-				$("#ForHarga").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariMinDiskon',
-			data: "idpr=" + idpr + "&id=" + id + "&diskontotal=" + diskontotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-			success: function(html) {
-				$("#ForDiskon").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariMinPajak',
-			data: "idpr=" + idpr + "&id=" + id + "&taxtotal=" + taxtotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-			success: function(html) {
-				$("#ForTax").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariMinSum',
-			data: "idpr=" + idpr + "&id=" + id + "&hargatotal=" + hargatotal + "&diskontotal=" + diskontotal + "&taxtotal=" + taxtotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-			success: function(html) {
-				$("#ForSum").html(html);
-			}
-		});
-		$('#data_request #trmaterial_' + id).remove();
-	}
-
-	function HapusItem(id) {
-
-	}
 
 	function HitungHarga2(id) {
 		var dt_qty = $("#dt_qty_" + id).val();
@@ -1278,7 +1315,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		console.log(dt_width);
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/HitungHarga',
+			url: siteurl + 'purchase_order_non_material/HitungHarga',
 			data: "dt_hargasatuan=" + dt_hargasatuan + "&dt_qty=" + dt_qty + "&id=" + id + "&dt_width=" + dt_width,
 			success: function(html) {
 				$("#jumlahharga_" + id).html(html);
@@ -1291,7 +1328,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		var supplier = $("#id_suplier").val();
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'purchase_order/CariLokasi',
+			url: siteurl + 'purchase_order_non_material/CariLokasi',
 			data: "supplier=" + supplier,
 			success: function(html) {
 				$("#loi").html(html);
@@ -1321,13 +1358,13 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		// 	var total 	= Number(alloyprice) + Number(fabcost);
 		// 	var jumlah 	= total * dt_width;	
 
-		// 	$("#dt_hargasatuan_"+id).val(number_format(total,2));
+		// 	$("#dt_hargasatuan_"+id).val(number_format(total, 2,2));
 		// }
 		//else{
 
-		if (disc_num !== ((hargasatuan * qty) * disc_persen / 100)) {
-			disc_num = ((hargasatuan * qty) * disc_persen / 100);
-		}
+		// if (disc_num !== ((hargasatuan * qty) * disc_persen / 100)) {
+		// 	disc_num = ((hargasatuan * qty) * disc_persen / 100);
+		// }
 
 
 		var total = hargasatuan;
@@ -1349,15 +1386,15 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 
 
 
-		$("#dt_jumlahharga_" + id).val(number_format(jumlah));
-		$("#dt_totalharga_" + id).val(number_format(totalharga));
+		$("#dt_jumlahharga_" + id).val(number_format(jumlah, 2));
+		$("#dt_totalharga_" + id).val(number_format(totalharga, 2));
 
 		$("#dt_ch_pajak_" + id).val(tot_pajak);
 		$("#dt_ch_diskon_" + id).val(tot_diskon);
 		$("#dt_ch_jumlah_" + id).val(tot_jumlah);
 
-		$("#disc_persen_" + id).val(number_format(disc_persen));
-		$("#disc_num_" + id).val(number_format(disc_num));
+		$("#disc_persen_" + id).val(number_format(disc_persen, 2));
+		$("#disc_num_" + id).val(number_format(disc_num, 2));
 
 		var SUM_JML = 0
 		var SUM_DIS = 0
@@ -1388,12 +1425,13 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 			SUM_DISC += Number($(this).val().split(",").join(""));
 		});
 
-		$("#hargatotal").val(number_format(SUM_JMX));
+		$("#hargatotal").val(number_format(SUM_JMX, 2));
 		$("#totalppn").val(number_format(SUM_PPN));
-		$("#totaldisc").val(number_format(SUM_DISC));
-		$("#diskontotal").val(number_format(SUM_DIS));
-		$("#taxtotal").val(number_format(SUM_PJK));
+		$("#totaldisc").val(number_format(SUM_DISC, 2));
+		$("#diskontotal").val(number_format(SUM_DIS, 2));
+		$("#taxtotal").val(number_format(SUM_PJK, 2));
 		$("#subtotal").val(number_format(SUM_JML));
+
 
 	}
 
@@ -1408,7 +1446,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 
 		// if (persen_disc > 0 && persen_disc !== null) {	
 		// 	var disc = parseFloat(total * persen_disc / 100);
-		// 	$("#totaldisc").val(number_format(disc));
+		// 	$("#totaldisc").val(number_format(disc, 2));
 		// }
 
 		if (persen_ppn > 0 && persen_ppn !== null) {
@@ -1417,39 +1455,39 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		}
 
 		var grandtotal = kirim + total - disc + ppn;
-		$("#kirim").val(number_format(kirim));
+		$("#kirim").val(number_format(kirim, 2));
 		$("#subtotal").val(number_format(grandtotal));
 
 	}
 
-	function SumDel() {
-		var SUM_JML = 0
-		var SUM_DIS = 0
-		var SUM_PJK = 0
-		var SUM_JMX = 0
+	// function SumDel() {
+	// 	var SUM_JML = 0
+	// 	var SUM_DIS = 0
+	// 	var SUM_PJK = 0
+	// 	var SUM_JMX = 0
 
-		$(".ch_diskon").each(function() {
-			SUM_DIS += Number($(this).val());
-		});
+	// 	$(".ch_diskon").each(function() {
+	// 		SUM_DIS += Number($(this).val());
+	// 	});
 
-		$(".ch_pajak").each(function() {
-			SUM_PJK += Number($(this).val());
-		});
+	// 	$(".ch_pajak").each(function() {
+	// 		SUM_PJK += Number($(this).val());
+	// 	});
 
-		$(".ch_jumlah").each(function() {
-			SUM_JML += Number($(this).val());
-		});
+	// 	$(".ch_jumlah").each(function() {
+	// 		SUM_JML += Number($(this).val());
+	// 	});
 
-		$(".ch_jumlah_ex").each(function() {
-			SUM_JMX += Number($(this).val().split(",").join(""));
-		});
+	// 	$(".ch_jumlah_ex").each(function() {
+	// 		SUM_JMX += Number($(this).val().split(",").join(""));
+	// 	});
 
-		$("#hargatotal").val(number_format(SUM_JMX));
-		$("#diskontotal").val(number_format(SUM_DIS));
-		$("#taxtotal").val(number_format(SUM_PJK));
-		$("#subtotal").val(number_format(SUM_JML));
+	// 	$("#hargatotal").val(number_format(SUM_JMX, 2));
+	// 	$("#diskontotal").val(number_format(SUM_DIS, 2));
+	// 	$("#taxtotal").val(number_format(SUM_PJK, 2));
+	// 	$("#subtotal").val(number_format(SUM_JML, 2));
 
-	}
+	// }
 
 	function TotalSemua() {
 		var SUM_JML = 0
@@ -1494,9 +1532,9 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 
 		// alert(SUM_JMX);
 
-		$("#hargatotal").val(number_format(SUM_JMX));
-		$("#diskontotal").val(number_format(SUM_DIS));
-		$("#taxtotal").val(number_format(SUM_PJK));
+		$("#hargatotal").val(number_format(SUM_JMX, 2));
+		$("#diskontotal").val(number_format(SUM_DIS, 2));
+		$("#taxtotal").val(number_format(SUM_PJK, 2));
 		$("#subtotal").val(number_format((SUM_JMX - totaldisc + totalppn + biaya_kirim)));
 
 	}
