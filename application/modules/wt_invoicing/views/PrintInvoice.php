@@ -444,7 +444,7 @@
 					<th></th>
 					<th></th>
 					<th align="center">PPN</th>
-					<th align="right" width="110"><?= number_format($header->nilai_ppn) ?></th>
+					<th align="right" width="110"><?= number_format(floor($header->nilai_ppn)) ?></th>
 				</tr>
 
 			<?php } ?>
@@ -455,7 +455,7 @@
 				<th align="center">Kgs</th>
 				<th></th>
 				<th align="center">Total</th>
-				<th align="right" width="110"><?= number_format($header->nilai_invoice) ?></th>
+				<th align="right" width="110"><?= number_format($header->grand_total + (floor($header->nilai_ppn))) ?></th>
 			</tr>
 
 
