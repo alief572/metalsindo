@@ -438,7 +438,7 @@
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . $final_detail_code . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . $final_detail_nama . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='center'>" . ucfirst($satuan) . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . number_format($detail->qty / $konversi, 2) . "</td>
+                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . number_format($detail->qty / $konversi) . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . ucfirst($satuan_packing) . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $header->matauang . " " . $HS . "</td>
                             <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $detail->qty . "</td>
@@ -497,12 +497,12 @@
 
                 <tr>
                     <td align="right" colspan='8' style="font-size: 8px;">PPN </td>
-                    <td align="right" style="font-size: 8px;"><?= $header->matauang . ' ' . number_format($header->total_ppn, 2) ?></td>
+                    <td align="right" style="font-size: 8px;"><?= $header->matauang . ' ' . number_format($header->total_ppn) ?></td>
                 </tr>
 
                 <tr>
                     <td align="right" colspan='8' style="font-size: 8px;">Grand Total </td>
-                    <td align="right" style="font-size: 8px;"><?= $header->matauang . ' ' . number_format($header->subtotal, 2) ?></td>
+                    <td align="right" style="font-size: 8px;"><?= $header->matauang . ' ' . number_format($header->subtotal) ?></td>
 
                 </tr>
 

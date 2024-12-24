@@ -517,11 +517,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 
 
 		$('.auto_num').autoNumeric('init', {
-			decimalPlaces: 0, // Set decimal places to 0
-			decimalCharacter: '.', // Define the decimal separator (optional)
-			digitGroupSeparator: ',', // Define the group separator (optional)
-			minimumValue: 0, // Optional: Set a minimum value (can be adjusted)
-			maximumValue: 999999999 // Optional: Set a maximum value (can be adjusted)
+			
 		});
 
 		var max_fields2 = 10; //maximum input boxes allowed
@@ -704,12 +700,10 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 					$('#data_request').html(data.list_mat);
 					$(".bilangan-desimal").maskMoney();
 					$('.autoNumeric3').autoNumeric('init', {
-						vMin: 0,
-						vMax: 999999999999999
+						
 					});
 					$('.autoNumeric').autoNumeric({
-						vMin: 0,
-						vMax: 999999999999999
+						
 					});
 					$('#expect_tanggal').val(data.min_date);
 				}
@@ -910,7 +904,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		var qty = getNum($('#dt_qty_' + key).val().split(',').join(''));
 
 		var disc_num = ((hargasatuan * qty) * disc_persen / 100);
-		$('#disc_num_' + key).val(number_format(disc_num));
+		$('#disc_num_' + key).val(number_format(disc_num, 2));
 
 		HitAmmount(key);
 	});
@@ -933,7 +927,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 
 		var disc = (total * persen_disc / 100);
 
-		$("#totaldisc").val(number_format(disc));
+		$("#totaldisc").val(number_format(disc, 2));
 		cariTotal();
 	});
 
@@ -942,7 +936,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		var disc = getNum($("#totaldisc").val().split(",").join(""));
 
 		var persen_disc = (disc / total * 100);
-		$("#persendisc").val(number_format(persen_disc));
+		$("#persendisc").val(number_format(persen_disc, 2));
 
 		cariTotal();
 	});
@@ -1091,8 +1085,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 					$(".bilangan-desimal").maskMoney();
 					$(".chosen-select").chosen();
 					$('.autoNumeric3').autoNumeric('init', {
-						vMin: 0,
-						vMax: 999999999999999
+						
 					});
 				}
 			});
@@ -1570,15 +1563,15 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 
 
 
-		$("#dt_jumlahharga_" + id).val(number_format(jumlah));
-		$("#dt_totalharga_" + id).val(number_format(totalharga));
+		$("#dt_jumlahharga_" + id).val(number_format(jumlah, 2));
+		$("#dt_totalharga_" + id).val(number_format(totalharga, 2));
 
 		$("#dt_ch_pajak_" + id).val(tot_pajak);
 		$("#dt_ch_diskon_" + id).val(tot_diskon);
 		$("#dt_ch_jumlah_" + id).val(tot_jumlah);
 
-		$("#disc_persen_" + id).val(number_format(disc_persen));
-		$("#disc_num_" + id).val(number_format(disc_num));
+		$("#disc_persen_" + id).val(number_format(disc_persen, 2));
+		$("#disc_num_" + id).val(number_format(disc_num, 2));
 
 		var SUM_JML = 0
 		var SUM_DIS = 0
@@ -1609,11 +1602,11 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 			SUM_DISC += Number($(this).val().split(",").join(""));
 		});
 
-		$("#hargatotal").val(number_format(SUM_JMX));
+		$("#hargatotal").val(number_format(SUM_JMX, 2));
 		$("#totalppn").val(number_format(SUM_PPN));
-		$("#totaldisc").val(number_format(SUM_DISC));
-		$("#diskontotal").val(number_format(SUM_DIS));
-		$("#taxtotal").val(number_format(SUM_PJK));
+		$("#totaldisc").val(number_format(SUM_DISC, 2));
+		$("#diskontotal").val(number_format(SUM_DIS, 2));
+		$("#taxtotal").val(number_format(SUM_PJK, 2));
 		$("#subtotal").val(number_format(SUM_JML));
 
 	}
@@ -1665,9 +1658,9 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 			SUM_JMX += Number($(this).val().split(",").join(""));
 		});
 
-		$("#hargatotal").val(number_format(SUM_JMX));
-		$("#diskontotal").val(number_format(SUM_DIS));
-		$("#taxtotal").val(number_format(SUM_PJK));
+		$("#hargatotal").val(number_format(SUM_JMX, 2));
+		$("#diskontotal").val(number_format(SUM_DIS, 2));
+		$("#taxtotal").val(number_format(SUM_PJK, 2));
 		$("#subtotal").val(number_format(SUM_JML));
 
 	}
@@ -1694,10 +1687,10 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 			SUM_JMX += Number($(this).val().split(",").join(""));
 		});
 
-		$("#hargatotal").val(number_format(SUM_JMX));
-		$("#diskontotal").val(number_format(SUM_DIS));
-		$("#taxtotal").val(number_format(SUM_PJK));
-		$("#subtotal").val(number_format(SUM_JMX));
+		$("#hargatotal").val(number_format(SUM_JMX, 2));
+		$("#diskontotal").val(number_format(SUM_DIS, 2));
+		$("#taxtotal").val(number_format(SUM_PJK, 2));
+		$("#subtotal").val(number_format(SUM_JMX, 2));
 
 	}
 
