@@ -1104,7 +1104,7 @@ foreach ($results['head'] as $head) {
 			SUM_JMX += Number($(this).val().split(",").join(""));
 		});
 
-		$("#hargatotal").val(number_format(SUM_JMX));
+		$("#hargatotal").val(number_format(SUM_JMX, 2));
 		$("#diskontotal").val(number_format(SUM_DIS));
 		$("#taxtotal").val(number_format(SUM_PJK));
 		$("#subtotal").val(number_format(SUM_JML));
@@ -1133,7 +1133,7 @@ foreach ($results['head'] as $head) {
 			SUM_JMX += Number($(this).val().split(",").join(""));
 		});
 
-		$("#hargatotal").val(number_format(SUM_JMX));
+		$("#hargatotal").val(number_format(SUM_JMX, 2));
 		$("#diskontotal").val(number_format(SUM_DIS));
 		$("#taxtotal").val(number_format(SUM_PJK));
 		$("#subtotal").val(number_format(SUM_JML));
