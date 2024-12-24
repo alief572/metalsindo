@@ -560,7 +560,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 											echo '</td>';
 
 											echo '<td class="text-center">';
-											echo '<button type="button" class="btn btn-sm btn-danger del_top" data-top_no="' . $no . '"><i class="fa fa-trash"></i></button>';
+											
 											echo '</td>';
 
 											echo '</tr>';
