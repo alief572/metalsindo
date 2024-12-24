@@ -435,7 +435,7 @@
 					<th></th>
 					<th></th>
 					<th align="center">DPP</th>
-					<th align="right" width="110"><?= number_format($header->grand_total) ?></th>
+					<th align="right" width="110"><?= number_format($header->grand_total, 2) ?></th>
 				</tr>
 
 				<tr>
