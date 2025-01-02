@@ -37,8 +37,7 @@ class Material_planing extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$data = $this->Inventory_4_model->CariSPK();
-		$this->template->set('results', $data);
+		
 		$this->template->title('Material Planing');
 		$this->template->render('index');
 	}
@@ -1686,5 +1685,9 @@ class Material_planing extends Admin_Controller
 		}
 
 		echo json_encode($status);
+	}
+	
+	public function get_data_material_planning() {
+		$this->Inventory_4_model->get_data_material_planning();
 	}
 }

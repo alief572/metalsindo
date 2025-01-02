@@ -46,156 +46,12 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 						</thead>
 
 						<tbody>
-							<?php if (empty($results)) {
-							} else {
 
-								$numb = 0;
-								foreach ($results as $record) {
-									//if ($record->status_lanjutan==1){	
-									$numb++;
-									$id_spkmarketing = $record->id_spkmarketing;
-									$totalharga	= $this->db->query("SELECT SUM(total_harga) as total FROM dt_spkmarketing WHERE id_spkmarketing='$id_spkmarketing' ")->result();
-									$booking	= $this->db->query("SELECT 
-																	SUM(a.berat) as total,
-																	b.id_category3
-																FROM 
-																	stock_material_customer a 
-																	LEFT JOIN stock_material b ON a.id_stock=b.id_stock
-																WHERE 
-																	a.id_customer = '$record->id_customer' 
-																	AND b.id_category3 = '$record->id_material'
-																	AND b.width = '$record->width'
-																	AND a.id_dt_spkmarketing = '$record->id_dt_spkmarketing' 
-																")->result();
-							?>
-									<tr>
-										<td><?= $numb; ?></td>
-										<td><?= $record->no_surat ?></td>
-										<td><?= strtoupper($record->name_customer) ?></td>
-										<td><?= $record->id_material ?></td>
-										<td><?= $record->no_alloy ?></td>
-										<td align='right'><?= number_format($record->thickness, 2); ?></td>
-										<td align='right'><?= number_format($record->width, 2); ?></td>
-										<td align='right'><?= number_format($record->length, 2); ?></td>
-										<td align='right'><?= date('d-M-Y', strtotime($record->delivery)); ?></td>
-										<td align='right'><?= number_format($record->qty_produk) ?></td>
-										<td align='right'>-</td>
-										<td align='right'><?= number_format($booking[0]->total, 2); ?></td>
-										<td>
-											<?php if ($ENABLE_VIEW) : ?>
-												<a class="btn btn-warning btn-sm edit" href="javascript:void(0)" title="Lihat Stock" data-id_dt_spkmarketing="<?= $record->id_dt_spkmarketing ?>" data-id_material="<?= $record->id_material ?>" data-width="<?= $record->width ?>" data-view='edit'><i class="fa fa-bars"></i>
-												</a>
-											<?php endif; ?>
-											<?php if ($ENABLE_VIEW) : ?>
-												<a class="btn btn-primary btn-sm" href="<?= base_url('/purchase_request/add_pr/' . $record->id_dt_spkmarketing) ?>" title="Create PR" data-no_inquiry="<?= $record->no_inquiry ?>"><i class="fa fa-table"></i>
-												</a>
-											<?php endif; ?>
-
-											<?php if ($ENABLE_VIEW) : ?>
-												<?php //if ($record->status_lanjutan==1){ 
-												?>
-												<a class="btn btn-success btn-sm delete" href="javascript:void(0)" title="Approve" data-id_dt_spkmarketing="<?= $record->id_dt_spkmarketing ?>" data-id_material="<?= $record->id_material ?>"><i class="fa fa-check"></i>
-												</a>
-												<?php //} 
-												?>
-
-											<?php endif; ?>
-
-											<?php if ($ENABLE_VIEW) : ?>
-												<?php if ($record->status_lanjutan == 2) { ?>
-													<a class="btn btn-warning btn-sm tutup" href="javascript:void(0)" title="Close" data-id_dt_spkmarketing="<?= $record->id_dt_spkmarketing ?>" data-id_material="<?= $record->id_material ?>"><i class="fa fa-times"></i>
-													</a>
-												<?php } ?>
-
-											<?php endif; ?>
-										</td>
-
-									</tr>
-							<?php }
-							} //}  
-							?>
 						</tbody>
 					</table>
 				</div>
 
-				<div role="tabpanel" class="tab-pane " id="mat2">
-					<br>
-					<table id="example2" class="table table-bordered table-striped">
-						<thead>
-							<tr>
-								<th>#</th>
-								<th>No. SPK</th>
-								<th>Custommer</th>
-								<th>No. Aloy</th>
-								<th>Thickness</th>
-								<th>Width</th>
-								<th>Delivery Date</th>
-								<th>Total Weight</th>
-								<th>Total SPK</th>
-								<th>FG</th>
-								<?php if ($ENABLE_MANAGE) : ?>
-									<th>Action</th>
-								<?php endif; ?>
-							</tr>
-						</thead>
 
-						<tbody>
-							<?php if (empty($results)) {
-							} else {
-
-								$numb = 0;
-								foreach ($results as $record) {
-									if ($record->status_lanjutan == 2) {
-										$numb++;
-										$id_spkmarketing = $record->id_spkmarketing;
-										$totalharga	= $this->db->query("SELECT SUM(total_harga) as total FROM dt_spkmarketing WHERE id_spkmarketing='$id_spkmarketing' ")->result();
-										$booking	= $this->db->query("SELECT 
-																	SUM(a.berat) as total,
-																	b.id_category3
-																FROM 
-																	stock_material_customer a 
-																	LEFT JOIN stock_material b ON a.id_stock=b.id_stock
-																WHERE 
-																	a.id_customer = '$record->id_customer' 
-																	AND b.id_category3 = '$record->id_material'
-																	AND b.width = '$record->width'
-																")->result();
-							?>
-										<tr>
-											<td><?= $numb; ?></td>
-											<td><?= $record->no_surat ?></td>
-											<td><?= strtoupper($record->name_customer) ?></td>
-
-											<td><?= $record->no_alloy ?></td>
-											<td align='right'><?= number_format($record->thickness, 2); ?></td>
-											<td align='right'><?= number_format($record->width, 2); ?></td>
-											<td align='right'><?= date('d-M-Y', strtotime($record->delivery)); ?></td>
-											<td align='right'><?= number_format($record->qty_produk) ?></td>
-											<td align='right'>-</td>
-											<td align='right'><?= number_format($booking[0]->total, 2); ?></td>
-											<td>
-												<?php if ($ENABLE_VIEW) : ?>
-													<a class="btn btn-warning btn-sm edit" href="javascript:void(0)" title="Lihat Stock" data-id_dt_spkmarketing="<?= $record->id_dt_spkmarketing ?>" data-id_material="<?= $record->id_material ?>" data-width="<?= $record->width ?>" data-view='onlyview'><i class="fa fa-bars"></i>
-													</a>
-												<?php endif; ?>
-
-												<?php if ($ENABLE_VIEW) : ?>
-													<?php if ($record->status_lanjutan == 2) { ?>
-														<a class="btn btn-danger btn-sm hapus" href="javascript:void(0)" title="Close" data-id_dt_spkmarketing="<?= $record->id_dt_spkmarketing ?>" data-id_material="<?= $record->id_material ?>"><i class="fa fa-trash"></i>
-														</a>
-													<?php } ?>
-
-												<?php endif; ?>
-
-											</td>
-
-										</tr>
-							<?php }
-								}
-							}  ?>
-						</tbody>
-					</table>
-				</div>
 
 			</div>
 		</div>
@@ -247,6 +103,9 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 
 <!-- page script -->
 <script type="text/javascript">
+	$(document).ready(function() {
+		DataTables();
+	});
 	$(document).on('click', '.edit', function(e) {
 		var id = $(this).data('id_dt_spkmarketing');
 		var id_material = $(this).data('id_material');
@@ -494,10 +353,7 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 		// } );
 		// } );
 
-		var table = $('#example1').DataTable({
-			orderCellsTop: true,
-			fixedHeader: true
-		});
+		
 
 		var table = $('#example2').DataTable({
 			orderCellsTop: true,
@@ -509,6 +365,69 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 
 
 	//Delete
+
+	function DataTables() {
+			// var dataTables = $('#table_penawaran').dataTable();
+			// dataTables.destroy();
+
+			var dataTables = $('#example1').dataTable({
+				ajax: {
+					url: siteurl + active_controller + 'get_data_material_planning',
+					type: "POST",
+					dataType: "JSON",
+					data: function(d) {
+
+					}
+				},
+				columns: [
+					{
+						data: 'no'
+					},
+					{
+						data: 'no_spk'
+					},
+					{
+						data: 'customer'
+					},
+					{
+						data: 'kode_material'
+					},
+					{
+						data: 'no_aloy'
+					},
+					{
+						data: 'thickness'
+					},
+					{
+						data: 'width'
+					},
+					{
+						data: 'length'
+					},
+					{
+						data: 'delivery_date'
+					},
+					{
+						data: 'total_weight'
+					},
+					{
+						data: 'total_spk'
+					},
+					{
+						data: 'fg'
+					},
+					{
+						data: 'action'
+					}
+				],
+				responsive: true,
+				processing: true,
+				serverSide: true,
+				stateSave: true,
+				destroy: true,
+				paging: true
+			});
+		}
 
 	function PreviewPdf(id) {
 		param = id;
