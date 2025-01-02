@@ -37,32 +37,7 @@ class Material_planing extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$data = $this->Inventory_4_model->CariSPK();
-
-		$total_harga = [];
-		$total_booking = [];
-		foreach ($data as $item) {
-			// $get_total_harga = $this->db->query("SELECT SUM(total_harga) as total FROM dt_spkmarketing WHERE id_spkmarketing='$item->id_spkmarketing' ")->row();
-
-			// $total_harga[$item->id_spkmarketing] = $get_total_harga->total;
-
-			$get_booking = $this->db->query("SELECT 
-				SUM(a.berat) as total,
-				b.id_category3
-			FROM 
-				stock_material_customer a 
-				LEFT JOIN stock_material b ON a.id_stock=b.id_stock
-			WHERE 
-				a.id_customer = '" . $item->id_customer . "' 
-				AND b.id_category3 = '" . $item->id_material . "'
-				AND b.width = '" . $item->width . "'
-				AND a.id_dt_spkmarketing = '" . $item->id_dt_spkmarketing . "'")->row();
-
-			$total_booking[$item->id_spkmarketing] = $get_booking->total;
-		}
-
-		$this->template->set('results', $data);
-		$this->template->set('total_booking', $total_booking);
+		
 		$this->template->title('Material Planing');
 		$this->template->render('index');
 	}

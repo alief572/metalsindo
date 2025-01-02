@@ -12,6 +12,11 @@ class Inventory_4_model extends BF_Model
 	/**
 	 * @var string  User Table Name
 	 */
+	protected $viewPermission 	= 'Material_Planing.View';
+	protected $addPermission  	= 'Material_Planing.Add';
+	protected $managePermission = 'Material_Planing.Manage';
+	protected $deletePermission = 'Material_Planing.Delete';
+
 	protected $table_name = 'ms_inventory_category3';
 	protected $key        = 'id';
 
@@ -327,15 +332,107 @@ class Inventory_4_model extends BF_Model
 			$this->db->or_like('c.name_customer', $search['value'], 'both');
 			$this->db->or_like('a.id_material', $search['value'], 'both');
 			$this->db->or_like('a.no_alloy', $search['value'], 'both');
-			$this->db->or_like('a.thickness', $search['value'], 'both');
-			$this->db->or_like('a.width', $search['value'], 'both');
-			$this->db->or_like('a.length', $search['value'], 'both');
-			$this->db->or_like('a.delivery', $search['value'], 'both');
+			// $this->db->or_like('a.thickness', $search['value'], 'both');
+			// $this->db->or_like('a.width', $search['value'], 'both');
+			// $this->db->or_like('a.length', $search['value'], 'both');
+			// $this->db->or_like('a.delivery', $search['value'], 'both');
+			// $this->db->or_like('a.qty_produk', $search['value'], 'both');
 			$this->db->group_end();
 		}
-
-
+		$this->db->order_by('a.id_dt_spkmarketing', 'asc');
+		$this->db->limit($length, $start);
 
 		$query = $this->db->get();
+
+		$this->db->select('a.*, c.name_customer as name_customer, b.no_surat as no_surat, c.id_customer');
+		$this->db->from('dt_spkmarketing a');
+		$this->db->join('tr_spk_marketing b', 'b.id_spkmarketing=a.id_spkmarketing');
+		$this->db->join('master_customers c', 'c.id_customer=b.id_customer');
+		$this->db->order_by('a.delivery', 'asc');
+		$this->db->where('a.deal="1" and a.status_close_planning ="OPN" and a.approved="1"');
+		if(!empty($search)) {
+			$this->db->group_start();
+			$this->db->like('b.no_surat', $search['value'], 'both');
+			$this->db->or_like('c.name_customer', $search['value'], 'both');
+			$this->db->or_like('a.id_material', $search['value'], 'both');
+			$this->db->or_like('a.no_alloy', $search['value'], 'both');
+			// $this->db->or_like('a.thickness', $search['value'], 'both');
+			// $this->db->or_like('a.width', $search['value'], 'both');
+			// $this->db->or_like('a.length', $search['value'], 'both');
+			// $this->db->or_like('a.delivery', $search['value'], 'both');
+			// $this->db->or_like('a.qty_produk', $search['value'], 'both');
+			$this->db->group_end();
+		}
+		$this->db->order_by('a.id_dt_spkmarketing', 'asc');
+
+		$query_all = $this->db->get();
+
+		$hasil = [];
+
+		$no = (0 + $start);
+		foreach($query->result() as $item) {
+			$no++;
+
+			$booking	= $this->db->query("SELECT 
+				SUM(a.berat) as total,
+				b.id_category3
+			FROM 
+				stock_material_customer a 
+				LEFT JOIN stock_material b ON a.id_stock=b.id_stock
+			WHERE 
+				a.id_customer = '$item->id_customer' 
+				AND b.id_category3 = '$item->id_material'
+				AND b.width = '$item->width'
+				AND a.id_dt_spkmarketing = '$item->id_dt_spkmarketing'
+			")->row();
+
+			$nilai_booking = (!empty($booking)) ? $booking->total : 0;
+
+			$btn_edit = '<a class="btn btn-warning btn-sm edit" href="javascript:void(0)" title="Lihat Stock" data-id_dt_spkmarketing="'. $item->id_dt_spkmarketing .'" data-id_material="'. $item->id_material .'" data-width="'. $item->width .'" data-view="edit"><i class="fa fa-bars"></i></a>';
+
+			$btn_create_pr = '<a class="btn btn-primary btn-sm" href="'. base_url("/purchase_request/add_pr/" . $item->id_dt_spkmarketing) .'" title="Create PR" data-no_inquiry="'. $item->no_inquiry .'"><i class="fa fa-table"></i></a>';
+
+			$btn_approve = '<a class="btn btn-success btn-sm delete" href="javascript:void(0)" title="Approve" data-id_dt_spkmarketing="'. $item->id_dt_spkmarketing .'" data-id_material="'. $item->id_material .'"><i class="fa fa-check"></i></a>';
+
+			$btn_tutup = '';
+
+			// if($item->status_lanjutan == '1') {
+				
+			// }
+			if($item->status_lanjutan == '2') {
+				$btn_tutup = '<a class="btn btn-warning btn-sm tutup" href="javascript:void(0)" title="Close" data-id_dt_spkmarketing="'. $item->id_dt_spkmarketing .'" data-id_material="'. $item->id_material .'"><i class="fa fa-times"></i></a>';
+			}
+
+			if(!has_permission($this->viewPermission)) {
+				$btn_edit = '';
+				$btn_create_pr = '';
+				$btn_approve = '';
+				$btn_tutup = '';
+			}
+
+
+			$hasil[] = [
+				'no' => $no,
+				'no_spk' => $item->no_surat,
+				'customer' => $item->name_customer,
+				'kode_material' => $item->id_material,
+				'no_aloy' => $item->no_alloy,
+				'thickness' => $item->thickness,
+				'width' => $item->width,
+				'length' => $item->length,
+				'delivery_date' => date('d-M-Y', strtotime($item->delivery)),
+				'total_weight' => number_format($item->qty_produk),
+				'total_spk' => '-',
+				'fg' => number_format($nilai_booking, 2),
+				'action' => $btn_edit.' '.$btn_create_pr.' '.$btn_approve.' '.$btn_tutup
+			];
+		}
+
+		echo json_encode([
+            'draw' => intval($draw),
+            'recordsTotal' => $query_all->num_rows(),
+            'recordsFiltered' => $query_all->num_rows(),
+            'data' => $hasil
+        ]);
 	}
 }

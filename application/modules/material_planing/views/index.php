@@ -103,6 +103,9 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 
 <!-- page script -->
 <script type="text/javascript">
+	$(document).ready(function() {
+		DataTables();
+	});
 	$(document).on('click', '.edit', function(e) {
 		var id = $(this).data('id_dt_spkmarketing');
 		var id_material = $(this).data('id_material');
@@ -350,7 +353,20 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 		// } );
 		// } );
 
-		function DataTables() {
+		
+
+		var table = $('#example2').DataTable({
+			orderCellsTop: true,
+			fixedHeader: true
+		});
+
+		$("#form-area").hide();
+	});
+
+
+	//Delete
+
+	function DataTables() {
 			// var dataTables = $('#table_penawaran').dataTable();
 			// dataTables.destroy();
 
@@ -412,17 +428,6 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 				paging: true
 			});
 		}
-
-		var table = $('#example2').DataTable({
-			orderCellsTop: true,
-			fixedHeader: true
-		});
-
-		$("#form-area").hide();
-	});
-
-
-	//Delete
 
 	function PreviewPdf(id) {
 		param = id;
