@@ -263,7 +263,7 @@
 	// 	cariNama();
 	// });
 
-	$(document).on('keyup', '#inventory_2,#inventory_3,#nm_inventory,.maker,.hardness', function() {
+	$(document).on('keyup', '#inventory_2, #inventory_3, #nm_inventory, .maker, .hardness, #id_surface', function() {
 		cariNama();
 	});
 
@@ -574,6 +574,8 @@
 			data: "idsurface=" + idsurface,
 			success: function(data) {
 				$(".surface").val(data);
+
+				cariNama();
 			}
 		});
 
