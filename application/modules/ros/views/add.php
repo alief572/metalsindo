@@ -64,7 +64,7 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="">Supplier Name</label>
-                        <select name="supplier_name" id="" class="form-control form-control-sm select2 get_supplier" onchange="DataTables_no_po()">
+                        <select name="supplier_name" id="" class="form-control form-control-sm select2 get_supplier">
                             <?php
 
                             if ($no_ros == 'new') {
@@ -580,29 +580,29 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
             }));
         });
 
-        // $(document).on('change', '.get_supplier', function() {
-        //     var supplier = $(this).val();
+        $(document).on('change', '.get_supplier', function() {
+            var supplier = $(this).val();
 
-        //     $.ajax({
-        //         type: 'POST',
-        //         url: siteurl + active_controller + 'get_po_by_supplier',
-        //         data: {
-        //             'supplier': supplier
-        //         },
-        //         cache: false,
-        //         success: function(result) {
-        //             $('.no_po').html(result);
-        //             // $('.select2').select2();
-        //         },
-        //         error: function(result) {
-        //             swal({
-        //                 title: 'Error !',
-        //                 text: 'Please try again later !',
-        //                 type: 'error'
-        //             });
-        //         }
-        //     });
-        // });
+            $.ajax({
+                type: 'POST',
+                url: siteurl + active_controller + 'get_po_by_supplier',
+                data: {
+                    'supplier': supplier
+                },
+                cache: false,
+                success: function(result) {
+                    $('.no_po').html(result);
+                    // $('.select2').select2();
+                },
+                error: function(result) {
+                    swal({
+                        title: 'Error !',
+                        text: 'Please try again later !',
+                        type: 'error'
+                    });
+                }
+            });
+        });
 
         $(document).on('submit', '#frm-data', function(e) {
             e.preventDefault();
@@ -1003,6 +1003,7 @@ $edit = ($no_ros !== 'new') ? 1 : 0;
                         data: 'option'
                     }
                 ],
+                lengthMenu: [5, 10, 15, 25, 50, 75, 100, 200, 500, 1000],
                 responsive: true,
                 processing: true,
                 serverSide: true,
