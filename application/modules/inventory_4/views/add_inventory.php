@@ -574,6 +574,8 @@
 			data: "idsurface=" + idsurface,
 			success: function(data) {
 				$(".surface").val(data);
+
+				cariNama();
 			}
 		});
 
