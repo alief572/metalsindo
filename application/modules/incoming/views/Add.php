@@ -335,8 +335,12 @@ $tanggal = date('Y-m-d');
 				success: function(result) {
 					ttl_total_incoming = parseFloat(result.total_incoming);
 					$('#total').val(ttl_total_incoming);
-
 					$('#pib').val(result.no_pib);
+
+					var ket = $('#ket').val();
+					if(ket == '') {
+						$('#ket').val(result.keterangan);
+					}
 				}
 			});
 		}
