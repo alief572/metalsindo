@@ -158,7 +158,7 @@
 													<?= $ensi->nm_dimensi ?>
 												</td>
 												<td align='left'>
-													<input type='text' id="dimensi<?= $numensi ?>" name='dimens[<?= $numensi ?>][nilai_dimensi]' class='form-control <?= $class_hitung ?>'>
+													<input type='text' id="dimensi<?= $numensi ?>" name='dimens[<?= $numensi ?>][nilai_dimensi]' class='form-control <?= strtolower($ensi->nm_dimensi) . ' ' . $class_hitung ?>'>
 												</td>
 											</tr>
 									<?php
@@ -263,7 +263,7 @@
 	// 	cariNama();
 	// });
 
-	$(document).on('keyup', '#inventory_2, #inventory_3, #nm_inventory, .maker, .hardness, #id_surface', function() {
+	$(document).on('keyup', '#inventory_2, #inventory_3, #nm_inventory, .maker, .hardness, #id_surface, .width, .length', function() {
 		cariNama();
 	});
 
@@ -623,10 +623,22 @@
 		} else {
 			var stripsurface = '';
 		};
+		var width = $('.width').val();
+		if (width != '') {
+			var stripwidth = '-';
+		} else {
+			var stripwidth = '';
+		};
+		var length = $('.length').val();
+		if (length != '') {
+			var striplength = '-';
+		} else {
+			var striplength = '';
+		};
 
 		// alert(alloy);
 
-		var nama = spek + stripspek + hardness + striphardness + thickness + stripthickness + alloy + stripsurface + surface;
+		var nama = spek + stripspek + hardness + striphardness + surface + stripsurface + thickness + stripthickness + width + stripwidth + length + striplength + alloy;
 		$(".nama").val(nama);
 
 	}
