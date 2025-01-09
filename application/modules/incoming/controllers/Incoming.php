@@ -413,11 +413,6 @@ class Incoming extends Admin_Controller
 			$roll = substr($idroll->id_roll, -3) + 1;
 			$idroll = $id_material . "-" . str_pad($roll, 3, "0", STR_PAD_LEFT);
 
-
-
-
-
-
 			$no++;
 			echo "
 		<tr id='trmaterial_" . $id . "_" . $no . "'> 
@@ -2841,7 +2836,8 @@ class Incoming extends Admin_Controller
 
 		echo json_encode([
 			'total_incoming' => $total_incoming,
-			'no_pib' => $get_ros->no_pengajuan_pib
+			'no_pib' => $get_ros->no_pengajuan_pib,
+			'keterangan' => $get_ros->keterangan
 		]);
 
 	}
