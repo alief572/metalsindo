@@ -278,13 +278,19 @@ class Inventory_4 extends Admin_Controller
 	{
 		$inventory_1 = $_GET['inventory_1'];
 		$data = $this->Inventory_4_model->level_2($inventory_1);
-		echo "<select id='inventory_2' name='hd1[1][inventory_2]' class='form-control onchange='get_inv3()'  input-sm select2'>";
-		echo "<option value=''>--Pilih--</option>";
+		$hasil = "<select id='inventory_2' name='hd1[1][inventory_2]' class='form-control input-sm select' onchange='get_inv3()' required>";
+		$hasil .= "<option>--Pilih--</option>";
 		foreach ($data as $key => $st) :
-			echo "<option value='$st->id_category1' set_select('inventory_2', $st->id_category1, isset($data->id_category1) && $data->id_category1 == $st->id_category1)>$st->nama
-                    </option>";
+			$selected = '';
+			if ($st->id_category1 == $data->id_category1) {
+				$selected = 'selected';
+			}
+			$hasil .= "<option value='" . $st->id_category1 . "' " . $selected . ">" . $st->nama . "</option>";
 		endforeach;
-		echo "</select>";
+		$hasil .= "</select>";
+
+		print_r($hasil);
+		exit;
 	}
 
 	function get_namainven2()
@@ -303,7 +309,7 @@ class Inventory_4 extends Admin_Controller
 		// print_r($data);
 		// exit();
 		echo "<select id='inventory_3' name='hd1[1][inventory_3]' class='form-control input-sm select2'>";
-		echo "<option value=''>--Pilih--</option>";
+		echo "<option>--Pilih--</option>";
 		foreach ($data as $key => $st) :
 			echo "<option value='$st->id_category2' set_select('inventory_3', $st->id_category2, isset($data->id_category2) && $data->id_category2 == $st->id_category2)>$st->nama
                     </option>";
