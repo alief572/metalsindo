@@ -259,9 +259,13 @@
 <script type="text/javascript">
 	//$('#input-kendaraan').hide();
 
-	// $(document).on('keyup','#inventory_2','#inventory_3','#nm_inventory','.maker','.hardness', function(){
-	// cariNama();
+	// $(document).on('keyup', '#inventory_2', '#inventory_3', '#nm_inventory', '.maker', '.hardness', function() {
+	// 	cariNama();
 	// });
+
+	$(document).on('keyup', '#inventory_2,#inventory_3,#nm_inventory,.maker,.hardness', function() {
+		cariNama();
+	});
 
 	$(document).ready(function() {
 		$('.chosen_select').chosen({
@@ -618,7 +622,9 @@
 			var stripsurface = '';
 		};
 
-		var nama = alloy + stripspek + spek + striphardness + hardness + stripthickness + thickness + stripsurface + surface;
+		// alert(alloy);
+
+		var nama = spek + stripspek + hardness + striphardness + thickness + stripthickness + alloy + stripsurface + surface;
 		$(".nama").val(nama);
 
 	}
