@@ -190,7 +190,7 @@ if ($inven->spek != '') {
 
 												</td>
 												<td align='left'>
-													<input type='text' id="dimensi<?= $numb ?>" name='dimens[<?= $numb ?>][nilai_dimensi]' class='form-control <?= $class_hitung ?>' value='<?= $dimensi->nilai_dimensi ?>'>
+													<input type='text' id="dimensi<?= $numb ?>" name='dimens[<?= $numb ?>][nilai_dimensi]' class='form-control <?= strtolower($dimensi->nm_dimensi) ?> <?= $class_hitung ?>' value='<?= $dimensi->nilai_dimensi ?>'>
 												</td>
 											</tr>
 									<?php
@@ -624,12 +624,53 @@ if ($inven->spek != '') {
 
 	function cariNama() {
 		var alloy = $("#alloy").val();
-		var spek = $("#nm_inventory").val();
-		var hardness = $(".hardness").val();
-		var thickness = $("#thickness").val();
-		var maker = $(".maker").val();
 
-		var nama = alloy + '-' + spek + '-' + hardness + '-' + thickness + '-' + maker;
+		var spek = $("#nm_inventory").val();
+		if (spek != '') {
+			var stripspek = '-';
+		} else {
+			var stripspek = '';
+		};
+		var hardness = $(".hardness").val();
+		if (hardness != '') {
+			var striphardness = '-';
+		} else {
+			var striphardness = '';
+		};
+		var thickness = $("#thickness").val();
+		if (thickness != '') {
+			var stripthickness = '-';
+		} else {
+			var stripthickness = '';
+		};
+		var maker = $(".maker").val();
+		if (maker != '') {
+			var stripmaker = '-';
+		} else {
+			var stripmaker = '';
+		};
+		var surface = $(".surface").val();
+		if (surface != '') {
+			var stripsurface = '-';
+		} else {
+			var stripsurface = '';
+		};
+		var width = $('.width').val();
+		if (width != '') {
+			var stripwidth = '-';
+		} else {
+			var stripwidth = '';
+		};
+		var length = $('.length').val();
+		if (length != '') {
+			var striplength = '-';
+		} else {
+			var striplength = '';
+		};
+
+		// alert(alloy);
+
+		var nama = spek + stripspek + hardness + striphardness + surface + stripsurface + thickness + stripthickness + width + stripwidth + length + striplength + alloy;
 		$(".nama").val(nama);
 
 	}
