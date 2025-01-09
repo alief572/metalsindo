@@ -457,7 +457,7 @@ class Incoming extends Admin_Controller
 		
 		<td><input  type='text' 		value='" . $idroll . "'	class='form-control input-sm' id='id_roll_" . $id . "_" . $no . "' 		required name='dt[" . $id . "][detail][" . $no . "][id_roll]' 	readonly></td>
 		
-		<td	><input  type='text' 											class='form-control input-sm text-right autoNumeric widthrecive' id='dt_widthrecive" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][widthrecive]'  onBlur='cariPanjang($id,$no)'		data-numb1='" . $id . "' data-numb2='" . $no . "'  ></td>
+		<td	width='50'><input type='text' class='form-control input-sm text-right autoNumeric widthrecive' id='dt_widthrecive" . $id . "_" . $no . "' required name='dt[" . $id . "][detail][" . $no . "][widthrecive]'  onBlur='cariPanjang($id,$no)' data-numb1='" . $id . "' data-numb2='" . $no . "'  ></td>
 		<td	width ='130'><input  type='text' 											class='form-control input-sm' id='dt_lotno_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][loto]' 		></td>
 		
 		
@@ -768,12 +768,12 @@ class Incoming extends Admin_Controller
 			<thead>
 			<tr class='bg-blue'>
 			<th width='5' hidden>No PO</th>					 
-			<th width='10'>Material</th> 
+			<th width='5'>Material</th> 
 			<th width='5'>Keterangan</th>
-			<th width='10'>Id</th>
-			<th width='5'>Berat</th>
-			<th width='5'>Nomor Lot &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-			<th width='3'>Gudang</th>
+			<th width='5'>Id</th>
+			<th width='60'>Berat</th>
+			<th width='5'>Nomor Lot</th>
+			<th width='5'>Gudang</th>
 			<th width='5'>Customer</th>
 			<th width='5'>Berat Aktual</th>
 			<th width='5'>Selisih</th>
