@@ -627,47 +627,70 @@ if ($inven->spek != '') {
 		var alloy = $("#alloy").val();
 
 		var spek = $("#nm_inventory").val();
+		if(spek == undefined) {
+			spek = '';
+		}
 		if (spek != '') {
 			var stripspek = '-';
 		} else {
 			var stripspek = '';
 		};
 		var hardness = $(".hardness").val();
+		if(hardness == undefined) {
+			hardness = '';
+		}
 		if (hardness != '') {
 			var striphardness = '-';
 		} else {
 			var striphardness = '';
 		};
 		var thickness = $("#thickness").val();
+		if(thickness == undefined) {
+			thickness = '';
+		}
 		if (thickness != '') {
 			var stripthickness = '-';
 		} else {
 			var stripthickness = '';
 		};
 		var maker = $(".maker").val();
+		if(maker == undefined) {
+			maker = '';
+		}
 		if (maker != '') {
 			var stripmaker = '-';
 		} else {
 			var stripmaker = '';
 		};
 		var surface = $(".surface").val();
+		if(surface == undefined) {
+			surface = '';
+		}
 		if (surface != '') {
 			var stripsurface = '-';
 		} else {
 			var stripsurface = '';
 		};
 		var width = $('.width').val();
+		if(width == undefined) {
+			width = '';
+		}
 		if (width != '') {
 			var stripwidth = '-';
 		} else {
 			var stripwidth = '';
 		};
 		var length = $('.length').val();
+		if(length == undefined) {
+			length = '';
+		}
 		if (length != '') {
 			var striplength = '-';
 		} else {
 			var striplength = '';
 		};
+
+		
 
 		// alert(alloy);
 
