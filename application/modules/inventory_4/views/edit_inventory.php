@@ -623,6 +623,7 @@ if ($inven->spek != '') {
 	}
 
 	function cariNama() {
+		var id_bentuk = "<?= $inven->id_bentuk ?>";
 		var alloy = $("#alloy").val();
 
 		var spek = $("#nm_inventory").val();
@@ -670,7 +671,11 @@ if ($inven->spek != '') {
 
 		// alert(alloy);
 
-		var nama = spek + stripspek + hardness + striphardness + surface + stripsurface + thickness + stripthickness + width + stripwidth + length + striplength + alloy;
+		if(id_bentuk == 'B2000002') {
+			var nama = spek + stripspek + hardness + striphardness + surface + stripsurface + thickness + stripthickness + width + stripwidth + length + striplength + alloy;
+		} else {
+			var nama = alloy + stripspek + spek + striphardness + hardness + stripthickness + thickness + stripsurface + surface;
+		}
 		$(".nama").val(nama);
 
 	}
