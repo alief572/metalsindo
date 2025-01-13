@@ -274,6 +274,7 @@ class Inventory_4_model extends BF_Model
 		$this->db->join('child_inven_dimensi d','d.id_category3 =b.id_category3');
 		$this->db->join('ms_surface e','b.id_surface =e.id_surface');
 		$this->db->where('a.no_penawaran',$id);
+		$this->db->group_by('a.id_category3');
 		$query = $this->db->get();		
 		return $query->result();
 		
