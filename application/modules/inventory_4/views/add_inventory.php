@@ -591,7 +591,7 @@
 	}
 
 	function cariNama() {
-		var id_bentuk = "<?= $inven->id_bentuk ?>";
+		var id_bentuk = "<?= $results['id_bentuk'][0]->id_bentuk ?>";
 		var alloy = $("#alloy").val();
 
 		var spek = $("#nm_inventory").val();
