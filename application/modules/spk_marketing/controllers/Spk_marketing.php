@@ -1270,6 +1270,7 @@ class Spk_marketing extends Admin_Controller
 				'no_alloy'		        => $dp[noalloy],
 				'thickness'		        => $dp[thickness],
 				'width'		        	=> $dp[width],
+				'length'		        => $dp[length],
 				'harga_penawaran'		=> $dp[hgpenaaran],
 				'harga_deal'		    => $dp[hgdeal],
 				'qty_produk'			=> $dp[qty],
