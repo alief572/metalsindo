@@ -511,7 +511,7 @@
                 <tr>
                     <td align="center" colspan="2">DELIVERY TO :</td>
                     <td align="center" colspan="2">DELIVERY DATE :</td>
-                    <td align="center" colspan="2">TERMS :</td>
+                    <td align="center" colspan="2">PAYMENT TERMS :</td>
                     <td align="center" colspan="3">DATE REQUIRED :</td>
                 </tr>
                 <tr>
