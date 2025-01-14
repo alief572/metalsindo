@@ -269,7 +269,7 @@
                     <td width='22' align='center'><?= $valx['hardness']; ?></td>
                     <td width='22' align='center'><?= number_format($valx['thickness'], 2); ?></td>
                     <td width='22' align='center'><?= $valx['width']; ?></td>
-                    <td width='22' align='center'><?php if ($valx['length'] <= 0) {
+                    <td width='22' align='center'><?php if ($valx['id_bentuk'] == 'B2000001') {
                                                         echo "C";
                                                     } else {
                                                         echo number_format($valx['length'], 2);
