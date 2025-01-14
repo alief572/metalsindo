@@ -335,7 +335,7 @@ $tgl = date('d-F-Y', strtotime($header->tgl_do));
 			<th></th>
 			<th></th>
 			<th></th>
-			<th align="center">DPP</th>
+			<th align="center">Subtotal</th>
 			<th align="right" width="110"><?= number_format(floor($header->grand_total)) ?></th>
 			</tr>
 			
