@@ -105,12 +105,12 @@ $id_bentuk = $this->uri->segment(3);
 		<?php
 		} elseif ($id_bentuk == 'B2000002') {
 		?>
-			<table class="table table-bordered table-striped">
+			<table id="example3" class="table table-bordered table-striped">
 				<thead>
 					<tr>
 						<th width="5">#</th>
 						<th width="13%">Id Material</th>
-						<thhidden>Nama Type</th>
+						<th hidden>Nama Type</th>
 							<th>FERROUS / NON FERROUS</th>
 							<th hidden>Nama Category II</th>
 							<th hidden>Nama Category III</th>
@@ -187,7 +187,7 @@ $id_bentuk = $this->uri->segment(3);
 					<tr>
 						<th width="5">#</th>
 						<th width="13%">Id Material</th>
-						<thhidden>Nama Type</th>
+						<th hidden>Nama Type</th>
 							<th>FERROUS / NON FERROUS</th>
 							<th hidden>Nama Category II</th>
 							<th hidden>Nama Category III</th>
