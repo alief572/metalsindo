@@ -240,6 +240,20 @@ $tanggal = date('Y-m-d');
 			dataType: 'json',
 			success: function(result) {
 				$("#bentuk_" + id).html(result.html);
+				if (result.id_bentuk == 'B2000002') {
+					$('#tr_' + id).each(function() {
+						$(this).find('td').eq(3).css('visibility', 'hidden');
+						$(this).find('td').eq(4).css('visibility', 'hidden');
+					});
+				} else {
+					$('#tr_' + id).each(function() {
+						$(this).find('td').eq(3).css('visibility', 'visible');
+						$(this).find('td').eq(4).css('visibility', 'visible');
+					});
+				}
+
+				$('#dt_width_' + id).autoNumeric('set', result.width);
+				$('#dt_length_' + id).autoNumeric('set', result.length);
 			}
 		});
 		$.ajax({
