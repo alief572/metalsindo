@@ -368,8 +368,8 @@
 		<thead>
 			<tr height='60'>
 				<th align="center" width="20">No</th>
-				<th align="center" width="300">Description Of Goods</th>
-				<th align="center" width="60">Width</th>
+				<th align="center" width="270">Description Of Goods</th>
+				<th align="center" width="60">Spec</th>
 				<th align="center" width="60">Quantity</th>
 				<th align="center" width="60">Nett Weight (Kgs)</th>
 				<th align="center" width="60">Gross Weight (Kgs) </th>
@@ -389,7 +389,7 @@
 				$length    = $detail->length;
 				$gabung     = $detail->kode_gabung;
 				$nama 		= $this->db->get_where('ms_inventory_category3', array('id_category3' => $detail->id_material))->row();
-				$qty		= $this->db->query("SELECT SUM(weight_mat) AS totweightmat, SUM(qty_mat) AS totqty_mat FROM dt_delivery_order_child WHERE id_delivery_order ='$id' AND id_material ='$material' AND width='$width' AND length = '$lenght' AND kode_gabung='$gabung'")->row();
+				$qty		= $this->db->query("SELECT SUM(a.weight_mat) AS totweightmat, SUM(a.qty_mat) AS totqty_mat FROM dt_delivery_order_child a WHERE a.id_delivery_order ='$id' AND a.id_material ='$material' AND a.width='$width' AND a.length = '$length' AND a.kode_gabung='$gabung'")->row();
 
 
 
@@ -418,8 +418,8 @@
 			?>
 				<tr>
 					<td align="left">&nbsp;<?= $no ?></td>
-					<td align="left" width="350">&nbsp;<?= $nama->nama . ',' . $spek ?></td>
-					<td align="center" width="60">&nbsp;<?= $detail->width ?></td>
+					<td align="left" width="270">&nbsp;<?= $nama->nama . ',' . $spek ?></td>
+					<td align="center" width="90">&nbsp;<?= $detail->thickness . ' x ' . $detail->width . ' x ' . $detail->length ?></td>
 					<td align="right"><?= number_format($qty->totqty_mat, 2) ?></td>
 					<td align="right"><?= number_format($qty->totweightmat, 2) ?></td>
 					<td align="right"><?= number_format($qty->totweightmat + 5, 2) ?></td>
