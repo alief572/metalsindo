@@ -379,6 +379,7 @@ class Wt_invoicing_model extends BF_Model
     $this->db->where('a.id_delivery_order', $id);
     $this->db->group_by('a.id_material');
     $this->db->group_by('a.width');
+    $this->db->group_by('a.length');
     $this->db->group_by('a.kode_gabung');
 
     $query = $this->db->get();
