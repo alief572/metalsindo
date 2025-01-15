@@ -386,9 +386,10 @@
 				$no++;
 				$material  = $detail->id_material;
 				$width     = $detail->width;
+				$length    = $detail->length;
 				$gabung     = $detail->kode_gabung;
 				$nama 		= $this->db->get_where('ms_inventory_category3', array('id_category3' => $detail->id_material))->row();
-				$qty		= $this->db->query("SELECT SUM(weight_mat) AS totweightmat, SUM(qty_mat) AS totqty_mat FROM dt_delivery_order_child WHERE id_delivery_order ='$id' AND id_material ='$material' AND width='$width' AND kode_gabung='$gabung'")->row();
+				$qty		= $this->db->query("SELECT SUM(weight_mat) AS totweightmat, SUM(qty_mat) AS totqty_mat FROM dt_delivery_order_child WHERE id_delivery_order ='$id' AND id_material ='$material' AND width='$width' AND length = '$lenght' AND kode_gabung='$gabung'")->row();
 
 
 
