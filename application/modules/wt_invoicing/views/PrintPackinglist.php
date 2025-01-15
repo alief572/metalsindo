@@ -368,7 +368,7 @@
 		<thead>
 			<tr height='60'>
 				<th align="center" width="20">No</th>
-				<th align="center" width="370">Description Of Goods</th>
+				<th align="center" width="270">Description Of Goods</th>
 				<th align="center" width="60">Spec</th>
 				<th align="center" width="60">Quantity</th>
 				<th align="center" width="60">Nett Weight (Kgs)</th>
@@ -418,7 +418,7 @@
 			?>
 				<tr>
 					<td align="left">&nbsp;<?= $no ?></td>
-					<td align="left" width="350">&nbsp;<?= $nama->nama . ',' . $spek ?></td>
+					<td align="left" width="270">&nbsp;<?= $nama->nama . ',' . $spek ?></td>
 					<td align="center" width="90">&nbsp;<?= $detail->thickness . ' x ' . $detail->width . ' x ' . $detail->length ?></td>
 					<td align="right"><?= number_format($qty->totqty_mat, 2) ?></td>
 					<td align="right"><?= number_format($qty->totweightmat, 2) ?></td>
