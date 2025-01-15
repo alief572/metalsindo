@@ -333,7 +333,12 @@ class Purchase_request extends Admin_Controller
 		$id_bentuk = $kategory3[0]->id_bentuk;
 		$bentukquery	= $this->db->query("SELECT * FROM ms_bentuk WHERE id_bentuk = '$id_bentuk' ")->result();
 		$bentuk_material = $bentukquery[0]->nm_bentuk;
-		echo "<input readonly type='text' class='form-control' value='" . $bentuk_material . "' id='dt_bentuk_" . $loop . "' required name='dt[" . $loop . "][bentuk]' >";
+
+		$hasil = "<input readonly type='text' class='form-control' value='" . $bentuk_material . "' id='dt_bentuk_" . $loop . "' required name='dt[" . $loop . "][bentuk]' >";
+		echo json_encode([
+			'html' => $hasil,
+			'id_bentuk' => $id_bentuk
+		]);
 	}
 	function CariIdBentuk()
 	{
