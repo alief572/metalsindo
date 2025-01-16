@@ -254,8 +254,7 @@ class Purchase_request extends Admin_Controller
 	function AddMaterial()
 	{
 		$loop = $_GET['jumlah'] + 1;
-		$material = $this->db->query("SELECT a.*, b.nama as alloy, c.nm_bentuk as bentuk FROM ms_inventory_category3 as a 							INNER JOIN ms_inventory_category2 as b ON a.id_category2 = b.id_category2 
-									INNER JOIN ms_bentuk as c ON a.id_bentuk = c.id_bentuk WHERE a.deleted = '0'  ")->result();
+		$material = $this->db->query("SELECT a.*, b.nama as alloy, c.nm_bentuk as bentuk FROM ms_inventory_category3 as a JOIN ms_inventory_category2 as b ON a.id_category2 = b.id_category2 JOIN ms_bentuk as c ON a.id_bentuk = c.id_bentuk WHERE a.deleted = '0'  ")->result();
 		echo "
 		<tr id='tr_$loop'>
 		<td><select class='form-control select2' id='dt_idmaterial_$loop' name='dt[$loop][idmaterial]'	onchange ='CariProperties($loop)'>
@@ -333,7 +332,21 @@ class Purchase_request extends Admin_Controller
 		$id_bentuk = $kategory3[0]->id_bentuk;
 		$bentukquery	= $this->db->query("SELECT * FROM ms_bentuk WHERE id_bentuk = '$id_bentuk' ")->result();
 		$bentuk_material = $bentukquery[0]->nm_bentuk;
-		echo "<input readonly type='text' class='form-control' value='" . $bentuk_material . "' id='dt_bentuk_" . $loop . "' required name='dt[" . $loop . "][bentuk]' >";
+
+		$hasil = "<input readonly type='text' class='form-control' value='" . $bentuk_material . "' id='dt_bentuk_" . $loop . "' required name='dt[" . $loop . "][bentuk]' >";
+
+		$get_width = $this->db->get_where('child_inven_dimensi', array('id_category3' => $id_category3, 'id_dimensi' => '32'))->row();
+		$get_length = $this->db->get_where('child_inven_dimensi', array('id_category3' => $id_category3, 'id_dimensi' => '33'))->row();
+
+		$width = (!empty($get_width)) ? $get_width->nilai_dimensi : 0;
+		$length = (!empty($get_length)) ? $get_length->nilai_dimensi : 0;
+
+		echo json_encode([
+			'html' => $hasil,
+			'id_bentuk' => $id_bentuk,
+			'width' => $width,
+			'length' => $length
+		]);
 	}
 	function CariIdBentuk()
 	{
@@ -634,7 +647,7 @@ class Purchase_request extends Admin_Controller
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
 			$numb1++;
-			$materials = $this->db->query("SELECT a.*, b.nama as alloy, c.nm_bentuk as bentuk FROM ms_inventory_category3 as a INNER JOIN ms_inventory_category2 as b ON a.id_category2 = b.id_category2 INNER JOIN ms_bentuk as c ON a.id_bentuk = c.id_bentuk WHERE a.id_category3 = '" . $used[idmaterial] . "' AND a.deleted = '0'  ")->result();
+			$materials = $this->db->query("SELECT a.*, b.nama as alloy, c.nm_bentuk as bentuk FROM ms_inventory_category3 as a JOIN ms_inventory_category2 as b ON a.id_category2 = b.id_category2 JOIN ms_bentuk as c ON a.id_bentuk = c.id_bentuk WHERE a.id_category3 = '" . $used[idmaterial] . "' AND a.deleted = '0'  ")->result();
 			foreach ($materials as $material) {
 				if ($material->id_bentuk == 'B2000001') {
 					$dimensi = $this->db->query("SELECT * FROM child_inven_dimensi WHERE id_category3 = '$material->id_category3' AND id_dimensi = '22' ")->result();
@@ -674,11 +687,16 @@ class Purchase_request extends Admin_Controller
 					$nama_material = "$material->bentuk $material->alloy $material->nama $material->hardness $thickness";
 				};
 			};
+
+			$get_material = $this->db->get_where('ms_inventory_category3', array('id_category3' => $used['idmaterial']))->row();
+
+			$idameter = ($get_material->id_bentuk !== 'B2000002') ? $used['idameter'] : 0;
+			$odameter = ($get_material->id_bentuk !== 'B2000002') ? str_replace(',', '', $used['odameter']) : 0;
 			$dt =  array(
 				'no_pr'					=> $code,
 				'id_dt_pr'				=> $code . '-' . $numb1,
-				'idameter'			=> $used[idameter],
-				'odameter'			=> str_replace(',', '', $used[odameter]),
+				'idameter'			=> $idameter,
+				'odameter'			=> $odameter,
 				'idmaterial'			=> $used[idmaterial],
 				'nama_material'			=> $nama_material,
 				'bentuk'				=> $used[bentuk],
@@ -776,6 +794,11 @@ class Purchase_request extends Admin_Controller
 					$nama_material = "$material->bentuk $material->alloy $material->nama $material->hardness $thickness";
 				};
 			};
+
+			$get_material = $this->db->get_where('ms_inventory_category3', array('id_category3' => $used['idmaterial']))->row();
+
+			$idameter = ($get_material->id_bentuk !== 'B2000002') ? $used['idameter'] : 0;
+			$odameter = ($get_material->id_bentuk !== 'B2000002') ? str_replace(',', '', $used['odameter']) : 0;
 			$dt =  array(
 				'no_pr'					=> $code,
 				'id_dt_pr'				=> $code . '-' . $numb1,
@@ -783,10 +806,8 @@ class Purchase_request extends Admin_Controller
 				'nama_material'			=> $nama_material,
 				'bentuk'				=> $used[bentuk],
 				'id_bentuk'				=> $used[idbentuk],
-				'idameter'				=> $used[idameter],
-				'odameter'				=> str_replace(',', '', $used[odameter]),
-
-
+				'idameter'				=> $idameter,
+				'odameter'				=> $odameter,
 				'qty'				=> $used[qty],
 				'weight'			=> $used[weight],
 				'totalweight'		=> str_replace(',', '', $used[totalweight]),
