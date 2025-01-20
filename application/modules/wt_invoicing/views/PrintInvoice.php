@@ -463,7 +463,7 @@
 				<th align="center">Kgs</th>
 				<th></th>
 				<th align="center">Total</th>
-				<th align="right" width="110"><?= number_format($header->grand_total + ((11 / 12 * $header->grand_total) * 12 / 100)) ?></th>
+				<th align="right" width="110"><?= number_format(ceil($header->grand_total + ((11 / 12 * $header->grand_total) * 12 / 100)), 1) ?></th>
 			</tr>
 
 
