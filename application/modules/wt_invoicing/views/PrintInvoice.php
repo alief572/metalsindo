@@ -443,7 +443,7 @@
 					<th></th>
 					<th></th>
 					<th align="center">DPP Nilai Lain</th>
-					<th align="right" width="110"><?= number_format((11 / 12 * $header->grand_total), 1) ?></th>
+					<th align="right" width="110"><?= number_format(ceil((11 / 12 * $header->grand_total)), 1) ?></th>
 				</tr>
 
 				<tr>
@@ -452,7 +452,7 @@
 					<th></th>
 					<th></th>
 					<th align="center">PPN</th>
-					<th align="right" width="110"><?= number_format((11 / 12 * $header->grand_total) * 12 / 100, 1) ?></th>
+					<th align="right" width="110"><?= number_format(ceil((11 / 12 * $header->grand_total)) * 12 / 100, 1) ?></th>
 				</tr>
 
 			<?php } ?>
