@@ -60,20 +60,26 @@ foreach ($results['head'] as $head) {
 								<button type='button' class='btn btn-sm btn-success' title='Ambil' id='tbh_ata' data-role='qtip' onClick='addmaterial();'><i class='fa fa-plus'></i>Add</button>
 
 							</div>
-							<div class="form-group row">
+							<div class="form-group row table-responsive">
 								<table class='table table-bordered table-striped'>
 									<thead>
 										<tr class='bg-blue'>
 											<th width="10%">Material</th>
-											<th width='8%'>Bentuk</th>
-											<th width='8%'>ID</th>
-											<th width='8%'>OD</th>
+											<th width='20%'>Bentuk</th>
+											<th width='20%'>ID</th>
+											<th width='20%'>OD</th>
 											<th hidden>Qty (Unit)</th>
 											<th hidden>Weight (Unit)</th>
-											<th width='8%'>Total Weight</th>
-											<th width='8%'>Width</th>
+											<?php 
+												if($results['check_sheet'] > 0) {
+													echo '<th width="20%">Qty Sheet</th>';
+													echo '<th width="20%">Weight Sheet</th>';
+												}
+											?>
+											<th width='20%'>Total Weight</th>
+											<th width='20%'>Width</th>
 											<th hidden>Width</th>
-											<th width='8%'>Length</th>
+											<th width='20%'>Length</th>
 											<th width='15%'>Supplier</th>
 											<th width='10%'>Tanggal Dibutuhkan</th>
 											<th width='10%'>Keterangan</th>
@@ -198,9 +204,27 @@ foreach ($results['head'] as $head) {
 			";
 		}
 		echo "
-		</td>
+		</td>";
+
+		if($results['check_sheet'] > 0) {
+			if($detail->bentuk == 'SHEET') {
+				echo '<td><input type="text" class="form-control autoNumeric text-right" id="dt_qtysheet_'.$loop.'" name="dt['.$loop.'][qtysheet]" onchange="hitung_sheet('.$loop.')" value="'.$detail->qty_sheet.'" required></td>';
+				
+				echo '<td><input type="text" class="form-control autoNumeric text-right" id="dt_weightsheet_'.$loop.'" name="dt['.$loop.'][weightsheet]" value="'.$detail->weight_sheet.'" readonly></td>';
+			} else {
+				echo '
+					<td></td>
+					<td></td>
+				';
+			}
+		}
+
+		echo "
 		<td hidden><input type='number' class='form-control' value='" . $detail->qty . "'  id='dt_qty_$loop' 			required name='dt[$loop][qty]' 		onkeyup='HitungTweight(" . $loop . ")'></td>
 		<td hidden><input type='number' class='form-control' value='" . $detail->weight . "' id='dt_weight_$loop' 			required name='dt[$loop][weight]' 	onkeyup='HitungTweight(" . $loop . ")'></td>
+		";
+
+		echo "
 		<td id='HasilTwight_" . $loop . "'><input value='" . $detail->totalweight . "' type='text' class='form-control autoNumeric text-right' id='dt_totalweight_$loop' 	required name='dt[$loop][totalweight]' ></td>
 		<td><input type='text' class='form-control autoNumeric text-right' id='dt_width_$loop' value='" . $detail->width . "'	required name='dt[$loop][width]' ></td>
 		<td><input type='text' class='form-control autoNumeric text-right' id='dt_length_$loop' value='" . $detail->length . "'	required name='dt[$loop][length]' ></td>
@@ -382,25 +406,73 @@ foreach ($results['head'] as $head) {
 		});
 	}
 
+	function cariSheet() {
+		var no = 1;
+
+		var sts_sheet = 0;
+		$('#data_request').each(function() {
+
+			var bentuk = $('#dt_bentuk_' + no).val();
+			if (bentuk == 'SHEET' && sts_sheet == 0) {
+				sts_sheet = 1;
+			}
+
+			no++;
+		});
+
+		return sts_sheet;
+	}
+
 	function CariProperties(id) {
 		var idmaterial = $("#dt_idmaterial_" + id).val();
+		var sts_sheet = cariSheet();
+
 		$.ajax({
 			type: "GET",
 			url: siteurl + 'purchase_request/CariBentuk',
-			data: "idmaterial=" + idmaterial + "&id=" + id,
+			data: "idmaterial=" + idmaterial + "&id=" + id + "&sts_sheet=" + sts_sheet,
 			dataType: 'json',
 			success: function(result) {
 				$("#bentuk_" + id).html(result.html);
 				if (result.id_bentuk == 'B2000002') {
+
+					var qty_sheet_col = $('#tr_thead th:nth-child(6)').text();
+					var weight_sheet_col = $('#tr_thead th:nth-child(7)').text();
+					if (qty_sheet_col !== 'Qty Sheet' && weight_sheet_col !== 'Weight / Sheet') {
+						var newTh = $('<th>').text('Qty Sheet');
+						var newTh2 = $('<th>').text('Weight / Sheet');
+
+						$('#tr_thead th:nth-child(6)').before(newTh);
+						$('#tr_thead th:nth-child(7)').before(newTh2);
+
+					}
 					$('#tr_' + id).each(function() {
 						$(this).find('td').eq(3).css('visibility', 'hidden');
 						$(this).find('td').eq(4).css('visibility', 'hidden');
+						if ($(this).find('#dt_qtysheet_' + result.no).length < 1) {
+							$(this).find('td').eq(5).after('<td>');
+							$(this).find('td').eq(6).html(result.input_qty_sheet);
+							$(this).find('td').eq(6).after('<td>');
+							$(this).find('td').eq(7).html(result.input_weight_sheet);
+						}
 					});
 				} else {
+					if (cariSheet() < 1) {
+						$('th:contains("Qty Sheet")').remove();
+						$('th:contains("Weight / Sheet")').remove();
+					}
+
 					$('#tr_' + id).each(function() {
 						$(this).find('td').eq(3).css('visibility', 'visible');
 						$(this).find('td').eq(4).css('visibility', 'visible');
+						if (sts_sheet > 0) {
+							$(this).find('td').eq(5).after('<td>');
+							$(this).find('td').eq(6).html(result.input_qty_sheet);
+							$(this).find('td').eq(6).after('<td>');
+							$(this).find('td').eq(7).html(result.input_weight_sheet);
+						}
 					});
+
 				}
 
 				$('#dt_width_' + id).autoNumeric('set', result.width);
@@ -429,5 +501,42 @@ foreach ($results['head'] as $head) {
 	function HapusItem(id) {
 		$('#data_request #tr_' + id).remove();
 
+		if (cariSheet() < 1) {
+			$('th:contains("Qty Sheet")').remove();
+			$('th:contains("Weight / Sheet")').remove();
+		}
+
+		var bentuk = $('#dt_bentuk_' + id).val();
+		if (bentuk !== 'SHEET') {
+			$(this).find('td').eq(3).css('visibility', 'visible');
+			$(this).find('td').eq(4).css('visibility', 'visible');
+			if ($(this).find('#dt_qtysheet_' + result.no).length > 0) {
+				$('#tr_' + id + ' td:nth-child(7), #tr_' + id + ' td:nth-child(8)').remove();
+			}
+		}
+	}
+
+	function get_num(nilai = null) {
+		if (nilai !== '' && nilai !== null) {
+			nilai = nilai.split(',').join('');
+			if (isNaN(nilai)) {
+				nilai = 0;
+			} else {
+				nilai = parseFloat(nilai);
+			}
+		} else {
+			nilai = 0;
+		}
+
+		return nilai;
+	}
+
+	function hitung_sheet(id) {
+		var qty_sheet = get_num($('#dt_qtysheet_' + id).val());
+		var weight_sheet = get_num($('#dt_weightsheet_' + id).val());
+
+		var total_weight = (weight_sheet * qty_sheet);
+
+		$('#dt_totalweight_' + id).autoNumeric('set', total_weight);
 	}
 </script>

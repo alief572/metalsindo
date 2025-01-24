@@ -37,8 +37,6 @@ class Purchase_request extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$data = $this->db->query("SELECT * FROM tr_purchase_request ORDER BY created_on DESC ")->result();
-		$this->template->set('results', $data);
 		$this->template->title('Purchase Request');
 		$this->template->render('index');
 	}
@@ -70,8 +68,9 @@ class Purchase_request extends Admin_Controller
 		$this->template->page_icon('fa fa-pencil');
 		$aktif = 'active';
 		$deleted = '0';
-		$head = $this->db->query("SELECT * FROM tr_purchase_request  WHERE no_pr = '$id' ")->result();
-		$detail = $this->db->query("SELECT * FROM dt_trans_pr  WHERE no_pr = '$id' ")->result();
+		$head = $this->db->query("SELECT * FROM tr_purchase_request WHERE no_pr = '$id' ")->result();
+		$detail = $this->db->query("SELECT * FROM dt_trans_pr WHERE no_pr = '$id' ")->result();
+		$check_sheet = $this->db->query('SELECT id_dt_pr FROM dt_trans_pr WHERE no_pr = "'.$id.'"')->num_rows();
 		$customers = $this->Pr_model->get_data('master_customers', 'deleted', $deleted);
 		$karyawan = $this->Pr_model->get_data('ms_karyawan', 'deleted', $deleted);
 		$mata_uang = $this->Pr_model->get_data('mata_uang', 'deleted' . $deleted);
@@ -81,6 +80,7 @@ class Purchase_request extends Admin_Controller
 			'customers' => $customers,
 			'karyawan' => $karyawan,
 			'mata_uang' => $mata_uang,
+			'check_sheet' => $check_sheet
 		];
 		$this->template->set('results', $data);
 		$this->template->title('Purchase Request');
@@ -341,11 +341,23 @@ class Purchase_request extends Admin_Controller
 		$width = (!empty($get_width)) ? $get_width->nilai_dimensi : 0;
 		$length = (!empty($get_length)) ? $get_length->nilai_dimensi : 0;
 
+		$input_qty_sheet = '';
+		$input_weight_sheet = '';
+		if($id_bentuk == 'B2000002') {
+			$input_qty_sheet = '<input type="text" class="form-control autoNumeric text-right" id="dt_qtysheet_'.$loop.'" name="dt['.$loop.'][qtysheet]" onchange="hitung_sheet('.$loop.')" required>';
+			
+			$input_weight_sheet = '<input type="text" class="form-control autoNumeric text-right" id="dt_weightsheet_'.$loop.'" name="dt['.$loop.'][weightsheet]" value="'.$kategory3[0]->total_weight.'" readonly>';
+		}
+
+
 		echo json_encode([
 			'html' => $hasil,
 			'id_bentuk' => $id_bentuk,
 			'width' => $width,
-			'length' => $length
+			'length' => $length,
+			'no' => $loop,
+			'input_qty_sheet' => $input_qty_sheet,
+			'input_weight_sheet' => $input_weight_sheet
 		]);
 	}
 	function CariIdBentuk()
@@ -692,6 +704,9 @@ class Purchase_request extends Admin_Controller
 
 			$idameter = ($get_material->id_bentuk !== 'B2000002') ? $used['idameter'] : 0;
 			$odameter = ($get_material->id_bentuk !== 'B2000002') ? str_replace(',', '', $used['odameter']) : 0;
+			$qty_sheet = ($get_material->id_bentuk == 'B2000002') ? str_replace(',', '', $used['qtysheet']) : 0;
+			$weight_sheet = ($get_material->id_bentuk == 'B2000002') ? str_replace(',', '', $used['weightsheet']) : 0;
+
 			$dt =  array(
 				'no_pr'					=> $code,
 				'id_dt_pr'				=> $code . '-' . $numb1,
@@ -709,6 +724,8 @@ class Purchase_request extends Admin_Controller
 				'suplier'			=> $used[suplier],
 				'tanggal'			=> $used[tanggal],
 				'keterangan'			=> $used[keterangan],
+				'qty_sheet' => $qty_sheet,
+				'weight_sheet' => $weight_sheet
 			);
 			$this->db->insert('dt_trans_pr', $dt);
 		}
@@ -799,6 +816,8 @@ class Purchase_request extends Admin_Controller
 
 			$idameter = ($get_material->id_bentuk !== 'B2000002') ? $used['idameter'] : 0;
 			$odameter = ($get_material->id_bentuk !== 'B2000002') ? str_replace(',', '', $used['odameter']) : 0;
+			$qty_sheet = ($get_material->id_bentuk == 'B2000002') ? str_replace(',', '', $used['qtysheet']) : 0;
+			$weight_sheet = ($get_material->id_bentuk == 'B2000002') ? str_replace(',', '', $used['weightsheet']) : 0;
 			$dt =  array(
 				'no_pr'					=> $code,
 				'id_dt_pr'				=> $code . '-' . $numb1,
@@ -816,6 +835,8 @@ class Purchase_request extends Admin_Controller
 				'suplier'			=> $used[suplier],
 				'tanggal'			=> $used[tanggal],
 				'keterangan'		=> $used[keterangan],
+				'qty_sheet' => $qty_sheet,
+				'weight_sheet' => $weight_sheet
 			);
 			$this->db->insert('dt_trans_pr', $dt);
 		}
@@ -1409,5 +1430,9 @@ class Purchase_request extends Admin_Controller
                     </tr>";
 		endforeach;
 		echo "</select>";
+	}
+
+	public function get_purchase_request() {
+		$this->Pr_model->get_purchase_request();
 	}
 }
