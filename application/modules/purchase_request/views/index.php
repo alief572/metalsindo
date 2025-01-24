@@ -267,8 +267,31 @@ $ENABLE_DELETE  = has_permission('PR.Delete');
 		// } );
 
 		var table = $('#example1').DataTable({
-			orderCellsTop: true,
-			fixedHeader: true
+			processing: true,
+			serverSide: true,
+			ajax: {
+				url: siteurl + active_controller + 'get_purchase_request',
+				type: 'post'
+			},
+			columns: [{
+					data: 'no'
+				},
+				{
+					data: 'no_surat'
+				},
+				{
+					data: 'tanggal'
+				},
+				{
+					data: 'requestor'
+				},
+				{
+					data: 'status'
+				},
+				{
+					data: 'option'
+				}
+			]
 		});
 		$("#form-area").hide();
 	});
