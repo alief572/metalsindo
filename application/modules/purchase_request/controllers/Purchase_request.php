@@ -816,6 +816,8 @@ class Purchase_request extends Admin_Controller
 
 			$idameter = ($get_material->id_bentuk !== 'B2000002') ? $used['idameter'] : 0;
 			$odameter = ($get_material->id_bentuk !== 'B2000002') ? str_replace(',', '', $used['odameter']) : 0;
+			$qty_sheet = ($get_material->id_bentuk == 'B2000002') ? str_replace(',', '', $used['qtysheet']) : 0;
+			$weight_sheet = ($get_material->id_bentuk == 'B2000002') ? str_replace(',', '', $used['weightsheet']) : 0;
 			$dt =  array(
 				'no_pr'					=> $code,
 				'id_dt_pr'				=> $code . '-' . $numb1,
@@ -833,6 +835,8 @@ class Purchase_request extends Admin_Controller
 				'suplier'			=> $used[suplier],
 				'tanggal'			=> $used[tanggal],
 				'keterangan'		=> $used[keterangan],
+				'qty_sheet' => $qty_sheet,
+				'weight_sheet' => $weight_sheet
 			);
 			$this->db->insert('dt_trans_pr', $dt);
 		}
