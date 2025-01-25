@@ -37,8 +37,6 @@ class Delivery_order extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$data = $this->Delivery_order_model->CariDO();
-		$this->template->set('results', $data);
 		$this->template->title('Delivery Order');
 		$this->template->render('index');
 	}
@@ -3059,5 +3057,9 @@ class Delivery_order extends Admin_Controller
 		$data['detail']  = $this->Delivery_order_model->PrintDetail($id);
 		$data['detail2']  = $this->Delivery_order_model->PrintDetail2($id);
 		$this->load->view('PrintHeaderWordSlitting', $data);
+	}
+
+	public function get_delivery_order() {
+		$this->Delivery_order_model->get_delivery_order();
 	}
 }
