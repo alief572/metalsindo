@@ -369,20 +369,21 @@
                 if ($check_sheet > 0) {
                 ?>
 
-                    <td align="right"><?= number_format($ttl_sheet, 2) ?></td>
+                    <td align="right"><?= number_format($ttl_she, 2) ?></td>
+                    <td align="right"></td>
+                    <td align="right"><?= number_format($detailsum[0]->sumtotalwidth, 2) ?></td>
+                    <td align="right"></td>
 
                 <?php
                 } else {
                 ?>
 
                     <td align="right"><?= number_format($detailsum[0]->sumtotalwidth, 2) ?></td>
+                    <td align="right" colspan="3"></td>
 
                 <?php
                 }
                 ?>
-                <td align="right"></td>
-                <td align="right"><?= number_format($detailsum[0]->sumtotalwidth, 2) ?></td>
-                <td align="right"></td>
                 <td align="right"><?= $TOTHEAD ?></td>
                 <td align="center"></td>
             </tr>
