@@ -250,15 +250,38 @@
     ?>
     <table class='gridtable' cellpadding='0' cellspacing='0' style='vertical-align:top;'>
         <tbody>
-            <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
-                <td align="center" width='150'>Material</td>
-                <td align="center" width='30'>Width</td>
-                <td align="center" width='30'>Length</td>
-                <td align="center" width='40'>Total Weight</td>
-                <td align="center" width='30'>Unit Price<?= $matauang; ?></td>
-                <td align="center" width='80'>Amount<?= $matauang; ?><br><?= $header->cif; ?></td>
-                <td align="center" width='130'>Remarks</td>
-            </tr>
+            <?php
+            if ($check_sheet > 0) {
+            ?>
+
+                <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
+                    <td align="center" width="100" style="font-size: 11px;">Material</td>
+                    <td align="center" width="30" style="font-size: 11px;">Width</td>
+                    <td align="center" width="30" style="font-size: 11px;">Length</td>
+                    <td align="center" width="50" style="font-size: 11px;">Total Sheet</td>
+                    <td align="center" width="50" style="font-size: 11px;">Unit Price <br> Sheet</td>
+                    <td align="center" width="50" style="font-size: 11px;">Total Kgs</td>
+                    <td align="center" width="50" style="font-size: 11px;">Unit Price <br> Kgs</td>
+                    <td align="center" width="80" style="font-size: 11px;">Amount</td>
+                    <td align="center" width="50" style="font-size: 11px;">Remarks</td>
+                </tr>
+
+            <?php
+            } else {
+            ?>
+                <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
+                    <td align="center" width='150'>Material</td>
+                    <td align="center" width='30'>Width</td>
+                    <td align="center" width='30'>Length</td>
+                    <td align="center" width='40'>Total Weight</td>
+                    <td align="center" width='30'>Unit Price<?= $matauang; ?></td>
+                    <td align="center" width='80'>Amount<?= $matauang; ?><br><?= $header->cif; ?></td>
+                    <td align="center" width='130'>Remarks</td>
+                </tr>
+            <?php
+            }
+            ?>
+
             <?php
             $CIF = "<br>" . $header->cif . "<br><br><br><br>";
             $TOT_PPH = 0;
@@ -270,42 +293,61 @@
                     $HS = number_format($detail->hargasatuan, 2);
                     $JH = number_format($detail->jumlahharga, 2);
                 }
-                if ($jumlahdata <= '30') {
+                if ($check_sheet > 0) {
+
+
+                    echo "	
+                    <tr >
+                        <td width='100' style='word-wrap: break-word;white-space: normal;'>" . nl2br($detail->nama) . "</td>
+                        <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
+                        <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
+                        <td width='50' align='right'>" . number_format($detail->totalwidth, 2) . "</td>
+                        <td width='50' align='right'>" . number_format($detail->hargasatuan * $detail->total_weight, 2) . "</td>
+                        <td width='50' align='right'>" . number_format($detail->totalwidth / $detail->total_weight, 2) . "</td>
+                        <td width='50' align='right'>" . $HS . "</td>
+                        <td width='80' align='right'>" . number_format($detail->jumlahharga, 2) . "</td>
+                        <td width='50'>" . $detail->description . "</td>
+                    </tr>";
+                } else {
                     echo "	
                     <tr >
                         <td width='150'>" . $detail->nama . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
-						<td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
+                        <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
                         <td width='40' align='right'>" . number_format($detail->totalwidth, 2) . "</td>
                         <td width='30' align='right'>" . $HS . "</td>
                         <td width='80' align='right'>" . $JH . "</td>
                         <td width='130'>" . $detail->description . "</td>
                     </tr>";
-                    $CIF = "";
-                } else {
-                    echo "	
-                    <tr >
-                        <td width='150'>" . $detail->namamaterial . "</td>
-                        <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
-						<td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
-                        <td width='40' align='right'>" . number_format($detail->totalwidth, 2) . "</td>
-                        <td width='30' align='right'>" . $HS . "</td>
-                        <td width='80' align='right'>" . $JH . "</td>
-                        <td width='130'>" . $detail->description . "</td>
-                    </tr>";
-                    $CIF = "";
                 }
+                $CIF = "";
             } ?>
 
             <?php
             if ($header->loi == 'Lokal') {
+                if ($check_sheet > 0) {
             ?>
-                <tr>
-                    <td align="center" colspan='3'>PPN </td>
-                    <td align="right" colspan='2'></td>
-                    <td align="right"><?= number_format($TOT_PPH, 2) ?></td>
-                    <td align="center"></td>
-                </tr>
+
+                    <tr>
+                        <td align="center" colspan='7'>PPN </td>
+                        <td align="right"><?= number_format($TOT_PPH, 2) ?></td>
+                        <td align="center"></td>
+                    </tr>
+
+                <?php
+                } else {
+                ?>
+
+                    <tr>
+                        <td align="center" colspan='3'>PPN </td>
+                        <td align="right" colspan='2'></td>
+                        <td align="right"><?= number_format($TOT_PPH, 2) ?></td>
+                        <td align="center"></td>
+                    </tr>
+
+                <?php
+                }
+                ?>
             <?php
             }
             if ($header->loi == 'Import') {
@@ -320,7 +362,7 @@
             <tr>
                 <td align="center" colspan='3'>Total </td>
                 <td align="right"><?= number_format($detailsum[0]->sumtotalwidth, 2) ?></td>
-                <td align="right"></td>
+                <td align="right" colspan="3"></td>
                 <td align="right"><?= $TOTHEAD ?></td>
                 <td align="center"></td>
             </tr>
@@ -337,6 +379,30 @@
                 </td>
                 <td colspan=3' align="center" width='40'>Eta Date</td>
             </tr>
+
+            <?php
+            if ($check_sheet > 0) {
+            ?>
+
+                <tr style='vertical-align:middle;'>
+                    <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->tanggal)) ?></td>
+                    <td colspan='3' align="center">PT Metalsindo Pacific<br>Cikarang, Indonesia</td>
+                    <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->expect_tanggal)) ?></td>
+                </tr>
+
+            <?php
+            } else {
+            ?>
+
+                <tr style='vertical-align:middle;'>
+                    <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->tanggal)) ?></td>
+                    <td colspan='3' align="center">PT Metalsindo Pacific<br>Cikarang, Indonesia</td>
+                    <td colspan='2' align="center"><?= date('d-M-Y', strtotime($header->expect_tanggal)) ?></td>
+                </tr>
+
+            <?php
+            }
+            ?>
             <tr style='vertical-align:middle;'>
                 <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->tanggal)) ?></td>
                 <td colspan='3' align="center">PT Metalsindo Pacific<br>Cikarang, Indonesia</td>
@@ -346,6 +412,7 @@
                 <td colspan="3" align="center">Payment Term</td>
                 <td colspan="3" align="center"><?= $header->term ?></td>
             </tr>
+
         </tbody>
     </table>
     <br>

@@ -12,6 +12,11 @@ class Delivery_order_model extends BF_Model
 	/**
 	 * @var string  User Table Name
 	 */
+	protected $viewPermission 	= 'Delivery_Order.View';
+	protected $addPermission  	= 'Delivery_Order.Add';
+	protected $managePermission = 'Delivery_Order.Manage';
+	protected $deletePermission = 'Delivery_Order.Delete';
+	
 	protected $table_name = 'ms_inventory_category3';
 	protected $key        = 'id';
 
@@ -371,5 +376,118 @@ class Delivery_order_model extends BF_Model
 		$this->db->where('a.id_category3', $id);
 		$query = $this->db->get();
 		return $query->result();
+	}
+
+	public function get_delivery_order() {
+		$draw = $this->input->post('draw');
+		$length = $this->input->post('length');
+        $start = $this->input->post('start');
+        $search = $this->input->post('search');
+
+		$this->db->select('a.*, b.name_customer as name_customer, SUM(c.weight_mat) AS total_fg, SUM(d.weight_mat) as total_scrap');
+		$this->db->from('tr_delivery_order a');
+		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+		$this->db->join('dt_delivery_order_child c', 'c.id_delivery_order = a.id_delivery_order', 'left');
+		$this->db->join('dt_delivery_order_child_scrap d', 'd.id_delivery_order = a.id_delivery_order', 'left');
+		if(!empty($search)) {
+			$this->db->group_start();
+			$this->db->like('DATE_FORMAT(a.tgl_delivery_order, "%d-%M-%Y")', $search['value'], 'both');
+			$this->db->or_like('a.no_surat', $search['value'], 'both');
+			$this->db->or_like('a.no_spk_marketing', $search['value'], 'both');
+			$this->db->or_like('b.name_customer', $search['value'], 'both');
+			$this->db->or_like('a.type', $search['value'], 'both');
+			$this->db->group_end();
+		}
+		$this->db->group_by('a.id_delivery_order');
+		$this->db->order_by('a.id_delivery_order', 'desc');
+		$this->db->limit($length, $start);
+		$query = $this->db->get();
+
+		$this->db->select('a.*, b.name_customer as name_customer, SUM(c.weight_mat) AS total_fg, SUM(d.weight_mat) as total_scrap');
+		$this->db->from('tr_delivery_order a');
+		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+		$this->db->join('dt_delivery_order_child c', 'c.id_delivery_order = a.id_delivery_order', 'left');
+		$this->db->join('dt_delivery_order_child_scrap d', 'd.id_delivery_order = a.id_delivery_order', 'left');
+		if(!empty($search)) {
+			$this->db->group_start();
+			$this->db->like('DATE_FORMAT(a.tgl_delivery_order, "%d-%M-%Y")', $search['value'], 'both');
+			$this->db->or_like('a.no_surat', $search['value'], 'both');
+			$this->db->or_like('a.no_spk_marketing', $search['value'], 'both');
+			$this->db->or_like('b.name_customer', $search['value'], 'both');
+			$this->db->or_like('a.type', $search['value'], 'both');
+			$this->db->group_end();
+		}
+		$this->db->group_by('a.id_delivery_order');
+		$this->db->order_by('a.id_delivery_order', 'desc');
+		$query_all = $this->db->get();
+
+		$hasil = [];
+
+		$no = (0 + $start);
+		foreach($query->result() as $item) {
+			$no++;
+
+			$button = '';
+
+			if($item->status_approve == 1) {
+				if(has_permission($this->viewPermission)) {
+					$button = '
+						<a class="btn btn-primary btn-sm" href="'. base_url('/delivery_order/PrintHeader/' . $item->id_delivery_order) .'" target="_blank" title="Print"><i class="fa fa-print"></i>
+						</a>
+						<a class="btn btn-success btn-sm" href="'. base_url('/delivery_order/PrintHeaderWord/' . $item->id_delivery_order) .'" target="_blank" title="Print Word"><i class="fa fa-file-word-o"></i>
+						</a>
+						<a class="btn btn-success btn-sm" href="'. base_url('/delivery_order/PrintHeaderHtml/' . $item->id_delivery_order) .'" target="_blank" title="Ke Printer"><i class="fa fa-print"></i>
+						</a>
+						<a class="btn btn-warning btn-sm" href="'. base_url('/delivery_order/PrintHeaderSlitting/' . $item->id_delivery_order) .'" target="_blank" title="Print"><i class="fa fa-print"></i>
+						</a>
+						<a class="btn btn-primary btn-sm" href="'. base_url('/delivery_order/PrintHeaderWordSlitting/' . $item->id_delivery_order) .'" target="_blank" title="Print Word Slitting"><i class="fa fa-file-word-o"></i>
+						</a>
+					';
+				}
+ 			} else {
+				if(has_permission($this->viewPermission)) {
+					$button .= '
+						<a class="btn btn-primary btn-sm" href="'. base_url('/delivery_order/PrintHeaderHtml/' . $item->id_delivery_order) .'" target="_blank" title="Print"><i class="fa fa-print"></i>
+						</a>
+						<a class="btn btn-success btn-sm" href="'. base_url('/delivery_order/PrintHeaderWord/' . $item->id_delivery_order) .'" target="_blank" title="Print Word"><i class="fa fa-file-word-o"></i>
+						</a>
+						<a class="btn btn-warning btn-sm" href="'. base_url('/delivery_order/PrintHeaderSlitting/' . $item->id_delivery_order) .'" target="_blank" title="Print"><i class="fa fa-print"></i>
+						</a>
+						<a class="btn btn-primary btn-sm" href="'. base_url('/delivery_order/PrintHeaderWordSlitting/' . $item->id_delivery_order) .'" target="_blank" title="Print Word Slitting"><i class="fa fa-file-word-o"></i>
+						</a>
+					';
+				}
+				if(has_permission($this->managePermission)) {
+					$button .= '
+						<a class="btn btn-info btn-sm" href="'. base_url('/delivery_order/editHeader/' . $item->id_delivery_order) .'" title="Edit"><i class="fa fa-edit"></i></i></a>
+					';
+				}
+				if(has_permission($this->managePermission)) {
+					$button .= '
+						<button type="text" class="btn btn-success btn-sm release" title="Release" data-id="'. $item->id_delivery_order .'"><i class="fa fa-check"></i></button>
+					';
+				}
+			}
+
+			$hasil[] = [
+				'no' => $no,
+				'tanggal_do' => date('d-M-Y', strtotime($item->tgl_delivery_order)),
+				'no_do' => $item->no_surat,
+				'no_spk_marketing' => $item->no_spk_marketing,
+				'nm_customer' => strtoupper($item->name_customer),
+				'total_fg' => number_format($item->total_fg, 2),
+				'total_scrap' => number_format($item->total_scrap, 2),
+				'total_berat' => number_format($item->total_fg + $item->total_scrap, 2),
+				'tipe' => strtoupper($item->type),
+				'action' => $button
+			];
+		}
+
+		echo json_encode([
+            "draw" => $draw,
+            "recordsTotal" => $query_all->num_rows(),
+            "recordsFiltered" => $query_all->num_rows(),
+            "data" => $hasil
+        ]);
 	}
 }
