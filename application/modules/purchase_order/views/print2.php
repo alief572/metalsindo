@@ -297,21 +297,25 @@
                 }
                 if ($check_sheet > 0) {
 
+                    $total_weight_sheet = (!empty($detail) && $detail->total_weight > 0) ? $detail->total_weight : 1;
+
+                    $total_weight_kgs = ($detail->totalwidth / $total_weight_sheet);
+                    $harga_satuan_kgs = ($detail->hargasatuan * $detail->total_weight);
 
                     echo "	
                     <tr >
                         <td width='100'>" . wordwrap($detail->nama, 15, '<br>', true) . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($detail->totalwidth / $detail->total_weight, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($detail->hargasatuan * $detail->total_weight, 2) . "</td>
+                        <td width='50' align='right'>" . number_format($total_weight_kgs, 2) . "</td>
+                        <td width='50' align='right'>" . number_format($harga_satuan_kgs, 2) . "</td>
                         <td width='50' align='right'>" . number_format($detail->totalwidth, 2) . "</td>
                         <td width='50' align='right'>" . $HS . "</td>
                         <td width='80' align='right'>" . number_format($detail->jumlahharga, 2) . "</td>
                         <td width='50'>" . $detail->description . "</td>
                     </tr>";
 
-                    $ttl_sheet += ($detail->totalwidth / $detail->total_weight);
+                    $ttl_sheet += ($total_weight_kgs);
                 } else {
                     echo "	
                     <tr >
@@ -373,19 +377,20 @@
                     <td align="right"></td>
                     <td align="right"><?= number_format($detailsum[0]->sumtotalwidth, 2) ?></td>
                     <td align="right"></td>
-
+                    <td align="right"><?= $TOTHEAD ?></td>
+                    <td align="center"></td>
                 <?php
                 } else {
                 ?>
 
                     <td align="right"><?= number_format($detailsum[0]->sumtotalwidth, 2) ?></td>
-                    <td align="right" colspan="3"></td>
-
+                    <td align="right" colspan="1"></td>
+                    <td align="right"><?= $TOTHEAD ?></td>
+                    <td align="center"></td>
                 <?php
                 }
                 ?>
-                <td align="right"><?= $TOTHEAD ?></td>
-                <td align="center"></td>
+                
             </tr>
             <tr style='vertical-align:middle;'>
                 <td colspan='3' align="center">Issued Date</td>
