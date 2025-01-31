@@ -1371,7 +1371,7 @@ class Purchase_order extends Admin_Controller
 		$this->auth->restrict($this->managePermission);
 		$id = $this->uri->segment(3);
 		$data['header'] = $this->db->query("SELECT a.*, b.name_suplier as name_suplier, b.address_office as address_office,b.id_negara as negara, b.telephone as telephone,b.fax as fax FROM tr_purchase_order as a INNER JOIN master_supplier as b on a.id_suplier = b.id_suplier WHERE a.no_po = '" . $id . "' ")->result();
-		$data['detail']  = $this->db->query("SELECT a.*, b.nama FROM dt_trans_po a 
+		$data['detail']  = $this->db->query("SELECT a.*, b.nama, b.total_weight FROM dt_trans_po a 
 		INNER JOIN ms_inventory_category3 b ON b.id_category3 = a.idmaterial 
 		WHERE a.no_po = '" . $id . "' ")->result();
 		$data['detailsum'] = $this->db->query("SELECT AVG(width) as totalwidth, AVG(qty) as totalqty FROM dt_trans_po WHERE no_po = '" . $id . "' ")->result();
@@ -1392,6 +1392,14 @@ class Purchase_order extends Admin_Controller
 
 		$data['no_pr'] = $no_pr;
 		$data['date_required'] = $get_no_pr[0]->tanggal;
+
+		$this->db->select('a.id');
+		$this->db->from('dt_trans_po a');
+		$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.idmaterial');
+		$this->db->where('b.id_bentuk', 'B2000002');
+		$check_sheet = $this->db->get()->num_rows();
+
+		$data['check_sheet'] = $check_sheet;
 
 		
 
