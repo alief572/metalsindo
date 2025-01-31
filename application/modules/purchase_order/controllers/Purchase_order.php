@@ -1396,6 +1396,7 @@ class Purchase_order extends Admin_Controller
 		$this->db->select('a.id');
 		$this->db->from('dt_trans_po a');
 		$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.idmaterial');
+		$this->db->where('a.no_po', $id);
 		$this->db->where('b.id_bentuk', 'B2000002');
 		$check_sheet = $this->db->get()->num_rows();
 
