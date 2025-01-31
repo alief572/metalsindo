@@ -379,6 +379,7 @@
                 </td>
                 <td colspan=3' align="center" width='40'>Eta Date</td>
             </tr>
+
             <?php
             if ($check_sheet > 0) {
             ?>
@@ -402,6 +403,16 @@
             <?php
             }
             ?>
+            <tr style='vertical-align:middle;'>
+                <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->tanggal)) ?></td>
+                <td colspan='3' align="center">PT Metalsindo Pacific<br>Cikarang, Indonesia</td>
+                <td colspan='2' rowspan="2" align="center"><?= date('d-M-Y', strtotime($header->expect_tanggal)) ?></td>
+            </tr>
+            <tr style="vertical-align: middle;">
+                <td colspan="3" align="center">Payment Term</td>
+                <td colspan="3" align="center"><?= $header->term ?></td>
+            </tr>
+
         </tbody>
     </table>
     <br>
