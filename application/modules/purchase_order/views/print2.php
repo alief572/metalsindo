@@ -298,7 +298,7 @@
 
                     echo "	
                     <tr >
-                        <td width='100' style='word-wrap: break-word;white-space: normal;'>" . nl2br($detail->nama) . "</td>
+                        <td width='100'>" . wordwrap($detail->nama, 15, '<br>', true) . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
                         <td width='50' align='right'>" . number_format($detail->totalwidth, 2) . "</td>
@@ -388,6 +388,7 @@
             <tr style="vertical-align: middle;">
                 <td colspan="3" align="center">Payment Term</td>
                 <td colspan="3" align="center"><?= $header->term ?></td>
+                <td colspan="3" align="center"></td>
             </tr>
 
 
