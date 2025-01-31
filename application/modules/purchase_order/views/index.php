@@ -270,10 +270,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 		// } );
 		// } );
 
-		var table = $('#example1').DataTable({
-			orderCellsTop: true,
-			fixedHeader: true
-		});
+		var table = $('#example1').DataTable();
 		$("#form-area").hide();
 	});
 
