@@ -388,6 +388,7 @@
             <tr style="vertical-align: middle;">
                 <td colspan="3" align="center">Payment Term</td>
                 <td colspan="3" align="center"><?= $header->term ?></td>
+                <td colspan="3" align="center"></td>
             </tr>
 
 
