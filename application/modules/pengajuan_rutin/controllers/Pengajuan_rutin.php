@@ -61,11 +61,16 @@ class Pengajuan_rutin extends Admin_Controller
 		$departemen = '';
 		//		$datauser=$this->All_model->GetInfoUser($this->auth->user_id());
 		//		if($datauser) $departemen=$datauser->departemen;
+		$this->template->title('Approval Pengajuan Pembayaran Periodik');
 		$data = $this->Pengajuan_rutin_model->GetPengajuanRutin(array('a.status' => 0));
 		$datdept  = $this->All_model->GetDeptCombo();
 		$this->template->set('datdept', $datdept);
 		$this->template->set('results', $data);
+<<<<<<< HEAD
+		// $this->template->title('Pengajuan Pembayaran Periodik');
+=======
 		$this->template->title('Approval Pengajuan Pembayaran Periodik');
+>>>>>>> 8130b4a49bc76331822d93e1f812d38002de8983
 		$this->template->render('app_list');
 	}
 
