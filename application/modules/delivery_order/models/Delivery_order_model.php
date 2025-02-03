@@ -384,11 +384,9 @@ class Delivery_order_model extends BF_Model
         $start = $this->input->post('start');
         $search = $this->input->post('search');
 
-		$this->db->select('a.*, b.name_customer as name_customer, SUM(c.weight_mat) AS total_fg, SUM(d.weight_mat) as total_scrap');
+		$this->db->select('a.*, b.name_customer as name_customer');
 		$this->db->from('tr_delivery_order a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		$this->db->join('dt_delivery_order_child c', 'c.id_delivery_order = a.id_delivery_order', 'left');
-		$this->db->join('dt_delivery_order_child_scrap d', 'd.id_delivery_order = a.id_delivery_order', 'left');
 		if(!empty($search)) {
 			$this->db->group_start();
 			$this->db->like('DATE_FORMAT(a.tgl_delivery_order, "%d-%M-%Y")', $search['value'], 'both');
@@ -403,11 +401,9 @@ class Delivery_order_model extends BF_Model
 		$this->db->limit($length, $start);
 		$query = $this->db->get();
 
-		$this->db->select('a.*, b.name_customer as name_customer, SUM(c.weight_mat) AS total_fg, SUM(d.weight_mat) as total_scrap');
+		$this->db->select('a.*, b.name_customer as name_customer');
 		$this->db->from('tr_delivery_order a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		$this->db->join('dt_delivery_order_child c', 'c.id_delivery_order = a.id_delivery_order', 'left');
-		$this->db->join('dt_delivery_order_child_scrap d', 'd.id_delivery_order = a.id_delivery_order', 'left');
 		if(!empty($search)) {
 			$this->db->group_start();
 			$this->db->like('DATE_FORMAT(a.tgl_delivery_order, "%d-%M-%Y")', $search['value'], 'both');
@@ -469,15 +465,25 @@ class Delivery_order_model extends BF_Model
 				}
 			}
 
+			$this->db->select('SUM(a.weight_mat) as total_fg');
+			$this->db->from('dt_delivery_order_child a');
+			$this->db->where('a.id_delivery_order', $item->id_delivery_order);
+			$get_total_fg = $this->db->get()->row();
+
+			$this->db->select('SUM(a.weight_mat) as total_fg');
+			$this->db->from('dt_delivery_order_child_scrap a');
+			$this->db->where('a.id_delivery_order', $item->id_delivery_order);
+			$get_total_scrap = $this->db->get()->row();
+
 			$hasil[] = [
 				'no' => $no,
 				'tanggal_do' => date('d-M-Y', strtotime($item->tgl_delivery_order)),
 				'no_do' => $item->no_surat,
 				'no_spk_marketing' => $item->no_spk_marketing,
 				'nm_customer' => strtoupper($item->name_customer),
-				'total_fg' => number_format($item->total_fg, 2),
-				'total_scrap' => number_format($item->total_scrap, 2),
-				'total_berat' => number_format($item->total_fg + $item->total_scrap, 2),
+				'total_fg' => number_format($get_total_fg->total_fg, 2),
+				'total_scrap' => number_format($get_total_scrap->total_scrap, 2),
+				'total_berat' => number_format($get_total_fg->total_fg + $get_total_scrap->total_scrap, 2),
 				'tipe' => strtoupper($item->type),
 				'action' => $button
 			];
