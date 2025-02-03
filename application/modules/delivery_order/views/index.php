@@ -38,9 +38,7 @@ $ENABLE_DELETE  = has_permission('Delivery_Order.Delete');
 					<th>Total Scrap</th>
 					<th>Total Berat</th>
 					<th>Type</th>
-					<?php if ($ENABLE_MANAGE) : ?>
-						<th>Action</th>
-					<?php endif; ?>
+					<th>Action</th>
 				</tr>
 			</thead>
 
@@ -222,8 +220,7 @@ $ENABLE_DELETE  = has_permission('Delivery_Order.Delete');
 			processing: true,
 			serverSide: true,
 			paging: true,
-			columns: [
-				{
+			columns: [{
 					data: 'no'
 				},
 				{
