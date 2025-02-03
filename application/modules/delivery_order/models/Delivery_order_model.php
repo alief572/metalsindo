@@ -470,7 +470,7 @@ class Delivery_order_model extends BF_Model
 			$this->db->where('a.id_delivery_order', $item->id_delivery_order);
 			$get_total_fg = $this->db->get()->row();
 
-			$this->db->select('SUM(a.weight_mat) as total_fg');
+			$this->db->select('SUM(a.weight) as total_scrap');
 			$this->db->from('dt_delivery_order_child_scrap a');
 			$this->db->where('a.id_delivery_order', $item->id_delivery_order);
 			$get_total_scrap = $this->db->get()->row();
