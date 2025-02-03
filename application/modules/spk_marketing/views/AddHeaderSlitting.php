@@ -165,6 +165,7 @@
 			<th width='30%'>Nama Material</th>
 			<th width='5%'>Thickness</th>
 			<th width='5%'>Width</th>
+			<th width='5%'>Length</th>
 			<th width='10%'>Part Number</th>
 			<th width='10%'>Harga Penawaran</th>
 			<th width='10%'>Harga Deal / Kg</th>
