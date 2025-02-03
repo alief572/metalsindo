@@ -455,16 +455,29 @@
 					<th align="right" width="110"><?= number_format(((11 / 12 * $header->grand_total) * 12 / 100)) ?></th>
 				</tr>
 
-			<?php } ?>
+				<tr>
+					<th></th>
+					<th align="center"><?= number_format($totqty, 2) ?></th>
+					<th align="center">Kgs</th>
+					<th></th>
+					<th align="center">Grand Total</th>
+					<th align="right" width="110"><?= number_format(($header->grand_total + ((11 / 12 * $header->grand_total) * 12 / 100))) ?></th>
+				</tr>
 
-			<tr>
-				<th></th>
-				<th align="center"><?= number_format($totqty, 2) ?></th>
-				<th align="center">Kgs</th>
-				<th></th>
-				<th align="center">Grand Total</th>
-				<th align="right" width="110"><?= number_format(($header->grand_total + ((11 / 12 * $header->grand_total) * 12 / 100))) ?></th>
-			</tr>
+			<?php } else {
+			?>
+
+				<tr>
+					<th></th>
+					<th align="center"><?= number_format($totqty, 2) ?></th>
+					<th align="center">Kgs</th>
+					<th></th>
+					<th align="center">Grand Total</th>
+					<th align="right" width="110"><?= number_format($header->grand_total) ?></th>
+				</tr>
+
+			<?php
+			} ?>
 
 
 		</tfoot>
