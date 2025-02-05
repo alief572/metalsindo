@@ -70,7 +70,7 @@ class Purchase_request extends Admin_Controller
 		$deleted = '0';
 		$head = $this->db->query("SELECT * FROM tr_purchase_request WHERE no_pr = '$id' ")->result();
 		$detail = $this->db->query("SELECT * FROM dt_trans_pr WHERE no_pr = '$id' ")->result();
-		$check_sheet = $this->db->query('SELECT id_dt_pr FROM dt_trans_pr WHERE no_pr = "'.$id.'"')->num_rows();
+		$check_sheet = $this->db->query('SELECT id_dt_pr FROM dt_trans_pr WHERE no_pr = "'.$id.'" AND id_bentuk = "B2000002"')->num_rows();
 		$customers = $this->Pr_model->get_data('master_customers', 'deleted', $deleted);
 		$karyawan = $this->Pr_model->get_data('ms_karyawan', 'deleted', $deleted);
 		$mata_uang = $this->Pr_model->get_data('mata_uang', 'deleted' . $deleted);
