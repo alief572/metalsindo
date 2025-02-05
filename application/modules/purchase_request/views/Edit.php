@@ -459,7 +459,7 @@ foreach ($results['head'] as $head) {
 				} else {
 					if (cariSheet() < 1) {
 						$('th:contains("Qty Sheet")').remove();
-						$('th:contains("Weight / Sheet")').remove();
+						$('th:contains("Weight Sheet")').remove();
 					}
 
 					$('#tr_' + id).each(function() {
