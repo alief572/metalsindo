@@ -268,10 +268,10 @@ class Inventory_4_model extends BF_Model
 		$search = "a.no_penawaran='$id' ";
 		$this->db->select('a.*, b.nama as nama_category3, b.maker as maker, b.hardness as hardness, c.nama as nama_category2,  d.nilai_dimensi as thickness, e.nm_surface');
 		$this->db->from('child_penawaran a');
-		$this->db->join('ms_inventory_category3 b','b.id_category3 =a.id_category3');
-		$this->db->join('ms_inventory_category2 c','c.id_category2 =b.id_category2');
-		$this->db->join('child_inven_dimensi d','d.id_category3 =b.id_category3');
-		$this->db->join('ms_surface e','b.id_surface =e.id_surface');
+		$this->db->join('ms_inventory_category3 b','b.id_category3 =a.id_category3', 'left');
+		$this->db->join('ms_inventory_category2 c','c.id_category2 =b.id_category2', 'left');
+		$this->db->join('child_inven_dimensi d','d.id_category3 =b.id_category3', 'left');
+		$this->db->join('ms_surface e','b.id_surface =e.id_surface', 'left');
 		$this->db->where('a.no_penawaran',$id);
 		$query = $this->db->get();		
 		return $query->result();
