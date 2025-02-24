@@ -757,7 +757,7 @@ class Material_planing extends Admin_Controller
 		$this->auth->restrict($this->deletePermission);
 		$id = $this->input->post('id');
 		$data = [
-			'status_lanjutan' 		=> '2'
+			'status_lanjutan' => '2'
 		];
 
 		$this->db->trans_begin();
