@@ -168,7 +168,7 @@ class Incoming extends Admin_Controller
 		$gudang	= $this->db->query("select * FROM ms_gudang ")->result();
 		$suplier	= $this->db->query("select * FROM master_supplier WHERE deleted = '0' ")->result();
 		$suplier2	= $this->db->query("select a.id_suplier, b.name_suplier FROM tr_purchase_order a
-		                                inner join master_supplier b on a.id_suplier = b.id_suplier GROUP BY a.id_suplier ORDER BY b.name_suplier ASC ")->result();
+		                                join master_supplier b on a.id_suplier = b.id_suplier GROUP BY a.id_suplier, b.name_suplier ORDER BY b.name_suplier ASC ")->result();
 		$data = [
 			'po' => $po,
 			'gudang' => $gudang,
