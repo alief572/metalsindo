@@ -12,6 +12,11 @@ class Pr_model extends BF_Model
     /**
      * @var string  User Table Name
      */
+    protected $viewPermission     = 'Incoming.View';
+    protected $addPermission      = 'Incoming.Add';
+    protected $managePermission = 'Incoming.Manage';
+    protected $deletePermission = 'Incoming.Delete';
+
     protected $table_name = 'ms_inventory_category3';
     protected $key        = 'id';
 
@@ -79,7 +84,7 @@ class Pr_model extends BF_Model
         $bulan = date('m');
         $tahun = date('Y');
         $blnthn = date('Y-m');
-        $query = $this->db->query("SELECT MAX(id_incoming) as max_id FROM tr_incoming WHERE id_incoming LIKE '%MP-".date('m')."/".date('Y')."%'");
+        $query = $this->db->query("SELECT MAX(id_incoming) as max_id FROM tr_incoming WHERE id_incoming LIKE '%MP-" . date('m') . "/" . date('Y') . "%'");
         $row = $query->row_array();
         $thn = date('T');
         $max_id = $row['max_id'];
@@ -338,5 +343,85 @@ class Pr_model extends BF_Model
         $counter = $max_id1 + 1;
         $idcust = "R" . $thn . str_pad($counter, 5, "0", STR_PAD_LEFT);
         return $idcust;
+    }
+
+    public function get_incoming()
+    {
+        $draw = $this->input->post('draw');
+        $length = $this->input->post('length');
+        $start = $this->input->post('start');
+        $search = $this->input->post('search');
+
+        $this->db->select('a.*, b.name_suplier');
+        $this->db->from('tr_incoming a');
+        $this->db->join('master_supplier b', 'b.id_suplier=a.id_suplier', 'inner');
+        if (!empty($search['value'])) {
+            $this->db->group_start();
+            $this->db->like('a.id_incoming', $search['value'], 'both');
+            $this->db->or_like('b.name_suplier', $search['value'], 'both');
+            $this->db->or_like('a.tanggal', $search['value'], 'both');
+            $this->db->or_like('a.pic', $search['value'], 'both');
+            $this->db->or_like('a.keterangan', $search['value'], 'both');
+            $this->db->or_like('a.tgl_input', $search['value'], 'both');
+            $this->db->group_end();
+        }
+        $this->db->order_by('a.id_incoming', 'DESC');
+        $this->db->limit($length, $start);
+
+        $get_data = $this->db->get();
+
+        $this->db->select('a.*, b.name_suplier');
+        $this->db->from('tr_incoming a');
+        $this->db->join('master_supplier b', 'b.id_suplier=a.id_suplier', 'inner');
+        if (!empty($search['value'])) {
+            $this->db->group_start();
+            $this->db->like('a.id_incoming', $search['value'], 'both');
+            $this->db->or_like('b.name_suplier', $search['value'], 'both');
+            $this->db->or_like('a.tanggal', $search['value'], 'both');
+            $this->db->or_like('a.pic', $search['value'], 'both');
+            $this->db->or_like('a.keterangan', $search['value'], 'both');
+            $this->db->or_like('a.tgl_input', $search['value'], 'both');
+            $this->db->group_end();
+        }
+        $this->db->order_by('a.id_incoming', 'DESC');
+
+        $get_data_all = $this->db->get();
+
+        $hasil = [];
+
+        $no = (0 + $start);
+        foreach ($get_data->result() as $item) {
+            $no++;
+
+            $option = '';
+
+            if (has_permission($this->viewPermission)) {
+                $option .= ' <a class="btn btn-warning btn-sm view" href="javascript:void(0)" title="View" data-id_data="' . $item->id_data . '"><i class="fa fa-eye"></i></a>';
+            }
+
+            if (has_permission($this->managePermission)) {
+                $option .= ' <a class="btn btn-info btn-sm" href="' . base_url('/incoming/print_incoming_fix/' . $item->id_data) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
+
+                $option .= ' <a class="btn btn-success btn-sm" href="' . base_url('/incoming/timbang/' . $item->id_data) . '" target="_blank" title="Penimbangan"><i class="fa fa-check"></i></a>';
+            }
+
+            $hasil[] = [
+                'no' => $no,
+                'no_dokumen' => $item->id_incoming,
+                'suplier' => $item->name_suplier,
+                'tanggal' => $item->tanggal,
+                'pic' => $item->pic,
+                'keterangan' => $item->keterangan,
+                'tgl_input' => date('Y-m-d H:i:s', strtotime($item->created_date)),
+                'action' => $option
+            ];
+        }
+
+        echo json_encode([
+            'draw' => intval($draw),
+            'recordsTotal' => $get_data_all->num_rows(),
+            'recordsFiltered' => $get_data_all->num_rows(),
+            'data' => $hasil
+        ]);
     }
 }
