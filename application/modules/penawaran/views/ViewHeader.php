@@ -129,23 +129,24 @@ foreach ($results['header'] as $header) {
 						</center>
 					</td>
 				</tr>
-				<tr><? if ($header->mata_uang == 'USD') { ?>
-						<td colspan='2'>
-							<table class='col-sm-12' border='1'>
+				<tr><? 
+					if ($header->mata_uang == 'USD') { ?>
+						<td colspan="2">
+							<table class="col-sm-12" border="1">
 								<tr>
-									<td rowspan='2'>
+									<td rowspan="2">
 										<center>Unit</center>
 									</td>
-									<td rowspan='2'>
+									<td rowspan="2">
 										<center>Part</center>
 									</td>
-									<td rowspan='2'>
+									<td rowspan="2">
 										<center>Item</center>
 									</td>
-									<td colspan='5'>
+									<td colspan="5">
 										<center>Description Of Merchendise</center>
 									</td>
-									<td colspan='2'>
+									<td colspan="2">
 										<center>Price/Kg</center>
 									</td>
 									<td rowspan='2'>
@@ -192,7 +193,7 @@ foreach ($results['header'] as $header) {
 												echo "C";
 											} else {
 												echo "$detail->length";
-											}; ?></td>
+											} ?></td>
 										<td>$ <?= number_format($detail->harga_dolar, 2) ?></td>
 										<td>Rp <?= number_format($detail->harga_penawaran_cust, 2) ?></td>
 										<td><?= $detail->keterangan ?></td>
@@ -205,25 +206,25 @@ foreach ($results['header'] as $header) {
 					<?php
 					} else {
 					?>
-						<td colspan='2'>
-							<table class='col-sm-12' border='1'>
+						<td colspan="2">
+							<table class="col-sm-12" border="1">
 								<tr>
-									<td rowspan='2'>
+									<td rowspan="2">
 										<center>Unit</center>
 									</td>
-									<td rowspan='2'>
+									<td rowspan="2">
 										<center>Part</center>
 									</td>
-									<td rowspan='2'>
+									<td rowspan="2">
 										<center>Item</center>
 									</td>
-									<td colspan='5'>
+									<td colspan="5">
 										<center>Description Of Merchendise</center>
 									</td>
-									<td rowspan='2'>
+									<td rowspan="2">
 										<center>Price/Kg</center>
 									</td>
-									<td rowspan='2'>
+									<td rowspan="2">
 										<center>Remark</center>
 									</td>
 								</tr>
