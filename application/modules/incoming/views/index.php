@@ -11,7 +11,7 @@ $ENABLE_DELETE  = has_permission('Incoming.Delete');
 	}
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
-<link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
 
 <div class="box">
 	<div class="box-header">
@@ -24,55 +24,22 @@ $ENABLE_DELETE  = has_permission('Incoming.Delete');
 	<!-- /.box-header -->
 	<!-- /.box-header -->
 	<div class="box-body">
-		<table id="example1" class="table table-bordered table-striped">
+		<table id="example5" class="table table-bordered table-striped">
 			<thead>
 				<tr>
-					<th width="5">#</th>
+					<th>#</th>
 					<th>No.Dokumen</th>
 					<th>Suplier</th>
 					<th>Tanggal</th>
-					<th>Status</th>
 					<th>PIC</th>
 					<th>Keterangan</th>
 					<th>Tgl Input</th>
-					<?php if ($ENABLE_MANAGE) : ?>
-						<th width="13%">Action</th>
-					<?php endif; ?>
+					<th width="13%">Action</th>
 				</tr>
 			</thead>
 
 			<tbody>
-				<?php if (empty($results)) {
-				} else {
-
-					$numb = 0;
-					foreach ($results as $record) {
-						$numb++; ?>
-						<tr>
-							<td><?= $numb; ?></td>
-							<td><?= $record->id_incoming ?></td>
-							<td><?= strtoupper($record->name_suplier) ?></td>
-							<td align='center'><?= date('d-M-Y', strtotime($record->tanggal)) ?></td>
-							<td><?= $record->status ?></td>
-							<td><?= strtoupper($record->pic) ?></td>
-							<td><?= $record->keterangan ?></td>
-							<td align='center'><?= date('d-M-Y H:i:s', strtotime($record->created_date)) ?></td>
-							<td style="padding-left:20px">
-								<?php if ($ENABLE_VIEW) : ?>
-									<a class="btn btn-warning btn-sm view" href="javascript:void(0)" title="View" data-id_data="<?= $record->id_data ?>"><i class="fa fa-eye"></i>
-									</a>
-								<?php endif; ?>
-								<?php if ($ENABLE_MANAGE) : ?>
-									<a class="btn btn-info btn-sm" href="<?= base_url('/incoming/print_incoming_fix/' . $record->id_data) ?>" target='_blank' title="Print"><i class="fa fa-print"></i></a>
-
-									<a class="btn btn-success btn-sm" href="<?= base_url('/incoming/timbang/' . $record->id_data) ?>" target='_blank' title="Penimbangan"><i class="fa fa-check"></i></a>
-
-								<?php endif; ?>
-							</td>
-
-						</tr>
-				<?php }
-				}  ?>
+				
 			</tbody>
 		</table>
 	</div>
@@ -118,8 +85,7 @@ $ENABLE_DELETE  = has_permission('Incoming.Delete');
 </div>
 
 <!-- DataTables -->
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js') ?>"></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
 
 <!-- page script -->
 <script type="text/javascript">
@@ -235,37 +201,52 @@ $ENABLE_DELETE  = has_permission('Incoming.Delete');
 	})
 
 	$(function() {
-		// $('#example1 thead tr').clone(true).appendTo( '#example1 thead' );
-		// $('#example1 thead tr:eq(1) th').each( function (i) {
-		// var title = $(this).text();
-		//alert(title);
-		// if (title == "#" || title =="Action" ) {
-		// $(this).html( '' );
-		// }else{
-		// $(this).html( '<input type="text" />' );
-		// }
-
-		// $( 'input', this ).on( 'keyup change', function () {
-		// if ( table.column(i).search() !== this.value ) {
-		// table
-		// .column(i)
-		// .search( this.value )
-		// .draw();
-		// }else{
-		// table
-		// .column(i)
-		// .search( this.value )
-		// .draw();
-		// }
-		// } );
-		// } );
-
-		var table = $('#example1').DataTable({
-			orderCellsTop: true,
-			fixedHeader: true
-		});
+		DataTables();
 		$("#form-area").hide();
 	});
+
+	function DataTables() {
+		var DataTables = $('#example5').DataTable({
+			serverSide: true,
+			processing: true,
+			destroy: true,
+			language: {
+				searchPlaceholder: "Search...",
+				loadingRecords: 'Loading - Please Wait...'
+			},
+			ajax: {
+				url: siteurl + active_controller + 'get_incoming',
+				type: 'post',
+				dataType: 'json'
+			},
+			columns: [
+				{
+					data: 'no'
+				},
+				{
+					data: 'no_dokumen'
+				},
+				{
+					data: 'suplier'
+				},
+				{
+					data: 'tanggal'
+				},
+				{
+					data: 'pic'
+				},
+				{
+					data: 'keterangan'
+				},
+				{
+					data: 'tgl_input'
+				},
+				{
+					data: 'action'
+				}
+			]
+		});
+	}
 
 
 	//Delete

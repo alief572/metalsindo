@@ -483,18 +483,7 @@ class Incoming extends Admin_Controller
 		
 		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_selisih_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][selisih]' 	readonly	></td>
 		<td				       hidden ><input  type='text' 		value='" . number_format($material->hargasatuan, 3) . "'									class='form-control input-sm text-right' id='dt_hargasatuan_" . $id . "_" . $no . "' 		required name='dt[" . $id . "][detail][" . $no . "][hargasatuan]' 	></td>
-		<td align='left'>
-			<select class='form-control' name='dt[" . $id . "][detail][" . $no . "][tipe_material]' required>
-				<option value=''>- Select Tipe Material -</option>
-				";
-
-			foreach ($list_tipe_material as $item_tipe_material) {
-				echo '<option value="' . $item_tipe_material->id_bentuk . '">' . $item_tipe_material->nm_bentuk . '</option>';
-			}
-
-			echo "
-			</select>
-		</td>
+		
 		<td align='center'>
 			<button type='button' class='btn btn-sm btn-danger cancelSubPart' data-no1='" . $id . "' data-no2='" . $no . "' title='Delete Part'><i class='fa fa-close'></i></button>
 			<button type='button' class='btn btn-sm btn-primary repeatSubPart' data-no1='" . $id . "' data-no2='" . $no . "'  data-lot='" . $roll . "' data-id='" . $material->id_dt_po . "' id='tombol" . $no . "' 		 title='Repeat Part'><i class='fa fa-retweet'></i></button>
@@ -596,19 +585,6 @@ class Incoming extends Admin_Controller
 		
 		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_selisih_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][selisih]'  	readonly	></td>
 		<td				       hidden ><input  type='text' 		value='" . number_format($material->hargasatuan, 3) . "'									class='form-control input-sm text-right' id='dt_hargasatuan_" . $id . "_" . $no . "' 		required name='dt[" . $id . "][detail][" . $no . "][hargasatuan]' 	></td>
-
-		<td align='left'>
-			<select class='form-control' name='dt[" . $id . "][detail][" . $no . "][tipe_material]' required>
-				<option value=''>- Select Tipe Material -</option>
-				";
-
-			foreach ($list_tipe_material as $item_tipe_material) {
-				echo '<option value="' . $item_tipe_material->id_bentuk . '">' . $item_tipe_material->nm_bentuk . '</option>';
-			}
-
-			echo "
-			</select>
-		</td>
 		
 		<td align='center'>
 			<button type='button' class='btn btn-sm btn-danger cancelSubPart' data-no1='" . $id . "' data-no2='" . $no . "' title='Delete Part'><i class='fa fa-close'></i></button>
@@ -778,7 +754,6 @@ class Incoming extends Admin_Controller
 			<th width='5'>Berat Aktual</th>
 			<th width='5'>Selisih</th>
 			<th width='5' hidden>Harga Satuan</th>
-			<th width='5'>Tipe Material</th>
 			<th width='5'>Action</th>
 			</tr>
 			</thead>
@@ -1156,7 +1131,6 @@ class Incoming extends Admin_Controller
 				$ArrDetail2[$val2 . $val]['actual_berat'] 		= $valx2['aktual'];
 				$ArrDetail2[$val2 . $val]['selisih'] 			    = $valx2['selisih'];
 				$ArrDetail2[$val2 . $val]['thickness'] 			= str_replace(',', '', $valx2['thickness']);
-				$ArrDetail2[$val2 . $val]['tipe_material'] 			= $valx2['tipe_material'];
 
 				$id_dt_po = $valx2['iddtpo'];
 				$cek = $this->db->query("SELECT totalwidth, qty_terima, berat_terima FROM dt_trans_po WHERE id_dt_po ='$id_dt_po'")->row();
@@ -1202,7 +1176,6 @@ class Incoming extends Admin_Controller
 				$ArrStok[$val2 . $val]['sisa_spk'] 			= str_replace(',', '', $valx2['widthrecive']);
 				$ArrStok[$val2 . $val]['customer'] 			= $valx2['customer'];
 				$ArrStok[$val2 . $val]['no_surat'] 			= 'INCOMING';
-				$ArrStok[$val2 . $val]['tipe_material'] 			= $valx2['tipe_material'];
 			}
 		}
 
@@ -2816,7 +2789,8 @@ class Incoming extends Admin_Controller
 		$this->template->render('ViewCustomer');
 	}
 
-	public function check_ros() {
+	public function check_ros()
+	{
 		$post = $this->input->post();
 
 		$get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $post['no_po']])->row();
@@ -2824,13 +2798,13 @@ class Incoming extends Admin_Controller
 		$no_surat = $get_po->no_surat;
 
 		$get_ros = $this->db->select('a.*')->from('tr_ros a')->like('a.no_po', $no_surat, 'both')->get()->row();
-		
+
 		$get_ros_detail = $this->db
-		->select('SUM(a.qty_packing_list) as total_incoming')
-		->from('tr_ros_detail a')
-		->where('a.no_ros', $get_ros->id)
-		->get()
-		->row();
+			->select('SUM(a.qty_packing_list) as total_incoming')
+			->from('tr_ros_detail a')
+			->where('a.no_ros', $get_ros->id)
+			->get()
+			->row();
 
 		$total_incoming = $get_ros_detail->total_incoming;
 
@@ -2839,6 +2813,10 @@ class Incoming extends Admin_Controller
 			'no_pib' => $get_ros->no_pengajuan_pib,
 			'keterangan' => $get_ros->keterangan
 		]);
+	}
 
+	public function get_incoming()
+	{
+		$this->Pr_model->get_incoming();
 	}
 }
