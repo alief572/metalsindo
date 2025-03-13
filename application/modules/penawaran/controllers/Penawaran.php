@@ -37,8 +37,6 @@ class Penawaran extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$data = $this->Inventory_4_model->CariPenawaran();
-		$this->template->set('results', $data);
 		$this->template->title('Penawaran');
 		$this->template->render('index');
 	}
@@ -1976,5 +1974,9 @@ class Penawaran extends Admin_Controller
 	{
 		$no_surat = $this->Inventory_4_model->BuatNomorNew();
 		print_r($no_surat);
+	}
+
+	public function get_data_penawaran() {
+		$this->Inventory_4_model->get_data_penawaran();
 	}
 }
