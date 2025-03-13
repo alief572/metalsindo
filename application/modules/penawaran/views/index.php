@@ -11,7 +11,7 @@ $ENABLE_DELETE  = has_permission('Penawaran.Delete');
 	}
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
-<link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
 
 <div class="box">
 	<div class="box-header">
@@ -25,7 +25,7 @@ $ENABLE_DELETE  = has_permission('Penawaran.Delete');
 	<!-- /.box-header -->
 	<!-- /.box-header -->
 	<div class="box-body">
-		<table id="example1" class="table table-bordered table-striped">
+		<table id="example5" class="table table-bordered table-striped">
 			<thead>
 				<tr>
 					<th>#</th>
@@ -35,104 +35,11 @@ $ENABLE_DELETE  = has_permission('Penawaran.Delete');
 					<th>Status</th>
 					<th>Revisi</th>
 					<th>Ket Closing</th>
-					<?php if ($ENABLE_MANAGE) : ?>
-						<th>Action</th>
-					<?php endif; ?>
+					<th>Action</th>
 				</tr>
 			</thead>
-
 			<tbody>
-				<?php if (empty($results)) {
-				} else {
-
-					$numb = 0;
-					foreach ($results as $record) {
-						$numb++;
-
-						$get_spk = $this->db->select('no_surat')->get_where('tr_spk_marketing', array('no_penawaran' => $record->no_penawaran))->result_array();
-						$arrImp = [];
-						foreach ($get_spk as $key => $value) {
-							$arrImp[] = $value['no_surat'];
-						}
-						$Status = "<span class='badge bg-yellow'>Open</span>";
-						$keterangan = ucfirst(strtolower($record->keterangan));
-						if ($record->spkmarketing != NULL) {
-							$Status = "<span class='badge bg-green'>Closed</span>";
-							$keterangan = implode("<br>", $arrImp);
-						}
-						if ($record->spkmarketing == NULL and $record->status == 'Y') {
-							$Status = "<span class='badge bg-red'>Closed</span>";
-						}
-
-						if ($record->status_revisi == 0) {
-							$revisi = "<span class='badge bg-purple'>Tidak Ada Revisi</span>";
-						} elseif ($record->status_revisi == 1) {
-							$revisi = "<span class='badge bg-orange'>Menunggu Approval Revisi</span>";
-						} elseif ($record->status_revisi == 2) {
-							$revisi = "<span class='badge bg-green'>Revisi Disetujui</span>";
-						} elseif ($record->status_revisi == 3) {
-							$revisi = "<span class='badge bg-red'>Revisi Ditolak</span>";
-						}
-				?>
-						<tr>
-							<td><?= $numb; ?></td>
-							<td><?= $record->no_surat ?></td>
-							<td><?= strtoupper($record->name_customer) ?></td>
-							<td><?= date('d-F-Y', strtotime($record->tgl_penawaran)) ?></td>
-							<td><?= $Status; ?></td>
-							<td><?= $revisi; ?></td>
-							<td><?= $keterangan; ?></td>
-							<td style="padding-left:20px">
-								<?php if ($ENABLE_VIEW) : ?>
-									<a class="btn btn-warning btn-sm view" href="javascript:void(0)" title="View" data-no_penawaran="<?= $record->no_penawaran ?>"><i class="fa fa-eye"></i>
-									</a>
-								<?php endif; ?>
-
-								<?php if ($ENABLE_MANAGE and $record->status == 'N') : ?>
-									<a class="btn btn-success btn-sm edit" href="javascript:void(0)" title="Edit" data-no_penawaran="<?= $record->no_penawaran ?>"><i class="fa fa-edit"></i>
-									</a>
-								<?php endif; ?>
-
-								<?php if ($ENABLE_VIEW and $record->spkmarketing == NULL and $record->status == 'N') : ?>
-									<a class="btn btn-primary btn-sm" href="<?= base_url('/penawaran/detail/' . $record->no_penawaran) ?>" title="Detail" data-no_inquiry="<?= $record->no_inquiry ?>"><i class="fa fa-table"></i>
-									</a>
-								<?php endif; ?>
-								<?php if ($ENABLE_VIEW) : ?>
-									<a class="btn btn-info btn-sm" href="<?= base_url('/penawaran/PrintHeader/' . $record->no_penawaran) ?>" target="_blank" title="Detail" data-no_inquiry="<?= $record->no_inquiry ?>"><i class="fa fa-print"></i>
-									</a>
-								<?php endif; ?>
-								<?php if ($ENABLE_MANAGE and $record->spkmarketing == NULL and $record->status == 'N') : ?>
-									<a class="btn bg-purple btn-sm close_penawaran" href="javascript:void(0)" title="Close Penawaran" data-no_penawaran="<?= $record->no_penawaran ?>"><i class="fa fa-check"></i>
-									</a>
-								<?php endif; ?>
-
-
-								<?php if ($ENABLE_MANAGE) : ?>
-									<a class="btn btn-success btn-sm copy" href="javascript:void(0)" title="Copy" data-no_penawaran="<?= $record->no_penawaran ?>"><i class="fa fa-copy"></i>
-									</a>
-								<?php endif; ?>
-
-								<?php if ($ENABLE_MANAGE and $record->spkmarketing == NULL and $record->status == 'N') : ?>
-									<!--<a class="btn btn-warning btn-sm" href="<?= base_url('/penawaran/ajukanapproval/' . $record->no_penawaran) ?>" title="Ajukan approval" data-no_inquiry="<?= $record->no_inquiry ?>"><i class="fa fa-mail-forward"></i>
-				</a>-->
-								<?php endif; ?>
-
-
-								<?php if ($ENABLE_MANAGE and $record->spkmarketing != NULL  and $record->status_revisi == 0) : ?>
-									<a class="btn btn-primary btn-sm revisi" href="javascript:void(0)" title="Ajukan Revisi" data-no_penawaran="<?= $record->no_penawaran ?>"><i class="fa fa-history"></i>
-									</a>
-									</a>
-								<?php endif; ?>
-								<?php if ($ENABLE_MANAGE and $record->spkmarketing != NULL and $record->status_revisi == '2') : ?>
-									<a class="btn btn-primary btn-sm" href="<?= base_url('/penawaran/detailrevisi/' . $record->no_penawaran) ?>" title="Revisi" data-no_inquiry="<?= $record->no_inquiry ?>"><i class="fa fa-list"></i>
-									</a>
-								<?php endif; ?>
-
-							</td>
-
-						</tr>
-				<?php }
-				}  ?>
+				
 			</tbody>
 		</table>
 	</div>
@@ -200,8 +107,7 @@ $ENABLE_DELETE  = has_permission('Penawaran.Delete');
 <!-- /.modal -->
 
 <!-- DataTables -->
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js') ?>"></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
 
 <!-- page script -->
 <script type="text/javascript">
@@ -305,40 +211,6 @@ $ENABLE_DELETE  = has_permission('Penawaran.Delete');
 		});
 	});
 
-	$(function() {
-		// $('#example1 thead tr').clone(true).appendTo( '#example1 thead' );
-		// $('#example1 thead tr:eq(1) th').each( function (i) {
-		// var title = $(this).text();
-		//alert(title);
-		// if (title == "#" || title =="Action" ) {
-		// $(this).html( '' );
-		// }else{
-		// $(this).html( '<input type="text" />' );
-		// }
-
-		// $( 'input', this ).on( 'keyup change', function () {
-		// if ( table.column(i).search() !== this.value ) {
-		// table
-		// .column(i)
-		// .search( this.value )
-		// .draw();
-		// }else{
-		// table
-		// .column(i)
-		// .search( this.value )
-		// .draw();
-		// }
-		// } );
-		// } );
-
-		var table = $('#example1').DataTable({
-			orderCellsTop: true,
-			fixedHeader: true
-		});
-		$("#form-area").hide();
-	});
-
-
 	$(document).on('click', '.copy', function(e) {
 		var id = $(this).data('no_penawaran');
 		$("#head_title").html("<i class='fa fa-list-alt'></i><b>Copy Inventory</b>");
@@ -352,7 +224,6 @@ $ENABLE_DELETE  = has_permission('Penawaran.Delete');
 			}
 		})
 	});
-
 
 	$(document).on('click', '.revisi', function(e) {
 		var id = $(this).data('no_penawaran');
@@ -368,9 +239,53 @@ $ENABLE_DELETE  = has_permission('Penawaran.Delete');
 		})
 	});
 
-
-
+	$(function() {
+		DataTables();
+		$("#form-area").hide();
+	});
 	//Delete
+
+	function DataTables() {
+		var DataTables = $('#example5').DataTable({
+			serverSide: true,
+			processing: true,
+			destroy: true,
+			language: {
+				loadingRecords: 'Loading - Please wait ...'
+			},
+			ajax: {
+				url: siteurl + active_controller + 'get_data_penawaran',
+				type: 'POST',
+				dataType: 'json'
+			},
+			columns: [
+				{
+					data: 'no',
+				},
+				{
+					data: 'no_surat'
+				},
+				{
+					data: 'name_customer'
+				},
+				{
+					data: 'tgl_penawaran'
+				},
+				{
+					data: 'status'
+				},
+				{
+					data: 'status_revisi'
+				},
+				{
+					data: 'keterangan'
+				},
+				{
+					data: 'aksi'
+				}
+			]
+		});
+	}
 
 	function PreviewPdf(id) {
 		param = id;
