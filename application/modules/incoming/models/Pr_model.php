@@ -365,7 +365,7 @@ class Pr_model extends BF_Model
             $this->db->or_like('a.tgl_input', $search['value'], 'both');
             $this->db->group_end();
         }
-        $this->db->order_by('a.id_incoming', 'DESC');
+        $this->db->order_by('a.created_date', 'DESC');
         $this->db->limit($length, $start);
 
         $get_data = $this->db->get();
@@ -383,7 +383,7 @@ class Pr_model extends BF_Model
             $this->db->or_like('a.tgl_input', $search['value'], 'both');
             $this->db->group_end();
         }
-        $this->db->order_by('a.id_incoming', 'DESC');
+        $this->db->order_by('a.created_date', 'DESC');
 
         $get_data_all = $this->db->get();
 
