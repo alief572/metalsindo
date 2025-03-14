@@ -765,6 +765,7 @@ class Penawaran extends Admin_Controller
 				'harga_penawaran'		=> str_replace(',', '', $post['harga_penawaran']),
 				'harga_penawaran_cust'	=> str_replace(',', '', $post['harga_penawaran_cust']),
 				'harga_dolar'			=> $dolar,
+				'price_sheet'			=> str_replace(',', '', $post['price_sheet']),
 				'created_on'			=> date('Y-m-d H:i:s'),
 				'created_by'			=> $this->auth->user_id()
 			];
@@ -856,6 +857,7 @@ class Penawaran extends Admin_Controller
 				'harga_penawaran'		=> str_replace(',', '', $post['harga_penawaran']),
 				'harga_penawaran_cust'	=> str_replace(',', '', $post['harga_penawaran_cust']),
 				'harga_dolar'			=> $dolar,
+				'price_sheet'			=> str_replace(',', '', $post['price_sheet']),
 				'created_on'			=> date('Y-m-d H:i:s'),
 				'created_by'			=> $this->auth->user_id(),
 				'ket_detail'			=> $post['ket_detail'],

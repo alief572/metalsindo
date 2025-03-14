@@ -453,8 +453,6 @@ class Incoming extends Admin_Controller
 		
 		</td>
 		
-		
-		
 		<td><input  type='text' 		value='" . $idroll . "'	class='form-control input-sm' id='id_roll_" . $id . "_" . $no . "' 		required name='dt[" . $id . "][detail][" . $no . "][id_roll]' 	readonly></td>
 		
 		<td	width='50'><input type='text' class='form-control input-sm text-right autoNumeric widthrecive' id='dt_widthrecive" . $id . "_" . $no . "' required name='dt[" . $id . "][detail][" . $no . "][widthrecive]'  onBlur='cariPanjang($id,$no)' data-numb1='" . $id . "' data-numb2='" . $no . "'  ></td>
@@ -479,7 +477,11 @@ class Incoming extends Admin_Controller
 			};
 			echo "</select></td>
 		
-		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_aktual_" . $id . "_" . $no . "' 	onBlur='cariSelisih($id,$no)'		required name='dt[" . $id . "][detail][" . $no . "][aktual]' 	Placeholder='Berat Aktual'	></td>
+		<td><input  type='text' class='form-control input-sm autoNumeric' id='dt_aktual_" . $id . "_" . $no . "' 	onBlur='cariSelisih($id,$no)'		required name='dt[" . $id . "][detail][" . $no . "][aktual]' 	Placeholder='Berat Aktual'	></td>
+
+		<td>
+			<input type='text' class='form-control input-sm autoNumeric' id='dt_aktual_".$id."_".$no."' name='dt[".$id."][detail][".$no."][qty_sheet]' placeholder='Qty Sheet'>
+		</td>
 		
 		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_selisih_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][selisih]' 	readonly	></td>
 		<td				       hidden ><input  type='text' 		value='" . number_format($material->hargasatuan, 3) . "'									class='form-control input-sm text-right' id='dt_hargasatuan_" . $id . "_" . $no . "' 		required name='dt[" . $id . "][detail][" . $no . "][hargasatuan]' 	></td>
@@ -752,6 +754,7 @@ class Incoming extends Admin_Controller
 			<th width='5'>Gudang</th>
 			<th width='5'>Customer</th>
 			<th width='5'>Berat Aktual</th>
+			<th width='5'>Qty / Sheet</th>
 			<th width='5'>Selisih</th>
 			<th width='5' hidden>Harga Satuan</th>
 			<th width='5'>Action</th>
@@ -1108,8 +1111,6 @@ class Incoming extends Admin_Controller
 			$ArrDetail[$val]['id_incoming']			= $no_surat;
 			$ArrDetail[$val]['id_detail_incoming']	= $id_data . '-' . $urut;
 
-
-
 			foreach ($valx['detail'] as $val2 => $valx2) {
 				$ArrDetail2[$val2 . $val]['id_data']				= $id_data;
 				$ArrDetail2[$val2 . $val]['id_incoming']			= $no_surat;
@@ -1131,6 +1132,7 @@ class Incoming extends Admin_Controller
 				$ArrDetail2[$val2 . $val]['actual_berat'] 		= $valx2['aktual'];
 				$ArrDetail2[$val2 . $val]['selisih'] 			    = $valx2['selisih'];
 				$ArrDetail2[$val2 . $val]['thickness'] 			= str_replace(',', '', $valx2['thickness']);
+				$ArrDetail2[$val2 . $val]['qty_sheet'] 			= str_replace(',', '', $valx2['qty_sheet']);
 
 				$id_dt_po = $valx2['iddtpo'];
 				$cek = $this->db->query("SELECT totalwidth, qty_terima, berat_terima FROM dt_trans_po WHERE id_dt_po ='$id_dt_po'")->row();

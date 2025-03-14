@@ -240,9 +240,6 @@ foreach ($results['header'] as $header) {
 					dropdownParent: $('#ModalView'),
 					width: '100%'
 				});
-
-
-
 			}
 		})
 
