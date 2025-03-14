@@ -222,7 +222,7 @@
 
         $loop = 0;
         foreach ($dt as $dtl) {
-
+            $get_material_bentuk = $this->db->get_where('ms_inventory_category3', array('id_category3' => $dtl->id_material))->row();
             if ($i > 0) {
 
                 if ($id_material != $dtl->id_material) {
@@ -235,13 +235,14 @@
                         <td bgcolor="#c9c9c9"></td>
                         <td bgcolor="#c9c9c9"></td>
                         <td bgcolor="#c9c9c9" align="center"><?= number_format($qty, 2) ?> </td>
-                        <td bgcolor="#c9c9c9"></td>
+                        <td bgcolor="#c9c9c9" align="center"><?= number_format($qty_sheet, 2) ?> </td>
                         <td bgcolor="#c9c9c9" align="center"><?= number_format($berat, 2) ?></td>
                         <td bgcolor="#c9c9c9"></td>
                     </tr>
 
                     <?php
                     $qty = 0;
+                    $qty_sheet = 0;
                     $berat = 0;
                 } else {
                     if ($width != $dtl->width || $length != $dtl->length) {
@@ -253,7 +254,7 @@
                             <td bgcolor="#c9c9c9"></td>
                             <td bgcolor="#c9c9c9"></td>
                             <td bgcolor="#c9c9c9" align="center"><?= number_format($qty, 2) ?> </td>
-                            <td bgcolor="#c9c9c9"></td>
+                            <td bgcolor="#c9c9c9" align="center"><?= number_format($qty_sheet, 2) ?> </td>
                             <td bgcolor="#c9c9c9" align="center"><?= number_format($berat, 2) ?></td>
                             <td bgcolor="#c9c9c9"></td>
                         </tr>
@@ -261,6 +262,7 @@
             <?php
 
                         $qty = 0;
+                        $qty_sheet = 0;
                         $berat = 0;
                     }
                 }
@@ -269,7 +271,8 @@
             $loop++;
 
             $SUMKG += $dtl->weight_mat;
-            $SUMQTY += $dtl->qty_mat;
+            $SUMQTY += ($get_material_bentuk->id_bentuk == 'B2000001') ? $dtl->qty_mat : 0;
+            $SUMQTY_SHEET += ($get_material_bentuk->id_bentuk == 'B2000002') ? $dtl->qty_mat : 0;
 
 
 
@@ -289,8 +292,8 @@
                 <td width="180"><?= $dtl->nm_material . ',' . $dtl->part_number ?></td>
                 <td width="55"><?= $spec ?></td>
                 <td width="145" align="left"><?= $dtl->lotno ?></td>
-                <td width="20" align="center"><?= number_format($dtl->qty_mat, 2); ?></td>
-                <td width="25" align="right"></td>
+                <td width="20" align="center"><?= ($get_material_bentuk->id_bentuk == 'B2000001') ? number_format($dtl->qty_mat, 2) : 0; ?></td>
+                <td width="25" align="center"><?= ($get_material_bentuk->id_bentuk == 'B2000002') ? number_format($dtl->qty_mat, 2) : 0; ?></td>
                 <td width="20" align="center"><?= number_format($dtl->weight_mat, 2); ?></td>
                 <td width="60" align="center"><?= $dtl->remark ?></td>
             </tr>
@@ -301,7 +304,8 @@
             $width = $dtl->width;
             $lengthh = $dtl->length;
             $id_material = $dtl->id_material;
-            $qty = $qty + $dtl->qty_mat;
+            $qty += ($get_material_bentuk->id_bentuk == 'B2000001') ? $dtl->qty_mat : 0;
+            $qty_sheet += ($get_material_bentuk->id_bentuk == 'B2000002') ? $dtl->qty_mat : 0;
             $berat = $berat + $dtl->weight_mat;
         }
         ?>
@@ -311,7 +315,7 @@
             <td bgcolor="#c9c9c9"></td>
             <td bgcolor="#c9c9c9"></td>
             <td bgcolor="#c9c9c9" align="center"><?= number_format($qty, 2) ?> </td>
-            <td bgcolor="#c9c9c9"></td>
+            <td bgcolor="#c9c9c9" align="center"><?= number_format($qty_sheet, 2) ?> </td>
             <td bgcolor="#c9c9c9" align="center"><?= number_format($berat, 2) ?></td>
             <td bgcolor="#c9c9c9"></td>
         </tr>
@@ -321,7 +325,7 @@
             <td bgcolor="#c9c9c9" rowspan='2' align="center" valign="middle" width="55"></td>
             <td bgcolor="#c9c9c9" rowspan='2' align="center" valign="middle" width="135"></td>
             <td bgcolor="#c9c9c9" width="20" align="center"><?= number_format($SUMQTY, 2) ?></td>
-            <td bgcolor="#c9c9c9" width="25" align="center"></td>
+            <td bgcolor="#c9c9c9" width="20" align="center"><?= number_format($SUMQTY_SHEET, 2) ?></td>
             <td bgcolor="#c9c9c9" width="20" align="center"><?= number_format($SUMKG, 2) ?></td>
             <td bgcolor="#c9c9c9" rowspan='2' align="center" valign="middle" width="60"></td>
         </tr>
