@@ -414,6 +414,11 @@ class Inventory_4_model extends BF_Model
 
 			$get_material = $this->db->get_where('ms_inventory_category3', ['id_category3' => $item->id_material])->row();
 
+			$total_sheet = 0;
+			if($get_material->id_bentuk == 'B2000002') {
+				$total_sheet = $item->width / $get_material->total_weight;
+			}
+
 			$hasil[] = [
 				'no' => $no,
 				'no_spk' => $item->no_surat,
@@ -425,7 +430,7 @@ class Inventory_4_model extends BF_Model
 				'length' => $item->length,
 				'delivery_date' => date('d-M-Y', strtotime($item->delivery)),
 				'total_weight' => number_format($item->qty_produk),
-				'total_sheet' => ($get_material->id_bentuk == 'B2000002') ? number_format($item->width / $item->qty_produk, 2) : number_format(0, 2),
+				'total_sheet' => number_format($total_sheet, 2),
 				'total_spk' => '-',
 				'fg' => number_format($nilai_booking, 2),
 				'action' => $btn_edit . ' ' . $btn_create_pr . ' ' . $btn_approve . ' ' . $btn_tutup
