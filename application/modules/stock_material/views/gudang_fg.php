@@ -37,6 +37,7 @@ $id_bentuk = $this->uri->segment(3);
 					<th class='no-sort text-center'>Jumlah Item</th>
 					<th class='no-sort text-center'>Berat Satuan (kg)</th>
 					<th class='no-sort text-center'>Berat Total (kg)</th>
+					<th class='no-sort text-center'>Total Sheet</th>
 					<th class='no-sort text-center'>Keterangan</th>
 					<th class='no-sort text-center'>Gudang</th>
 					<th class='no-sort text-center'>Customer</th>
