@@ -553,7 +553,7 @@ class Delivery_order extends Admin_Controller
 			// 	$lot			= $this->db->query("SELECT * FROM stock_material WHERE id_gudang = '3' AND id_category3='$id_category3' AND width = $dt->width AND no_surat like '%$nomor->no_surat%' AND status_do='OPN' ")->result();
 			// }
 
-			if(empty($lot)) {
+			if (empty($lot)) {
 				$lot			= $this->db->query("SELECT * FROM stock_material WHERE id_gudang = '3' AND id_category3='$id_category3' AND width = $dt->width AND no_surat like '%$nomor->no_surat%' AND status_do='OPN' ")->result();
 			}
 
@@ -3059,7 +3059,8 @@ class Delivery_order extends Admin_Controller
 		$this->load->view('PrintHeaderWordSlitting', $data);
 	}
 
-	public function get_delivery_order() {
+	public function get_delivery_order()
+	{
 		$this->Delivery_order_model->get_delivery_order();
 	}
 }
