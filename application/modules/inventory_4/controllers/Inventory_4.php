@@ -156,6 +156,7 @@ class Inventory_4 extends Admin_Controller
 		$id_supplier = $this->Inventory_4_model->get_data('master_supplier');
 		$id_surface = $this->Inventory_4_model->get_data('ms_surface');
 		$dt_suplier = $this->Inventory_4_model->get_data('child_inven_suplier', 'id_category3', $id);
+		$id_bentuks = $this->Inventory_4_model->get_data('ms_bentuk', 'id_bentuk', $inventory_3[0]->id_bentuk);
 		$data = [
 			'inventory_1' => $inventory_1,
 			'inventory_2' => $inventory_2,
@@ -163,6 +164,7 @@ class Inventory_4 extends Admin_Controller
 			'komposisi' => $komposisi,
 			'dimensi' => $dimensi,
 			'id_bentuk' => $id_bentuk,
+			'id_bentuks' => $id_bentuks,
 			'inven' => $inven,
 			'maker' => $maker,
 			'supl' => $supl,
