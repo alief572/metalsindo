@@ -165,7 +165,16 @@ foreach ($results['penawaran'] as $penawaran) {
 									</div>
 								</div>
 							</div>
-
+							<div class="col-sm-6">
+								<div class='form-group row'>
+									<div class='col-md-4'>
+										<label for='forecast'>Qty (Sheet)</label>
+									</div>
+									<div class='col-md-8' id="">
+										<input type="text" name="qty_sheet" id="" class="form-control form-control-sm autoNumeric" value="<?= $penawaran->qty_sheet ?>">
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 					<div class="col-sm-12">
