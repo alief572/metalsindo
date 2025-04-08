@@ -79,7 +79,7 @@ class Penawaran extends Admin_Controller
 
 		$tipe_sheet = 0;
 		foreach($data['detail'] as $item) :
-			if($item->id_bentuk == 'B2000001' && $tipe_sheet == 0) {
+			if($item->id_bentuk == 'B2000002' && $tipe_sheet == 0) {
 				$tipe_sheet = 1;
 			}
 		endforeach;
