@@ -12,6 +12,11 @@ class Inventory_4_model extends BF_Model
 	/**
 	 * @var string  User Table Name
 	 */
+	protected $viewPermission 	= 'Spk_produksi.View';
+	protected $addPermission  	= 'Spk_produksi.Add';
+	protected $managePermission = 'Spk_produksi.Manage';
+	protected $deletePermission = 'Spk_produksi.Delete';
+
 	protected $table_name = 'ms_inventory_category3';
 	protected $key        = 'id';
 
@@ -409,5 +414,205 @@ class Inventory_4_model extends BF_Model
 		$this->db->where('a.id_category3', $id);
 		$query = $this->db->get();
 		return $query->result();
+	}
+
+	public function get_data_spk_produksi_reguler()
+	{
+		$draw = $this->input->post('draw');
+		$length = $this->input->post('length');
+		$start = $this->input->post('start');
+		$search = $this->input->post('search');
+
+		$this->db->select('a.*, z.nama');
+		$this->db->from('tr_spk_produksi a');
+		$this->db->join('ms_inventory_category3 z', 'z.id_category3=a.id_material');
+		$this->db->where('a.sts_over', NULL);
+
+		if (!empty($search['value'])) {
+			$this->db->like('a.no_surat', $search['value']);
+			$this->db->or_like('z.nama', $search['value']);
+		}
+		$this->db->order_by('a.id_spkproduksi', 'desc');
+		$this->db->limit($length, $start);
+
+		$get_data = $this->db->get();
+
+		$this->db->select('a.*, z.nama');
+		$this->db->from('tr_spk_produksi a');
+		$this->db->join('ms_inventory_category3 z', 'z.id_category3=a.id_material');
+		$this->db->where('a.sts_over', NULL);
+
+		if (!empty($search['value'])) {
+			$this->db->like('a.no_surat', $search['value']);
+			$this->db->or_like('z.nama', $search['value']);
+		}
+		$this->db->order_by('a.id_spkproduksi', 'desc');
+
+		$get_data_all = $this->db->get();
+
+		$hasil = [];
+
+		$no = (0 + $start);
+
+		foreach ($get_data->result() as $item) :
+			$no++;
+
+			$this->db->select('a.*, b.name_customer as name_customer');
+			$this->db->from('dt_spk_produksi a');
+			$this->db->join('master_customers b', 'b.id_customer = a.idcustomer', 'left');
+			$this->db->where('a.id_spkproduksi', $item->id_spkproduksi);
+			$this->db->group_by('b.name_customer');
+			$get_customers = $this->db->get()->result();
+
+			$list_customer = '';
+			foreach ($get_customers as $item_customers) :
+				$list_customer .= '- ' . $item_customers->name_customer . '<br>';
+			endforeach;
+
+			$status = '';
+
+			if ($item->status_approve == '1') {
+				$status = "Menunggu";
+			} elseif ($item->status_approve == '2') {
+				$status = "Diturunkan";
+			} elseif ($item->status_approve == '3') {
+				$status = "Selesai Diproduksi";
+			}
+
+			$action = '';
+
+			if ($item->status_approve == '1') {
+				if (has_permission($this->viewPermission)) {
+					$action .= ' <a class="btn btn-primary btn-sm view" href="' . base_url('/spk_produksi/addHeader_view/' . $item->id_spkproduksi . '/view') . '" title="View"><i class="fa fa-eye"></i></a>';
+				}
+
+				if (has_permission($this->managePermission)) {
+					$action .= '<a class="btn btn-warning btn-sm" href="' . base_url('/spk_produksi/addHeaderproses/' . $item->id_spkproduksi) . '"  title="Add Proses"><i class="fa fa-plus"></i></a>';
+				}
+
+				if (has_permission($this->viewPermission)) {
+					$action .= ' <a class="btn btn-success btn-sm view" href="' . base_url('/spk_produksi/index2/' . $item->id_spkproduksi) . '" title="Detail"><i class="fa fa-list"></i></a>';
+				}
+			} else {
+				if (has_permission($this->viewPermission)) {
+					$action .= ' <a class="btn btn-primary btn-sm view" href="' . base_url('/spk_produksi/addHeader_view/' . $item->id_spkproduksi . '/view') . '" title="View"><i class="fa fa-eye"></i></a>';
+				}
+			}
+
+			$hasil[] = [
+				'no' => $no,
+				'no_spk_produksi' => $item->no_surat,
+				'customer' => $list_customer,
+				'nama_material' => $item->nama,
+				'action' => $action
+			];
+		endforeach;
+
+		echo json_encode([
+			'draw' => $draw,
+			'recordsTotal' => $get_data_all->num_rows(),
+			'recordsFiltered' => $get_data_all->num_rows(),
+			'data' => $hasil
+		]);
+	}
+
+	public function get_data_spk_produksi_booking() {
+		$draw = $this->input->post('draw');
+		$length = $this->input->post('length');
+		$start = $this->input->post('start');
+		$search = $this->input->post('search');
+
+		$this->db->select('a.*, z.nama');
+		$this->db->from('tr_spk_produksi a');
+		$this->db->join('ms_inventory_category3 z', 'z.id_category3 = a.id_material');
+		$this->db->where('a.sts_over', '1');
+
+		if (!empty($search['value'])) {
+			$this->db->like('a.no_surat', $search['value']);
+			$this->db->or_like('z.nama', $search['value']);
+		}
+		$this->db->order_by('a.id_spkproduksi', 'desc');
+		$this->db->limit($length, $start);
+
+		$get_data = $this->db->get();
+
+		$this->db->select('a.*, z.nama');
+		$this->db->from('tr_spk_produksi a');
+		$this->db->join('ms_inventory_category3 z', 'z.id_category3 = a.id_material');
+		$this->db->where('a.sts_over', '1');
+
+		if (!empty($search['value'])) {
+			$this->db->like('a.no_surat', $search['value']);
+			$this->db->or_like('z.nama', $search['value']);
+		}
+		$this->db->order_by('a.id_spkproduksi', 'desc');
+
+		$get_data_all = $this->db->get();
+
+		$hasil = [];
+
+		$no = (0 + $start);
+
+		foreach ($get_data->result() as $item) :
+			$no++;
+
+			$this->db->select('a.*, b.name_customer as name_customer');
+			$this->db->from('dt_spk_produksi a');
+			$this->db->join('master_customers b', 'b.id_customer = a.idcustomer', 'left');
+			$this->db->where('a.id_spkproduksi', $item->id_spkproduksi);
+			$get_customers = $this->db->get()->result();
+
+			$list_customer = '';
+			foreach ($get_customers as $item_customers) :
+				$list_customer .= '- ' . $item_customers->name_customer . '<br>';
+			endforeach;
+
+			$status = '';
+
+			if ($item->status_approve == '1') {
+				$status = "Menunggu";
+			} elseif ($item->status_approve == '2') {
+				$status = "Diturunkan";
+			} elseif ($item->status_approve == '3') {
+				$status = "Selesai Diproduksi";
+			}
+
+			$action = '';
+
+			if ($item->status_approve == '1') {
+				if (has_permission($this->viewPermission)) {
+					$action .= ' <a class="btn btn-primary btn-sm view" href="' . base_url('/spk_produksi/addHeader_view/' . $item->id_spkproduksi . '/view') . '" title="View"><i class="fa fa-eye"></i></a>';
+				}
+
+				if (has_permission($this->managePermission)) {
+					$action .= '<a class="btn btn-warning btn-sm" href="' . base_url('/spk_produksi/addHeaderproses/' . $item->id_spkproduksi) . '"  title="Add Proses"><i class="fa fa-plus"></i></a>';
+				}
+
+				if (has_permission($this->viewPermission)) {
+					$action .= ' <a class="btn btn-success btn-sm view" href="' . base_url('/spk_produksi/index2/' . $item->id_spkproduksi) . '" title="Detail"><i class="fa fa-list"></i></a>';
+				}
+			} else {
+				if (has_permission($this->viewPermission)) {
+					$action .= ' <a class="btn btn-primary btn-sm view" href="' . base_url('/spk_produksi/addHeader_view/' . $item->id_spkproduksi . '/view') . '" title="View"><i class="fa fa-eye"></i></a>';
+				}
+			}
+
+			$hasil[] = [
+				'no' => $no,
+				'no_spk_produksi' => $item->no_surat,
+				'customer' => $list_customer,
+				'nama_material' => $item->nama,
+				'status' => $status,
+				'alasan' => $item->reason,
+				'action' => $action
+			];
+		endforeach;
+
+		echo json_encode([
+			'draw' => $draw,
+			'recordsTotal' => $get_data_all->num_rows(),
+			'recordsFiltered' => $get_data_all->num_rows(),
+			'data' => $hasil
+		]);
 	}
 }

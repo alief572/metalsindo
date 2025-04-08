@@ -16,7 +16,7 @@ thead input {
 }
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
-<link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css')?>">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
 
 <div class="box">
 	<div class="box-body">
@@ -34,67 +34,18 @@ thead input {
 						<span class="pull-right"></span>
 					</div>
 					<div class="box-body">
-						<table id="example1" class="table table-bordered table-striped">
+						<table id="example2" class="table table-bordered table-striped">
 							<thead>
 								<tr>
 									<th width='4%'>#</th>
 									<th width='12%'>No SPK Produksi</th>
 									<th width='24%'>Customer</th>
 									<th width='14%'>Nama Material</th>
-									
-									<?php if($ENABLE_MANAGE) : ?>
 									<th width='12%'>Action</th>
-									<?php endif; ?>
 								</tr>
 							</thead>
 							<tbody>
-								<?php 
-								if(empty($results)){
-								}
-								else{
-									
-								$numb=0; foreach($results AS $record){ $numb++; 
-								$id_spkproduksi = $record->id_spkproduksi;
-								$customer	= $this->db->query("SELECT a.*, b.name_customer as name_customer FROM dt_spk_produksi as a LEFT JOIN master_customers as b ON a.idcustomer = b.id_customer WHERE a.id_spkproduksi='$id_spkproduksi' GROUP BY a.idcustomer ")->result();
-								?>
-								<tr>
-									<td><?= $numb; ?></td>
-									<td><?= $record->no_surat ?></td>
-									<td>
-										<table><?php foreach($customer AS $customer){
-											echo"<tr><td>- ".strtoupper($customer->namacustomer)."</td></tr>";}
-											?>
-										</table>
-									</td>
-									<td><?= $record->nama ?></td>
-									
-									<?php if($record->status_approve == '1'){ ?>
-									<td>
-									<?php if($ENABLE_VIEW) : ?>
-										<a class="btn btn-primary btn-sm view" href="<?= base_url('/spk_produksi/addHeader_view/'.$record->id_spkproduksi.'/view') ?>" title="View"><i class="fa fa-eye"></i>
-										</a>
-									<?php endif; ?>
-									<?php if($ENABLE_MANAGE) : ?>
-									<a class="btn btn-warning btn-sm" href="<?= base_url('/spk_produksi/addHeaderproses/'.$record->id_spkproduksi) ?>"  title="Add Proses"><i class="fa fa-plus"></i></a>
-									<?php endif; ?>
-									
-									<?php if($ENABLE_VIEW) : ?>
-										<a class="btn btn-success btn-sm view" href="<?= base_url('/spk_produksi/index2/'.$record->id_spkproduksi) ?>" title="Detail"><i class="fa fa-list"></i>
-										</a>
-									<?php endif; ?>
-									
-								    </td>
-									<?php }else{ ?>
-									<td>
-									<?php if($ENABLE_VIEW) : ?>
-										<a class="btn btn-primary btn-sm view" href="<?= base_url('/spk_produksi/addHeader_view/'.$record->id_spkproduksi.'/view') ?>" title="View"><i class="fa fa-eye"></i>
-										</a>
-									<?php endif; ?>
 
-									</td>
-									<?php } ?>
-								</tr>
-								<?php } }  ?>
 							</tbody>
 						</table>
 					</div>
@@ -109,7 +60,7 @@ thead input {
 						<span class="pull-right"></span>
 					</div>
 					<div class="box-body">
-						<table id="example2" class="table table-bordered table-striped">
+						<table id="example3" class="table table-bordered table-striped">
 							<thead>
 								<tr>
 									<th width='4%'>#</th>
@@ -118,68 +69,11 @@ thead input {
 									<th width='14%'>Nama Material</th>
 									<th width='9%'>Status</th>
 									<th>Alasan</th>
-									<?php if($ENABLE_MANAGE) : ?>
 									<th width='12%'>Action</th>
-									<?php endif; ?>
 								</tr>
 							</thead>
 							<tbody>
-								<?php 
-								if(empty($results2)){
-								}
-								else{
-									
-								$numb=0; foreach($results2 AS $record){ $numb++; 
-								$id_spkproduksi = $record->id_spkproduksi;
-								$customer	= $this->db->query("SELECT a.*, b.name_customer as name_customer FROM dt_spk_produksi as a INNER JOIN master_customers as b ON a.idcustomer = b.id_customer WHERE a.id_spkproduksi='$id_spkproduksi' GROUP BY a.idcustomer ")->result();
-								?>
-								<tr>
-									<td><?= $numb; ?></td>
-									<td><?= $record->no_surat ?></td>
-									<td>
-										<table><?php foreach($customer AS $customer){
-											echo"<tr><td>- ".strtoupper($customer->namacustomer)."</td></tr>";} 
-											?>
-										</table>
-									</td>
-									<td><?= $record->nama_material ?></td>
-									<td><?if($record->status_approve == '1'){
-										echo"Menunggu";
-									}elseif($record->status_approve == '2'){
-										echo"Diturunkan";
-									}elseif($record->status_approve == '3'){
-										echo"Selesai Diproduksi";
-									} ?></td>
-									<td><?= $record->reason ?></td>
-									
-									
-									<?php if($record->status_approve == '1'){ ?>
-									<td>
-									<?php if($ENABLE_VIEW) : ?>
-										<a class="btn btn-primary btn-sm view" href="<?= base_url('/spk_produksi/addHeader_view/'.$record->id_spkproduksi.'/view') ?>" title="View"><i class="fa fa-eye"></i>
-										</a>
-									<?php endif; ?>
-									<?php if($ENABLE_MANAGE) : ?>
-									<a class="btn btn-warning btn-sm" href="<?= base_url('/spk_produksi/addHeaderproses/'.$record->id_spkproduksi) ?>"  title="Add Proses"><i class="fa fa-plus"></i></a>
-									<?php endif; ?>
-									
-									<?php if($ENABLE_VIEW) : ?>
-										<a class="btn btn-success btn-sm view" href="<?= base_url('/spk_produksi/index2/'.$record->id_spkproduksi) ?>" title="Detail"><i class="fa fa-list"></i>
-										</a>
-									<?php endif; ?>
-									
-								    </td>
-									<?php }else{ ?>
-									<td>
-									<?php if($ENABLE_VIEW) : ?>
-										<a class="btn btn-primary btn-sm view" href="<?= base_url('/spk_produksi/addHeader_view/'.$record->id_spkproduksi.'/view') ?>" title="View"><i class="fa fa-eye"></i>
-										</a>
-									<?php endif; ?>
-
-									</td>
-									<?php } ?>
-								</tr>
-								<?php } }  ?>
+								
 							</tbody>
 						</table>
 					</div>
@@ -230,8 +124,7 @@ thead input {
 </div>
 
 <!-- DataTables -->
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js')?>"></script>
-<script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js')?>"></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
 
 <!-- page script -->
 <script type="text/javascript">
@@ -362,42 +255,82 @@ thead input {
 		
 	})
 
+	function Datatables() {
+		
+	}
+
   	$(function() {
-    	// $('#example1 thead tr').clone(true).appendTo( '#example1 thead' );
-	    // $('#example1 thead tr:eq(1) th').each( function (i) {
-	        // var title = $(this).text();
-	        //alert(title);
-	        // if (title == "#" || title =="Action" ) {
-	        	// $(this).html( '' );
-	        // }else{
-	        	// $(this).html( '<input type="text" />' );
-	        // }
+	    var datatables = $('#example2').DataTable({
+			serverSide: true,
+			processing: true,
+			destroy: true,
+			language: {
+				loadingRecords: 'Loading - Please wait ...'
+			},
+			ajax: {
+				url: siteurl + active_controller + 'get_data_spk_produksi_reguler',
+				type: 'POST',
+				dataType: 'json'
+			},
+			columns: [
+				{
+					data: 'no'
+				},
+				{
+					data: 'no_spk_produksi'
+				},
+				{
+					data: 'customer'
+				},
+				{
+					data: 'nama_material'
+				},
+				{
+					data: 'action'
+				}
+			]
+		});
 
-	        // $( 'input', this ).on( 'keyup change', function () {
-	            // if ( table.column(i).search() !== this.value ) {
-	                // table
-	                    // .column(i)
-	                    // .search( this.value )
-	                    // .draw();
-	            // }else{
-	            	// table
-	                    // .column(i)
-	                    // .search( this.value )
-	                    // .draw();
-	            // }
-	        // } );
-	    // } );
-
-	    var table = $('#example1').DataTable( {
-	        orderCellsTop: true,
-	        fixedHeader: true
-	    } );
-		var table = $('#example2').DataTable( {
-	        orderCellsTop: true,
-	        fixedHeader: true
-	    } );
-    	$("#form-area").hide();
+		var datatables = $('#example3').DataTable({
+			serverSide: true,
+			processing: true,
+			destroy: true,
+			language: {
+				loadingRecords: 'Loading - Please wait ...'
+			},
+			ajax: {
+				url: siteurl + active_controller + 'get_data_spk_produksi_booking',
+				type: 'POST',
+				dataType: 'json'
+			},
+			columns: [
+				{
+					data: 'no'
+				},
+				{
+					data: 'no_spk_produksi'
+				},
+				{
+					data: 'customer'
+				},
+				{
+					data: 'nama_material'
+				},
+				{
+					data: 'status'
+				},
+				{
+					data: 'alasan'
+				},
+				{
+					data: 'action'
+				}
+			]
+		});
+    	// $("#form-area").hide();
   	});
+
+	
 	
 	
 	//Delete

@@ -3880,4 +3880,12 @@ class Spk_produksi extends Admin_Controller
 
 		echo $tipe;
 	}
+
+	public function get_data_spk_produksi_reguler() {
+		$this->Inventory_4_model->get_data_spk_produksi_reguler();
+	}
+
+	public function get_data_spk_produksi_booking() {
+		$this->Inventory_4_model->get_data_spk_produksi_booking();
+	}
 }
