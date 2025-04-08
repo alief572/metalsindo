@@ -16,7 +16,7 @@ class Delivery_order_model extends BF_Model
 	protected $addPermission  	= 'Delivery_Order.Add';
 	protected $managePermission = 'Delivery_Order.Manage';
 	protected $deletePermission = 'Delivery_Order.Delete';
-	
+
 	protected $table_name = 'ms_inventory_category3';
 	protected $key        = 'id';
 
@@ -378,16 +378,17 @@ class Delivery_order_model extends BF_Model
 		return $query->result();
 	}
 
-	public function get_delivery_order() {
+	public function get_delivery_order()
+	{
 		$draw = $this->input->post('draw');
 		$length = $this->input->post('length');
-        $start = $this->input->post('start');
-        $search = $this->input->post('search');
+		$start = $this->input->post('start');
+		$search = $this->input->post('search');
 
 		$this->db->select('a.*, b.name_customer as name_customer');
 		$this->db->from('tr_delivery_order a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		if(!empty($search)) {
+		if (!empty($search)) {
 			$this->db->group_start();
 			$this->db->like('DATE_FORMAT(a.tgl_delivery_order, "%d-%M-%Y")', $search['value'], 'both');
 			$this->db->or_like('a.no_surat', $search['value'], 'both');
@@ -404,7 +405,7 @@ class Delivery_order_model extends BF_Model
 		$this->db->select('a.*, b.name_customer as name_customer');
 		$this->db->from('tr_delivery_order a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		if(!empty($search)) {
+		if (!empty($search)) {
 			$this->db->group_start();
 			$this->db->like('DATE_FORMAT(a.tgl_delivery_order, "%d-%M-%Y")', $search['value'], 'both');
 			$this->db->or_like('a.no_surat', $search['value'], 'both');
@@ -420,47 +421,47 @@ class Delivery_order_model extends BF_Model
 		$hasil = [];
 
 		$no = (0 + $start);
-		foreach($query->result() as $item) {
+		foreach ($query->result() as $item) {
 			$no++;
 
 			$button = '';
 
-			if($item->status_approve == 1) {
-				if(has_permission($this->viewPermission)) {
+			if ($item->status_approve == 1) {
+				if (has_permission($this->viewPermission)) {
 					$button = '
-						<a class="btn btn-primary btn-sm" href="'. base_url('/delivery_order/PrintHeader/' . $item->id_delivery_order) .'" target="_blank" title="Print"><i class="fa fa-print"></i>
+						<a class="btn btn-primary btn-sm" href="' . base_url('/delivery_order/PrintHeader/' . $item->id_delivery_order) . '" target="_blank" title="Print"><i class="fa fa-print"></i>
 						</a>
-						<a class="btn btn-success btn-sm" href="'. base_url('/delivery_order/PrintHeaderWord/' . $item->id_delivery_order) .'" target="_blank" title="Print Word"><i class="fa fa-file-word-o"></i>
+						<a class="btn btn-success btn-sm" href="' . base_url('/delivery_order/PrintHeaderWord/' . $item->id_delivery_order) . '" target="_blank" title="Print Word"><i class="fa fa-file-word-o"></i>
 						</a>
-						<a class="btn btn-success btn-sm" href="'. base_url('/delivery_order/PrintHeaderHtml/' . $item->id_delivery_order) .'" target="_blank" title="Ke Printer"><i class="fa fa-print"></i>
+						<a class="btn btn-success btn-sm" href="' . base_url('/delivery_order/PrintHeaderHtml/' . $item->id_delivery_order) . '" target="_blank" title="Ke Printer"><i class="fa fa-print"></i>
 						</a>
-						<a class="btn btn-warning btn-sm" href="'. base_url('/delivery_order/PrintHeaderSlitting/' . $item->id_delivery_order) .'" target="_blank" title="Print"><i class="fa fa-print"></i>
+						<a class="btn btn-warning btn-sm" href="' . base_url('/delivery_order/PrintHeaderSlitting/' . $item->id_delivery_order) . '" target="_blank" title="Print"><i class="fa fa-print"></i>
 						</a>
-						<a class="btn btn-primary btn-sm" href="'. base_url('/delivery_order/PrintHeaderWordSlitting/' . $item->id_delivery_order) .'" target="_blank" title="Print Word Slitting"><i class="fa fa-file-word-o"></i>
-						</a>
-					';
-				}
- 			} else {
-				if(has_permission($this->viewPermission)) {
-					$button .= '
-						<a class="btn btn-primary btn-sm" href="'. base_url('/delivery_order/PrintHeaderHtml/' . $item->id_delivery_order) .'" target="_blank" title="Print"><i class="fa fa-print"></i>
-						</a>
-						<a class="btn btn-success btn-sm" href="'. base_url('/delivery_order/PrintHeaderWord/' . $item->id_delivery_order) .'" target="_blank" title="Print Word"><i class="fa fa-file-word-o"></i>
-						</a>
-						<a class="btn btn-warning btn-sm" href="'. base_url('/delivery_order/PrintHeaderSlitting/' . $item->id_delivery_order) .'" target="_blank" title="Print"><i class="fa fa-print"></i>
-						</a>
-						<a class="btn btn-primary btn-sm" href="'. base_url('/delivery_order/PrintHeaderWordSlitting/' . $item->id_delivery_order) .'" target="_blank" title="Print Word Slitting"><i class="fa fa-file-word-o"></i>
+						<a class="btn btn-primary btn-sm" href="' . base_url('/delivery_order/PrintHeaderWordSlitting/' . $item->id_delivery_order) . '" target="_blank" title="Print Word Slitting"><i class="fa fa-file-word-o"></i>
 						</a>
 					';
 				}
-				if(has_permission($this->managePermission)) {
+			} else {
+				if (has_permission($this->viewPermission)) {
 					$button .= '
-						<a class="btn btn-info btn-sm" href="'. base_url('/delivery_order/editHeader/' . $item->id_delivery_order) .'" title="Edit"><i class="fa fa-edit"></i></i></a>
+						<a class="btn btn-primary btn-sm" href="' . base_url('/delivery_order/PrintHeaderHtml/' . $item->id_delivery_order) . '" target="_blank" title="Print"><i class="fa fa-print"></i>
+						</a>
+						<a class="btn btn-success btn-sm" href="' . base_url('/delivery_order/PrintHeaderWord/' . $item->id_delivery_order) . '" target="_blank" title="Print Word"><i class="fa fa-file-word-o"></i>
+						</a>
+						<a class="btn btn-warning btn-sm" href="' . base_url('/delivery_order/PrintHeaderSlitting/' . $item->id_delivery_order) . '" target="_blank" title="Print"><i class="fa fa-print"></i>
+						</a>
+						<a class="btn btn-primary btn-sm" href="' . base_url('/delivery_order/PrintHeaderWordSlitting/' . $item->id_delivery_order) . '" target="_blank" title="Print Word Slitting"><i class="fa fa-file-word-o"></i>
+						</a>
 					';
 				}
-				if(has_permission($this->managePermission)) {
+				if (has_permission($this->managePermission)) {
 					$button .= '
-						<button type="text" class="btn btn-success btn-sm release" title="Release" data-id="'. $item->id_delivery_order .'"><i class="fa fa-check"></i></button>
+						<a class="btn btn-info btn-sm" href="' . base_url('/delivery_order/editHeader/' . $item->id_delivery_order) . '" title="Edit"><i class="fa fa-edit"></i></i></a>
+					';
+				}
+				if (has_permission($this->managePermission)) {
+					$button .= '
+						<button type="text" class="btn btn-success btn-sm release" title="Release" data-id="' . $item->id_delivery_order . '"><i class="fa fa-check"></i></button>
 					';
 				}
 			}
@@ -475,6 +476,20 @@ class Delivery_order_model extends BF_Model
 			$this->db->where('a.id_delivery_order', $item->id_delivery_order);
 			$get_total_scrap = $this->db->get()->row();
 
+
+			$this->db->select('a.width, a.weight_mat, b.id_bentuk, b.total_weight');
+			$this->db->from('dt_delivery_order_child a');
+			$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_material', 'left');
+			$this->db->where('a.id_delivery_order', $item->id_delivery_order);
+			$get_do_item = $this->db->get()->result();
+
+			$total_sheet = 0;
+			foreach ($get_do_item as $item_do) :
+				if($item_do->id_bentuk == 'B2000002') {
+					$total_sheet += ($item_do->width / $item_do->total_weight);
+				}
+			endforeach;
+
 			$hasil[] = [
 				'no' => $no,
 				'tanggal_do' => date('d-M-Y', strtotime($item->tgl_delivery_order)),
@@ -484,16 +499,17 @@ class Delivery_order_model extends BF_Model
 				'total_fg' => number_format($get_total_fg->total_fg, 2),
 				'total_scrap' => number_format($get_total_scrap->total_scrap, 2),
 				'total_berat' => number_format($get_total_fg->total_fg + $get_total_scrap->total_scrap, 2),
+				'total_sheet' => number_format($total_sheet, 2),
 				'tipe' => strtoupper($item->type),
 				'action' => $button
 			];
 		}
 
 		echo json_encode([
-            "draw" => $draw,
-            "recordsTotal" => $query_all->num_rows(),
-            "recordsFiltered" => $query_all->num_rows(),
-            "data" => $hasil
-        ]);
+			"draw" => $draw,
+			"recordsTotal" => $query_all->num_rows(),
+			"recordsFiltered" => $query_all->num_rows(),
+			"data" => $hasil
+		]);
 	}
 }

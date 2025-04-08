@@ -37,11 +37,10 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 								<th>Length</th>
 								<th>Delivery Date</th>
 								<th>Total Weight</th>
+								<th>Total Sheet</th>
 								<th>Total SPK</th>
 								<th>FG</th>
-								<?php if ($ENABLE_MANAGE) : ?>
-									<th>Action</th>
-								<?php endif; ?>
+								<th>Action</th>
 							</tr>
 						</thead>
 
@@ -353,7 +352,7 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 		// } );
 		// } );
 
-		
+
 
 		var table = $('#example2').DataTable({
 			orderCellsTop: true,
@@ -367,67 +366,69 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 	//Delete
 
 	function DataTables() {
-			// var dataTables = $('#table_penawaran').dataTable();
-			// dataTables.destroy();
+		// var dataTables = $('#table_penawaran').dataTable();
+		// dataTables.destroy();
 
-			var dataTables = $('#example1').dataTable({
-				ajax: {
-					url: siteurl + active_controller + 'get_data_material_planning',
-					type: "POST",
-					dataType: "JSON",
-					data: function(d) {
+		var dataTables = $('#example1').dataTable({
+			ajax: {
+				url: siteurl + active_controller + 'get_data_material_planning',
+				type: "POST",
+				dataType: "JSON",
+				data: function(d) {
 
-					}
+				}
+			},
+			columns: [{
+					data: 'no'
 				},
-				columns: [
-					{
-						data: 'no'
-					},
-					{
-						data: 'no_spk'
-					},
-					{
-						data: 'customer'
-					},
-					{
-						data: 'kode_material'
-					},
-					{
-						data: 'no_aloy'
-					},
-					{
-						data: 'thickness'
-					},
-					{
-						data: 'width'
-					},
-					{
-						data: 'length'
-					},
-					{
-						data: 'delivery_date'
-					},
-					{
-						data: 'total_weight'
-					},
-					{
-						data: 'total_spk'
-					},
-					{
-						data: 'fg'
-					},
-					{
-						data: 'action'
-					}
-				],
-				responsive: true,
-				processing: true,
-				serverSide: true,
-				stateSave: true,
-				destroy: true,
-				paging: true
-			});
-		}
+				{
+					data: 'no_spk'
+				},
+				{
+					data: 'customer'
+				},
+				{
+					data: 'kode_material'
+				},
+				{
+					data: 'no_aloy'
+				},
+				{
+					data: 'thickness'
+				},
+				{
+					data: 'width'
+				},
+				{
+					data: 'length'
+				},
+				{
+					data: 'delivery_date'
+				},
+				{
+					data: 'total_weight'
+				},
+				{
+					data: 'total_sheet'
+				},
+				{
+					data: 'total_spk'
+				},
+				{
+					data: 'fg'
+				},
+				{
+					data: 'action'
+				}
+			],
+			responsive: true,
+			processing: true,
+			serverSide: true,
+			stateSave: true,
+			destroy: true,
+			paging: true
+		});
+	}
 
 	function PreviewPdf(id) {
 		param = id;

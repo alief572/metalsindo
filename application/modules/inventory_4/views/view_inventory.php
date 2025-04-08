@@ -159,6 +159,11 @@ foreach ($results['inven'] as $inven) {
 									$numb = 0;
 									foreach ($results['dimensi'] as $dimensi) {
 										$numb++;
+
+										$class_hitung = '';
+										if ($results['id_bentuks'][0]->id_bentuk == 'B2000002') {
+											$class_hitung = 'hitung_all';
+										}
 									?>
 										<tr>
 											<td hidden align='left'>
@@ -173,6 +178,17 @@ foreach ($results['inven'] as $inven) {
 											</td>
 										</tr>
 									<?php
+									}
+
+									if ($class_hitung !== '') {
+										echo '<tr>';
+										echo '<td>';
+										echo 'WEIGHT (Kg)';
+										echo '</td>';
+										echo '<td>';
+										echo '<input type="text" class="form-control weight_kg" name="weight_kg" value="'.$inven->total_weight.'" readonly>';
+										echo '</td>';
+										echo '</tr>';
 									}
 									?>
 								</tbody>

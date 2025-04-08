@@ -320,13 +320,14 @@ class Inventory_4_model extends BF_Model
 		$length = $this->input->post('length');
 		$search = $this->input->post('search');
 
-		$this->db->select('a.*, c.name_customer as name_customer, b.no_surat as no_surat, c.id_customer');
+		$this->db->select('a.*, c.name_customer as name_customer, b.no_surat as no_surat, c.id_customer, d.total_weight');
 		$this->db->from('dt_spkmarketing a');
 		$this->db->join('tr_spk_marketing b', 'b.id_spkmarketing=a.id_spkmarketing');
 		$this->db->join('master_customers c', 'c.id_customer=b.id_customer');
+		$this->db->join('ms_inventory_category3 d', 'd.id_category3=a.id_material', 'left');
 		$this->db->order_by('a.delivery', 'asc');
 		$this->db->where('a.deal="1" and a.status_close_planning ="OPN" and a.approved="1"');
-		if(!empty($search)) {
+		if (!empty($search)) {
 			$this->db->group_start();
 			$this->db->like('b.no_surat', $search['value'], 'both');
 			$this->db->or_like('c.name_customer', $search['value'], 'both');
@@ -344,13 +345,14 @@ class Inventory_4_model extends BF_Model
 
 		$query = $this->db->get();
 
-		$this->db->select('a.*, c.name_customer as name_customer, b.no_surat as no_surat, c.id_customer');
+		$this->db->select('a.*, c.name_customer as name_customer, b.no_surat as no_surat, c.id_customer, d.total_weight');
 		$this->db->from('dt_spkmarketing a');
 		$this->db->join('tr_spk_marketing b', 'b.id_spkmarketing=a.id_spkmarketing');
 		$this->db->join('master_customers c', 'c.id_customer=b.id_customer');
+		$this->db->join('ms_inventory_category3 d', 'd.id_category3=a.id_material', 'left');
 		$this->db->order_by('a.delivery', 'asc');
 		$this->db->where('a.deal="1" and a.status_close_planning ="OPN" and a.approved="1"');
-		if(!empty($search)) {
+		if (!empty($search)) {
 			$this->db->group_start();
 			$this->db->like('b.no_surat', $search['value'], 'both');
 			$this->db->or_like('c.name_customer', $search['value'], 'both');
@@ -370,7 +372,7 @@ class Inventory_4_model extends BF_Model
 		$hasil = [];
 
 		$no = (0 + $start);
-		foreach($query->result() as $item) {
+		foreach ($query->result() as $item) {
 			$no++;
 
 			$booking	= $this->db->query("SELECT 
@@ -388,28 +390,34 @@ class Inventory_4_model extends BF_Model
 
 			$nilai_booking = (!empty($booking)) ? $booking->total : 0;
 
-			$btn_edit = '<a class="btn btn-warning btn-sm edit" href="javascript:void(0)" title="Lihat Stock" data-id_dt_spkmarketing="'. $item->id_dt_spkmarketing .'" data-id_material="'. $item->id_material .'" data-width="'. $item->width .'" data-view="edit"><i class="fa fa-bars"></i></a>';
+			$btn_edit = '<a class="btn btn-warning btn-sm edit" href="javascript:void(0)" title="Lihat Stock" data-id_dt_spkmarketing="' . $item->id_dt_spkmarketing . '" data-id_material="' . $item->id_material . '" data-width="' . $item->width . '" data-view="edit"><i class="fa fa-bars"></i></a>';
 
-			$btn_create_pr = '<a class="btn btn-primary btn-sm" href="'. base_url("/purchase_request/add_pr/" . $item->id_dt_spkmarketing) .'" title="Create PR" data-no_inquiry="'. $item->no_inquiry .'"><i class="fa fa-table"></i></a>';
+			$btn_create_pr = '<a class="btn btn-primary btn-sm" href="' . base_url("/purchase_request/add_pr/" . $item->id_dt_spkmarketing) . '" title="Create PR" data-no_inquiry="' . $item->no_inquiry . '"><i class="fa fa-table"></i></a>';
 
-			$btn_approve = '<a class="btn btn-success btn-sm delete" href="javascript:void(0)" title="Approve" data-id_dt_spkmarketing="'. $item->id_dt_spkmarketing .'" data-id_material="'. $item->id_material .'"><i class="fa fa-check"></i></a>';
+			$btn_approve = '<a class="btn btn-success btn-sm delete" href="javascript:void(0)" title="Approve" data-id_dt_spkmarketing="' . $item->id_dt_spkmarketing . '" data-id_material="' . $item->id_material . '"><i class="fa fa-check"></i></a>';
 
 			$btn_tutup = '';
 
 			// if($item->status_lanjutan == '1') {
-				
+
 			// }
-			if($item->status_lanjutan == '2') {
-				$btn_tutup = '<a class="btn btn-warning btn-sm tutup" href="javascript:void(0)" title="Close" data-id_dt_spkmarketing="'. $item->id_dt_spkmarketing .'" data-id_material="'. $item->id_material .'"><i class="fa fa-times"></i></a>';
+			if ($item->status_lanjutan == '2') {
+				$btn_tutup = '<a class="btn btn-warning btn-sm tutup" href="javascript:void(0)" title="Close" data-id_dt_spkmarketing="' . $item->id_dt_spkmarketing . '" data-id_material="' . $item->id_material . '"><i class="fa fa-times"></i></a>';
 			}
 
-			if(!has_permission($this->viewPermission)) {
+			if (!has_permission($this->viewPermission)) {
 				$btn_edit = '';
 				$btn_create_pr = '';
 				$btn_approve = '';
 				$btn_tutup = '';
 			}
 
+			$get_material = $this->db->get_where('ms_inventory_category3', ['id_category3' => $item->id_material])->row();
+
+			$total_sheet = 0;
+			if($get_material->id_bentuk == 'B2000002') {
+				$total_sheet = $item->width / $get_material->total_weight;
+			}
 
 			$hasil[] = [
 				'no' => $no,
@@ -422,17 +430,18 @@ class Inventory_4_model extends BF_Model
 				'length' => $item->length,
 				'delivery_date' => date('d-M-Y', strtotime($item->delivery)),
 				'total_weight' => number_format($item->qty_produk),
+				'total_sheet' => number_format($total_sheet, 2),
 				'total_spk' => '-',
 				'fg' => number_format($nilai_booking, 2),
-				'action' => $btn_edit.' '.$btn_create_pr.' '.$btn_approve.' '.$btn_tutup
+				'action' => $btn_edit . ' ' . $btn_create_pr . ' ' . $btn_approve . ' ' . $btn_tutup
 			];
 		}
 
 		echo json_encode([
-            'draw' => intval($draw),
-            'recordsTotal' => $query_all->num_rows(),
-            'recordsFiltered' => $query_all->num_rows(),
-            'data' => $hasil
-        ]);
+			'draw' => intval($draw),
+			'recordsTotal' => $query_all->num_rows(),
+			'recordsFiltered' => $query_all->num_rows(),
+			'data' => $hasil
+		]);
 	}
 }

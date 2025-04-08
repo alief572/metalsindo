@@ -111,15 +111,15 @@ $id_bentuk = $this->uri->segment(3);
 						<th width="5">#</th>
 						<th width="13%">Id Material</th>
 						<th hidden>Nama Type</th>
-							<th>FERROUS / NON FERROUS</th>
-							<th hidden>Nama Category II</th>
-							<th hidden>Nama Category III</th>
-							<th>Nama Material</th>
-							<th>Supplier</th>
-							<th>Status</th>
-							<?php if ($ENABLE_MANAGE) : ?>
-								<th width="13%">Action</th>
-							<?php endif; ?>
+						<th>FERROUS / NON FERROUS</th>
+						<th hidden>Nama Category II</th>
+						<th hidden>Nama Category III</th>
+						<th>Nama Material</th>
+						<th>Supplier</th>
+						<th>Status</th>
+						<?php if ($ENABLE_MANAGE) : ?>
+							<th width="13%">Action</th>
+						<?php endif; ?>
 					</tr>
 				</thead>
 				<tbody>
@@ -188,15 +188,15 @@ $id_bentuk = $this->uri->segment(3);
 						<th width="5">#</th>
 						<th width="13%">Id Material</th>
 						<th hidden>Nama Type</th>
-							<th>FERROUS / NON FERROUS</th>
-							<th hidden>Nama Category II</th>
-							<th hidden>Nama Category III</th>
-							<th>Detail Nama Material</th>
-							<th>Supplier</th>
-							<th>Status</th>
-							<?php if ($ENABLE_MANAGE) : ?>
-								<th width="13%">Action</th>
-							<?php endif; ?>
+						<th>FERROUS / NON FERROUS</th>
+						<th hidden>Nama Category II</th>
+						<th hidden>Nama Category III</th>
+						<th>Detail Nama Material</th>
+						<th>Supplier</th>
+						<th>Status</th>
+						<?php if ($ENABLE_MANAGE) : ?>
+							<th width="13%">Action</th>
+						<?php endif; ?>
 					</tr>
 				</thead>
 				<tbody>
