@@ -37,12 +37,12 @@ class Spk_produksi extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$data = $this->Inventory_4_model->CariSPK();
-		$data2 = $this->Inventory_4_model->CariSPK2();
-		$selTab = (!empty($_SESSION['JSON_Filter'])) ? $_SESSION['JSON_Filter']['tabnya'] : '';
-		$this->template->set('results', $data);
-		$this->template->set('results2', $data2);
-		$this->template->set('selTab', $selTab);
+		// $data = $this->Inventory_4_model->CariSPK();
+		// $data2 = $this->Inventory_4_model->CariSPK2();
+		// $selTab = (!empty($_SESSION['JSON_Filter'])) ? $_SESSION['JSON_Filter']['tabnya'] : '';
+		// $this->template->set('results', $data);
+		// $this->template->set('results2', $data2);
+		// $this->template->set('selTab', $selTab);
 		$this->template->title('SPK Produksi');
 		$this->template->render('index');
 	}
