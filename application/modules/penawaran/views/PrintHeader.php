@@ -349,9 +349,9 @@
 					<td width='200' align="center" colspan='6'>DESCRIPTION OF MERCHANDISE</td>
 					<?php
 					if ($tipe_sheet == '1') {
-						echo '<td width="50 align="center" colspan="2">PRICE/SHEET</td>';
+						echo '<td width="50 align="center" >PRICE/SHEET</td>';
 					} else {
-						echo '<td width="50 align="center" colspan="2">PRICE/KG</td>';
+						echo '<td width="50 align="center" >PRICE/KG</td>';
 					}
 					?>
 					<td width='50' align="center" rowspan='2'>REMARKS</td>
