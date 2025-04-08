@@ -144,13 +144,13 @@ foreach ($results['headpenawaran'] as $headpenawaran) {
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-6" hidden>
+						<div class="col-sm-6">
 							<div class='form-group row'>
 								<div class='col-md-4'>
-									<label for='forecast'>Inventory1</label>
+									<label for='forecast'>Qty (Sheet)</label>
 								</div>
-								<div class='col-md-8' id="untuk_inven1">
-									<input type='text' class='form-control' id='inven1' required name='inven1' placeholder='Bentuk Material'>
+								<div class='col-md-8' id="">
+									<input type="text" name="qty_sheet" id="" class="form-control form-control-sm autoNumeric">
 								</div>
 							</div>
 						</div>

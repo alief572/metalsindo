@@ -76,6 +76,15 @@ class Penawaran extends Admin_Controller
 		$id = $this->uri->segment(3);
 		$data['header'] = $this->Inventory_4_model->getHeaderPenawaran($id);
 		$data['detail']  = $this->Inventory_4_model->PrintDetail($id);
+
+		$tipe_sheet = 0;
+		foreach($data['detail'] as $item) :
+			if($item->id_bentuk == 'B2000001' && $tipe_sheet == 0) {
+				$tipe_sheet = 1;
+			}
+		endforeach;
+		$data['tipe_sheet'] = $tipe_sheet;
+
 		$this->load->view('PrintHeader', $data);
 		$html = ob_get_contents();
 
@@ -766,6 +775,7 @@ class Penawaran extends Admin_Controller
 				'harga_penawaran_cust'	=> str_replace(',', '', $post['harga_penawaran_cust']),
 				'harga_dolar'			=> $dolar,
 				'price_sheet'			=> str_replace(',', '', $post['price_sheet']),
+				'qty_sheet'			=> str_replace(',', '', $post['qty_sheet']),
 				'created_on'			=> date('Y-m-d H:i:s'),
 				'created_by'			=> $this->auth->user_id()
 			];
@@ -1140,6 +1150,8 @@ class Penawaran extends Admin_Controller
 			'keterangan'			=> $post['keterangan'],
 			'harga_penawaran'		=> str_replace(',', '', $post['harga_penawaran']),
 			'harga_penawaran_cust'	=> str_replace(',', '', $post['harga_penawaran_cust']),
+			'price_sheet'	=> str_replace(',', '', $post['price_sheet']),
+			'qty_sheet'	=> str_replace(',', '', $post['qty_sheet']),
 			'harga_dolar'			=> $dolar,
 			'created_on'			=> date('Y-m-d H:i:s'),
 			'created_by'			=> $this->auth->user_id()

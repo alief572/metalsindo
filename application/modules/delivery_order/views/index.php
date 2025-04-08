@@ -37,6 +37,7 @@ $ENABLE_DELETE  = has_permission('Delivery_Order.Delete');
 					<th>Total FG</th>
 					<th>Total Scrap</th>
 					<th>Total Berat</th>
+					<th>Total Sheet</th>
 					<th>Type</th>
 					<th>Action</th>
 				</tr>
@@ -243,6 +244,9 @@ $ENABLE_DELETE  = has_permission('Delivery_Order.Delete');
 				},
 				{
 					data: 'total_berat'
+				},
+				{
+					data: 'total_sheet'
 				},
 				{
 					data: 'tipe'
