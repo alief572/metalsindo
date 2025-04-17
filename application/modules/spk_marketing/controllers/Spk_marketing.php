@@ -37,8 +37,8 @@ class Spk_marketing extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$data = $this->Inventory_4_model->CariSPK();
-		$this->template->set('results', $data);
+		// $data = $this->Inventory_4_model->CariSPK();
+		// $this->template->set('results', $data);
 		$this->template->title('SPK Marketing');
 		$this->template->render('index');
 	}
@@ -2022,6 +2022,18 @@ class Spk_marketing extends Admin_Controller
 			->get()
 			->result_array();
 		$data['detailsum'] 	= array();
+
+		$tipe_sheet = 0;
+		$get_detail_spkmarketing  = $this->db->get_where('dt_spkmarketing', array('id_spkmarketing' => $id))->result();
+		foreach($get_detail_spkmarketing as $item) :
+			$get_material = $this->db->get_where('ms_inventory_category3', array('id_category3' => $item->id_material))->row();
+			if($tipe_sheet == 0 && $get_material->id_bentuk == 'B2000002') {
+				$tipe_sheet = 1;
+			}
+		endforeach;
+		
+		$data['tipe_sheet'] = $tipe_sheet;
+
 		$this->load->view('print2slitting', $data);
 		$html = ob_get_contents();
 
@@ -2049,5 +2061,9 @@ class Spk_marketing extends Admin_Controller
 	{
 		$no_surat = $this->Inventory_4_model->BuatNomorNew();
 		print_r($no_surat);
+	}
+
+	public function get_spk_marketing() {
+		$this->Inventory_4_model->get_spk_marketing();
 	}
 }

@@ -11,7 +11,7 @@ $ENABLE_DELETE  = has_permission('SPK_marketing.Delete');
 	}
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
-<link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
 
 <div class="box">
 	<div class="box-header">
@@ -25,7 +25,7 @@ $ENABLE_DELETE  = has_permission('SPK_marketing.Delete');
 	<!-- /.box-header -->
 	<!-- /.box-header -->
 	<div class="box-body">
-		<table id="example1" class="table table-bordered table-striped">
+		<table id="example2" class="table table-bordered table-striped">
 			<thead>
 				<tr>
 					<th width="5">#</th>
@@ -34,78 +34,12 @@ $ENABLE_DELETE  = has_permission('SPK_marketing.Delete');
 					<th>Custommer</th>
 					<th>Nilai SPK</th>
 					<th>Status</th>
-					<?php if ($ENABLE_MANAGE) : ?>
-						<th width="13%">Action</th>
-					<?php endif; ?>
+					<th width="13%">Action</th>
 				</tr>
 			</thead>
 
 			<tbody>
-				<?php if (empty($results)) {
-				} else {
-
-					$numb = 0;
-					foreach ($results as $record) {
-						$numb++;
-						$id_spkmarketing = $record->id_spkmarketing;
-						$totalharga	= $this->db->query("SELECT SUM(total_harga) as total FROM dt_spkmarketing WHERE id_spkmarketing='$id_spkmarketing' ")->result();
-				?>
-						<tr>
-							<td><?= $numb; ?></td>
-							<td><?= $record->tgl_spk_marketing ?></td>
-							<td><?= $record->no_surat ?></td>
-							<td><?= $record->name_customer ?></td>
-
-							<td align='right'> Rp <?= number_format($totalharga[0]->total); ?></td>
-							<td>
-								<?php if ($record->status_approve == '1') { ?>
-									<label class="label label-success">Approved</label>
-								<?php } else { ?>
-									<label class="label label-danger">Belum di Approve</label>
-								<?php } ?>
-							</td>
-							<?php if ($record->status_approve == '1') { ?>
-								<td style="padding-left:20px">
-									<?php if ($ENABLE_VIEW) : ?>
-										<a class="btn btn-primary btn-sm view" href="javascript:void(0)" title="View" data-id_spkmarketing="<?= $record->id_spkmarketing ?>"><i class="fa fa-eye"></i>
-										</a>
-										<a class="btn btn-success btn-sm" href="<?= base_url('/spk_marketing/PrintH2/' . $record->id_spkmarketing) ?>" target="_blank" title="Print"><i class="fa fa-print"></i></a>
-									<?php endif; ?>
-									<?php if ($ENABLE_MANAGE and $record->status_revisi == '2') : ?>
-										<a class="btn btn-primary btn-sm" href="<?= base_url('/spk_marketing/revisiHeader/' . $record->id_spkmarketing) ?>" title="Revisi" data-no_inquiry="<?= $record->no_inquiry ?>"><i class="fa fa-list"></i>
-										</a>
-									<?php endif; ?>
-									<!--
-				<a class="btn btn-primary btn-sm delete" href="javascript:void(0)" title="Approve" data-id_spkmarketing="<?= $record->id_spkmarketing ?>"><i class="fa fa-check"></i>
-				</a>
-				-->
-								</td>
-							<?php } else { ?>
-								<td style="padding-left:20px">
-									<?php if ($ENABLE_VIEW) : ?>
-										<a class="btn btn-primary btn-sm view" href="javascript:void(0)" title="View" data-id_spkmarketing="<?= $record->id_spkmarketing ?>"><i class="fa fa-eye"></i>
-										</a>
-										<a class="btn btn-success btn-sm" href="<?= base_url('/spk_marketing/PrintH2/' . $record->id_spkmarketing) ?>" target="_blank" title="Print"><i class="fa fa-print"></i></a>
-									<?php endif; ?>
-
-									<?php if ($ENABLE_MANAGE) : ?>
-										<a class="btn btn-info btn-sm" href="<?= base_url('/spk_marketing/editHeader/' . $record->id_spkmarketing) ?>" title="Edit"><i class="fa fa-edit">&nbsp;</i></i></a>
-										</a>
-									<?php endif; ?>
-
-									<?php if ($ENABLE_VIEW) :
-										if (!empty(checkApprove($record->id_spkmarketing))) {
-									?>
-											<a class="btn btn-success btn-sm delete" href="javascript:void(0)" title="Approve" data-id_spkmarketing="<?= $record->id_spkmarketing ?>"><i class="fa fa-check"></i>
-											</a>
-									<?php }
-									endif; ?>
-
-								</td>
-							<?php } ?>
-						</tr>
-				<?php }
-				}  ?>
+				
 			</tbody>
 		</table>
 	</div>
@@ -151,8 +85,7 @@ $ENABLE_DELETE  = has_permission('SPK_marketing.Delete');
 </div>
 
 <!-- DataTables -->
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js') ?>"></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
 
 <!-- page script -->
 <script type="text/javascript">
@@ -258,40 +191,45 @@ $ENABLE_DELETE  = has_permission('SPK_marketing.Delete');
 	})
 
 	$(function() {
-		// $('#example1 thead tr').clone(true).appendTo( '#example1 thead' );
-		// $('#example1 thead tr:eq(1) th').each( function (i) {
-		// var title = $(this).text();
-		//alert(title);
-		// if (title == "#" || title =="Action" ) {
-		// $(this).html( '' );
-		// }else{
-		// $(this).html( '<input type="text" />' );
-		// }
-
-		// $( 'input', this ).on( 'keyup change', function () {
-		// if ( table.column(i).search() !== this.value ) {
-		// table
-		// .column(i)
-		// .search( this.value )
-		// .draw();
-		// }else{
-		// table
-		// .column(i)
-		// .search( this.value )
-		// .draw();
-		// }
-		// } );
-		// } );
-
-		var table = $('#example1').DataTable({
-			orderCellsTop: true,
-			fixedHeader: true
-		});
-		$("#form-area").hide();
+		DataTables();
 	});
 
-
-	//Delete
+	function DataTables() {
+		var DataTables = $('#example2').dataTable({
+			serverSide: true,
+			processing: true,
+			stateSave: true,
+			paging: true,
+			ajax: {
+				type: 'post',
+				url: siteurl + active_controller + 'get_spk_marketing',
+				dataType: 'json'
+			},
+			columns: [
+				{
+					data: 'no'
+				},
+				{
+					data: 'tgl_terbit_spk'
+				},
+				{
+					data: 'no_spk'
+				},
+				{
+					data: 'customer'
+				},
+				{
+					data: 'nilai_spk'
+				},
+				{
+					data: 'status'
+				},
+				{
+					data: 'action'
+				}
+			]
+		});
+	}
 
 	function PreviewPdf(id) {
 		param = id;

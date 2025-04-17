@@ -1,3 +1,6 @@
+<?php 
+    $satuan = ($tipe_sheet == '1') ? 'SHEET' : 'KG';
+?>
 <html>
 
 <head>
@@ -241,10 +244,16 @@
                 <td align="center" rowspan='2'>NO.</td>
                 <td align="center" rowspan='2'>PRODUCT/ITEM</td>
                 <td width='90' align="center" colspan='6'>DESCRIPTION</td>
-                <td width='50' align="center" rowspan='2'>QTY (KG)</td>
+                <?php 
+                    if($tipe_sheet == 1) {
+                        echo '<td width="50" align="center" rowspan="2">QTY (SHEET)</td>';
+                    } else {
+                        echo '<td width="50" align="center" rowspan="2">QTY (KG)</td>';
+                    }
+                ?>
                 <td width='48' align="center" rowspan='2'>DELIVERY DATE</td>
-                <td width='48' align="center" rowspan='2'>DELIVERY (KG)</td>
-                <td align="center" rowspan='2'>+- (KG)</td>
+                <td width='48' align="center" rowspan='2'>DELIVERY (<?= $satuan ?>)</td>
+                <td align="center" rowspan='2'>+- (<?= $satuan ?>)</td>
             </tr>
             <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
                 <td width='22' align="center">Aloy</td>
