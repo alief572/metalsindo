@@ -248,7 +248,7 @@
                 <?php 
                     if($tipe_sheet == 1) {
                         echo '<td width="50" align="center" rowspan="2">QTY (SHEET)</td>';
-                        echo '<td width="50" align="center" rowspan="2">QTY (SHEET)</td>';
+                        echo '<td width="50" align="center" rowspan="2">QTY (KG)</td>';
                     } else {
                         echo '<td width="50" align="center" rowspan="2">QTY (KG)</td>';
                     }
