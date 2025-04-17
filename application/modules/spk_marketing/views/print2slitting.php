@@ -283,7 +283,13 @@
                                                     } else {
                                                         echo number_format($valx['length'], 2);
                                                     }; ?></td>
-                    <td width='50' align='right'><?= number_format($valx['qty_produk'], 2); ?></td>
+                    <?php 
+                        if($tipe_sheet == 1) :
+                            echo '<td width="50" align="right">'. number_format($valx['qty_sheet'], 2) .'</td>';
+                        else : 
+                            echo '<td width="50" align="right">'. number_format($valx['qty_produk'], 2) .'</td>';
+                        endif;
+                    ?>
                     <td width='48' align='center'><?= date('d-M-Y', strtotime($valx['delivery'])); ?></td>
                     <td width='48'></td>
                     <td width='48'></td>
