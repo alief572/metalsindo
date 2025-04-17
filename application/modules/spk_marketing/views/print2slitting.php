@@ -256,7 +256,7 @@
                 <td width='48' align="center" rowspan='2'>DELIVERY DATE</td>
             </tr>
             <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
-                <td width='22' align="center">Aloy</td>
+                <td width='46' align="center">Aloy</td>
                 <td width='22' align="center">Surface</td>
                 <td width='22' align="center">Hard</td>
                 <td width='22' align="center">Thick</td>
