@@ -12,6 +12,11 @@ class Inventory_4_model extends BF_Model
 	/**
 	 * @var string  User Table Name
 	 */
+	protected $viewPermission 	= 'SPK_marketing.View';
+	protected $addPermission  	= 'SPK_marketing.Add';
+	protected $managePermission = 'SPK_marketing.Manage';
+	protected $deletePermission = 'SPK_marketing.Delete';
+
 	protected $table_name = 'ms_inventory_category3';
 	protected $key        = 'id';
 
@@ -358,5 +363,102 @@ class Inventory_4_model extends BF_Model
 		$this->db->where('a.id_category3', $id);
 		$query = $this->db->get();
 		return $query->result();
+	}
+
+	public function get_spk_marketing()
+	{
+		$draw = $this->input->post('draw');
+		$length = $this->input->post('length');
+		$start = $this->input->post('start');
+		$search = $this->input->post('search');
+
+		$this->db->select('a.*, b.name_customer as name_customer');
+		$this->db->from('tr_spk_marketing a');
+		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+		if (!empty($search['value'])) {
+			$this->db->like('a.tgl_spk_marketing', $search['value'], 'both');
+			$this->db->or_like('a.no_surat', $search['value'], 'both');
+			$this->db->or_like('b.name_customer', $search['value'], 'both');
+		}
+		$this->db->order_by('a.id_spkmarketing', 'desc');
+		$this->db->limit($length, $start);
+
+		$query = $this->db->get();
+
+		$this->db->select('a.*, b.name_customer as name_customer');
+		$this->db->from('tr_spk_marketing a');
+		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+		if (!empty($search['value'])) {
+			$this->db->like('a.tgl_spk_marketing', $search['value'], 'both');
+			$this->db->or_like('a.no_surat', $search['value'], 'both');
+			$this->db->or_like('b.name_customer', $search['value'], 'both');
+		}
+		$this->db->order_by('a.id_spkmarketing', 'desc');
+
+		$query_all = $this->db->get();
+
+		$no = (0 + $start);
+
+		$hasil = [];
+
+		foreach ($query->result() as $item) :
+			$no++;
+
+			$this->db->select('SUM(a.total_harga) as total');
+			$this->db->from('dt_spkmarketing a');
+			$this->db->where('a.id_spkmarketing', $item->id_spkmarketing);
+			$totalharga = $this->db->get()->row();
+
+			if ($item->status_approve == '1') :
+				$status = '<label class="label label-success">Approved</label>';
+			else :
+				$status = '<label class="label label-danger">Belum di Approve</label>';
+			endif;
+
+			$action = '';
+
+			if ($item->status_approve == '1') {
+				if (has_permission($this->viewPermission)) :
+					$action .= ' <a class="btn btn-primary btn-sm view" href="javascript:void(0)" title="View" data-id_spkmarketing="' . $item->id_spkmarketing . '"><i class="fa fa-eye"></i></a>';
+
+					$action .= ' <a class="btn btn-success btn-sm" href="' . base_url('/spk_marketing/PrintH2/' . $item->id_spkmarketing) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
+				endif;
+
+				if (has_permission($this->managePermission) && $item->status_revisi == '2') :
+					$action .= ' <a class="btn btn-primary btn-sm" href="' . base_url('/spk_marketing/revisiHeader/' . $item->id_spkmarketing) . '" title="Revisi" data-no_inquiry="' . $item->no_inquiry . '"><i class="fa fa-list"></i></a>';
+				endif;
+			} else {
+				if (has_permission($this->viewPermission)) :
+					$action .= ' <a class="btn btn-primary btn-sm view" href="javascript:void(0)" title="View" data-id_spkmarketing="' . $item->id_spkmarketing . '"><i class="fa fa-eye"></i></a>';
+
+					$action .= '<a class="btn btn-success btn-sm" href="' . base_url('/spk_marketing/PrintH2/' . $item->id_spkmarketing) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
+				endif;
+
+				if (has_permission($this->managePermission)) :
+					$action .= ' <a class="btn btn-info btn-sm" href="'. base_url('/spk_marketing/editHeader/' . $item->id_spkmarketing) .'" title="Edit"><i class="fa fa-edit">&nbsp;</i></i></a></a>';
+				endif;
+
+				if(has_permission($this->viewPermission)) :
+					$action .= ' <a class="btn btn-success btn-sm delete" href="javascript:void(0)" title="Approve" data-id_spkmarketing="'. $item->id_spkmarketing .'"><i class="fa fa-check"></i></a>';
+				endif;
+			}
+
+			$hasil[] = [
+				'no' => $no,
+				'tgl_terbit_spk' => date('d F Y', strtotime($item->tgl_spk_marketing)),
+				'no_spk' => $item->no_surat,
+				'customer' => $item->name_customer,
+				'nilai_spk' => number_format($totalharga->total, 2),
+				'status' => $status,
+				'action' => $action
+			];
+		endforeach;
+
+		echo json_encode([
+			'draw' => intval($draw),
+			'recordsTotal' => $query_all->num_rows(),
+			'recordsFiltered' => $query_all->num_rows(),
+			'data' => $hasil,
+		]);
 	}
 }
