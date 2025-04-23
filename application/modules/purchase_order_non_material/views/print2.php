@@ -394,6 +394,7 @@
                 <?php
                 $CIF = "<br>" . $header->cif . "<br><br><br><br>";
                 $TOT_PPH = 0;
+                $TTL = 0;
                 foreach ($detail as $detail) {
                     $kategory = $detail->idmaterial;
                     $barang  = $this->db->query("SELECT * FROM ms_inventory_category3 WHERE id_category3 ='$kategory' ")->row();
@@ -401,9 +402,11 @@
                     $TOT_PPH += $detail->jumlahharga * $detail->pajak / 100;
                     $HS = number_format($detail->hargasatuan, 2);
                     $JH = number_format($detail->jumlahharga, 2);
+                    $JHS = $detail->jumlahharga;
                     if (strtolower($header->loi) == 'lokal') {
                         $HS = number_format($detail->hargasatuan, 2);
                         $JH = number_format($detail->jumlahharga, 2);
+                        $JHS = $detail->jumlahharga;
                     }
 
                     $satuan = $detail->satuan;
@@ -462,6 +465,8 @@
                         </tr>";
                         $CIF = "";
                     }
+
+                    $TTL += $JHS;
                 } ?>
 
                 <?php
@@ -481,7 +486,7 @@
                 ?>
                 <tr>
                     <td align="right" colspan='8' style="font-size: 8px;">Total </td>
-                    <td align="right" style="font-size: 8px;"><?= $header->matauang . ' ' . number_format($header->total_barang, 2) ?></td>
+                    <td align="right" style="font-size: 8px;"><?= $header->matauang . ' ' . number_format($TTL, 2) ?></td>
 
                 </tr>
                 <tr>
