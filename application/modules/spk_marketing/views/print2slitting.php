@@ -1,3 +1,7 @@
+<?php 
+    $satuan = ($tipe_sheet == '1') ? 'SHEET' : 'KG';
+    $colspan = ($tipe_sheet == '1') ? 8 : 7;
+?>
 <html>
 
 <head>
@@ -241,13 +245,18 @@
                 <td align="center" rowspan='2'>NO.</td>
                 <td align="center" rowspan='2'>PRODUCT/ITEM</td>
                 <td width='90' align="center" colspan='6'>DESCRIPTION</td>
-                <td width='50' align="center" rowspan='2'>QTY (KG)</td>
+                <?php 
+                    if($tipe_sheet == 1) {
+                        echo '<td width="50" align="center" rowspan="2">QTY (SHEET)</td>';
+                        echo '<td width="50" align="center" rowspan="2">QTY (KG)</td>';
+                    } else {
+                        echo '<td width="50" align="center" rowspan="2">QTY (KG)</td>';
+                    }
+                ?>
                 <td width='48' align="center" rowspan='2'>DELIVERY DATE</td>
-                <td width='48' align="center" rowspan='2'>DELIVERY (KG)</td>
-                <td align="center" rowspan='2'>+- (KG)</td>
             </tr>
             <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
-                <td width='22' align="center">Aloy</td>
+                <td width='46' align="center">Aloy</td>
                 <td width='22' align="center">Surface</td>
                 <td width='22' align="center">Hard</td>
                 <td width='22' align="center">Thick</td>
@@ -257,9 +266,11 @@
             <?php
             $a = 0;
             $SUM = 0;
+            $SUM_SHEET = 0;
             foreach ($detail as $val => $valx) {
                 $a++;
-                $SUM += $valx['qty_produk']
+                $SUM += $valx['qty_produk'];
+                $SUM_SHEET += $valx['qty_sheet'];
             ?>
                 <tr>
                     <td width='5' align="center"><?= $a ?></td>
@@ -274,9 +285,15 @@
                                                     } else {
                                                         echo number_format($valx['length'], 2);
                                                     }; ?></td>
-                    <td width='50' align='right'><?= number_format($valx['qty_produk'], 2); ?></td>
-                    <td width='48' align='center'><?= date('d-M-Y', strtotime($valx['delivery'])); ?></td>
-                    <td width='48'></td>
+                    <?php 
+                        if($tipe_sheet == 1) :
+                            echo '<td width="50" align="right">'. number_format($valx['qty_sheet'], 2) .'</td>';
+                            echo '<td width="50" align="right">'. number_format($valx['qty_produk'], 2) .'</td>';
+                        else : 
+                            echo '<td width="50" align="right">'. number_format($valx['qty_produk'], 2) .'</td>';
+                        endif;
+                    ?>
+                    
                     <td width='48'></td>
                 </tr>
             <?php
@@ -285,9 +302,12 @@
             <tr>
                 <th></th>
                 <th colspan='7'>TOTAL QUANTITY</th>
+                <?php 
+                    if($tipe_sheet == 1) :
+                        echo '<th align="right">'. number_format($SUM_SHEET, 2) .'</th>';
+                    endif;
+                ?>
                 <th align='right'><?= number_format($SUM, 2); ?></th>
-                <th></th>
-                <th></th>
                 <th></th>
             </tr>
         </tbody>
@@ -299,7 +319,7 @@
                 <td align="center" rowspan='2'>NO.</td>
                 <td align="center" rowspan='2' width='92'>ITEM<br>MATERIAL</td>
                 <td width='35' align="center" rowspan='2'>SIZE MOTHER COIL</td>
-                <td width='35' align="center" rowspan='2'>WEIGHT (KG)</td>
+                <td width='35' align="center" rowspan='2'>WEIGHT (<?= $satuan ?>)</td>
                 <td width='35' align="center" rowspan='2'>SIZE</td>
                 <td width='35' align="left">Sliting</td>
                 <td align="center" colspan='2'>QTY</td>

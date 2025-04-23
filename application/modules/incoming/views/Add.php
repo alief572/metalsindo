@@ -399,7 +399,7 @@ $tanggal = date('Y-m-d');
 			url: siteurl + 'incoming/TambahData',
 			data: "nopo=" + nopo + "&id=" + nomor + "&no=" + no,
 			success: function(html) {
-				$("#data_request_" + nomor).append(html);
+				$("#data_request_" + nomor).html(html);
 				$(".bilangan-desimal").maskMoney();
 				$(".chosen-select").select2({
 					width: '100%'

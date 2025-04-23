@@ -42,8 +42,8 @@ class Incoming extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$data = $this->db->query("SELECT a.*, b.name_suplier as name_suplier FROM tr_incoming as a INNER JOIN master_supplier as b on a.id_suplier=b.id_suplier ORDER BY a.id_incoming DESC")->result();
-		$this->template->set('results', $data);
+		// $data = $this->db->query("SELECT a.*, b.name_suplier as name_suplier FROM tr_incoming as a INNER JOIN master_supplier as b on a.id_suplier=b.id_suplier ORDER BY a.id_incoming DESC")->result();
+		// $this->template->set('results', $data);
 		$this->template->title('Incoming');
 		$this->template->render('index');
 	}

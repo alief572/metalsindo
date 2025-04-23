@@ -270,12 +270,12 @@
 					<td align="center" rowspan='2' width='100'>PART</td>
 					<td align="center" rowspan='2'>ITEM</td>
 					<td width='90' align="center" colspan='6'>DESCRIPTION OF MERCHANDISE</td>
-					<?php 
-						if($tipe_sheet == '1') {
-							echo '<td width="50 align="center" colspan="2">PRICE/SHEET</td>';
-						} else {
-							echo '<td width="50 align="center" colspan="2">PRICE/KG</td>';
-						}
+					<?php
+					if ($tipe_sheet == '1') {
+						echo '<td width="50 align="center" colspan="2">PRICE/SHEET</td>';
+					} else {
+						echo '<td width="50 align="center" colspan="2">PRICE/KG</td>';
+					}
 					?>
 					<td width='70' align="center" rowspan='2'>REMARKS</td>
 				</tr>
@@ -312,7 +312,20 @@
 														}; ?></td>
 
 						<td width='22' align='right'>$ <?= number_format($detail->harga_dolar, 2) ?></td>
-						<td width='22' align='right'>Rp <?= number_format($detail->harga_penawaran_cust) ?></td>
+						<?php
+						if ($tipe_sheet == '1') {
+						?>
+							<td width='22' align='right'>Rp <?= number_format($detail->price_sheet) ?></td>
+						<?php
+						} else {
+						?>
+
+							<td width='22' align='right'>Rp <?= number_format($detail->harga_penawaran_cust) ?></td>
+
+						<?php
+						}
+						?>
+
 
 						<td width='70' align='left'><?= $detail->keterangan ?></td>
 					</tr>
@@ -334,7 +347,13 @@
 					<td align="center" rowspan='2'>PART</td>
 					<td align="center" rowspan='2'>ITEM</td>
 					<td width='200' align="center" colspan='6'>DESCRIPTION OF MERCHANDISE</td>
-					<td width='40' align="center" rowspan='2'>PRICE/KG</td>
+					<?php
+					if ($tipe_sheet == '1') {
+						echo '<td width="50 align="center" rowspan="2">PRICE/SHEET</td>';
+					} else {
+						echo '<td width="50 align="center" rowspan="2">PRICE/KG</td>';
+					}
+					?>
 					<td width='50' align="center" rowspan='2'>REMARKS</td>
 				</tr>
 				<tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
@@ -368,7 +387,19 @@
 															echo number_format($detail->length, 2);
 														}; ?></td>
 
-						<td width='40' align='right'>Rp <?= number_format($detail->harga_penawaran_cust) ?></td>
+						<?php
+						if ($tipe_sheet == '1') {
+						?>
+							<td width='22' align='right'>Rp <?= number_format($detail->price_sheet) ?></td>
+						<?php
+						} else {
+						?>
+
+							<td width='22' align='right'>Rp <?= number_format($detail->harga_penawaran_cust) ?></td>
+
+						<?php
+						}
+						?>
 
 						<td width='50' align='left'><?= $detail->keterangan ?></td>
 					</tr>
