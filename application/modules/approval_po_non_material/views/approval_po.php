@@ -1617,15 +1617,19 @@ $ENABLE_DELETE  = has_permission('Approval_PO_Non_Material.Delete');
 			SUM_JML += Number($(this).val());
 		});
 
-		$(".ch_jumlah_ex2").each(function() {
+		$(".ch_jumlah_ex").each(function() {
 			SUM_JMX += Number($(this).val().split(",").join(""));
+		});
+
+		$(".ch_jumlah_ex2").each(function() {
+			// SUM_JMX += Number($(this).val().split(",").join(""));
 			SUM_JMXX += Number($(this).val().split(",").join(""));
 		});
 		$(".disc_num").each(function() {
-			SUM_JMX += Number($(this).val().split(",").join(""));
+			// SUM_JMX += Number($(this).val().split(",").join(""));
 		});
 		$(".ch_ppn").each(function() {
-			SUM_JMX -= Number($(this).val().split(",").join(""));
+			// SUM_JMX -= Number($(this).val().split(",").join(""));
 			SUM_JMXX -= Number($(this).val().split(",").join(""));
 
 			SUM_PPN += Number($(this).val().split(",").join(""));
