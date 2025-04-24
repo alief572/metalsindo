@@ -11,13 +11,13 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 	}
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
-<link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
 
 <div class="box">
 	<!-- /.box-header -->
 	<!-- /.box-header -->
 	<div class="box-body">
-		<table id="example1" class="table table-bordered table-striped">
+		<table id="example5" class="table table-bordered table-striped">
 			<thead>
 				<tr>
 					<th>#</th>
@@ -34,66 +34,7 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 			</thead>
 
 			<tbody>
-				<?php if (empty($results)) {
-				} else {
-
-					$numb = 0;
-					foreach ($results as $record) {
-						$numb++;
-						if ($record->status == 0) {
-							$Status = "<span class='badge bg-grey'>Draft</span>";
-						} elseif ($record->status == 1) {
-
-							$Status = "<span class='badge bg-yellow'>Menunggu Approval</span>";
-						} elseif ($record->status == 2) {
-							$Status = "<span class='badge bg-green'>Approved</span>";
-						} elseif ($record->status == 3) {
-							$Status = "<span class='badge bg-blue'>Print</span>";
-						} elseif ($record->status == 4) {
-							$Status = "<span class='badge bg-green'>Send</span>";
-						} elseif ($record->status == 5) {
-							$Status = "<span class='badge bg-red'>Not Approved</span>";
-						} elseif ($record->status == 6) {
-							$Status = "<span class='badge bg-green'>SO</span>";
-						} elseif ($record->status == 7) {
-							$Status = "<span class='badge bg-red'>Loss</span>";
-						}
-				?>
-						<tr>
-							<td><?= $numb; ?></td>
-							<td><?= $record->no_surat ?></td>
-							<td><?= strtoupper($record->name_customer) ?></td>
-							<td><?= $record->note ?></td>
-							<td><?= $record->no_do ?></td>
-							<td><?= number_format($record->nilai_invoice) ?></td>
-							<td><?= date('d-F-Y', strtotime($record->tgl_invoice)) ?></td>
-							<td style="padding-left:20px">
-								<?php if ($ENABLE_MANAGE and $record->no_proforma_invoice != '') : ?>
-									</a>
-									<a class="btn btn-primary btn-sm" href="<?= base_url('/wt_invoicing/PrintProformaInvoice/' . $record->id_invoice) ?>" target="_blank" title="Cetak Proforma Invoice" data-no_inquiry="<?= $record->no_inquiry ?>"><i class="fa fa-print"></i>
-									</a>
-								<?php endif; ?>
-								<?php if ($ENABLE_MANAGE and $record->no_invoice == '') : ?>
-									<a class="btn btn-warning btn-sm" href="<?= base_url('/wt_invoicing/createDealInvoice/' . $record->id_invoice) ?>" target="_blank" title="Create Invoice" data-no_inquiry="<?= $record->no_inquiry ?>"><i class="fa fa-plus"></i>
-									</a>
-								<?php endif; ?>
-								<?php if ($ENABLE_MANAGE and $record->no_invoice != '') : ?>
-									<a class="btn btn-success btn-sm" href="<?= base_url('/wt_invoicing/PrintInvoice/' . $record->no_invoice) ?>" target="_blank" title="Cetak Invoice" data-no_inquiry="<?= $record->no_inquiry ?>"><i class="fa fa-print"></i>
-									</a>
-								<?php endif; ?>
-								<?php if ($ENABLE_MANAGE and $record->no_invoice != '') : ?>
-									<a class="btn btn-primary btn-sm" href="<?= base_url('/wt_invoicing/PrintPackinglist/' . $record->no_invoice) ?>" target="_blank" title="Cetak Packinglist" data-no_inquiry="<?= $record->no_inquiry ?>"><i class="fa fa-print"></i>
-									</a>
-								<?php endif; ?>
-								<?php if ($ENABLE_MANAGE and $record->no_invoice != '') : ?>
-									<a class="btn btn-warning btn-sm" href="<?= base_url('/wt_invoicing/PrintPackinglistSlitting/' . $record->no_invoice) ?>" target="_blank" title="Packinglist Slitting" data-no_inquiry="<?= $record->no_inquiry ?>"><i class="fa fa-print"></i>
-									</a>
-								<?php endif; ?>
-							</td>
-
-						</tr>
-				<?php }
-				}  ?>
+				
 			</tbody>
 		</table>
 	</div>
@@ -161,8 +102,7 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 <!-- /.modal -->
 
 <!-- DataTables -->
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js') ?>"></script>
+<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
 
 <!-- page script -->
 <script type="text/javascript">
@@ -272,12 +212,48 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 
 
 	$(function() {
-		var table = $('#example1').DataTable({
-			orderCellsTop: true,
-			fixedHeader: true
-		});
+		DataTables();
 		$("#form-area").hide();
 	});
+
+	function DataTables() {
+		var DataTables = $('#example5').dataTable({
+			serverSide: true,
+			processing: true,
+			paging: true,
+			destroy: true,
+			ajax: {
+				type: 'post',
+				url: siteurl + active_controller + 'get_invoicing',
+				dataType: 'json'
+			},
+			columns: [{
+					data: 'no'
+				},
+				{
+					data: 'no_invoice'
+				},
+				{
+					data: 'nama_customer'
+				},
+				{
+					data: 'term'
+				},
+				{
+					data: 'nomor_do'
+				},
+				{
+					data: 'nilai_invoice'
+				},
+				{
+					data: 'tanggal_invoice'
+				},
+				{
+					data: 'action'
+				}
+			]
+		});
+	}
 
 
 	//Delete
