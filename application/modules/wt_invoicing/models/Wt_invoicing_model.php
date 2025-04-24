@@ -13,6 +13,11 @@ class Wt_invoicing_model extends BF_Model
   /**
    * @var string  User Table Name
    */
+  protected $viewPermission 	= 'Invoicing.View';
+	protected $addPermission  	= 'Invoicing.Add';
+	protected $managePermission = 'Invoicing.Manage';
+	protected $deletePermission = 'Invoicing.Delete';
+
   protected $table_name = 'tr_invoicing';
   protected $key        = 'id';
 
@@ -417,5 +422,96 @@ class Wt_invoicing_model extends BF_Model
     $this->db->order_by('a.no_invoice', DESC);
     $query = $this->db->get();
     return $query->result();
+  }
+
+  public function get_invoicing()
+  {
+    $draw = $this->input->post('draw');
+    $start = $this->input->post('start');
+    $length = $this->input->post('length');
+    $search = $this->input->post('search');
+
+    $this->db->select('a.*, b.name_customer as name_customer');
+    $this->db->from('tr_invoice a');
+    $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+    if(!empty($search['value'])) {
+      $this->db->group_start();
+      $this->db->like('a.no_surat', $search['value'], 'both');
+      $this->db->or_like('b.name_customer', $search['value'], 'both');
+      $this->db->or_like('a.note', $search['value'], 'both');
+      $this->db->or_like('a.no_do', $search['value'], 'both');
+      $this->db->or_like('a.nilai_invoice', $search['value'], 'both');
+      $this->db->or_like('a.tgl_invoice', $search['value'], 'both');
+      $this->db->group_end();
+    }
+    $this->db->order_by('a.id', 'desc');
+    $this->db->limit($length, $start);
+
+    $get_data = $this->db->get();
+
+    $this->db->select('a.*, b.name_customer as name_customer');
+    $this->db->from('tr_invoice a');
+    $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+    if(!empty($search['value'])) {
+      $this->db->group_start();
+      $this->db->like('a.no_surat', $search['value'], 'both');
+      $this->db->or_like('b.name_customer', $search['value'], 'both');
+      $this->db->or_like('a.note', $search['value'], 'both');
+      $this->db->or_like('a.no_do', $search['value'], 'both');
+      $this->db->or_like('a.nilai_invoice', $search['value'], 'both');
+      $this->db->or_like('a.tgl_invoice', $search['value'], 'both');
+      $this->db->group_end();
+    }
+    $this->db->order_by('a.id', 'desc');
+
+    $get_data_all = $this->db->get();
+
+    $hasil = [];
+
+    $no = (0 + $start);
+
+    foreach($get_data->result_array() as $item) {
+      $no++;
+
+      $action = '';
+
+      if(has_permission($this->managePermission) && $item['no_proforma_invoice'] != '') :
+        $action .= ' <a class="btn btn-primary btn-sm" href="'. base_url('/wt_invoicing/PrintProformaInvoice/' . $item['id_invoice']) .'" target="_blank" title="Cetak Proforma Invoice" data-no_inquiry="'. $item['no_inquiry'] .'"><i class="fa fa-print"></i></a>';
+      endif;
+
+      if(has_permission($this->managePermission) && $item['no_invoice'] == '') :
+        $action .= ' <a class="btn btn-warning btn-sm" href="'. base_url('/wt_invoicing/createDealInvoice/' . $item['id_invoice']) .'" target="_blank" title="Create Invoice" data-no_inquiry="'. $item['no_inquiry'] .'"><i class="fa fa-plus"></i></a> ';
+      endif;
+
+      if(has_permission($this->managePermission) && $item['no_invoice'] != '') :
+        $action .= ' <a class="btn btn-success btn-sm" href="'. base_url('/wt_invoicing/PrintInvoice/' . $item['no_invoice']) .'" target="_blank" title="Cetak Invoice" data-no_inquiry="'. $item['no_inquiry'] .'"><i class="fa fa-print"></i></a> ';
+      endif;
+
+      if(has_permission($this->managePermission) && $item['no_invoice'] != '') :
+        $action .= ' <a class="btn btn-primary btn-sm" href="'. base_url('/wt_invoicing/PrintPackinglist/' . $item['no_invoice']) .'" target="_blank" title="Cetak Packinglist" data-no_inquiry="'. $item['no_inquiry'] .'"><i class="fa fa-print"></i> ';
+      endif;
+
+      if(has_permission($this->managePermission) && $item['no_invoice'] != '') :
+        $action .= ' <a class="btn btn-warning btn-sm" href="'. base_url('/wt_invoicing/PrintPackinglistSlitting/' . $item['no_invoice']) .'" target="_blank" title="Packinglist Slitting" data-no_inquiry="'. $item['no_inquiry'] .'"><i class="fa fa-print"></i></a> ';
+      endif;
+
+      $hasil[] = [
+        'no' => $no,
+        'no_invoice' => $item['no_surat'],
+        'nama_customer' => strtoupper($item['name_customer']),
+        'term' => $item['note'],
+        'nomor_do' => $item['no_do'],
+        'nilai_invoice' => number_format($item['nilai_invoice']),
+        'tanggal_invoice' => date('d-F-Y', strtotime($item['tgl_invoice'])),
+        'action' => $action
+      ];
+    }
+
+    echo json_encode([
+      'draw' => intval($draw),
+      'recordsTotal' => $get_data_all->num_rows(),
+      'recordsFiltered' => $get_data_all->num_rows(),
+      'data' => $hasil
+    ]);
   }
 }
