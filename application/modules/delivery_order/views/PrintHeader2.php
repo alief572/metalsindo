@@ -314,8 +314,8 @@
                 $i++;
 
                 $SUMKG += $dtl->weight_mat;
-                $SUMQTY += ($get_material_bentuk->id_bentuk == 'B2000001') ? $dtl->qty_mat : 0;;
-                $SUMQTY_SHEET += ($get_material_bentuk->id_bentuk == 'B2000002') ? $dtl->qty_mat : 0;;
+                $SUMQTY += ($get_material_bentuk->id_bentuk == 'B2000001') ? $dtl->qty_order : 0;
+                $SUMQTY_SHEET += ($get_material_bentuk->id_bentuk == 'B2000002') ? $dtl->qty_order : 0;
 
 
 
@@ -335,8 +335,8 @@
                     <td width="180"><?= $dtl->nm_material . ',' . $dtl->part_number ?></td>
                     <td width="55"><?= $spec ?></td>
                     <td width="145" align="left"><?= $dtl->lotno ?></td>
-                    <td width="20" align="center"><?= ($get_material_bentuk->id_bentuk == 'B2000001') ? number_format($dtl->qty_mat, 0) : '' ?></td>
-                    <td width="25" align="center"><?= ($get_material_bentuk->id_bentuk == 'B2000002') ? number_format($dtl->qty_mat, 0) : '' ?></td>
+                    <td width="20" align="center"><?= ($get_material_bentuk->id_bentuk == 'B2000001') ? number_format($dtl->qty_order, 0) : '' ?></td>
+                    <td width="25" align="center"><?= ($get_material_bentuk->id_bentuk == 'B2000002') ? number_format($dtl->qty_order, 0) : '' ?></td>
                     <td width="20" align="right"><?= $dtl->weight_mat; ?></td>
                     <td width="60" align="center"><?= $dtl->remark ?></td>
                 </tr>
@@ -347,8 +347,8 @@
                 $width = $dtl->width;
                 $length = $dtl->length;
                 $id_material = $dtl->id_material;
-                $qty += ($get_material_bentuk->id_bentuk == 'B2000001') ? $dtl->qty_mat : 0;
-                $qty_sheet += ($get_material_bentuk->id_bentuk == 'B2000002') ? $dtl->qty_mat : 0;
+                $qty += ($get_material_bentuk->id_bentuk == 'B2000001') ? $dtl->qty_order : 0;
+                $qty_sheet += ($get_material_bentuk->id_bentuk == 'B2000002') ? $dtl->qty_order : 0;
                 $berat = $berat + $dtl->weight_mat;
             }
             ?>
