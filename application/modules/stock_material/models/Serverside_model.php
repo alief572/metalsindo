@@ -270,8 +270,26 @@ class Serverside_model extends BF_Model
 			$where_komponen = " AND thickness = '" . $komponen . "' ";
 		}
 
+		$where_search = '';
+		if (!empty($like_value)) {
+			$where_search = "AND (
+                        b.nama_gudang LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+                        OR a.lot_slitting LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+                        OR a.lotno LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+                        OR a.nama_material LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+						OR a.id_category3 LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+                    )";
+		}
+
 		$sql = "SELECT
-                    a.*, 
+                    a.id_category3,
+					a.lotno,
+					a.nama_material,
+					a.width,
+					a.sisa_spk,
+					a.qty,
+					a.no_surat,
+					a.customer, 
                     b.nama_gudang as nama_gudang,
 					c.maker
                 FROM
@@ -285,43 +303,15 @@ class Serverside_model extends BF_Model
                     " . $where_kategori . "
 					" . $where_series . "
 					" . $where_komponen . "
+                    " . $where_search . "
 					AND a.aktif='Y' AND sisa_spk > 0
-                    AND (
-                        b.nama_gudang LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                        OR a.lot_slitting LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                        OR a.lotno LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                        OR a.nama_material LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-						OR a.id_category3 LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                    )
                 ";
 		// echo $sql; exit;
 
-		$Query_Sum	= "SELECT
-                            SUM(a.sisa_spk) AS berat
-                        FROM
-                            stock_material a
-                            JOIN ms_gudang b ON b.id_gudang =a.id_gudang
-                            JOIN ms_inventory_category3 c ON a.id_category3 =c.id_category3
-                            JOIN ms_inventory_type d ON c.id_type=d.id_type
-                            JOIN ms_inventory_category1 e ON c.id_category1 =e.id_category1
-                            JOIN ms_inventory_category2 f ON c.id_category2 =f.id_category2
-                        WHERE 1=1
-                             " . $where_kategori . "
-							" . $where_series . "
-							" . $where_komponen . "
-							AND a.aktif='Y'
-                            AND (
-                                b.nama_gudang LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                                OR a.lot_slitting LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                                OR a.lotno LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                                OR a.nama_material LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-								OR a.id_category3 LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                            )
-                        ";
 		$Total_Aset	= 0;
-		$Hasil_SUM		   = $this->db->query($Query_Sum)->result_array();
-		if ($Hasil_SUM) {
-			$Total_Aset		= $Hasil_SUM[0]['berat'];
+		$Hasil_SUM		   = $this->db->query($sql)->result_array();
+		foreach ($Hasil_SUM as $item) {
+			$Total_Aset		= $item['sisa_spk'];
 		}
 		$data['totalData'] 	= $this->db->query($sql)->num_rows();
 		$data['totalAset'] 	= $Total_Aset;

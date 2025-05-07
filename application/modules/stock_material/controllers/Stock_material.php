@@ -110,13 +110,13 @@ class Stock_material extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$gudang = $this->Inventory_4_model->PerGudang($id_gudang);
-		$jumlah = $this->Inventory_4_model->SumPerGudang($id_gudang);
-		$data = [
-			'gudang' => $gudang,
-			'jumlah' => $jumlah,
-		];
-		$this->template->set('results', $data);
+		// $gudang = $this->Inventory_4_model->PerGudang($id_gudang);
+		// $jumlah = $this->Inventory_4_model->SumPerGudang($id_gudang);
+		// $data = [
+		// 	'gudang' => $gudang,
+		// 	'jumlah' => $jumlah,
+		// ];
+		// $this->template->set('results', $data);
 		$this->template->title('Stock Material WIP');
 		$this->template->render('gudang_wip');
 	}
@@ -127,13 +127,6 @@ class Stock_material extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		// $gudang = $this->Inventory_4_model->PerGudang($id_gudang);
-		// $jumlah = $this->Inventory_4_model->SumPerGudang($id_gudang);
-		// $data = [
-		// 	'gudang' => $gudang,
-		// 	'jumlah' => $jumlah,
-		// ];
-		// $this->template->set('results', $data);
 		$this->template->title('Stock Material FG');
 		$this->template->render('gudang_fg');
 	}
