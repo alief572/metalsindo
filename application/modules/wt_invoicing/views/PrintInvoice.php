@@ -391,7 +391,19 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 
 			$get_inventory = $this->db->get_where('ms_inventory_category3', array('id_category3' => $detail->id_category3))->row_array();
 			if ($get_inventory['id_bentuk'] == 'B2000002') :
-				$satuan = 'Sheets';
+				$this->db->select('a.price_sheet, a.qty_sheet');
+				$this->db->from('child_penawaran a');
+				$this->db->join('tr_spk_marketing b', 'b.no_penawaran = a.no_penawaran');
+				$this->db->join('tr_invoice c', 'c.no_so = b.id_spkmarketing');
+				$this->db->where('c.no_so', $detail->no_so);
+				$this->db->where('a.id_category3', $detail->id_category3);
+				$get_sheets_detail = $this->db->get()->row_array();
+
+				if ($get_sheets_detail['price_sheet'] > 0) :
+					$satuan = 'Sheets';
+				else :
+					$satuan = 'Kgs';
+				endif;
 			else :
 				$satuan = 'Kgs';
 			endif;
