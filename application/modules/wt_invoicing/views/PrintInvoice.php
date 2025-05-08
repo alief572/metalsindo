@@ -420,8 +420,27 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 				$this->db->where('a.id_category3', $detail->id_category3);
 				$get_sheets_detail = $this->db->get()->row_array();
 
-				$totqty += $detail->qty_invoice;
-				$totharga += ($detail->harga_satuan * $detail->qty_invoice);
+				$get_inventory = $this->db->get_where('ms_inventory_category3', array('id_category3' => $detail->id_category3))->row();
+
+				$density = $get_inventory->density;
+				$thickness = $get_inventory->thickness;
+				$width = 0;
+				$length = 0;
+
+				$get_nilai_other = $this->db->get_where('child_inven_dimensi', array('id_category3' => $detail->id_category3))->result();
+				foreach ($get_nilai_other as $item_nilai_other) {
+					if ($item_nilai_other->id_dimensi == '32') {
+						$width = $item_nilai_other->nilai_dimensi;
+					}
+					if ($item_nilai_other->id_dimensi == '33') {
+						$length = $item_nilai_other->nilai_dimensi;
+					}
+				}
+
+				$qty_invoice = round(($detail->qty_invoice / ($density * $thickness * $width * $length / 1000000)));
+
+				$totqty += $qty_invoice;
+				$totharga += ($detail->harga_satuan * $qty_invoice);
 
 				$harga_satuan = $detail->harga_satuan;
 				// $qty_invoice = $get_sheets_detail['qty_sheet'];
