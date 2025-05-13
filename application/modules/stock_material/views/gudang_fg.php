@@ -159,7 +159,7 @@ $id_bentuk = $this->uri->segment(3);
 			drawCallback: function(settings) {
 				var api = this.api();
 
-				$(api.column(7).footer()).html("<div align='right'>" + number_format(total_aset, 2) + "</div>");
+				$(api.column(8).footer()).html("<div align='right'>" + number_format(total_aset, 2) + "</div>");
 			}
 
 

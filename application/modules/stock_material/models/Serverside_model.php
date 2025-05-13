@@ -311,7 +311,7 @@ class Serverside_model extends BF_Model
 		$Total_Aset	= 0;
 		$Hasil_SUM		   = $this->db->query($sql)->result_array();
 		foreach ($Hasil_SUM as $item) {
-			$Total_Aset		= $item['sisa_spk'];
+			$Total_Aset		+= ($item['sisa_spk'] * $item['qty']);
 		}
 		$data['totalData'] 	= $this->db->query($sql)->num_rows();
 		$data['totalAset'] 	= $Total_Aset;
