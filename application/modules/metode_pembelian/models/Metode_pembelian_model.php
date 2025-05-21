@@ -327,7 +327,7 @@ class Metode_pembelian_model extends BF_Model
 							c.nm_lengkap LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 						)
 				";
-			} else if($category == 'asset') {
+			} else if ($category == 'asset') {
 				$sql = 'SELECT
 					a.no_pr as no_pr,
 					a.created_date as tgl_pr,
@@ -343,13 +343,12 @@ class Metode_pembelian_model extends BF_Model
 						a.app_status_3 = "Y" AND 
 						a.close_pr IS NULL
 						AND (
-							a.no_pr LIKE "%'.$this->db->escape_like_str($like_value).'%" OR
-							a.created_date LIKE "%'.$this->db->escape_like_str($like_value).'%" OR
-							b.nm_lengkap LIKE "%'.$this->db->escape_like_str($like_value).'%"
+							a.no_pr LIKE "%' . $this->db->escape_like_str($like_value) . '%" OR
+							a.created_date LIKE "%' . $this->db->escape_like_str($like_value) . '%" OR
+							b.nm_lengkap LIKE "%' . $this->db->escape_like_str($like_value) . '%"
 						)
 				';
-			}
-			else if ($category == 'stok') {
+			} else if ($category == 'stok') {
 				$sql = "
 					SELECT
 						a.no_pr as no_pr,
@@ -451,20 +450,22 @@ class Metode_pembelian_model extends BF_Model
 				SELECT
 					a.no_pr as no_pr,
 					a.created_date as tgl_pr,
-					b.nm_lengkap as request_by,
-					a.created_date as request_date,
-					'asset' as category,
-					'' as so_number
+					d.nama as departemen,
+					'Asset' as category,
+					b.nm_lengkap as by_name,
+					a.created_date as tgl_dibuat
 				FROM
 					tran_pr_header a
 					LEFT JOIN users b ON b.id_user = a.created_by
+					LEFT JOIN asset_planning c ON c.no_pr = a.no_pr
+					LEFT JOIN ms_department d ON d.id = c.id_dept
 				WHERE
 					a.metode_pembelian IS NULL AND
 					a.close_pr IS NULL AND
 					(
-						a.no_pr LIKE '%".$this->db->escape_like_str($like_value)."%' OR
-						a.created_date LIKE '%".$this->db->escape_like_str($like_value)."%' OR
-						b.nm_lengkap LIKE '%".$this->db->escape_like_str($like_value)."%'
+						a.no_pr LIKE '%" . $this->db->escape_like_str($like_value) . "%' OR
+						a.created_date LIKE '%" . $this->db->escape_like_str($like_value) . "%' OR
+						b.nm_lengkap LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 					)
 				GROUP BY a.no_pr
 			";
@@ -982,9 +983,9 @@ class Metode_pembelian_model extends BF_Model
 					a.close_pr IS NULL AND
 					a.app_status_3 = "Y" AND
 					(
-						a.no_pr LIKE "%'.$this->db->escape_like_str($like_value).'%" OR
-						a.created_date LIKE "%'.$this->db->escape_like_str($like_value).'%" OR
-						b.nm_lengkap LIKE "%'.$this->db->escape_like_str($like_value).'%"
+						a.no_pr LIKE "%' . $this->db->escape_like_str($like_value) . '%" OR
+						a.created_date LIKE "%' . $this->db->escape_like_str($like_value) . '%" OR
+						b.nm_lengkap LIKE "%' . $this->db->escape_like_str($like_value) . '%"
 					)
 			';
 
