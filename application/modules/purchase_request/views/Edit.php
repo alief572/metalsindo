@@ -70,11 +70,11 @@ foreach ($results['head'] as $head) {
 											<th width='20%'>OD</th>
 											<th hidden>Qty (Unit)</th>
 											<th hidden>Weight (Unit)</th>
-											<?php 
-												if($results['check_sheet'] > 0) {
-													echo '<th width="20%">Qty Sheet</th>';
-													echo '<th width="20%">Weight Sheet</th>';
-												}
+											<?php
+											if ($results['check_sheet'] > 0) {
+												echo '<th width="20%">Qty Sheet</th>';
+												echo '<th width="20%">Weight Sheet</th>';
+											}
 											?>
 											<th width='20%'>Total Weight</th>
 											<th width='20%'>Width</th>
@@ -146,85 +146,85 @@ foreach ($results['head'] as $head) {
 		<td id='idbentuk_" . $loop . "' hidden><input value='" . $detail->id_bentuk . "'   readonly type='number' class='form-control' id='dt_idbentuk_$loop' required name='dt[$loop][idbentuk]' ></td>
 		<td>
 		";
-		if($get_material->id_bentuk !== 'B2000002') {
-			echo "
+											if ($get_material->id_bentuk !== 'B2000002') {
+												echo "
 		<select class='form-control select2 ' id='dt_idameter_$loop' name='dt[$loop][idameter]' >";
-											if ($detail->idameter == 200) {
-												echo "<option value=''>Pilih</option>
+												if ($detail->idameter == 200) {
+													echo "<option value=''>Pilih</option>
 		<option value='200'>200</option>
 		<option value='250' selected>250</option>
 		<option value='300'>300</option>
 		<option value='400'>400</option>
 		<option value='500'>500</option>";
-											} elseif ($detail->idameter == 250) {
-												echo "<option value=''>Pilih</option>
+												} elseif ($detail->idameter == 250) {
+													echo "<option value=''>Pilih</option>
 		<option value='200'>200</option>
 		<option value='250' selected>250</option>
 		<option value='300'>300</option>
 		<option value='400'>400</option>
 		<option value='500'>500</option>";
-											} elseif ($detail->idameter == 300) {
-												echo "<option value=''>Pilih</option>
+												} elseif ($detail->idameter == 300) {
+													echo "<option value=''>Pilih</option>
 		<option value='200'>200</option>
 		<option value='250'>250</option>
 		<option value='300' selected>300</option>
 		<option value='400'>400</option>
 		<option value='500'>500</option>";
-											} elseif ($detail->idameter == 400) {
-												echo "<option value=''>Pilih</option>
+												} elseif ($detail->idameter == 400) {
+													echo "<option value=''>Pilih</option>
 		<option value='200'>200</option>
 		<option value='250'>250</option>
 		<option value='300'>300</option>
 		<option value='400' selected>400</option>
 		<option value='500'>500</option>";
-											} elseif ($detail->idameter == 500) {
-												echo "<option value=''>Pilih</option>
+												} elseif ($detail->idameter == 500) {
+													echo "<option value=''>Pilih</option>
 		<option value='200'>200</option>
 		<option value='250'>250</option>
 		<option value='300'>300</option>
 		<option value='400'>400</option>
 		<option value='500' selected>500</option>";
-											} else {
-												echo "<option value=''>Pilih</option>
+												} else {
+													echo "<option value=''>Pilih</option>
 		<option value='200'>200</option>
 		<option value='250'>250</option>
 		<option value='300'>300</option>
 		<option value='400'>400</option>
 		<option value='500'>500</option>";
+												}
+												echo "</select>";
 											}
-											echo "</select>";
-		}
 											echo "
 		</td>
 		<td>
 		";
-		if($get_material->id_bentuk !== 'B2000002') {
-			echo "
+											if ($get_material->id_bentuk !== 'B2000002') {
+												echo "
 				<input type='text' class='form-control autoNumeric text-right ' value='" . $detail->odameter . "' id='dt_odameter_$loop' required name='dt[$loop][odameter]'>
 			";
-		}
-		echo "
+											}
+											echo "
 		</td>";
 
-		if($results['check_sheet'] > 0) {
-			if($detail->bentuk == 'SHEET') {
-				echo '<td><input type="text" class="form-control autoNumeric text-right" id="dt_qtysheet_'.$loop.'" name="dt['.$loop.'][qtysheet]" onchange="hitung_sheet('.$loop.')" value="'.$detail->qty_sheet.'" required></td>';
-				
-				echo '<td><input type="text" class="form-control autoNumeric text-right" id="dt_weightsheet_'.$loop.'" name="dt['.$loop.'][weightsheet]" value="'.$detail->weight_sheet.'" readonly></td>';
-			} else {
-				echo '
+											if ($results['check_sheet'] > 0) {
+												if ($detail->bentuk == 'SHEET') {
+													echo '<td><input type="text" class="form-control autoNumeric text-right" id="dt_qtysheet_' . $loop . '" name="dt[' . $loop . '][qtysheet]" onchange="hitung_sheet(' . $loop . ')" value="' . $detail->qty_sheet . '" required></td>';
+
+													echo '<td><input type="text" class="form-control autoNumeric text-right" id="dt_weightsheet_' . $loop . '" name="dt[' . $loop . '][weightsheet]" value="' . $detail->weight_sheet . '" readonly></td>';
+												} else {
+													echo '
 					<td></td>
 					<td></td>
 				';
-			}
-		}
+												}
+											}
 
-		echo "
+											echo "
 		<td hidden><input type='number' class='form-control' value='" . $detail->qty . "'  id='dt_qty_$loop' 			required name='dt[$loop][qty]' 		onkeyup='HitungTweight(" . $loop . ")'></td>
 		<td hidden><input type='number' class='form-control' value='" . $detail->weight . "' id='dt_weight_$loop' 			required name='dt[$loop][weight]' 	onkeyup='HitungTweight(" . $loop . ")'></td>
 		";
 
-		echo "
+											echo "
 		<td id='HasilTwight_" . $loop . "'><input value='" . $detail->totalweight . "' type='text' class='form-control autoNumeric text-right' id='dt_totalweight_$loop' 	required name='dt[$loop][totalweight]' ></td>
 		<td><input type='text' class='form-control autoNumeric text-right' id='dt_width_$loop' value='" . $detail->width . "'	required name='dt[$loop][width]' ></td>
 		<td><input type='text' class='form-control autoNumeric text-right' id='dt_length_$loop' value='" . $detail->length . "'	required name='dt[$loop][length]' ></td>
@@ -436,14 +436,16 @@ foreach ($results['head'] as $head) {
 				$("#bentuk_" + id).html(result.html);
 				if (result.id_bentuk == 'B2000002') {
 
+
+
 					var qty_sheet_col = $('#tr_thead th:nth-child(6)').text();
 					var weight_sheet_col = $('#tr_thead th:nth-child(7)').text();
 					if (qty_sheet_col !== 'Qty Sheet' && weight_sheet_col !== 'Weight / Sheet') {
-						var newTh = $('<th>').text('Qty Sheet');
-						var newTh2 = $('<th>').text('Weight / Sheet');
+						var newTh = $('<th width="250px">').text('Qty Sheet');
+						var newTh2 = $('<th width="250px">').text('Weight / Sheet');
 
-						$('#tr_thead th:nth-child(6)').before(newTh);
-						$('#tr_thead th:nth-child(7)').before(newTh2);
+						$('#tr_thead th:nth-child(5)').before(newTh);
+						$('#tr_thead th:nth-child(6)').before(newTh2);
 
 					}
 					$('#tr_' + id).each(function() {
@@ -459,20 +461,22 @@ foreach ($results['head'] as $head) {
 				} else {
 					if (cariSheet() < 1) {
 						$('th:contains("Qty Sheet")').remove();
-						$('th:contains("Weight Sheet")').remove();
+						$('th:contains("Weight / Sheet")').remove();
+
+						$('th:contains("Qty Sheet")').remove();
+						$('th:contains("Weight / Sheet")').remove();
 					}
 
 					$('#tr_' + id).each(function() {
 						$(this).find('td').eq(3).css('visibility', 'visible');
 						$(this).find('td').eq(4).css('visibility', 'visible');
 						if (sts_sheet > 0) {
+							$(this).find('td').eq(4).after('<td>');
+							$(this).find('td').eq(5).html(result.input_qty_sheet);
 							$(this).find('td').eq(5).after('<td>');
-							$(this).find('td').eq(6).html(result.input_qty_sheet);
-							$(this).find('td').eq(6).after('<td>');
-							$(this).find('td').eq(7).html(result.input_weight_sheet);
+							$(this).find('td').eq(6).html(result.input_weight_sheet);
 						}
 					});
-
 				}
 
 				$('#dt_width_' + id).autoNumeric('set', result.width);
