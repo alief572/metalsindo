@@ -413,6 +413,7 @@ class Metode_pembelian_model extends BF_Model
 				WHERE
 					a.category IN ('pr material', 'pr stok') AND
 					a.metode_pembelian IS NULL AND
+					a.app_3_by IS NOT NULL AND
 					(
 						a.no_pr LIKE '%" . $this->db->escape_like_str($like_value) . "%' OR
 						a.tgl_so LIKE '%" . $this->db->escape_like_str($like_value) . "%' OR
@@ -437,7 +438,9 @@ class Metode_pembelian_model extends BF_Model
 					LEFT JOIN users c ON c.id_user = a.created_by
 				WHERE
 					a.sts_app = 'Y' AND 
-					a.metode_pembelian IS NULL AND (
+					a.metode_pembelian IS NULL AND
+					a.app_3_by IS NOT NULL AND
+					 (
 						a.no_pr LIKE '%" . $this->db->escape_like_str($like_value) . "%' OR
 						a.created_date LIKE '%" . $this->db->escape_like_str($like_value) . "%' OR
 						b.nama LIKE '%" . $this->db->escape_like_str($like_value) . "%' OR
@@ -462,6 +465,7 @@ class Metode_pembelian_model extends BF_Model
 				WHERE
 					a.metode_pembelian IS NULL AND
 					a.close_pr IS NULL AND
+					a.app_3_by IS NOT NULL AND
 					(
 						a.no_pr LIKE '%" . $this->db->escape_like_str($like_value) . "%' OR
 						a.created_date LIKE '%" . $this->db->escape_like_str($like_value) . "%' OR
