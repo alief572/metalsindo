@@ -2,6 +2,12 @@
 $tanggal = date('Y-m-d');
 ?>
 
+<style>
+	input,
+	select {
+		mind-width: 200px;
+	}
+</style>
 <div class="box box-primary">
 	<div class="box-body">
 		<form id="data-form" method="post">
@@ -55,29 +61,28 @@ $tanggal = date('Y-m-d');
 								<button type='button' class='btn btn-sm btn-success' title='Ambil' id='tbh_ata' data-role='qtip' onClick='addmaterial();'><i class='fa fa-plus'></i>Add</button>
 
 							</div>
-							<div class="form-group row table-responsive">
-								<table class='table table-bordered table-striped'>
-									<thead>
-										<tr id="tr_thead" class='bg-blue'>
-											<th>Material</th>
-											<th width='8%'>Bentuk</th>
-											<th width='20%'>ID</th>
-											<th width='20%'>OD</th>
-											<th hidden>Qty (Unit)</th>
-											<th hidden>Weight (Unit)</th>
-											<th width='20%'>Total Weight</th>
-											<th width='20%'>Width</th>
-											<th hidden>Width</th>
-											<th width='20%'>Length</th>
-											<th width='15%'>Supplier</th>
-											<th width='10%'>Tanggal Dibutuhkan</th>
-											<th width='10%'>Keterangan</th>
-											<th width='10%'>Aksi</th>
-										</tr>
-									</thead>
-									<tbody id="data_request">
-									</tbody>
-								</table>
+							<div class="form-group row ">
+								<div class="table-responsive">
+									<table class='table table-bordered table-striped'>
+										<thead>
+											<tr id="tr_thead" class='bg-blue'>
+												<th width="300px">Material</th>
+												<th width="220px">Bentuk</th>
+												<th width="100px">ID</th>
+												<th width="100px">OD</th>
+												<th width="150px">Total Weight</th>
+												<th width="150px">Width</th>
+												<th width="150px">Length</th>
+												<th width="180px">Supplier</th>
+												<th width="150px">Tanggal Dibutuhkan</th>
+												<th width="250px">Keterangan</th>
+												<th width="100px">Aksi</th>
+											</tr>
+										</thead>
+										<tbody id="data_request">
+										</tbody>
+									</table>
+								</div>
 							</div>
 						</div>
 						<center>
@@ -91,7 +96,7 @@ $tanggal = date('Y-m-d');
 
 <style>
 	.select2 {
-		width: 100% !important;
+		width: 250px !important;
 	}
 
 	.datepicker {
@@ -264,8 +269,8 @@ $tanggal = date('Y-m-d');
 					var qty_sheet_col = $('#tr_thead th:nth-child(6)').text();
 					var weight_sheet_col = $('#tr_thead th:nth-child(7)').text();
 					if (qty_sheet_col !== 'Qty Sheet' && weight_sheet_col !== 'Weight / Sheet') {
-						var newTh = $('<th>').text('Qty Sheet');
-						var newTh2 = $('<th>').text('Weight / Sheet');
+						var newTh = $('<th width="250px">').text('Qty Sheet');
+						var newTh2 = $('<th width="250px">').text('Weight / Sheet');
 
 						$('#tr_thead th:nth-child(6)').before(newTh);
 						$('#tr_thead th:nth-child(7)').before(newTh2);
