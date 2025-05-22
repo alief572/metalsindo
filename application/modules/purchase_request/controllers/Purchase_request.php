@@ -70,7 +70,7 @@ class Purchase_request extends Admin_Controller
 		$deleted = '0';
 		$head = $this->db->query("SELECT * FROM tr_purchase_request WHERE no_pr = '$id' ")->result();
 		$detail = $this->db->query("SELECT * FROM dt_trans_pr WHERE no_pr = '$id' ")->result();
-		$check_sheet = $this->db->query('SELECT id_dt_pr FROM dt_trans_pr WHERE no_pr = "'.$id.'" AND id_bentuk = "B2000002"')->num_rows();
+		$check_sheet = $this->db->query('SELECT id_dt_pr FROM dt_trans_pr WHERE no_pr = "' . $id . '" AND id_bentuk = "B2000002"')->num_rows();
 		$customers = $this->Pr_model->get_data('master_customers', 'deleted', $deleted);
 		$karyawan = $this->Pr_model->get_data('ms_karyawan', 'deleted', $deleted);
 		$mata_uang = $this->Pr_model->get_data('mata_uang', 'deleted' . $deleted);
@@ -257,7 +257,7 @@ class Purchase_request extends Admin_Controller
 		$material = $this->db->query("SELECT a.*, b.nama as alloy, c.nm_bentuk as bentuk FROM ms_inventory_category3 as a JOIN ms_inventory_category2 as b ON a.id_category2 = b.id_category2 JOIN ms_bentuk as c ON a.id_bentuk = c.id_bentuk WHERE a.deleted = '0'  ")->result();
 		echo "
 		<tr id='tr_$loop'>
-		<td><select class='form-control select2' id='dt_idmaterial_$loop' name='dt[$loop][idmaterial]'	onchange ='CariProperties($loop)'>
+		<td width='300px'><select class='form-control select2' id='dt_idmaterial_$loop' name='dt[$loop][idmaterial]'	onchange ='CariProperties($loop)'>
 		<option value=''>Pilih</option>";
 		foreach ($material as $material) {
 			if ($material->id_bentuk == 'B2000001') {
@@ -299,28 +299,28 @@ class Purchase_request extends Admin_Controller
 			};
 		};
 		echo "</select></td>
-		<td id='bentuk_" . $loop . "'><input readonly type='text' class='form-control autoNumeric text-right' id='dt_bentuk_$loop' required name='dt[$loop][bentuk]' ></td>
+		<td id='bentuk_" . $loop . "' width='250px'><input readonly type='text' class='form-control autoNumeric text-right' id='dt_bentuk_$loop' required name='dt[$loop][bentuk]' ></td>
 		<td id='idbentuk_" . $loop . "' hidden><input readonly type='number' class='form-control' id='dt_idbentuk_$loop' required name='dt[$loop][idbentuk]' ></td>
-		<td>
-		<select class='form-control select2' id='dt_idameter_$loop' name='dt[$loop][idameter]'>
+		<td class='100px'>
+		<select class='form-control' id='dt_idameter_$loop' name='dt[$loop][idameter]'>
 		<option value='200'>200</option>
 		<option value='250'>250</option>
 		<option value='300'>300</option>
 		<option value='400'>400</option>
 		<option value='500'>500</option>
 		</select>
-		</td>
+		</td width='100px'>
 		<td><input type='text' class='form-control autoNumeric text-right' id='dt_odameter_$loop' 			required name='dt[$loop][odameter]' 	></td>
 		<td hidden><input type='number' class='form-control' id='dt_qty_$loop' 			required name='dt[$loop][qty]' 		onkeyup='HitungTweight(" . $loop . ")'></td>
 		<td hidden><input type='number' class='form-control maskMoney' id='dt_weight_$loop' 			required name='dt[$loop][weight]' 	onkeyup='HitungTweight(" . $loop . ")'></td>
-		<td id='HasilTwight_" . $loop . "'><input type='text' class='form-control autoNumeric text-right' id='dt_totalweight_$loop' 	required name='dt[$loop][totalweight]' ></td>
-		<td><input type='text' class='form-control text-right autoNumeric' id='dt_width_$loop' 	required name='dt[$loop][width]' ></td>
-		<td><input type='text' class='form-control text-right autoNumeric' id='dt_length_$loop' 	required name='dt[$loop][length]' ></td>
-		<td id='supplier_" . $loop . "'><select class='form-control select2' id='dt_suplier_$loop' name='dt[$loop][suplier]'>
+		<td id='HasilTwight_" . $loop . "' width='150px'><input type='text' class='form-control autoNumeric text-right' id='dt_totalweight_$loop' 	required name='dt[$loop][totalweight]' ></td>
+		<td width='150px'><input type='text' style='min-width: 100px;' class='form-control text-right autoNumeric' id='dt_width_$loop' 	required name='dt[$loop][width]' ></td>
+		<td width='150px'><input type='text' style='min-width: 100px;' class='form-control text-right autoNumeric' id='dt_length_$loop' 	required name='dt[$loop][length]' ></td>
+		<td id='supplier_" . $loop . "' width='250px'><select style='min-width: 100px;' class='form-control select2' id='dt_suplier_$loop' name='dt[$loop][suplier]'>
 		<option value=''>Empty</option></select></td>
-		<td><input type='text' class='form-control datepicker' readonly id='dt_tanggal_$loop' 	required name='dt[$loop][tanggal]' 	></td>
-		<td><input type='text' class='form-control' id='dt_keterangan_$loop' 	required name='dt[$loop][keterangan]' 	></td>
-		<td><button type='button' class='btn btn-sm btn-danger' title='Hapus Data' data-role='qtip' onClick='return HapusItem($loop);'><i class='fa fa-close'></i></button></td>
+		<td width='150px'><input type='text' class='form-control datepicker' readonly id='dt_tanggal_$loop' 	required name='dt[$loop][tanggal]' 	></td>
+		<td width='150px'><input type='text' class='form-control' id='dt_keterangan_$loop' 	required name='dt[$loop][keterangan]' 	></td>
+		<td width='100px'><button type='button' class='btn btn-sm btn-danger' title='Hapus Data' data-role='qtip' onClick='return HapusItem($loop);'><i class='fa fa-close'></i></button></td>
 		</tr>
 		";
 	}
@@ -343,10 +343,10 @@ class Purchase_request extends Admin_Controller
 
 		$input_qty_sheet = '';
 		$input_weight_sheet = '';
-		if($id_bentuk == 'B2000002') {
-			$input_qty_sheet = '<input type="text" class="form-control autoNumeric text-right" id="dt_qtysheet_'.$loop.'" name="dt['.$loop.'][qtysheet]" onchange="hitung_sheet('.$loop.')" required>';
-			
-			$input_weight_sheet = '<input type="text" class="form-control autoNumeric text-right" id="dt_weightsheet_'.$loop.'" name="dt['.$loop.'][weightsheet]" value="'.$kategory3[0]->total_weight.'" readonly>';
+		if ($id_bentuk == 'B2000002') {
+			$input_qty_sheet = '<input type="text" class="form-control autoNumeric text-right" id="dt_qtysheet_' . $loop . '" name="dt[' . $loop . '][qtysheet]" onchange="hitung_sheet(' . $loop . ')" required>';
+
+			$input_weight_sheet = '<input type="text" class="form-control autoNumeric text-right" id="dt_weightsheet_' . $loop . '" name="dt[' . $loop . '][weightsheet]" value="' . $kategory3[0]->total_weight . '" readonly>';
 		}
 
 
@@ -1432,7 +1432,8 @@ class Purchase_request extends Admin_Controller
 		echo "</select>";
 	}
 
-	public function get_purchase_request() {
+	public function get_purchase_request()
+	{
 		$this->Pr_model->get_purchase_request();
 	}
 }
