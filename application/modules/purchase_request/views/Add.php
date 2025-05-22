@@ -266,14 +266,16 @@ $tanggal = date('Y-m-d');
 				$("#bentuk_" + id).html(result.html);
 				if (result.id_bentuk == 'B2000002') {
 
+
+
 					var qty_sheet_col = $('#tr_thead th:nth-child(6)').text();
 					var weight_sheet_col = $('#tr_thead th:nth-child(7)').text();
 					if (qty_sheet_col !== 'Qty Sheet' && weight_sheet_col !== 'Weight / Sheet') {
 						var newTh = $('<th width="250px">').text('Qty Sheet');
 						var newTh2 = $('<th width="250px">').text('Weight / Sheet');
 
-						$('#tr_thead th:nth-child(6)').before(newTh);
-						$('#tr_thead th:nth-child(7)').before(newTh2);
+						$('#tr_thead th:nth-child(5)').before(newTh);
+						$('#tr_thead th:nth-child(6)').before(newTh2);
 
 					}
 					$('#tr_' + id).each(function() {
@@ -290,19 +292,21 @@ $tanggal = date('Y-m-d');
 					if (cariSheet() < 1) {
 						$('th:contains("Qty Sheet")').remove();
 						$('th:contains("Weight / Sheet")').remove();
+
+						$('th:contains("Qty Sheet")').remove();
+						$('th:contains("Weight / Sheet")').remove();
 					}
 
 					$('#tr_' + id).each(function() {
 						$(this).find('td').eq(3).css('visibility', 'visible');
 						$(this).find('td').eq(4).css('visibility', 'visible');
 						if (sts_sheet > 0) {
+							$(this).find('td').eq(4).after('<td>');
+							$(this).find('td').eq(5).html(result.input_qty_sheet);
 							$(this).find('td').eq(5).after('<td>');
-							$(this).find('td').eq(6).html(result.input_qty_sheet);
-							$(this).find('td').eq(6).after('<td>');
-							$(this).find('td').eq(7).html(result.input_weight_sheet);
+							$(this).find('td').eq(6).html(result.input_weight_sheet);
 						}
 					});
-
 				}
 
 				$('#dt_width_' + id).autoNumeric('set', result.width);
