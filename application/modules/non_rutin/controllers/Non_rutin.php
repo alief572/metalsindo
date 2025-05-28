@@ -542,7 +542,7 @@ class Non_rutin extends Admin_Controller
 				'approve'		=> $approve,
 				'id'			=> $id,
 				'list_departement' => $get_departement,
-				'tingkat_approval'			=> $tingkat_approval,
+				'tingkat_approval' => $tingkat_approval,
 				'list_coa' => $get_list_coa
 			);
 
