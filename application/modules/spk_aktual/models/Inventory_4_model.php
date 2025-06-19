@@ -12,6 +12,11 @@ class Inventory_4_model extends BF_Model
 	/**
 	 * @var string  User Table Name
 	 */
+	protected $viewPermission 	= 'Spk_produksi_aktual.View';
+	protected $addPermission  	= 'Spk_produksi_aktual.Add';
+	protected $managePermission = 'Spk_produksi_aktual.Manage';
+	protected $deletePermission = 'Spk_produksi_aktual.Delete';
+
 	protected $table_name = 'ms_inventory_category3';
 	protected $key        = 'id';
 
@@ -324,5 +329,186 @@ class Inventory_4_model extends BF_Model
 		$this->db->where('a.id_category3', $id);
 		$query = $this->db->get();
 		return $query->result();
+	}
+
+	public function get_list_produksi()
+	{
+		$draw = $this->input->post('draw');
+		$length = $this->input->post('length');
+		$start = $this->input->post('start');
+		$search = $this->input->post('search');
+
+		$this->db->select('a.*, b.nama, d.name_customer, e.date_production');
+		$this->db->from('dt_tr_spk_produksi a');
+		$this->db->join('ms_inventory_category3 b', 'a.id_material=b.id_category3');
+		$this->db->join('dt_spk_produksi c', 'c.id_spkproduksi = a.id_spkproduksi', 'left');
+		$this->db->join('master_customers d', 'c.idcustomer = d.id_customer', 'left');
+		$this->db->join('tr_spk_aktual e', 'e.id_spkproduksi = a.id_spkproduksi', 'left');
+		$this->db->where('a.status_approve', '2');
+		if (!empty($search['value'])) {
+			$this->db->group_start();
+			$this->db->like('a.no_surat', $search['value'], 'both');
+			$this->db->or_like('a.no_surat', $search['value'], 'both');
+			$this->db->or_like('d.name_customer', $search['value'], 'both');
+			$this->db->or_like('a.nama', $search['value'], 'both');
+			$this->db->group_end();
+		}
+		$this->db->group_by('a.id_spkproduksi');
+		$this->db->order_by('a.id_spkproduksi', 'desc');
+		$this->db->limit($length, $start);
+
+		$get_data = $this->db->get();
+
+		$this->db->select('a.*, b.nama, d.name_customer, e.date_production');
+		$this->db->from('dt_tr_spk_produksi a');
+		$this->db->join('ms_inventory_category3 b', 'a.id_material=b.id_category3');
+		$this->db->join('dt_spk_produksi c', 'c.id_spkproduksi = a.id_spkproduksi', 'left');
+		$this->db->join('master_customers d', 'c.idcustomer = d.id_customer', 'left');
+		$this->db->join('tr_spk_aktual e', 'e.id_spkproduksi = a.id_spkproduksi', 'left');
+		$this->db->where('a.status_approve', '2');
+		if (!empty($search['value'])) {
+			$this->db->group_start();
+			$this->db->like('a.no_surat', $search['value'], 'both');
+			$this->db->or_like('a.no_surat', $search['value'], 'both');
+			$this->db->or_like('d.name_customer', $search['value'], 'both');
+			$this->db->or_like('a.nama', $search['value'], 'both');
+			$this->db->group_end();
+		}
+		$this->db->group_by('a.id_spkproduksi');
+		$this->db->order_by('a.id_spkproduksi', 'desc');
+
+		$get_data_all = $this->db->get();
+
+		$hasil = [];
+
+		$no = (0 + $start);
+
+		foreach ($get_data->result() as $item) :
+			$no++;
+
+			$produksi_date = (!empty($tgl->date_production)) ? date('d-m-Y', strtotime($item->date_production)) : date('d-m-Y', strtotime($item->tgl_spk_produksi));
+
+			$action = '';
+
+			if(has_permission($this->viewPermission) && $item->status_approve == '1') {
+				$action .= ' <a class="btn btn-success btn-sm view" href="'. base_url('/spk_aktual/addHeader_view/' . $item->id_spkproduksi . '/view') .'" title="View"><i class="fa fa-eye"></i></a>';
+			} else {
+				$action .= ' <a class="btn btn-warning btn-sm view" href="'. base_url('/spk_aktual/addHeader_view/' . $item->id_spkproduksi . '/view') .'" title="View"><i class="fa fa-eye"></i>';
+			}
+
+			if(has_permission($this->managePermission)) {
+				$action .= ' <a class="btn btn-success btn-sm" href='. base_url('/spk_aktual/EditHeader/' . $item->id_spkproduksi) .'" title="Input LHP Material Gabungan"><i class="fa fa-plus"></i></a>';
+
+				$action .= ' <a class="btn btn-danger btn-sm" href="'. base_url('/spk_aktual/EditHeadernew/View/' . $item->id_spkproduksi) .'" title="View LHP Material"><i class="fa fa-eye"></i></a>';
+
+				$action .= ' <a class="btn btn-success btn-sm" href="'. base_url('/spk_aktual/EditHeadernew/Edit/' . $item->id_tr_spk_produksi) .'" title="Edit LHP Material"><i class="fa fa-pencil"></i></a>';
+			}
+
+			if(has_permission($this->managePermission)) {
+				$action .= ' <a class="btn btn-success btn-sm" href="'. base_url('/spk_aktual/TambahLHP/' . $item->id_spkproduksi) .'" title="Input LHP"><i class="fa fa-edit"></i></a>';
+
+				$action .= ' <button type="button" class="btn btn-danger btn-sm reject" data-id_spkproduksi="'. $item->id_spkproduksi .'" title="Back To Produksi"><i class="fa fa-reply"></i></button>';
+
+				if($item->input1 == '1' && $item->input2 == '1') {
+					$action .= ' <button type="button" class="btn btn-success btn-sm approve" data-id_spkproduksi="'. $item->id_tr_spk_produksi .'" title="Approve"><i class="fa fa-check"></i></button>';
+				}
+			}
+
+			$hasil[] = [
+				'no' => $no,
+				'no_spk_produksi' => $item->no_surat,
+				'customer' => $item->name_customer,
+				'nama_material' => $item->nama,
+				'tanggal_produksi' => $produksi_date,
+				'action' => $action
+			];
+
+		endforeach;
+		echo json_encode([
+			'draw' => intval($draw),
+			'recordsTotal' => $get_data_all->num_rows(),
+			'recordsFiltered' => $get_data_all->num_rows(),
+			'data' => $hasil,
+		]);
+	}
+
+	public function get_history_produksi() {
+		$draw = $this->input->post('draw');
+		$length = $this->input->post('length');
+		$start = $this->input->post('start');
+		$search = $this->input->post('search');
+
+		$this->db->select('a.id_spk_aktual, a.no_surat_produksi, a.nama_material, a.date_production, a.created_on, c.name_customer');
+		$this->db->from('tr_spk_aktual a');
+		$this->db->join('dt_spk_produksi b', 'b.id_tr_spk_produksi = a.id_spk_aktual', 'left');
+		$this->db->join('master_customers c', 'c.id_customer = b.idcustomer', 'left');
+		if(!empty($search['value'])) {
+			$this->db->group_start();
+			$this->db->like('a.id_spk_aktual', $search['value'], 'both');
+			$this->db->or_like('a.no_spk_produksi', $search['value'], 'both');
+			$this->db->or_like('c.name_customer', $search['value'], 'both');
+			$this->db->or_like('a.nama_material', $search['value'], 'both');
+			$this->db->or_like('DATE_FORMAT(a.created_on, "%d-%m-%Y %H:%i:%s")', $search['value'], 'both');
+			$this->db->group_end();
+		}
+		$this->db->group_by('a.id_spk_aktual');
+		$this->db->order_by('a.id_spk_aktual', 'desc');
+		$this->db->limit($length, $start);
+
+		$get_data = $this->db->get();
+
+		$this->db->select('a.id_spk_aktual, a.no_surat_produksi, a.nama_material, a.date_production, a.created_on, c.name_customer');
+		$this->db->from('tr_spk_aktual a');
+		$this->db->join('dt_spk_produksi b', 'b.id_tr_spk_produksi = a.id_spk_aktual', 'left');
+		$this->db->join('master_customers c', 'c.id_customer = b.idcustomer', 'left');
+		if(!empty($search['value'])) {
+			$this->db->group_start();
+			$this->db->like('a.id_spk_aktual', $search['value'], 'both');
+			$this->db->or_like('a.no_spk_produksi', $search['value'], 'both');
+			$this->db->or_like('c.name_customer', $search['value'], 'both');
+			$this->db->or_like('a.nama_material', $search['value'], 'both');
+			$this->db->or_like('DATE_FORMAT(a.created_on, "%d-%m-%Y %H:%i:%s")', $search['value'], 'both');
+			$this->db->group_end();
+		}
+		$this->db->group_by('a.id_spk_aktual');
+		$this->db->order_by('a.id_spk_aktual', 'desc');
+
+		$get_data_all = $this->db->get();
+
+		$no = (0 + $start);
+		$hasil = [];
+
+		foreach($get_data->result() as $item) {
+			$no++;
+
+			$produksi_date = (!empty($item->date_production)) ? date('d-m-Y', strtotime($item->date_production)) : '-';
+
+			$action = '';
+
+			if(has_permission($this->viewPermission)) {
+				$action .= ' <a class="btn btn-warning btn-sm view" href="'. base_url('/spk_aktual/addHeader_view/' . $item->id_spk_aktual . '/view') .'" title="View"><i class="fa fa-eye"></i></a>';
+
+				$action .= ' <a class="btn btn-danger btn-sm" href="'. base_url('/spk_aktual/EditHeadernew/View/' . $item->id_spk_aktual) .'" title="View LHP Material"><i class="fa fa-eye"></i></i></a>';
+
+				$action .= ' <a class="btn btn-success btn-sm" href="'. base_url('/spk_aktual/TambahLHP/' . $item->id_spk_aktual . '/view') .'" title="View LHP Waktu"><i class="fa fa-eye"></i></i></a>';
+			}
+
+			$hasil[] = [
+				'no' => $no,
+				'kode' => $item->no_surat_produksi,
+				'customer' => ucfirst($item->nama_material),
+				'product' => $item->nama_material,
+				'tanggal_produksi' => $produksi_date,
+				'tanggal_input' => date('d-m-Y H:i:s', strtotime($item->created_on)),
+				'action' => $action
+			];
+		}
+
+		echo json_encode([
+			'draw' => intval($draw),
+			'recordsTotal' => $get_data_all->num_rows(),
+			'recordsFiltered' => $get_data_all->num_rows(),
+			'data' => $hasil
+		]);
 	}
 }

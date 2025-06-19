@@ -480,7 +480,7 @@ class Incoming extends Admin_Controller
 		<td><input  type='text' class='form-control input-sm autoNumeric' id='dt_aktual_" . $id . "_" . $no . "' 	onBlur='cariSelisih($id,$no)'		required name='dt[" . $id . "][detail][" . $no . "][aktual]' 	Placeholder='Berat Aktual'	></td>
 
 		<td>
-			<input type='text' class='form-control input-sm autoNumeric' id='dt_aktual_".$id."_".$no."' name='dt[".$id."][detail][".$no."][qty_sheet]' placeholder='Qty Sheet'>
+			<input type='text' class='form-control input-sm autoNumeric' id='dt_aktual_" . $id . "_" . $no . "' name='dt[" . $id . "][detail][" . $no . "][qty_sheet]' placeholder='Qty Sheet'>
 		</td>
 		
 		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_selisih_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][selisih]' 	readonly	></td>
@@ -584,6 +584,10 @@ class Incoming extends Admin_Controller
 		
 		
 		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_aktual_" . $id . "_" . $no . "' 		onBlur='cariSelisih($id,$no)'	required name='dt[" . $id . "][detail][" . $no . "][aktual]' 	Placeholder='Berat Aktual'	></td>
+
+		<td>
+			<input type='text' class='form-control input-sm autoNumeric' id='dt_qty_sheet_" . $id . "_" . $no . "' required name='dt[" . $id . "][detail][" . $no . "][qty_sheet]' placeholder='Qty Sheet'>
+		</td>
 		
 		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_selisih_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][selisih]'  	readonly	></td>
 		<td				       hidden ><input  type='text' 		value='" . number_format($material->hargasatuan, 3) . "'									class='form-control input-sm text-right' id='dt_hargasatuan_" . $id . "_" . $no . "' 		required name='dt[" . $id . "][detail][" . $no . "][hargasatuan]' 	></td>
@@ -1178,6 +1182,7 @@ class Incoming extends Admin_Controller
 				$ArrStok[$val2 . $val]['sisa_spk'] 			= str_replace(',', '', $valx2['widthrecive']);
 				$ArrStok[$val2 . $val]['customer'] 			= $valx2['customer'];
 				$ArrStok[$val2 . $val]['no_surat'] 			= 'INCOMING';
+				$ArrStok[$val2 . $val]['qty_sheet'] 		= str_replace(',', '', $valx2['qty_sheet']);
 			}
 		}
 
