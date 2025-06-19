@@ -2585,4 +2585,8 @@ class Wt_invoicing extends Admin_Controller
 	public function get_invoicing() {
 		$this->Wt_invoicing_model->get_invoicing();
 	}
+
+	public function get_monitoring_invoice() {
+		$this->Wt_invoicing_model->get_monitoring_invoice();
+	}
 }

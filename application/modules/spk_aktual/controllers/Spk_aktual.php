@@ -37,13 +37,7 @@ class Spk_aktual extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$produksi = $this->Inventory_4_model->CariSPKReguler();
-		$aktual = 	$this->db->query("SELECT * FROM tr_spk_aktual ORDER BY created_on DESC")->result();
-		$data = [
-			'produksi' => $produksi,
-			'aktual' => $aktual
-		];
-		$this->template->set('results', $data);
+
 		$this->template->title('Aktual Produksi');
 		$this->template->render('index');
 	}
@@ -3352,5 +3346,13 @@ class Spk_aktual extends Admin_Controller
 		$this->template->set('results', $data);
 		$this->template->title('SPK Produksi');
 		$this->template->render('AddHeader_view');
+	}
+
+	public function get_list_produksi() {
+		$this->Inventory_4_model->get_list_produksi();
+	}
+
+	public function get_history_produksi() {
+		$this->Inventory_4_model->get_history_produksi();
 	}
 }

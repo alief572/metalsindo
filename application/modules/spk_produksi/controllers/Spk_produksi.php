@@ -745,7 +745,7 @@ class Spk_produksi extends Admin_Controller
 		$id_material = $_GET['id_material'];
 		$id_spkproduksi = $_GET['id_spkproduksi'];
 
-		$stok	= $this->db->query("SELECT * FROM stock_material WHERE id_category3 = '$id_material' AND id_gudang='1' AND aktif='Y' AND ISNULL(on_proses) AND sisa_spk >0 ")->result();
+		$stok	= $this->db->query("SELECT * FROM stock_material WHERE id_category3 = '$id_material' AND id_gudang='1' AND aktif='Y' AND ISNULL(on_proses) AND sisa_spk > 0 ")->result();
 		echo "<select id='id_stock' name='id_stock' class='form-control select' onchange='get_produk()' required>
 						<option value=''>--Pilih--</option>";
 		foreach ($stok as $stok) {
@@ -962,7 +962,7 @@ class Spk_produksi extends Admin_Controller
 		$customers = $this->Inventory_4_model->get_data('master_customers', 'deleted', $deleted);
 
 
-		$nosurat = $this->db->query("SELECT a.*, b.no_surat as no_surat FROM dt_spkmarketing as a INNER JOIN tr_spk_marketing as b ON a.id_spkmarketing = b.id_spkmarketing WHERE a.id_material='$id_material' AND a.deal='1' AND b.status_approve = '1' AND a.status_lanjutan='2' AND close_do='N'")->result();
+		$nosurat = $this->db->query("SELECT a.*, b.no_surat as no_surat FROM dt_spkmarketing as a JOIN tr_spk_marketing as b ON a.id_spkmarketing = b.id_spkmarketing WHERE a.id_material='$id_material' AND a.deal='1' AND b.status_approve = '1' AND a.status_lanjutan='2' AND close_do='N'")->result();
 
 
 
@@ -3881,11 +3881,13 @@ class Spk_produksi extends Admin_Controller
 		echo $tipe;
 	}
 
-	public function get_data_spk_produksi_reguler() {
+	public function get_data_spk_produksi_reguler()
+	{
 		$this->Inventory_4_model->get_data_spk_produksi_reguler();
 	}
 
-	public function get_data_spk_produksi_booking() {
+	public function get_data_spk_produksi_booking()
+	{
 		$this->Inventory_4_model->get_data_spk_produksi_booking();
 	}
 }
