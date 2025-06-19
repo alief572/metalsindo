@@ -390,27 +390,27 @@ class Inventory_4_model extends BF_Model
 
 			$action = '';
 
-			if(has_permission($this->viewPermission) && $item->status_approve == '1') {
-				$action .= ' <a class="btn btn-success btn-sm view" href="'. base_url('/spk_aktual/addHeader_view/' . $item->id_spkproduksi . '/view') .'" title="View"><i class="fa fa-eye"></i></a>';
+			if (has_permission($this->viewPermission) && $item->status_approve == '1') {
+				$action .= ' <a class="btn btn-success btn-sm view" href="' . base_url('/spk_aktual/addHeader_view/' . $item->id_spkproduksi . '/view') . '" title="View"><i class="fa fa-eye"></i></a>';
 			} else {
-				$action .= ' <a class="btn btn-warning btn-sm view" href="'. base_url('/spk_aktual/addHeader_view/' . $item->id_spkproduksi . '/view') .'" title="View"><i class="fa fa-eye"></i>';
+				$action .= ' <a class="btn btn-warning btn-sm view" href="' . base_url('/spk_aktual/addHeader_view/' . $item->id_spkproduksi . '/view') . '" title="View"><i class="fa fa-eye"></i>';
 			}
 
-			if(has_permission($this->managePermission)) {
-				$action .= ' <a class="btn btn-success btn-sm" href='. base_url('/spk_aktual/EditHeader/' . $item->id_spkproduksi) .'" title="Input LHP Material Gabungan"><i class="fa fa-plus"></i></a>';
+			if (has_permission($this->managePermission)) {
+				$action .= ' <a class="btn btn-success btn-sm" href="' . base_url('/spk_aktual/EditHeader/' . $item->id_spkproduksi) . '" title="Input LHP Material Gabungan"><i class="fa fa-plus"></i></a>';
 
-				$action .= ' <a class="btn btn-danger btn-sm" href="'. base_url('/spk_aktual/EditHeadernew/View/' . $item->id_spkproduksi) .'" title="View LHP Material"><i class="fa fa-eye"></i></a>';
+				$action .= ' <a class="btn btn-danger btn-sm" href="' . base_url('/spk_aktual/EditHeadernew/View/' . $item->id_spkproduksi) . '" title="View LHP Material"><i class="fa fa-eye"></i></a>';
 
-				$action .= ' <a class="btn btn-success btn-sm" href="'. base_url('/spk_aktual/EditHeadernew/Edit/' . $item->id_tr_spk_produksi) .'" title="Edit LHP Material"><i class="fa fa-pencil"></i></a>';
+				$action .= ' <a class="btn btn-success btn-sm" href="' . base_url('/spk_aktual/EditHeadernew/Edit/' . $item->id_tr_spk_produksi) . '" title="Edit LHP Material"><i class="fa fa-pencil"></i></a>';
 			}
 
-			if(has_permission($this->managePermission)) {
-				$action .= ' <a class="btn btn-success btn-sm" href="'. base_url('/spk_aktual/TambahLHP/' . $item->id_spkproduksi) .'" title="Input LHP"><i class="fa fa-edit"></i></a>';
+			if (has_permission($this->managePermission)) {
+				$action .= ' <a class="btn btn-success btn-sm" href="' . base_url('/spk_aktual/TambahLHP/' . $item->id_spkproduksi) . '" title="Input LHP"><i class="fa fa-edit"></i></a>';
 
-				$action .= ' <button type="button" class="btn btn-danger btn-sm reject" data-id_spkproduksi="'. $item->id_spkproduksi .'" title="Back To Produksi"><i class="fa fa-reply"></i></button>';
+				$action .= ' <button type="button" class="btn btn-danger btn-sm reject" data-id_spkproduksi="' . $item->id_spkproduksi . '" title="Back To Produksi"><i class="fa fa-reply"></i></button>';
 
-				if($item->input1 == '1' && $item->input2 == '1') {
-					$action .= ' <button type="button" class="btn btn-success btn-sm approve" data-id_spkproduksi="'. $item->id_tr_spk_produksi .'" title="Approve"><i class="fa fa-check"></i></button>';
+				if ($item->input1 == '1' && $item->input2 == '1') {
+					$action .= ' <button type="button" class="btn btn-success btn-sm approve" data-id_spkproduksi="' . $item->id_tr_spk_produksi . '" title="Approve"><i class="fa fa-check"></i></button>';
 				}
 			}
 
@@ -432,7 +432,8 @@ class Inventory_4_model extends BF_Model
 		]);
 	}
 
-	public function get_history_produksi() {
+	public function get_history_produksi()
+	{
 		$draw = $this->input->post('draw');
 		$length = $this->input->post('length');
 		$start = $this->input->post('start');
@@ -442,7 +443,7 @@ class Inventory_4_model extends BF_Model
 		$this->db->from('tr_spk_aktual a');
 		$this->db->join('dt_spk_produksi b', 'b.id_tr_spk_produksi = a.id_spk_aktual', 'left');
 		$this->db->join('master_customers c', 'c.id_customer = b.idcustomer', 'left');
-		if(!empty($search['value'])) {
+		if (!empty($search['value'])) {
 			$this->db->group_start();
 			$this->db->like('a.id_spk_aktual', $search['value'], 'both');
 			$this->db->or_like('a.no_spk_produksi', $search['value'], 'both');
@@ -461,7 +462,7 @@ class Inventory_4_model extends BF_Model
 		$this->db->from('tr_spk_aktual a');
 		$this->db->join('dt_spk_produksi b', 'b.id_tr_spk_produksi = a.id_spk_aktual', 'left');
 		$this->db->join('master_customers c', 'c.id_customer = b.idcustomer', 'left');
-		if(!empty($search['value'])) {
+		if (!empty($search['value'])) {
 			$this->db->group_start();
 			$this->db->like('a.id_spk_aktual', $search['value'], 'both');
 			$this->db->or_like('a.no_spk_produksi', $search['value'], 'both');
@@ -478,19 +479,19 @@ class Inventory_4_model extends BF_Model
 		$no = (0 + $start);
 		$hasil = [];
 
-		foreach($get_data->result() as $item) {
+		foreach ($get_data->result() as $item) {
 			$no++;
 
 			$produksi_date = (!empty($item->date_production)) ? date('d-m-Y', strtotime($item->date_production)) : '-';
 
 			$action = '';
 
-			if(has_permission($this->viewPermission)) {
-				$action .= ' <a class="btn btn-warning btn-sm view" href="'. base_url('/spk_aktual/addHeader_view/' . $item->id_spk_aktual . '/view') .'" title="View"><i class="fa fa-eye"></i></a>';
+			if (has_permission($this->viewPermission)) {
+				$action .= ' <a class="btn btn-warning btn-sm view" href="' . base_url('/spk_aktual/addHeader_view/' . $item->id_spk_aktual . '/view') . '" title="View"><i class="fa fa-eye"></i></a>';
 
-				$action .= ' <a class="btn btn-danger btn-sm" href="'. base_url('/spk_aktual/EditHeadernew/View/' . $item->id_spk_aktual) .'" title="View LHP Material"><i class="fa fa-eye"></i></i></a>';
+				$action .= ' <a class="btn btn-danger btn-sm" href="' . base_url('/spk_aktual/EditHeadernew/View/' . $item->id_spk_aktual) . '" title="View LHP Material"><i class="fa fa-eye"></i></i></a>';
 
-				$action .= ' <a class="btn btn-success btn-sm" href="'. base_url('/spk_aktual/TambahLHP/' . $item->id_spk_aktual . '/view') .'" title="View LHP Waktu"><i class="fa fa-eye"></i></i></a>';
+				$action .= ' <a class="btn btn-success btn-sm" href="' . base_url('/spk_aktual/TambahLHP/' . $item->id_spk_aktual . '/view') . '" title="View LHP Waktu"><i class="fa fa-eye"></i></i></a>';
 			}
 
 			$hasil[] = [
