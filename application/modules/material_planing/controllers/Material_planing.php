@@ -37,7 +37,7 @@ class Material_planing extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		
+
 		$this->template->title('Material Planing');
 		$this->template->render('index');
 	}
@@ -151,7 +151,7 @@ class Material_planing extends Admin_Controller
 		$totalweight = $dtspk[0]->total_weight;
 
 		$stok 		= $this->db->query("SELECT * FROM stock_material WHERE id_category3 = '$id_material' AND width > 0 AND id_gudang = '1' ")->result();
-		$stok_fg 	= $this->db->query("SELECT * FROM stock_material WHERE id_category3 = '$id_material' AND width >= '$width' AND id_gudang='3' AND sisa_spk !='0' ORDER BY width ASC ")->result();
+		$stok_fg 	= $this->db->query("SELECT * FROM stock_material WHERE id_category3 = '$id_material' AND width >= '$width' AND id_gudang='3' AND sisa_spk != '0' ORDER BY width ASC ")->result();
 		$stok_book 	= $this->db->query("SELECT * FROM stock_material WHERE id_category3 = '$id_material' AND width >= '$width' AND id_gudang='3' ORDER BY width ASC ")->result();
 
 		//get_ pr-po - incoming
@@ -1686,8 +1686,9 @@ class Material_planing extends Admin_Controller
 
 		echo json_encode($status);
 	}
-	
-	public function get_data_material_planning() {
+
+	public function get_data_material_planning()
+	{
 		$this->Inventory_4_model->get_data_material_planning();
 	}
 }
