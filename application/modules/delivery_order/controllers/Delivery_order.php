@@ -614,7 +614,7 @@ class Delivery_order extends Admin_Controller
 				foreach ($lot as $lot) {
 
 					$totalqty += $lot->qty;
-					$totalbrt += $lot->weight;
+					$totalbrt += $lot->totalweight;
 					$totalberat = number_format($totalbrt, 2);
 					$numb++;
 
@@ -635,7 +635,7 @@ class Delivery_order extends Admin_Controller
 				<td rowspan='1' class='id_" . $loop . $numb . "'>
 					<input type='text' class='form-control input-sm text-right' value='" . number_format($child[0]->length, 2) . "' id='dp_length_$loop$numb' name='dp[$loop$numb][length]' readonly>
 					</td>
-				<td rowspan='1' class='id_" . $loop . $numb . "'><input type='text' class='form-control input-sm text-right' value='" . number_format($lot->qty, 2) . "'  id='dp_qty_produk_$loop$numb' name='dp[$loop$numb][qty_produk]' readonly></td>
+				<td rowspan='1' class='id_" . $loop . $numb . "'><input type='text' class='form-control input-sm text-right' value='" . number_format($lot->totalweight, 2) . "'  id='dp_qty_produk_$loop$numb' name='dp[$loop$numb][qty_produk]' readonly></td>
 				<td rowspan='1' class='id_" . $loop . $numb . "'>
 				</a>
 				</td>";
@@ -649,7 +649,7 @@ class Delivery_order extends Admin_Controller
 				
 				</td>
 				<td><input type='text' class='form-control input-sm text-right autoNumeric qty' value='$lot->qty' placeholder='Qty' id='dp_qty_mat_$loop$numb' required name='dp[$loop$numb][qty_mat]' readonly></td>
-				<td><input type='text' class='form-control input-sm text-right autoNumeric berat' placeholder='Weight' id='dp_weight_mat_$loop$numb' required name='dp[$loop$numb][weight_mat]' value='$lot->weight' readonly></td>
+				<td><input type='text' class='form-control input-sm text-right autoNumeric berat' placeholder='Weight' id='dp_weight_mat_$loop$numb' required name='dp[$loop$numb][weight_mat]' value='$lot->totalweight' readonly></td>
 				<td><input type='text' class='form-control input-sm' placeholder='Remarks' id='dp_remarks_$loop$numb' name='dp[$loop$numb][remarks]'></td>
 				
 				<td><a class='text-red' href='javascript:void(0)' title='Hapus' onClick='delRow($loop$numb,$loop)'><i class='fa fa-trash'></i>
