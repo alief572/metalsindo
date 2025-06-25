@@ -485,7 +485,7 @@ class Delivery_order_model extends BF_Model
 
 			$total_sheet = 0;
 			foreach ($get_do_item as $item_do) :
-				if($item_do->id_bentuk == 'B2000002') {
+				if ($item_do->id_bentuk == 'B2000002') {
 					$total_sheet += ($item_do->width / $item_do->total_weight);
 				}
 			endforeach;

@@ -541,9 +541,6 @@ class Delivery_order extends Admin_Controller
 
 		$dt             = $this->db->query("SELECT * FROM view_dt_spkmarketing WHERE id_spkmarketing = '$no_penawaran' AND deal=1 AND id_child_penawaran IS NOT NULL AND status_do='OPN'")->result();
 
-
-		// print_r($dt);
-		// exit;
 		$loop			= 0;
 		foreach ($dt as $dt) {
 			$loop++;
@@ -638,7 +635,7 @@ class Delivery_order extends Admin_Controller
 				<td rowspan='1' class='id_" . $loop . $numb . "'>
 					<input type='text' class='form-control input-sm text-right' value='" . number_format($child[0]->length, 2) . "' id='dp_length_$loop$numb' name='dp[$loop$numb][length]' readonly>
 					</td>
-				<td rowspan='1' class='id_" . $loop . $numb . "'><input type='text' class='form-control input-sm text-right' value='" . number_format($dt->total_qty, 2) . "'  id='dp_qty_produk_$loop$numb' name='dp[$loop$numb][qty_produk]' readonly></td>
+				<td rowspan='1' class='id_" . $loop . $numb . "'><input type='text' class='form-control input-sm text-right' value='" . number_format($lot->totalweight, 2) . "'  id='dp_qty_produk_$loop$numb' name='dp[$loop$numb][qty_produk]' readonly></td>
 				<td rowspan='1' class='id_" . $loop . $numb . "'>
 				</a>
 				</td>";
