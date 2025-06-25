@@ -244,8 +244,7 @@ $ENABLE_VIEW    = has_permission('Request_Payment.View');
 											<td>
 												<select name="tipe_pph_' . $numb . '" id="" class="form-control form-control-sm select_pph_' . $numb . '">
 													<option value="">- Select PPh -</option>
-													<option value="1">PPh 23</option>
-													<option value="2">PPh 22</option>
+													<option value="1">PPh 21</option>
 												</select>
 											</td>
 											<td class="text-center">:</td>

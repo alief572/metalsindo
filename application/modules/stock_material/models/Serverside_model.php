@@ -295,10 +295,10 @@ class Serverside_model extends BF_Model
                 FROM
                     stock_material a
                     JOIN ms_gudang b ON b.id_gudang =a.id_gudang
-                    JOIN ms_inventory_category3 c ON a.id_category3 =c.id_category3
-                    JOIN ms_inventory_type d ON c.id_type=d.id_type
-                    JOIN ms_inventory_category1 e ON c.id_category1 =e.id_category1
-                    JOIN ms_inventory_category2 f ON c.id_category2 =f.id_category2
+                    LEFT JOIN ms_inventory_category3 c ON a.id_category3 =c.id_category3
+                    LEFT JOIN ms_inventory_type d ON c.id_type=d.id_type
+                    LEFT JOIN ms_inventory_category1 e ON c.id_category1 =e.id_category1
+                    LEFT JOIN ms_inventory_category2 f ON c.id_category2 =f.id_category2
                 WHERE 1=1
                     " . $where_kategori . "
 					" . $where_series . "
