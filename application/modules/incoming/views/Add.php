@@ -338,7 +338,7 @@ $tanggal = date('Y-m-d');
 					$('#pib').val(result.no_pib);
 
 					var ket = $('#ket').val();
-					if(ket == '') {
+					if (ket == '') {
 						$('#ket').val(result.keterangan);
 					}
 				}

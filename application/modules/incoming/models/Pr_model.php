@@ -362,7 +362,6 @@ class Pr_model extends BF_Model
             $this->db->or_like('a.tanggal', $search['value'], 'both');
             $this->db->or_like('a.pic', $search['value'], 'both');
             $this->db->or_like('a.keterangan', $search['value'], 'both');
-            $this->db->or_like('a.tgl_input', $search['value'], 'both');
             $this->db->group_end();
         }
         $this->db->order_by('a.created_date', 'DESC');
@@ -380,7 +379,6 @@ class Pr_model extends BF_Model
             $this->db->or_like('a.tanggal', $search['value'], 'both');
             $this->db->or_like('a.pic', $search['value'], 'both');
             $this->db->or_like('a.keterangan', $search['value'], 'both');
-            $this->db->or_like('a.tgl_input', $search['value'], 'both');
             $this->db->group_end();
         }
         $this->db->order_by('a.created_date', 'DESC');
