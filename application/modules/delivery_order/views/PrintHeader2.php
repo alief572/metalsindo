@@ -386,7 +386,7 @@
                 $length = $dtl->length;
                 $id_material = $dtl->id_material;
                 $qty += ($get_material_bentuk->id_bentuk == 'B2000001') ? $dtl->qty_order : 0;
-                $qty_sheet += ($get_material_bentuk->id_bentuk == 'B2000002') ? $dtl->qty_order : 0;
+                $qty_sheet += $sheet_qty;
                 $berat = $berat + $dtl->weight_mat;
             }
             ?>
