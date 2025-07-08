@@ -157,7 +157,17 @@
         <table border="0" width='100%'>
             <tr width="100%">
                 <td align="left">
-                    <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'>
+                    <?php
+                    if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/metalsindo/assets/images/logo_metalsindo.jpeg')) {
+                    ?>
+                        <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'>
+                    <?php
+                    } else {
+                    ?>
+                        <img src='./assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'>
+                    <?php
+                    }
+                    ?>
                 </td>
                 <td align="center">
                     <h4 style="text-align: center;"><b>PT METALSINDO PACIFIC</b></h4>
@@ -169,7 +179,17 @@
                 <td align="right" width="3000px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                 <td align="right" width="3000px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                 <td align="right">
-                    <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/img/logo_iso.jpg' alt="" height='30' width='60'>
+                    <?php
+                    if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/metalsindo/assets/img/logo_iso.jpg')) {
+                    ?>
+                        <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/img/logo_iso.jpg' alt="" height='30' width='60'>
+                    <?php
+                    } else {
+                    ?>
+                        <img src='./assets/img/logo_iso.jpg' alt="" height='30' width='60'>
+                    <?php
+                    }
+                    ?>
                 </td>
             </tr>
         </table>
@@ -269,7 +289,7 @@
 
                     if ($id_material != $dtl->id_material) {
 
-                        
+
 
             ?>
 
@@ -313,9 +333,25 @@
                 }
                 $i++;
 
+                $sheet_qty = 0;
+
+                if ($get_material_bentuk->id_bentuk == 'B2000002') {
+                    $get_qty_sheet = $this->db->get_where('stock_material', ['lotno' => $dtl->lotno])->row_array();
+
+                    if (!empty($get_qty_sheet)) {
+                        if ($get_qty_sheet['qty_sheet'] > 0) {
+                            $sheet_qty = $get_qty_sheet['qty_sheet'];
+                        } else {
+                            $sheet_qty = $dtl->qty_order;
+                        }
+                    } else {
+                        $sheet_qty = $dtl->qty_order;
+                    }
+                }
+
                 $SUMKG += $dtl->weight_mat;
                 $SUMQTY += ($get_material_bentuk->id_bentuk == 'B2000001') ? $dtl->qty_order : 0;
-                $SUMQTY_SHEET += ($get_material_bentuk->id_bentuk == 'B2000002') ? $dtl->qty_order : 0;
+                $SUMQTY_SHEET += $sheet_qty;
 
 
 
@@ -328,6 +364,8 @@
 
 
 
+
+
                 $spec = number_format($dtl->thickness, 2) . ' x ' . floatval($dtl->width) . ' x ' . $length;
                 ?>
                 <tr>
@@ -336,7 +374,7 @@
                     <td width="55"><?= $spec ?></td>
                     <td width="145" align="left"><?= $dtl->lotno ?></td>
                     <td width="20" align="center"><?= ($get_material_bentuk->id_bentuk == 'B2000001') ? number_format($dtl->qty_order, 0) : '' ?></td>
-                    <td width="25" align="center"><?= ($get_material_bentuk->id_bentuk == 'B2000002') ? number_format($dtl->qty_order, 0) : '' ?></td>
+                    <td width="25" align="center"><?= number_format($sheet_qty) ?></td>
                     <td width="20" align="right"><?= $dtl->weight_mat; ?></td>
                     <td width="60" align="center"><?= $dtl->remark ?></td>
                 </tr>
