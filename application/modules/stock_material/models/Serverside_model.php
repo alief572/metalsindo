@@ -83,74 +83,37 @@ class Serverside_model extends BF_Model
 
 		$where_kategori = "";
 		if (!empty($kategori)) {
-			$where_kategori = " AND d.id_category2 = '" . $kategori . "' ";
+			$where_kategori = " AND a.id_category2 = '" . $kategori . "' ";
 		}
 
 		$sql = "SELECT
-                    a.*, 
-                    b.nama AS nama_type, 
-                    c.nama AS nama_category1,
-                    f.nm_bentuk AS nm_bentuk, 
-                    d.nama AS nama_category2, 
-                    e.nilai_dimensi AS nilai_dimensi,
-					g.nama AS nama_category3,
-                    (SELECT SUM(qty*sisa_spk) FROM stock_material WHERE id_category3 = a.id_category3) AS weight
+                    a.*
                 FROM
-                    ms_inventory_category3 a
-                    JOIN ms_inventory_type b ON b.id_type=a.id_type
-                    JOIN ms_inventory_category1 c ON c.id_category1 =a.id_category1
-                    JOIN ms_inventory_category2 d ON d.id_category2 =a.id_category2
-                    JOIN child_inven_dimensi e ON e.id_category3 =a.id_category3
-                    JOIN ms_bentuk f ON f.id_bentuk =a.id_bentuk
-					JOIN ms_inventory_category3 g ON g.id_category3 =a.id_category3
+					view_stock_material a
                 WHERE 1=1
-                    AND a.deleted = '0' AND a.sisa_spk > 0
                     " . $where_kategori . "
                     AND (
-                        b.nama LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                        OR c.nama LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+                        a.nama LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+                        OR a.nama LIKE '%" . $this->db->escape_like_str($like_value) . "%'
                         OR a.id_category3 LIKE '%" . $this->db->escape_like_str($like_value) . "%'
                         OR a.nama LIKE '%" . $this->db->escape_like_str($like_value) . "%'
                         OR a.hardness LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                        OR e.nilai_dimensi LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+                        OR a.nilai_dimensi LIKE '%" . $this->db->escape_like_str($like_value) . "%'
                         OR a.maker LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                        OR f.nm_bentuk LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                        OR d.nama LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                        OR e.nilai_dimensi LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+                        OR a.nm_bentuk LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+                        OR a.nama LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+                        OR a.nilai_dimensi LIKE '%" . $this->db->escape_like_str($like_value) . "%'
                     )
                 ";
 		// echo $sql; exit;
 
-		$Query_Sum	= "SELECT
-                            SUM(( SELECT SUM( totalweight ) FROM stock_material WHERE id_category3 = a.id_category3 )) AS weight 
-                        FROM
-                            ms_inventory_category3 a
-                            JOIN ms_inventory_type b ON b.id_type=a.id_type
-                            JOIN ms_inventory_category1 c ON c.id_category1 =a.id_category1
-                            JOIN ms_inventory_category2 d ON d.id_category2 =a.id_category2
-                            JOIN child_inven_dimensi e ON e.id_category3 =a.id_category3
-                            JOIN ms_bentuk f ON f.id_bentuk =a.id_bentuk
-                        WHERE 1=1
-                            AND a.deleted = '0'
-                            " . $where_kategori . "
-                            AND (
-                                b.nama LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                                OR c.nama LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                                OR a.id_category3 LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                                OR a.nama LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                                OR a.hardness LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                                OR e.nilai_dimensi LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                                OR a.maker LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                                OR f.nm_bentuk LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                                OR d.nama LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                                OR e.nilai_dimensi LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-                            )
-	                    ";
 		$Total_Aset	= 0;
-		$Hasil_SUM		   = $this->db->query($Query_Sum)->result_array();
-		if ($Hasil_SUM) {
-			$Total_Aset		= $Hasil_SUM[0]['weight'];
+		$get_query = $this->db->query($sql)->result();
+		foreach ($get_query as $item) {
+			$Total_Aset += $item->weight;
 		}
+
+
 		$data['totalData'] 	= $this->db->query($sql)->num_rows();
 		$data['totalAset'] 	= $Total_Aset;
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
@@ -163,7 +126,7 @@ class Serverside_model extends BF_Model
 			5 => 'nilai_dimensi'
 		);
 
-		$sql .= " ORDER BY d.nama,  " . $columns_order_by[$column_order] . " " . $column_dir . " ";
+		$sql .= " ORDER BY a.nama,  " . $columns_order_by[$column_order] . " " . $column_dir . " ";
 		$sql .= " LIMIT " . $limit_start . " ," . $limit_length . " ";
 
 		$data['query'] = $this->db->query($sql);
@@ -212,7 +175,7 @@ class Serverside_model extends BF_Model
 
 			$total_sheet = 0;
 			if ($get_material->id_bentuk == 'B2000002') {
-				$total_sheet = ($row['width'] / $total_weight_material);
+				$total_sheet = round($row['totalweight'] / $total_weight_material);
 			}
 
 			if ($get_material->id_bentuk !== 'B2000002') {
@@ -231,7 +194,7 @@ class Serverside_model extends BF_Model
 			$nestedData[]	= "<div align='right'>" . $jumlah_item . "</div>";
 			$nestedData[]	= "<div align='right'>" . number_format($row['sisa_spk'], 2) . "</div>";
 			$nestedData[]	= "<div align='right'>" . number_format($row['sisa_spk'] * $row['qty'], 2) . "</div>";
-			$nestedData[]	= "<div align='right'>" . number_format($total_sheet, 2) . "</div>";
+			$nestedData[]	= "<div align='right'>" . number_format($total_sheet) . "</div>";
 			$nestedData[]	= "<div align='left'>" . $row['no_surat'] . "</div>";
 			$nestedData[]	= "<div align='left'>" . strtoupper(strtolower($row['nama_gudang'])) . "</div>";
 			$nestedData[]	= "<div align='left'>" . strtoupper(strtolower($row['customer'])) . "</div>";
@@ -290,6 +253,7 @@ class Serverside_model extends BF_Model
 					a.qty,
 					a.no_surat,
 					a.customer, 
+					a.totalweight,
                     b.nama_gudang as nama_gudang,
 					c.maker
                 FROM
