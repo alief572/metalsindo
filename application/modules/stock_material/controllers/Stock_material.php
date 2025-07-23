@@ -53,8 +53,6 @@ class Stock_material extends Admin_Controller
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
 		$deleted = '0';
-		$data = $this->Inventory_4_model->get_data_category3();
-		$this->template->set('results', $data);
 		$this->template->title('Stock Material');
 		$this->template->render('index2');
 	}
