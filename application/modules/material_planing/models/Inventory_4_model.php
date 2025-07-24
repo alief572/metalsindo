@@ -325,49 +325,26 @@ class Inventory_4_model extends BF_Model
 		$this->db->join('tr_spk_marketing b', 'b.id_spkmarketing=a.id_spkmarketing');
 		$this->db->join('master_customers c', 'c.id_customer=b.id_customer');
 		$this->db->join('ms_inventory_category3 d', 'd.id_category3=a.id_material', 'left');
-		$this->db->order_by('a.delivery', 'asc');
-		$this->db->where('a.deal="1" and a.status_close_planning ="OPN" and a.approved="1"');
+		// $this->db->order_by('a.delivery', 'asc');
+		$this->db->where('a.deal', '1');
+		$this->db->where('a.status_close_planning', 'OPN');
+		$this->db->where('a.approved', '1');
 		if (!empty($search)) {
 			$this->db->group_start();
 			$this->db->like('b.no_surat', $search['value'], 'both');
 			$this->db->or_like('c.name_customer', $search['value'], 'both');
 			$this->db->or_like('a.id_material', $search['value'], 'both');
 			$this->db->or_like('a.no_alloy', $search['value'], 'both');
-			// $this->db->or_like('a.thickness', $search['value'], 'both');
-			// $this->db->or_like('a.width', $search['value'], 'both');
-			// $this->db->or_like('a.length', $search['value'], 'both');
-			// $this->db->or_like('a.delivery', $search['value'], 'both');
-			// $this->db->or_like('a.qty_produk', $search['value'], 'both');
 			$this->db->group_end();
 		}
+
+		$db_clone = clone $this->db;
+		$count_all = $db_clone->count_all_results(); // ✅ will preserve original query state
+
 		$this->db->order_by('a.id_dt_spkmarketing', 'asc');
 		$this->db->limit($length, $start);
 
 		$query = $this->db->get();
-
-		$this->db->select('a.*, c.name_customer as name_customer, b.no_surat as no_surat, c.id_customer, d.total_weight');
-		$this->db->from('dt_spkmarketing a');
-		$this->db->join('tr_spk_marketing b', 'b.id_spkmarketing=a.id_spkmarketing');
-		$this->db->join('master_customers c', 'c.id_customer=b.id_customer');
-		$this->db->join('ms_inventory_category3 d', 'd.id_category3=a.id_material', 'left');
-		$this->db->order_by('a.delivery', 'asc');
-		$this->db->where('a.deal="1" and a.status_close_planning ="OPN" and a.approved="1"');
-		if (!empty($search)) {
-			$this->db->group_start();
-			$this->db->like('b.no_surat', $search['value'], 'both');
-			$this->db->or_like('c.name_customer', $search['value'], 'both');
-			$this->db->or_like('a.id_material', $search['value'], 'both');
-			$this->db->or_like('a.no_alloy', $search['value'], 'both');
-			// $this->db->or_like('a.thickness', $search['value'], 'both');
-			// $this->db->or_like('a.width', $search['value'], 'both');
-			// $this->db->or_like('a.length', $search['value'], 'both');
-			// $this->db->or_like('a.delivery', $search['value'], 'both');
-			// $this->db->or_like('a.qty_produk', $search['value'], 'both');
-			$this->db->group_end();
-		}
-		$this->db->order_by('a.id_dt_spkmarketing', 'asc');
-
-		$query_all = $this->db->get();
 
 		$hasil = [];
 
@@ -415,8 +392,8 @@ class Inventory_4_model extends BF_Model
 			$get_material = $this->db->get_where('ms_inventory_category3', ['id_category3' => $item->id_material])->row();
 
 			$total_sheet = 0;
-			if($get_material->id_bentuk == 'B2000002') {
-				$total_sheet = $item->width / $get_material->total_weight;
+			if ($get_material->id_bentuk == 'B2000002') {
+				$total_sheet = round($item->qty_produk / $get_material->total_weight);
 			}
 
 			$hasil[] = [
@@ -430,7 +407,7 @@ class Inventory_4_model extends BF_Model
 				'length' => $item->length,
 				'delivery_date' => date('d-M-Y', strtotime($item->delivery)),
 				'total_weight' => number_format($item->qty_produk),
-				'total_sheet' => number_format($total_sheet, 2),
+				'total_sheet' => number_format($total_sheet),
 				'total_spk' => '-',
 				'fg' => number_format($nilai_booking, 2),
 				'action' => $btn_edit . ' ' . $btn_create_pr . ' ' . $btn_approve . ' ' . $btn_tutup
@@ -439,8 +416,8 @@ class Inventory_4_model extends BF_Model
 
 		echo json_encode([
 			'draw' => intval($draw),
-			'recordsTotal' => $query_all->num_rows(),
-			'recordsFiltered' => $query_all->num_rows(),
+			'recordsTotal' => $count_all,
+			'recordsFiltered' => $count_all,
 			'data' => $hasil
 		]);
 	}
