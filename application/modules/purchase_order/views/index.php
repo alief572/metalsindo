@@ -12,20 +12,21 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 </style>
 
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
-<link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 <div class="box">
 	<div class="box-header">
 		<span class="pull-left">
 			<?php if ($ENABLE_ADD) : ?>
-				<a class="btn btn-success btn-sm" href="<?= base_url('/purchase_order/add/' . $record->no_penawaran) ?>" title="Add"><i class="fa fa-plus"></i>&nbsp;Create</a>
-			<?php endif; ?>
+				<button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#dialog-select-tipe"><i class="fa fa-plus"></i>&nbsp;Create</a>
+				<?php endif; ?>
 		</span>
 	</div>
 	<!-- /.box-header -->
 	<!-- /.box-header -->
 	<div class="box-body">
-		<table id="example1" class="table table-bordered table-striped">
+		<table id="example2" class="table table-bordered table-striped">
 			<thead>
 				<tr>
 					<th width="5">#</th>
@@ -33,55 +34,11 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 					<th>Tanggal PO</th>
 					<th>Supplier</th>
 					<th>Progress PR</th>
-					<?php if ($ENABLE_MANAGE) : ?>
-						<th>Action</th>
-					<?php endif; ?>
+					<th>Action</th>
 				</tr>
 			</thead>
-
 			<tbody>
-				<?php if (empty($results)) {
-				} else {
 
-					$numb = 0;
-					foreach ($results as $record) {
-						$numb++; ?>
-						<tr>
-							<td><?= $numb; ?></td>
-							<td><?= $record->no_surat ?></td>
-							<td><?= date('d-M-Y', strtotime($record->tanggal)) ?></td>
-							<td><?= $record->namesup ?></td>
-							<?php if ($record->status == '1') {
-								echo "<td><span class='badge bg-blue'>Waiting</span></td>";
-							} elseif ($record->status == '2') {
-								echo "<td><span class='badge bg-green'>Approved</span></td>";
-							} else {
-								echo "<td><span class='badge bg-red'>Closed</span></td>";
-							}
-							?>
-
-							<td style="padding-left:20px">
-								<?php if ($ENABLE_VIEW) : ?>
-									<a class="btn btn-warning btn-sm view" href="javascript:void(0)" title="View" data-no_po="<?= $record->no_po ?>"><i class="fa fa-eye"></i>
-									</a>
-									<a class="btn btn-primary btn-sm" href="<?= base_url('/purchase_order/PrintH2/' . $record->no_po) ?>" target="_blank" title="Print"><i class="fa fa-print"></i></a>
-								<?php endif; ?>
-								<?php if ($ENABLE_MANAGE) :
-									if ($record->status == '1') { ?>
-										<a class="btn btn-info btn-sm" href="<?= base_url('/purchase_order/edit/' . $record->no_po) ?>" title="Edit"><i class="fa fa-edit"></i></a>
-								<?php }
-								endif; ?>
-								<?php if ($ENABLE_MANAGE) :
-									if ($record->status == '1') { ?>
-										<a class="btn btn-success btn-sm Approve" href="javascript:void(0)" title="Approval PO" data-no_po="<?= $record->no_po ?>"><i class="fa fa-check"></i>
-										</a>
-								<?php }
-								endif; ?>
-							</td>
-
-						</tr>
-				<?php }
-				}  ?>
 			</tbody>
 		</table>
 	</div>
@@ -90,6 +47,38 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 
 <!-- awal untuk modal dialog -->
 <!-- Modal -->
+<div class="modal modal-primary" id="dialog-select-tipe" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="myModalLabel"><span class="fa fa-file-pdf-o"></span>&nbsp;</h4>
+			</div>
+			<div class="modal-body" id="MyModalBody">
+				<div class="form-group">
+					<label for="">Bentuk Material</label>
+					<select class="form-control input-md tipe_pr">
+						<option value="">- Pilih Bentuk Material -</option>
+						<?php
+						foreach ($list_bentuk as $item) :
+							echo '<option value="' . $item['id_bentuk'] . '">' . strtoupper($item['nm_bentuk']) . '</option>';
+						endforeach;
+						?>
+					</select>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">
+					<span class="glyphicon glyphicon-remove"></span> Close
+				</button>
+				<button type="button" class="btn btn-success add_po">
+					<i class="fa fa-cogs"></i> Process
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <div class="modal modal-primary" id="dialog-rekap" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
@@ -127,12 +116,20 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 </div>
 
 <!-- DataTables -->
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js') ?>"></script>
+<script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
 <script src="<?= base_url('assets/js/jquery.maskMoney.js') ?>"></script>
 <script src="<?= base_url('assets/js/autoNumeric.js') ?>"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <!-- page script -->
 <script type="text/javascript">
+	$(document).ready(function() {
+		DataTables();
+	})
+
+	// $('.tipe_pr').select2({
+	// 	width: '100%'
+	// });
+
 	$(document).on('click', '.edit', function(e) {
 		var id = $(this).data('no_penawaran');
 		$("#head_title").html("<i class='fa fa-list-alt'></i><b>Edit Inventory</b>");
@@ -189,6 +186,25 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 		})
 	});
 
+	$(document).on('click', '.add_po', function() {
+		var bentuk_material = $('.tipe_pr').val();
+
+		if (bentuk_material == '') {
+			swal({
+				type: 'warning',
+				title: 'Peringatan !',
+				text: 'Tipe bentuk material harus dipilih !',
+				showConfirmButton: false,
+				timer: 3000
+			});
+		} else {
+			if (bentuk_material == 'B2000002') {
+				window.location.href = 'purchase_order/add_sheet';
+			} else {
+				window.location.href = 'purchase_order/add';
+			}
+		}
+	});
 
 	// DELETE DATA
 	$(document).on('click', '.Approve', function(e) {
@@ -197,7 +213,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 		// alert(id);
 		swal({
 				title: "Anda Yakin?",
-				text: "P.R. Akan Dihapus.",
+				text: "P.R. Akan Diapprove!",
 				type: "warning",
 				showCancelButton: true,
 				confirmButtonClass: "btn-info",
@@ -218,7 +234,9 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 							swal({
 									title: "Sukses",
 									text: "P.R Approved.",
-									type: "success"
+									type: "success",
+									timer: 2800,
+									showConfirmButton: false
 								},
 								function() {
 									window.location.reload(true);
@@ -274,6 +292,40 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 		$("#form-area").hide();
 	});
 
+	function DataTables() {
+		$('#example2').dataTable({
+			serverSide: true,
+			processing: true,
+			destroy: true,
+			paging: true,
+			stateSave: true,
+			ajax: {
+				type: 'post',
+				url: siteurl + active_controller + 'get_data_po',
+				dataType: 'json',
+				cache: false
+			},
+			columns: [{
+					data: 'no'
+				},
+				{
+					data: 'no_po'
+				},
+				{
+					data: 'tanggal_po'
+				},
+				{
+					data: 'supplier'
+				},
+				{
+					data: 'progress_pr'
+				},
+				{
+					data: 'action'
+				}
+			]
+		});
+	}
 
 	//Delete
 

@@ -37,8 +37,13 @@ class Purchase_order extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$data = $this->db->query("SELECT a.*, b.name_suplier as namesup FROM tr_purchase_order as a INNER JOIN master_supplier as b on a.id_suplier = b.id_suplier ORDER BY a.no_po DESC")->result();
-		$this->template->set('results', $data);
+
+		$this->db->select('a.id_bentuk, a.nm_bentuk');
+		$this->db->from('ms_bentuk a');
+		$this->db->where('a.deleted', '0');
+		$get_bentuk = $this->db->get()->result_array();
+
+		$this->template->set('list_bentuk', $get_bentuk);
 		$this->template->title('Purchase Order');
 		$this->template->render('index');
 	}
@@ -61,7 +66,7 @@ class Purchase_order extends Admin_Controller
 		$this->template->page_icon('fa fa-pencil');
 		$aktif = 'active';
 		$deleted = '0';
-		$supplier = $data = $this->db->query("SELECT a.* FROM master_supplier as a INNER JOIN dt_trans_pr as b on b.suplier = a.id_suplier INNER JOIN tr_purchase_request as c on b.no_pr = c.no_pr WHERE c.status = '2' GROUP BY b.suplier ")->result();
+		$supplier = $data = $this->db->query("SELECT a.* FROM master_supplier as a JOIN dt_trans_pr as b on b.suplier = a.id_suplier JOIN tr_purchase_request as c on b.no_pr = c.no_pr JOIN ms_inventory_category3 d ON d.id_category3 = b.idmaterial WHERE c.status = '2' AND d.id_bentuk <> 'B2000002' GROUP BY b.suplier ")->result();
 		$comp	= $this->db->query("select a.*, b.nominal as nominal_harga FROM ms_compotition as a inner join child_history_lme as b on b.id_compotition=a.id_compotition where a.deleted='0' and b.status='0' ")->result();
 		$customers = $this->Pr_model->get_data('master_customers', 'deleted', $deleted);
 		$karyawan = $this->Pr_model->get_data('ms_karyawan', 'deleted', $deleted);
@@ -79,6 +84,33 @@ class Purchase_order extends Admin_Controller
 		$this->template->title('Purchase Order');
 		$this->template->render('Add');
 	}
+
+	public function add_sheet()
+	{
+		$this->auth->restrict($this->viewPermission);
+		$session = $this->session->userdata('app_session');
+		$this->template->page_icon('fa fa-pencil');
+		$aktif = 'active';
+		$deleted = '0';
+		$supplier = $data = $this->db->query("SELECT a.* FROM master_supplier as a JOIN dt_trans_pr as b on b.suplier = a.id_suplier JOIN tr_purchase_request as c on b.no_pr = c.no_pr JOIN ms_inventory_category3 d ON d.id_category3 = b.idmaterial WHERE c.status = '2' AND d.id_bentuk = 'B2000002' GROUP BY b.suplier ")->result();
+		$comp	= $this->db->query("select a.*, b.nominal as nominal_harga FROM ms_compotition as a inner join child_history_lme as b on b.id_compotition=a.id_compotition where a.deleted='0' and b.status='0' ")->result();
+		$customers = $this->Pr_model->get_data('master_customers', 'deleted', $deleted);
+		$karyawan = $this->Pr_model->get_data('ms_karyawan', 'deleted', $deleted);
+		$mata_uang = $this->Pr_model->get_data('mata_uang', 'deleted' . $deleted);
+		$matauang = $this->db->get_where('matauang')->result();
+		$data = [
+			'supplier' => $supplier,
+			'comp' => $comp,
+			'customers' => $customers,
+			'karyawan' => $karyawan,
+			'mata_uang' => $mata_uang,
+			'matauang' => $matauang,
+		];
+		$this->template->set('results', $data);
+		$this->template->title('Purchase Order');
+		$this->template->render('Add_sheet');
+	}
+
 	public function edit()
 	{
 		$id = $this->uri->segment(3);
@@ -90,7 +122,7 @@ class Purchase_order extends Admin_Controller
 		$head = $this->db->query("SELECT * FROM tr_purchase_order  WHERE no_po = '$id' ")->result();
 		$comp	= $this->db->query("select a.*, b.nominal as nominal_harga FROM ms_compotition as a inner join child_history_lme as b on b.id_compotition=a.id_compotition where a.deleted='0' and b.status='0' ")->result();
 		$detail = $this->db->query("SELECT * FROM dt_trans_po  WHERE no_po = '$id' ")->result_array();
-		$supplier = $data = $this->db->query("SELECT a.* FROM master_supplier as a INNER JOIN dt_trans_pr as b on b.suplier = a.id_suplier INNER JOIN tr_purchase_request as c on b.no_pr = c.no_pr WHERE c.status = '2' GROUP BY b.suplier ")->result();
+		$supplier = $data = $this->db->query("SELECT a.* FROM master_supplier as a JOIN dt_trans_pr as b on b.suplier = a.id_suplier JOIN tr_purchase_request as c on b.no_pr = c.no_pr JOIN ms_inventory_category3 d ON d.id_category3 = b.idmaterial WHERE c.status = '2' AND d.id_bentuk <> 'B2000002' GROUP BY b.suplier ")->result();
 		$customers = $this->Pr_model->get_data('master_customers', 'deleted', $deleted);
 		$karyawan = $this->Pr_model->get_data('ms_karyawan', 'deleted', $deleted);
 		$mata_uang = $this->Pr_model->get_data('mata_uang', 'deleted' . $deleted);
@@ -109,6 +141,37 @@ class Purchase_order extends Admin_Controller
 		$this->template->title('Purchase Order');
 		$this->template->render('Edit');
 	}
+
+	public function edit_sheet()
+	{
+		$id = $this->uri->segment(3);
+		$this->auth->restrict($this->viewPermission);
+		$session = $this->session->userdata('app_session');
+		$this->template->page_icon('fa fa-pencil');
+		$aktif = 'active';
+		$deleted = '0';
+		$head = $this->db->query("SELECT * FROM tr_purchase_order  WHERE no_po = '$id' ")->result();
+		$comp	= $this->db->query("select a.*, b.nominal as nominal_harga FROM ms_compotition as a inner join child_history_lme as b on b.id_compotition=a.id_compotition where a.deleted='0' and b.status='0' ")->result();
+		$detail = $this->db->query("SELECT * FROM dt_trans_po  WHERE no_po = '$id' ")->result_array();
+		$supplier = $data = $this->db->query("SELECT a.* FROM master_supplier as a JOIN dt_trans_pr as b on b.suplier = a.id_suplier JOIN tr_purchase_request as c on b.no_pr = c.no_pr JOIN ms_inventory_category3 d ON d.id_category3 = b.idmaterial WHERE c.status = '2' AND d.id_bentuk = 'B2000002' GROUP BY b.suplier ")->result();
+		$customers = $this->Pr_model->get_data('master_customers', 'deleted', $deleted);
+		$karyawan = $this->Pr_model->get_data('ms_karyawan', 'deleted', $deleted);
+		$mata_uang = $this->Pr_model->get_data('mata_uang', 'deleted' . $deleted);
+		$matauang = $this->db->get_where('matauang')->result();
+		$data = [
+			'head' => $head,
+			'comp' => $comp,
+			'detail' => $detail,
+			'supplier' => $supplier,
+			'customers' => $customers,
+			'karyawan' => $karyawan,
+			'mata_uang' => $mata_uang,
+			'matauang' => $matauang,
+		];
+		$this->template->set('results', $data);
+		$this->template->title('Purchase Order');
+		$this->template->render('Edit_sheet');
+	}
 	public function Lihat()
 	{
 		$id = $this->uri->segment(3);
@@ -122,6 +185,19 @@ class Purchase_order extends Admin_Controller
 		$detail = $this->db->query("SELECT a.*, b.nama  FROM dt_trans_po a
 		INNER JOIN ms_inventory_category3 b ON a.idmaterial = b.id_category3
 		WHERE no_po = '$id' ")->result();
+
+		$this->db->select('a.*');
+		$this->db->from('dt_trans_po a');
+		$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.idmaterial');
+		$this->db->where('a.no_po', $id);
+		$this->db->where('b.id_bentuk', 'B2000002');
+		$check_detail_sheet = $this->db->get()->result_array();
+
+		$tipe_sheet = 1;
+		if (count($check_detail_sheet) < 1) {
+			$tipe_sheet = 0;
+		}
+
 		$supplier = $data = $this->db->query("SELECT a.* FROM master_supplier as a INNER JOIN dt_trans_pr as b on b.suplier = a.id_suplier INNER JOIN tr_purchase_request as c on b.no_pr = c.no_pr WHERE c.status = '2' ")->result();
 		$customers = $this->Pr_model->get_data('master_customers', 'deleted', $deleted);
 		$karyawan = $this->Pr_model->get_data('ms_karyawan', 'deleted', $deleted);
@@ -136,6 +212,7 @@ class Purchase_order extends Admin_Controller
 			'karyawan' => $karyawan,
 			'mata_uang' => $mata_uang,
 			'matauang' => $matauang,
+			'tipe_sheet' => $tipe_sheet
 		];
 		$this->template->set('results', $data);
 		$this->template->title('Purchase Order');
@@ -451,6 +528,7 @@ class Purchase_order extends Admin_Controller
 		$loi 		= $this->input->post('loi');
 		$material 	= $this->db->query("SELECT * FROM dt_trans_pr WHERE no_pr = '$no_pr'")->result_array();
 		$datemin 	= $this->db->query("SELECT MIN(tanggal) AS tanggal FROM dt_trans_pr WHERE no_pr = '$no_pr'")->result();
+		$id_bentuk = (isset($_POST['id_bentuk'])) ? $this->input->post('id_bentuk') : '';
 		// print_r($material);
 		$LIST = "";
 		foreach ($material as $key => $value) {
@@ -475,18 +553,36 @@ class Purchase_order extends Admin_Controller
 			$LIST .= 	"<td><input type='text' class='form-control input-sm' name='dt[" . $key . "][description]' id='dt_description_" . $key . "' value='" . $value['keterangan'] . "'></td>";
 			$LIST .= 	"<td><input type='text' class='form-control input-sm autoNumeric' name='dt[" . $key . "][width]' id='dt_width_" . $key . "'  value='" . $value['width'] . "'></td>";
 			$LIST .= 	"<td><input type='text' class='form-control input-sm autoNumeric' name='dt[" . $key . "][length]' id='dt_length_" . $key . "'  value='" . $value['length'] . "'></td>";
-			$LIST .= 	"<td><input type='text' class='form-control input-sm autoNumeric' name='dt[" . $key . "][totalweight]' id='dt_totalweight_" . $key . "' value='" . $value['totalweight'] . "'  onkeyup='HitAmmount(" . $key . ")'></td>";
-			$LIST .= 	"<td>
-								<select class='form-control input-sm' id='dt_ratelme_" . $key . "' name='dt[" . $key . "][ratelme]' onchange='CariPrice(" . $key . ")'>
-									<option value=''>-Pilih-</option>
-									<option value='Hari Ini'>Hari ini</option>
-									<option value='H-10'>H-10</option>
-									<option value='H-30'>H-30</option>
-								</select>
-							</td>";
-			$LIST .= 	"<td><input type='text' class='form-control input-sm autoNumeric3' id='dt_alloyprice_" . $key . "' " . $disabled . " data-decimal='.' data-thousand='' data-precision='0' data-allow-zero='' name='dt[" . $key . "][alloyprice]' onkeyup='HitAmmount(" . $key . ")'></td>";
-			$LIST .= 	"<td><input type='text' class='form-control input-sm autoNumeric3' id='dt_fabcost_" . $key . "' " . $disabled . " name='dt[" . $key . "][fabcost]' onkeyup='HitAmmount(" . $key . ")'></td>";
-			$LIST .= 	"<td><input type='text' class='form-control input-sm autoNumeric3' id='dt_hargasatuan_" . $key . "' " . $disabled2 . " name='dt[" . $key . "][hargasatuan]' onkeyup='HitAmmount(" . $key . ")'></td>";
+
+			if ($id_bentuk == 'B2000002') {
+
+				$get_material = $this->db->get_where('ms_inventory_category3', array('id_category3' => $value['idmaterial']))->row();
+
+				$material_ttlweight = (!empty($get_material) && $get_material->total_weight !== null) ? $get_material->total_weight : 0;
+
+				$totalweight = round($value['totalweight'] / $material_ttlweight);
+			} else {
+				$totalweight = $value['totalweight'];
+			}
+			$LIST .= 	"<td><input type='text' class='form-control input-sm autoNumeric' name='dt[" . $key . "][totalweight]' id='dt_totalweight_" . $key . "' value='" . $totalweight . "'  onkeyup='HitAmmount(" . $key . ")'></td>";
+
+			if ($id_bentuk !== 'B2000002') {
+				$LIST .= 	"<td>
+									<select class='form-control input-sm' id='dt_ratelme_" . $key . "' name='dt[" . $key . "][ratelme]' onchange='CariPrice(" . $key . ")'>
+										<option value=''>-Pilih-</option>
+										<option value='Hari Ini'>Hari ini</option>
+										<option value='H-10'>H-10</option>
+										<option value='H-30'>H-30</option>
+									</select>
+								</td>";
+				$LIST .= 	"<td><input type='text' class='form-control input-sm autoNumeric3' id='dt_alloyprice_" . $key . "' " . $disabled . " data-decimal='.' data-thousand='' data-precision='0' data-allow-zero='' name='dt[" . $key . "][alloyprice]' onkeyup='HitAmmount(" . $key . ")'></td>";
+				$LIST .= 	"<td><input type='text' class='form-control input-sm autoNumeric3' id='dt_fabcost_" . $key . "' " . $disabled . " name='dt[" . $key . "][fabcost]' onkeyup='HitAmmount(" . $key . ")'></td>";
+			}
+			if ($id_bentuk == 'B2000002') {
+				$LIST .= 	"<td><input type='text' class='form-control input-sm autoNumeric3' id='dt_hargasatuan_" . $key . "' name='dt[" . $key . "][hargasatuan]' onkeyup='HitAmmount(" . $key . ")'></td>";
+			} else {
+				$LIST .= 	"<td><input type='text' class='form-control input-sm autoNumeric3' id='dt_hargasatuan_" . $key . "' " . $disabled2 . " name='dt[" . $key . "][hargasatuan]' onkeyup='HitAmmount(" . $key . ")'></td>";
+			}
 			$LIST .= 	"<td><input type='text' class='form-control input-sm autoNumeric' id='dt_diskon_" . $key . "' name='dt[" . $key . "][diskon]' onkeyup='HitAmmount(" . $key . ")'></td>";
 			$LIST .= 	"<td><input type='text' class='form-control input-sm autoNumeric' id='dt_pajak_" . $key . "' name='dt[" . $key . "][pajak]' onkeyup='HitAmmount(" . $key . ")'></td>";
 			$LIST .= 	"<td><input type='text' class='form-control input-sm ch_jumlah_ex' id='dt_jumlahharga_" . $key . "' readonly name='dt[" . $key . "][jumlahharga]'></td>";
@@ -1229,23 +1325,23 @@ class Purchase_order extends Admin_Controller
 			$dt =  array(
 				'no_po'					=> $code,
 				'id_dt_po'				=> $code . '-' . $numb1,
-				'idpr'					=> $used[idpr],
-				'idmaterial'			=> $used[idmaterial],
-				'namamaterial'			=> $used[namamaterial],
-				'description'			=> $used[description],
-				'qty'					=> $used[qty],
-				'width'					=> str_replace(",", "", $used[width]),
-				'rate_lme'				=> $used[ratelme],
-				'fabcost'				=> str_replace(",", "", $used[fabcost]),
-				'alloyprice'			=> str_replace(",", "", $used[alloyprice]),
-				'totalwidth'			=> str_replace(",", "", $used[totalweight]),
-				'hargasatuan'			=> str_replace(",", "", $used[hargasatuan]),
-				'lebar'					=> $used[lebar],
-				'panjang'				=> str_replace(",", "", $used[length]),
-				'diskon'				=> str_replace(",", "", $used[diskon]),
-				'pajak'					=> str_replace(",", "", $used[pajak]),
-				'jumlahharga'			=> str_replace(",", "", $used[jumlahharga]),
-				'note'					=> $used[note],
+				'idpr'					=> $used['idpr'],
+				'idmaterial'			=> $used['idmaterial'],
+				'namamaterial'			=> $used['namamaterial'],
+				'description'			=> $used['description'],
+				'qty'					=> $used['qty'],
+				'width'					=> str_replace(",", "", $used['width']),
+				'rate_lme'				=> (isset($used['ratelme'])) ? $used['ratelme'] : 0,
+				'fabcost'				=> (isset($used['fabcost'])) ? str_replace(",", "", $used['fabcost']) : 0,
+				'alloyprice'			=> (isset($used['alloyprice'])) ? str_replace(",", "", $used['alloyprice']) : 0,
+				'totalwidth'			=> str_replace(",", "", $used['totalweight']),
+				'hargasatuan'			=> str_replace(",", "", $used['hargasatuan']),
+				'lebar'					=> $used['lebar'],
+				'panjang'				=> str_replace(",", "", $used['length']),
+				'diskon'				=> str_replace(",", "", $used['diskon']),
+				'pajak'					=> str_replace(",", "", $used['pajak']),
+				'jumlahharga'			=> str_replace(",", "", $used['jumlahharga']),
+				'note'					=> $used['note'],
 			);
 			$this->db->insert('dt_trans_po', $dt);
 		}
@@ -1306,23 +1402,23 @@ class Purchase_order extends Admin_Controller
 			$dt =  array(
 				'no_po'					=> $code,
 				'id_dt_po'				=> $code . '-' . $numb1,
-				'idpr'					=> $used[idpr],
-				'idmaterial'			=> $used[idmaterial],
-				'namamaterial'			=> $used[namamaterial],
-				'description'			=> $used[description],
-				'qty'					=> $used[qty],
-				'width'					=> str_replace(",", "", $used[width]),
-				'rate_lme'				=> $used[ratelme],
-				'fabcost'				=> str_replace(",", "", $used[fabcost]),
-				'alloyprice'			=> str_replace(",", "", $used[alloyprice]),
-				'totalwidth'			=> str_replace(",", "", $used[totalweight]),
-				'hargasatuan'			=> str_replace(",", "", $used[hargasatuan]),
-				'lebar'					=> $used[lebar],
-				'panjang'				=> str_replace(",", "", $used[length]),
-				'diskon'				=> str_replace(",", "", $used[diskon]),
-				'pajak'					=> str_replace(",", "", $used[pajak]),
-				'jumlahharga'			=> str_replace(",", "", $used[jumlahharga]),
-				'note'					=> $used[note],
+				'idpr'					=> $used['idpr'],
+				'idmaterial'			=> $used['idmaterial'],
+				'namamaterial'			=> $used['namamaterial'],
+				'description'			=> $used['description'],
+				'qty'					=> $used['qty'],
+				'width'					=> str_replace(",", "", $used['width']),
+				'rate_lme'				=> (isset($used['ratelme'])) ? $used['ratelme'] : 0,
+				'fabcost'				=> (isset($used['fabcost'])) ? str_replace(",", "", $used['fabcost']) : 0,
+				'alloyprice'			=> (isset($used['alloyprice'])) ? str_replace(",", "", $used['alloyprice']) : 0,
+				'totalwidth'			=> str_replace(",", "", $used['totalweight']),
+				'hargasatuan'			=> str_replace(",", "", $used['hargasatuan']),
+				'lebar'					=> $used['lebar'],
+				'panjang'				=> str_replace(",", "", $used['length']),
+				'diskon'				=> str_replace(",", "", $used['diskon']),
+				'pajak'					=> str_replace(",", "", $used['pajak']),
+				'jumlahharga'			=> str_replace(",", "", $used['jumlahharga']),
+				'note'					=> $used['note'],
 			);
 			$this->db->insert('dt_trans_po', $dt);
 		}
@@ -1372,7 +1468,7 @@ class Purchase_order extends Admin_Controller
 		$id = $this->uri->segment(3);
 		$data['header'] = $this->db->query("SELECT a.*, b.name_suplier as name_suplier, b.address_office as address_office,b.id_negara as negara, b.telephone as telephone,b.fax as fax FROM tr_purchase_order as a INNER JOIN master_supplier as b on a.id_suplier = b.id_suplier WHERE a.no_po = '" . $id . "' ")->result();
 		$data['detail']  = $this->db->query("SELECT a.*, b.nama, b.total_weight FROM dt_trans_po a 
-		INNER JOIN ms_inventory_category3 b ON b.id_category3 = a.idmaterial 
+		JOIN ms_inventory_category3 b ON b.id_category3 = a.idmaterial 
 		WHERE a.no_po = '" . $id . "' ")->result();
 		$data['detailsum'] = $this->db->query("SELECT AVG(width) as totalwidth, AVG(qty) as totalqty FROM dt_trans_po WHERE no_po = '" . $id . "' ")->result();
 
@@ -1386,7 +1482,7 @@ class Purchase_order extends Admin_Controller
 		$this->db->group_by('c.no_surat');
 		$get_no_pr = $this->db->get()->result();
 
-		foreach($get_no_pr as $item) {
+		foreach ($get_no_pr as $item) {
 			$no_pr[] = $item->no_surat;
 		}
 
@@ -1402,7 +1498,7 @@ class Purchase_order extends Admin_Controller
 
 		$data['check_sheet'] = $check_sheet;
 
-		
+
 
 		$this->load->view('print2', $data);
 		$html = ob_get_contents();
@@ -2045,6 +2141,8 @@ class Purchase_order extends Admin_Controller
 	public function getPR()
 	{
 		$id_suplier = $this->input->post('id_suplier');
+		$id_bentuk = (isset($_POST['id_bentuk'])) ? $this->input->post('id_bentuk') : '';
+
 		$no_po 		= (!empty($this->input->post('no_po'))) ? $this->input->post('no_po') : 0;
 
 		$get_no_po 	= $this->db->get_where('tr_purchase_order', array('no_po' => $no_po))->result();
@@ -2058,15 +2156,24 @@ class Purchase_order extends Admin_Controller
 			}
 		}
 		$dtImplode	= "('" . implode("','", $ArrPR) . "')";
+
+		if ($id_bentuk == 'B2000002') {
+			$where_bentuk = ' AND d.id_bentuk = "B2000002" AND d.deleted = "0"';
+		} else {
+			$where_bentuk = ' AND d.id_bentuk <> "B2000002" AND d.deleted = "0"';
+		}
+
 		$data 		=  $this->db->query("	SELECT 
 												c.* 
 											FROM 
 												dt_trans_pr b 
-												LEFT JOIN tr_purchase_request c ON b.no_pr = c.no_pr 
+												LEFT JOIN tr_purchase_request c ON b.no_pr = c.no_pr
+												JOIN ms_inventory_category3 d ON d.id_category3 = b.idmaterial
 											WHERE 
 												c.status = '2' 
 												AND b.suplier='" . $id_suplier . "' 
 												AND c.no_pr NOT IN " . $dtImplode . "
+												" . $where_bentuk . "
 											GROUP BY 
 												b.no_pr ")->result_array();
 
@@ -2165,5 +2272,10 @@ class Purchase_order extends Admin_Controller
 		}
 
 		echo json_encode($status);
+	}
+
+	public function get_data_po()
+	{
+		$this->Pr_model->get_data_po();
 	}
 }
