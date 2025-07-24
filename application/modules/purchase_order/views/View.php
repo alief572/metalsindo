@@ -231,7 +231,7 @@ foreach ($results['head'] as $head) {
 											<th width='7%'>Description</th>
 											<th hidden width='7%'>Width</th>
 											<th hidden width='7%'>Qty (Unit)</th>
-											<th width='7%'>Total Weight</th>
+											<th width='7%'>Total <?= ($results['tipe_sheet'] == 1) ? 'Sheet' : 'Weight' ?></th>
 											<th width='7%'>Total Length</th>
 											<th hidden width='10%'>Rate LME</th>
 											<th hidden width='7%'>Alloy Price</th>
@@ -254,14 +254,14 @@ foreach ($results['head'] as $head) {
 				<td hidden><input readonly 	type='text' 	value='" . $detail->idmaterial . "'		class='form-control input-sm' id='dt_idmaterial_" . $loop . "' 	required name='dt[" . $loop . "][idmaterial]' ></td>
 				<td ><input		readonly  	type='text' 	value='" . $detail->nama . "'	class='form-control input-sm' id='dt_namamaterial_" . $loop . "' required name='dt[" . $loop . "][namamaterial]' ></td>
 				<td ><input		readonly  	type='text' 	value='" . $detail->description . "'	class='form-control input-sm' id='dt_description_" . $loop . "' 	required name='dt[" . $loop . "][description]' ></td>
-				<td hidden ><input		readonly  	type='number' 	value='" . $detail->width . "'	class='form-control text-right input-sm' id='dt_width_" . $loop . "' 		required name='dt[" . $loop . "][width]'  ></td>
-				<td hidden ><input		readonly  	type='number' 	value='" . $detail->qty . "'	class='form-control text-right input-sm' id='dt_qty_" . $loop . "' 			required name='dt[" . $loop . "][qty]'  ></td>
-				<td ><input		readonly  	type='number' 	value='" . $detail->totalwidth . "'		class='form-control text-right input-sm' id='dt_totalwidth_" . $loop . "' 	required name='dt[" . $loop . "][totalwidth]'  ></td>
-				<td ><input		readonly  	type='number' 	value='" . $detail->panjang . "'		class='form-control text-right input-sm' id='dt_panjang_" . $loop . "' 	required name='dt[" . $loop . "][panjang]'  ></td>
-				<td	><input		readonly  	type='number' 	value='" . $detail->hargasatuan . "'	class='form-control text-right input-sm' id='dt_hargasatuan_" . $loop . "' 	required name='dt[" . $loop . "][hargasatuan]' ></td>
-				<td	><input		readonly 	type='number' 	value='" . $detail->diskon . "'			class='form-control text-right input-sm' id='dt_diskon_" . $loop . "' 		required name='dt[" . $loop . "][diskon]' ></td>
-				<td	><input		readonly	type='number' 	value='" . $detail->pajak . "'			class='form-control text-right input-sm' id='dt_pajak_" . $loop . "' 		required name='dt[" . $loop . "][pajak]' ></td>
-				<td ><input		readonly 	type='number' 	value='" . $detail->jumlahharga . "'	class='form-control text-right input-sm' id='dt_jumlahharga_" . $loop . "' 	required name='dt[" . $loop . "][jumlahharga]' ></td>
+				<td hidden ><input		readonly  	type='text' 	value='" . number_format($detail->width, 2) . "'	class='form-control text-right input-sm' id='dt_width_" . $loop . "' 		required name='dt[" . $loop . "][width]'  ></td>
+				<td hidden ><input		readonly  	type='text' 	value='" . number_format($detail->qty, 2) . "'	class='form-control text-right input-sm' id='dt_qty_" . $loop . "' 			required name='dt[" . $loop . "][qty]'  ></td>
+				<td ><input		readonly  	type='text' 	value='" . number_format($detail->totalwidth, 2) . "'		class='form-control text-right input-sm' id='dt_totalwidth_" . $loop . "' 	required name='dt[" . $loop . "][totalwidth]'  ></td>
+				<td ><input		readonly  	type='text' 	value='" . number_format($detail->panjang, 2) . "'		class='form-control text-right input-sm' id='dt_panjang_" . $loop . "' 	required name='dt[" . $loop . "][panjang]'  ></td>
+				<td	><input		readonly  	type='text' 	value='" . number_format($detail->hargasatuan, 2) . "'	class='form-control text-right input-sm' id='dt_hargasatuan_" . $loop . "' 	required name='dt[" . $loop . "][hargasatuan]' ></td>
+				<td	><input		readonly 	type='text' 	value='" . number_format($detail->diskon, 2) . "'			class='form-control text-right input-sm' id='dt_diskon_" . $loop . "' 		required name='dt[" . $loop . "][diskon]' ></td>
+				<td	><input		readonly	type='text' 	value='" . number_format($detail->pajak, 2) . "'			class='form-control text-right input-sm' id='dt_pajak_" . $loop . "' 		required name='dt[" . $loop . "][pajak]' ></td>
+				<td ><input		readonly 	type='text' 	value='" . number_format($detail->jumlahharga, 2) . "'	class='form-control text-right input-sm' id='dt_jumlahharga_" . $loop . "' 	required name='dt[" . $loop . "][jumlahharga]' ></td>
 				<td	><input		readonly  	type='text' 	value='" . $detail->note . "'			class='form-control input-sm' id='dt_note_" . $loop . "' 		required name='dt[" . $loop . "][note]' ></td>
 			</tr>
 			";
@@ -278,7 +278,7 @@ foreach ($results['head'] as $head) {
 										<label for="id_customer">Sub Total</label>
 									</div>
 									<div class="col-md-8" id="ForHarga">
-										<input readonly type="text" class="form-control" value="<?= $head->hargatotal  ?>" id="hargatotal" onkeyup required name="hargatotal">
+										<input readonly type="text" class="form-control" value="<?= number_format($head->hargatotal, 2)  ?>" id="hargatotal" onkeyup required name="hargatotal">
 									</div>
 								</div>
 							</div>
@@ -290,7 +290,7 @@ foreach ($results['head'] as $head) {
 										<label for="id_customer">Discount</label>
 									</div>
 									<div class="col-md-8" id="ForDiskon">
-										<input readonly type="text" class="form-control" value="<?= $head->diskontotal  ?>" id="diskontotal" onkeyup required name="diskontotal">
+										<input readonly type="text" class="form-control" value="<?= number_format($head->diskontotal, 2)  ?>" id="diskontotal" onkeyup required name="diskontotal">
 									</div>
 								</div>
 							</div>
@@ -302,7 +302,7 @@ foreach ($results['head'] as $head) {
 										<label for="id_customer">TAX</label>
 									</div>
 									<div class="col-md-8" id="ForTax">
-										<input readonly type="text" class="form-control" value="<?= $head->taxtotal  ?>" id="taxtotal" onkeyup required name="taxtotal">
+										<input readonly type="text" class="form-control" value="<?= number_format($head->taxtotal, 2)  ?>" id="taxtotal" onkeyup required name="taxtotal">
 									</div>
 								</div>
 							</div>
@@ -314,7 +314,7 @@ foreach ($results['head'] as $head) {
 										<label for="id_customer">Total Order</label>
 									</div>
 									<div class="col-md-8" id="ForSum">
-										<input readonly type="text" class="form-control" value="<?= $head->subtotal  ?>" id="subtotal" onkeyup required name="subtotal">
+										<input readonly type="text" class="form-control" value="<?= number_format($head->subtotal, 2)  ?>" id="subtotal" onkeyup required name="subtotal">
 									</div>
 								</div>
 							</div>

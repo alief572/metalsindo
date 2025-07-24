@@ -297,10 +297,10 @@
                 }
                 if ($check_sheet > 0) {
 
-                    $total_weight_sheet = (!empty($detail) && $detail->total_weight > 0) ? $detail->total_weight : 1;
-
-                    $total_weight_kgs = ($detail->totalwidth / $total_weight_sheet);
+                    $total_weight_kgs = ($detail->totalwidth);
                     $harga_satuan_kgs = ($detail->hargasatuan * $detail->total_weight);
+
+                    $total_weight_sheet = (!empty($detail->total_weight) && $detail->total_weight !== null && $detail->total_weight > 0) ? $detail->total_weight : 0;
 
                     echo "	
                     <tr >
@@ -308,8 +308,8 @@
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
                         <td width='50' align='right'>" . number_format($total_weight_kgs, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($harga_satuan_kgs, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($detail->totalwidth, 2) . "</td>
+                        <td width='50' align='right'>" . number_format($detail->hargasatuan, 2) . "</td>
+                        <td width='50' align='right'>" . number_format($detail->totalwidth * $detail->total_weight, 2) . "</td>
                         <td width='50' align='right'>" . $HS . "</td>
                         <td width='80' align='right'>" . number_format($detail->jumlahharga, 2) . "</td>
                         <td width='50'>" . $detail->description . "</td>
@@ -390,7 +390,7 @@
                 <?php
                 }
                 ?>
-                
+
             </tr>
             <tr style='vertical-align:middle;'>
                 <td colspan='3' align="center">Issued Date</td>
