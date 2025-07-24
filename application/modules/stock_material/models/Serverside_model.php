@@ -241,6 +241,7 @@ class Serverside_model extends BF_Model
                         OR a.lotno LIKE '%" . $this->db->escape_like_str($like_value) . "%'
                         OR a.nama_material LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 						OR a.id_category3 LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+						OR a.no_surat LIKE '%" . $this->db->escape_like_str($like_value) . "%'
                     )";
 		}
 
