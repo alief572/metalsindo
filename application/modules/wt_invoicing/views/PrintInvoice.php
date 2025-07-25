@@ -173,7 +173,17 @@ if ($header->type == 'slitting') {
 <table border="0" width='100%'>
 	<tr>
 		<td align="left">
-			<img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'>
+			<?php
+			if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/metalsindo/assets/images/logo_metalsindo.jpeg')) {
+			?>
+				<img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'>
+			<?php
+			} else {
+			?>
+				<img src='./assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'>
+			<?php
+			}
+			?>
 		</td>
 		<td align="left">
 			<h5 style="text-align: left;">PT METALSINDO PACIFIC</h5>
@@ -186,7 +196,17 @@ if ($header->type == 'slitting') {
 		<td align="right" width="3000px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 		<td align="right" width="3000px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 		<td align="right">
-			<img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/img/logo_iso.jpg' alt="" height='30' width='60'>
+			<?php
+			if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/metalsindo/assets/img/logo_iso.jpg')) {
+			?>
+				<img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/img/logo_iso.jpg' alt="" height='30' width='60'>
+			<?php
+			} else {
+			?>
+				<img src='./assets/img/logo_iso.jpg' alt="" height='30' width='60'>
+			<?php
+			}
+			?>
 		</td>
 
 

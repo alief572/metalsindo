@@ -1645,6 +1645,7 @@ class Wt_invoicing extends Admin_Controller
 		$data['header']   = $this->Wt_invoicing_model->get_data('tr_invoice', 'no_invoice', $id);
 		$data['detail']   = $this->Wt_invoicing_model->get_data('tr_invoice_detail', 'no_invoice', $id);
 		$this->load->view('PrintInvoice', $data);
+
 		$html = ob_get_contents();
 
 		require_once('./assets/html2pdf/html2pdf/html2pdf.class.php');
@@ -2582,11 +2583,13 @@ class Wt_invoicing extends Admin_Controller
 		$html2pdf->Output('Packinglist.pdf', 'I');
 	}
 
-	public function get_invoicing() {
+	public function get_invoicing()
+	{
 		$this->Wt_invoicing_model->get_invoicing();
 	}
 
-	public function get_monitoring_invoice() {
+	public function get_monitoring_invoice()
+	{
 		$this->Wt_invoicing_model->get_monitoring_invoice();
 	}
 }

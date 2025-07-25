@@ -12,11 +12,14 @@ $ENABLE_DELETE  = has_permission('SPK_marketing.Delete');
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
 <link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" integrity="sha512-yVvxUQV0QESBt1SyZbNJMAwyKvFTLMyXSyBHDO4BG5t7k/Lw34tyqlSDlKIrIENIzCl+RVUNjmCPG+V/GMesRw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 <div class="box">
 	<div class="box-header">
 		<?php if ($ENABLE_VIEW) : ?>
-			<a class="btn btn-success btn-sm" href="<?= base_url('/spk_marketing/addHeader/') ?>" title="Tambah"><i class="fa fa-plus">&nbsp;</i>Add</i></a>
+			<button type="button" class="btn btn-success btn-sm" title="Tambah" data-toggle="modal" data-target="#dialog-pilih-bentuk">
+				<i class="fa fa-plus"></i> Add
+			</button>
 		<?php endif; ?>
 
 		<span class="pull-right">
@@ -39,11 +42,41 @@ $ENABLE_DELETE  = has_permission('SPK_marketing.Delete');
 			</thead>
 
 			<tbody>
-				
+
 			</tbody>
 		</table>
 	</div>
 	<!-- /.box-body -->
+</div>
+
+<div class="modal modal-default fade" id="dialog-pilih-bentuk" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="myModalLabel"><span class="fa fa-users"></span>&nbsp;SPK MARKETING</h4>
+			</div>
+			<div class="modal-body" id="ModalViews">
+				<div class="form-group">
+					<label for="pilih_bentuk">Bentuk Material</label>
+					<select class="form-control form-control-sm" id="pilih_bentuk">
+						<option value="">- Pilih Bentuk Material -</option>
+						<?php
+						foreach ($list_bentuk as $item) :
+							echo '<option value="' . $item['id_bentuk'] . '">' . strtoupper($item['nm_bentuk']) . '</option>';
+						endforeach;
+						?>
+					</select>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-dismiss="modal">
+					<span class="glyphicon glyphicon-remove"></span> Close
+				</button>
+				<button type="button" class="btn btn-primary" onclick="addSPK()"><span class="glyphicon glyphicon-check"></span> Choose</button>
+			</div>
+		</div>
+	</div>
 </div>
 
 <!-- awal untuk modal dialog -->
@@ -86,9 +119,14 @@ $ENABLE_DELETE  = has_permission('SPK_marketing.Delete');
 
 <!-- DataTables -->
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
 
 <!-- page script -->
 <script type="text/javascript">
+	$('#pilih_bentuk').chosen({
+		width: '100%'
+	});
+
 	$(document).on('click', '.edit', function(e) {
 		var id = $(this).data('no_penawaran');
 		$("#head_title").html("<i class='fa fa-list-alt'></i><b>Edit Inventory</b>");
@@ -205,8 +243,7 @@ $ENABLE_DELETE  = has_permission('SPK_marketing.Delete');
 				url: siteurl + active_controller + 'get_spk_marketing',
 				dataType: 'json'
 			},
-			columns: [
-				{
+			columns: [{
 					data: 'no'
 				},
 				{
@@ -241,5 +278,25 @@ $ENABLE_DELETE  = has_permission('SPK_marketing.Delete');
 	function PreviewRekap() {
 		tujuan = 'customer/rekap_pdf';
 		$(".modal-body").html('<iframe src="' + tujuan + '" frameborder="no" width="100%" height="400"></iframe>');
+	}
+
+	function addSPK() {
+		var pilih_bentuk = $('#pilih_bentuk').val()
+
+		if (pilih_bentuk.length < 1) {
+			swal({
+				type: 'warning',
+				title: 'Warning !',
+				text: 'Bentuk material harus dipilih !',
+				showConfirmButton: false,
+				timer: 3000
+			});
+		} else {
+			if (pilih_bentuk == 'B2000002') {
+				window.location.href = siteurl + active_controller + 'addHeader_Sheet'
+			} else {
+				window.location.href = siteurl + active_controller + 'addHeader'
+			}
+		}
 	}
 </script>

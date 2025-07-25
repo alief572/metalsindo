@@ -1,6 +1,6 @@
-<?php 
-    $satuan = ($tipe_sheet == '1') ? 'SHEET' : 'KG';
-    $colspan = ($tipe_sheet == '1') ? 8 : 7;
+<?php
+$satuan = ($tipe_sheet == '1') ? 'SHEET' : 'KG';
+$colspan = ($tipe_sheet == '1') ? 8 : 7;
 ?>
 <html>
 
@@ -245,13 +245,13 @@
                 <td align="center" rowspan='2'>NO.</td>
                 <td align="center" rowspan='2'>PRODUCT/ITEM</td>
                 <td width='90' align="center" colspan='6'>DESCRIPTION</td>
-                <?php 
-                    if($tipe_sheet == 1) {
-                        echo '<td width="50" align="center" rowspan="2">QTY (SHEET)</td>';
-                        echo '<td width="50" align="center" rowspan="2">QTY (KG)</td>';
-                    } else {
-                        echo '<td width="50" align="center" rowspan="2">QTY (KG)</td>';
-                    }
+                <?php
+                if ($tipe_sheet == 1) {
+                    echo '<td width="50" align="center" rowspan="2">QTY (SHEET)</td>';
+                    echo '<td width="50" align="center" rowspan="2">QTY (KG)</td>';
+                } else {
+                    echo '<td width="50" align="center" rowspan="2">QTY (KG)</td>';
+                }
                 ?>
                 <td width='48' align="center" rowspan='2'>DELIVERY DATE</td>
             </tr>
@@ -269,8 +269,14 @@
             $SUM_SHEET = 0;
             foreach ($detail as $val => $valx) {
                 $a++;
-                $SUM += $valx['qty_produk'];
-                $SUM_SHEET += $valx['qty_sheet'];
+
+                $qty_kg = $valx['qty_produk'];
+                if ($valx['id_bentuk'] == 'B2000002') {
+                    $qty_kg = ($valx['qty_produk'] * $valx['total_weight']);
+                }
+
+                $SUM += $qty_kg;
+                $SUM_SHEET += $valx['qty_produk'];
             ?>
                 <tr>
                     <td width='5' align="center"><?= $a ?></td>
@@ -285,15 +291,15 @@
                                                     } else {
                                                         echo number_format($valx['length'], 2);
                                                     }; ?></td>
-                    <?php 
-                        if($tipe_sheet == 1) :
-                            echo '<td width="50" align="right">'. number_format($valx['qty_sheet'], 2) .'</td>';
-                            echo '<td width="50" align="right">'. number_format($valx['qty_produk'], 2) .'</td>';
-                        else : 
-                            echo '<td width="50" align="right">'. number_format($valx['qty_produk'], 2) .'</td>';
-                        endif;
+                    <?php
+                    if ($tipe_sheet == 1) :
+                        echo '<td width="50" align="right">' . number_format($valx['qty_produk'], 2) . '</td>';
+                        echo '<td width="50" align="right">' . number_format($qty_kg, 2) . '</td>';
+                    else :
+                        echo '<td width="50" align="right">' . number_format($valx['qty_produk'], 2) . '</td>';
+                    endif;
                     ?>
-                    
+
                     <td width='48'></td>
                 </tr>
             <?php
@@ -302,10 +308,10 @@
             <tr>
                 <th></th>
                 <th colspan='7'>TOTAL QUANTITY</th>
-                <?php 
-                    if($tipe_sheet == 1) :
-                        echo '<th align="right">'. number_format($SUM_SHEET, 2) .'</th>';
-                    endif;
+                <?php
+                if ($tipe_sheet == 1) :
+                    echo '<th align="right">' . number_format($SUM_SHEET, 2) . '</th>';
+                endif;
                 ?>
                 <th align='right'><?= number_format($SUM, 2); ?></th>
                 <th></th>
@@ -337,21 +343,21 @@
             $a = 0;
             foreach ($detail as $val => $valx) {
                 $a++;
-                ?>
-                    <tr>
-                        <td align="center" width='5'><?= $a ?></td>
-                        <td width='92'></td>
-                        <td width='35'></td>
-                        <td width='35'></td>
-                        <td width='35'></td>
-                        <td width='35'></td>
-                        <td width='35'></td>
-                        <td width='35'></td>
-                        <td width='35'></td>
-                        <td width='35'></td>
-                        <td width='35'></td>
-                    </tr>
-                <?php
+            ?>
+                <tr>
+                    <td align="center" width='5'><?= $a ?></td>
+                    <td width='92'></td>
+                    <td width='35'></td>
+                    <td width='35'></td>
+                    <td width='35'></td>
+                    <td width='35'></td>
+                    <td width='35'></td>
+                    <td width='35'></td>
+                    <td width='35'></td>
+                    <td width='35'></td>
+                    <td width='35'></td>
+                </tr>
+            <?php
             }
             ?>
             <tr>

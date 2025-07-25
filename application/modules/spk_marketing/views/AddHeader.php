@@ -215,7 +215,10 @@ $tanggal = date('Y-m-d');
 				url: siteurl + 'spk_marketing/get_penawaran',
 				cache: false,
 				type: "POST",
-				data: "id=" + this.value,
+				data: {
+					'id': this.value,
+					'id_bentuk': '<?= $results['id_bentuk'] ?>'
+				},
 				dataType: "json",
 				success: function(data) {
 					$("#no_penawaran").html(data.option).trigger("chosen:updated");
