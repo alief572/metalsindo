@@ -39,7 +39,7 @@ $ENABLE_DELETE  = has_permission('Penawaran.Delete');
 				</tr>
 			</thead>
 			<tbody>
-				
+
 			</tbody>
 		</table>
 	</div>
@@ -258,8 +258,7 @@ $ENABLE_DELETE  = has_permission('Penawaran.Delete');
 				type: 'POST',
 				dataType: 'json'
 			},
-			columns: [
-				{
+			columns: [{
 					data: 'no',
 				},
 				{

@@ -391,24 +391,13 @@ class Inventory_4_model extends BF_Model
 		}
 		$this->db->group_by('a.no_penawaran');
 		$this->db->order_by('a.no_penawaran', 'desc');
+
+		$db_clone = clone $this->db;
+		$count_all = $db_clone->count_all_results();
+
 		$this->db->limit($length, $start);
 
 		$get_data = $this->db->get();
-
-		$this->db->select('a.*, b.name_customer as name_customer, c.id_spkmarketing AS spkmarketing');
-		$this->db->from('tr_penawaran a');
-		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		$this->db->join('tr_spk_marketing c', 'a.no_penawaran=c.no_penawaran', 'left');
-		$this->db->where('a.type', 'reguler');
-		if (!empty($search['value'])) {
-			$this->db->like('a.no_surat', $search['value']);
-			$this->db->or_like('b.name_customer', $search['value']);
-			$this->db->or_like('a.tgl_penawaran', $search['value']);
-		}
-		$this->db->group_by('a.no_penawaran');
-		$this->db->order_by('a.no_penawaran', 'desc');
-
-		$get_data_all = $this->db->get();
 
 		$hasil = [];
 		$no = (0 + $start);
@@ -444,37 +433,37 @@ class Inventory_4_model extends BF_Model
 
 			$option = '';
 
-			if(has_permission($this->viewPermission)) {
-				$option .= ' <a class="btn btn-warning btn-sm view" href="javascript:void(0)" title="View" data-no_penawaran="'.$item->no_penawaran.'"><i class="fa fa-eye"></i></a>';
+			if (has_permission($this->viewPermission)) {
+				$option .= ' <a class="btn btn-warning btn-sm view" href="javascript:void(0)" title="View" data-no_penawaran="' . $item->no_penawaran . '"><i class="fa fa-eye"></i></a>';
 			}
 
-			if(has_permission($this->managePermission) && $item->status == 'N') {
-				$option .= ' <a class="btn btn-success btn-sm edit" href="javascript:void(0)" title="Edit" data-no_penawaran="'.$item->no_penawaran.'"><i class="fa fa-edit"></i></a>';
+			if (has_permission($this->managePermission) && $item->status == 'N') {
+				$option .= ' <a class="btn btn-success btn-sm edit" href="javascript:void(0)" title="Edit" data-no_penawaran="' . $item->no_penawaran . '"><i class="fa fa-edit"></i></a>';
 			}
 
-			if(has_permission($this->viewPermission) && $item->spkmarketing == null && $item->status == 'N') {
-				$option .= ' <a class="btn btn-primary btn-sm" href="'.base_url('/penawaran/detail/' . $item->no_penawaran).'" title="Detail" data-no_inquiry="'.$item->no_inquiry.'"><i class="fa fa-table"></i></a>';
+			if (has_permission($this->viewPermission) && $item->spkmarketing == null && $item->status == 'N') {
+				$option .= ' <a class="btn btn-primary btn-sm" href="' . base_url('/penawaran/detail/' . $item->no_penawaran) . '" title="Detail" data-no_inquiry="' . $item->no_inquiry . '"><i class="fa fa-table"></i></a>';
 			}
 
-			if(has_permission($this->viewPermission)) {
-				$option .= ' <a class="btn btn-info btn-sm" href="'. base_url('/penawaran/PrintHeader/' . $item->no_penawaran) .'" target="_blank" title="Detail" data-no_inquiry="'. $item->no_inquiry .'"><i class="fa fa-print"></i></a>';
+			if (has_permission($this->viewPermission)) {
+				$option .= ' <a class="btn btn-info btn-sm" href="' . base_url('/penawaran/PrintHeader/' . $item->no_penawaran) . '" target="_blank" title="Detail" data-no_inquiry="' . $item->no_inquiry . '"><i class="fa fa-print"></i></a>';
 			}
 
-			if(has_permission($this->managePermission) && $item->spkmarketing == null && $item->status == 'N') {
-				$option .= ' <a class="btn bg-purple btn-sm close_penawaran" href="javascript:void(0)" title="Close Penawaran" data-no_penawaran="'. $item->no_penawaran .'"><i class="fa fa-check"></i></a>';
+			if (has_permission($this->managePermission) && $item->spkmarketing == null && $item->status == 'N') {
+				$option .= ' <a class="btn bg-purple btn-sm close_penawaran" href="javascript:void(0)" title="Close Penawaran" data-no_penawaran="' . $item->no_penawaran . '"><i class="fa fa-check"></i></a>';
 			}
 
-			if(has_permission($this->managePermission)) {
-				$option .= ' <a class="btn btn-success btn-sm copy" href="javascript:void(0)" title="Copy" data-no_penawaran="'.$item->no_penawaran.'"><i class="fa fa-copy"></i></a>';
+			if (has_permission($this->managePermission)) {
+				$option .= ' <a class="btn btn-success btn-sm copy" href="javascript:void(0)" title="Copy" data-no_penawaran="' . $item->no_penawaran . '"><i class="fa fa-copy"></i></a>';
 			}
 
-			if(has_permission($this->managePermission) && $item->spkmarketing != null && $item->status_revisi == 0) {
-				$option .= ' <a class="btn btn-primary btn-sm revisi" href="javascript:void(0)" title="Ajukan Revisi" data-no_penawaran="'.$item->no_penawaran .'"><i class="fa fa-history"></i></a>';
+			if (has_permission($this->managePermission) && $item->spkmarketing != null && $item->status_revisi == 0) {
+				$option .= ' <a class="btn btn-primary btn-sm revisi" href="javascript:void(0)" title="Ajukan Revisi" data-no_penawaran="' . $item->no_penawaran . '"><i class="fa fa-history"></i></a>';
 			}
 
-			if(has_permission($this->managePermission) && $item->spkmarketing != null && $item->status_revisi == '2') {
+			if (has_permission($this->managePermission) && $item->spkmarketing != null && $item->status_revisi == '2') {
 				$option .= '
-				<a class="btn btn-primary btn-sm" href="'. base_url('/penawaran/detailrevisi/' . $item->no_penawaran) .'" title="Revisi" data-no_inquiry="'. $item->no_inquiry .'"><i class="fa fa-list"></i></a>
+				<a class="btn btn-primary btn-sm" href="' . base_url('/penawaran/detailrevisi/' . $item->no_penawaran) . '" title="Revisi" data-no_inquiry="' . $item->no_inquiry . '"><i class="fa fa-list"></i></a>
 				';
 			}
 
@@ -492,8 +481,8 @@ class Inventory_4_model extends BF_Model
 
 		echo json_encode([
 			'draw' => $draw,
-			'recordsTotal' => $get_data_all->num_rows(),
-			'recordsFiltered' => $get_data_all->num_rows(),
+			'recordsTotal' => $count_all,
+			'recordsFiltered' => $count_all,
 			'data' => $hasil
 		]);
 	}

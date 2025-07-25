@@ -39,6 +39,13 @@ class Spk_marketing extends Admin_Controller
 		$this->template->page_icon('fa fa-users');
 		// $data = $this->Inventory_4_model->CariSPK();
 		// $this->template->set('results', $data);
+
+		$this->db->select('a.id_bentuk, a.nm_bentuk');
+		$this->db->from('ms_bentuk a');
+		$this->db->where('a.deleted', '0');
+		$get_bentuk = $this->db->get()->result_array();
+
+		$this->template->set('list_bentuk', $get_bentuk);
 		$this->template->title('SPK Marketing');
 		$this->template->render('index');
 	}
@@ -53,7 +60,7 @@ class Spk_marketing extends Admin_Controller
 		$this->template->render('index_slitting');
 	}
 
-	public function addHeader()
+	public function addHeader($id_bentuk)
 	{
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
@@ -65,7 +72,42 @@ class Spk_marketing extends Admin_Controller
 			->select('a.id_customer, b.name_customer')
 			->from('tr_penawaran a')
 			->join('master_customers b', 'a.id_customer=b.id_customer', 'left')
+			->join('child_penawaran c', 'c.no_penawaran = a.no_penawaran')
 			->where('a.status', 'N')
+			->where('c.id_bentuk <>', 'B2000002')
+			->group_by('a.id_customer')
+			->order_by('b.name_customer', 'asc')
+			->get()
+			->result();
+		$karyawan = $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted);
+		$mata_uang = $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted);
+		$data = [
+			'id_bentuk' => $id_bentuk,
+			'penawaran' => $penawaran,
+			'karyawan' => $karyawan,
+			'customer' => $customer,
+			'mata_uang' => $mata_uang,
+		];
+		$this->template->set('results', $data);
+		$this->template->title('Add SPK Marketing');
+		$this->template->render('AddHeader');
+	}
+
+	public function addHeader_Sheet()
+	{
+		$this->auth->restrict($this->viewPermission);
+		$session = $this->session->userdata('app_session');
+		$this->template->page_icon('fa fa-pencil');
+		$aktif = 'active';
+		$deleted = '0';
+		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran', 'status', 'N');
+		$customer = $this->db
+			->select('a.id_customer, b.name_customer')
+			->from('tr_penawaran a')
+			->join('master_customers b', 'a.id_customer=b.id_customer', 'left')
+			->join('child_penawaran c', 'c.no_penawaran = a.no_penawaran')
+			->where('a.status', 'N')
+			->where('c.id_bentuk', 'B2000002')
 			->group_by('a.id_customer')
 			->order_by('b.name_customer', 'asc')
 			->get()
@@ -80,8 +122,9 @@ class Spk_marketing extends Admin_Controller
 		];
 		$this->template->set('results', $data);
 		$this->template->title('Add SPK Marketing');
-		$this->template->render('AddHeader');
+		$this->template->render('AddHeader_Sheet');
 	}
+
 	public function addHeaderSlitting()
 	{
 		$this->auth->restrict($this->viewPermission);
@@ -151,7 +194,14 @@ class Spk_marketing extends Admin_Controller
 		INNER JOIN ms_inventory_category3 b ON b.id_category3 = a.id_material
 		WHERE a.id_spkmarketing ='$id' AND a.deal='1'")->result();
 
+		$check_sheet = $this->db->query("SELECT a.*, b.nama, b.maker FROM dt_spkmarketing a
+		JOIN ms_inventory_category3 b ON b.id_category3 = a.id_material
+		WHERE a.id_spkmarketing ='$id' AND a.deal='1' AND b.id_bentuk = 'B2000002'")->result();
 
+		$tipe_sheet = 0;
+		if (count($check_sheet) > 0) {
+			$tipe_sheet = 1;
+		}
 
 		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran');
 		$customer = $this->db
@@ -172,6 +222,7 @@ class Spk_marketing extends Admin_Controller
 			'customer' => $customer,
 			'karyawan' => $karyawan,
 			'mata_uang' => $mata_uang,
+			'tipe_sheet' => $tipe_sheet
 		];
 		$this->template->set('results', $data);
 		$this->template->title('Edit SPK Marketing');
@@ -276,12 +327,25 @@ class Spk_marketing extends Admin_Controller
 		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran');
 		$karyawan = $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted);
 		$mata_uang = $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted);
+
+		$tipe_sheet = 0;
+		$this->db->select('a.id');
+		$this->db->from('dt_spkmarketing a');
+		$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_material');
+		$this->db->where('b.id_bentuk', 'B2000002');
+		$check_sheet = $this->db->get()->result_array();
+
+		if (count($check_sheet) > 0) {
+			$tipe_sheet = 1;
+		}
+
 		$data = [
 			'tr_spk' => $tr_spk,
 			'dtspk' => $dtspk,
 			'penawaran' => $penawaran,
 			'karyawan' => $karyawan,
 			'mata_uang' => $mata_uang,
+			'tipe_sheet' => $tipe_sheet
 		];
 		$this->template->set('results', $data);
 		$this->template->title('View Penawaran');
@@ -1943,6 +2007,7 @@ class Spk_marketing extends Admin_Controller
 	public function get_penawaran()
 	{
 		$id 	= $this->input->post('id');
+		$id_bentuk = $this->input->post('id_bentuk');
 		$result	= $this->db->get_where('tr_penawaran', array('id_customer' => $id, 'status' => 'N'))->result_array();
 
 		$option	= "<option value='0'>--Pilih--</option>";
@@ -2011,7 +2076,7 @@ class Spk_marketing extends Admin_Controller
 		$id = $this->uri->segment(3);
 		$data['header'] 	= $this->db->get_where('tr_spk_marketing', array('id_spkmarketing' => $id))->result();
 		$data['detail']  	= $this->db
-			->select('a.*, b.thickness, b.width, b.qty_sheet, a.length, c.hardness, c.id_bentuk, c.spek as aloy, d.nama AS item, e.nm_surface')
+			->select('a.*, b.thickness, b.width, b.qty_sheet, a.length, c.hardness, c.id_bentuk, c.total_weight, c.spek as aloy, d.nama AS item, e.nm_surface')
 			->from('dt_spkmarketing a')
 			->join('child_penawaran b', 'a.id_child_penawaran=b.id_child_penawaran')
 			->join('ms_inventory_category3 c', 'c.id_category3=b.id_category3')
@@ -2025,13 +2090,13 @@ class Spk_marketing extends Admin_Controller
 
 		$tipe_sheet = 0;
 		$get_detail_spkmarketing  = $this->db->get_where('dt_spkmarketing', array('id_spkmarketing' => $id))->result();
-		foreach($get_detail_spkmarketing as $item) :
+		foreach ($get_detail_spkmarketing as $item) :
 			$get_material = $this->db->get_where('ms_inventory_category3', array('id_category3' => $item->id_material))->row();
-			if($tipe_sheet == 0 && $get_material->id_bentuk == 'B2000002') {
+			if ($tipe_sheet == 0 && $get_material->id_bentuk == 'B2000002') {
 				$tipe_sheet = 1;
 			}
 		endforeach;
-		
+
 		$data['tipe_sheet'] = $tipe_sheet;
 
 		$this->load->view('print2slitting', $data);
@@ -2063,7 +2128,8 @@ class Spk_marketing extends Admin_Controller
 		print_r($no_surat);
 	}
 
-	public function get_spk_marketing() {
+	public function get_spk_marketing()
+	{
 		$this->Inventory_4_model->get_spk_marketing();
 	}
 }

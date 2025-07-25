@@ -380,22 +380,14 @@ class Inventory_4_model extends BF_Model
 			$this->db->or_like('a.no_surat', $search['value'], 'both');
 			$this->db->or_like('b.name_customer', $search['value'], 'both');
 		}
+
+		$db_clone = clone $this->db;
+		$count_all = $db_clone->count_all_results();
+
 		$this->db->order_by('a.id_spkmarketing', 'desc');
 		$this->db->limit($length, $start);
 
 		$query = $this->db->get();
-
-		$this->db->select('a.*, b.name_customer as name_customer');
-		$this->db->from('tr_spk_marketing a');
-		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		if (!empty($search['value'])) {
-			$this->db->like('a.tgl_spk_marketing', $search['value'], 'both');
-			$this->db->or_like('a.no_surat', $search['value'], 'both');
-			$this->db->or_like('b.name_customer', $search['value'], 'both');
-		}
-		$this->db->order_by('a.id_spkmarketing', 'desc');
-
-		$query_all = $this->db->get();
 
 		$no = (0 + $start);
 
@@ -435,11 +427,11 @@ class Inventory_4_model extends BF_Model
 				endif;
 
 				if (has_permission($this->managePermission)) :
-					$action .= ' <a class="btn btn-info btn-sm" href="'. base_url('/spk_marketing/editHeader/' . $item->id_spkmarketing) .'" title="Edit"><i class="fa fa-edit">&nbsp;</i></i></a></a>';
+					$action .= ' <a class="btn btn-info btn-sm" href="' . base_url('/spk_marketing/editHeader/' . $item->id_spkmarketing) . '" title="Edit"><i class="fa fa-edit">&nbsp;</i></i></a></a>';
 				endif;
 
-				if(has_permission($this->viewPermission)) :
-					$action .= ' <a class="btn btn-success btn-sm delete" href="javascript:void(0)" title="Approve" data-id_spkmarketing="'. $item->id_spkmarketing .'"><i class="fa fa-check"></i></a>';
+				if (has_permission($this->viewPermission)) :
+					$action .= ' <a class="btn btn-success btn-sm delete" href="javascript:void(0)" title="Approve" data-id_spkmarketing="' . $item->id_spkmarketing . '"><i class="fa fa-check"></i></a>';
 				endif;
 			}
 
@@ -456,8 +448,8 @@ class Inventory_4_model extends BF_Model
 
 		echo json_encode([
 			'draw' => intval($draw),
-			'recordsTotal' => $query_all->num_rows(),
-			'recordsFiltered' => $query_all->num_rows(),
+			'recordsTotal' => $count_all,
+			'recordsFiltered' => $count_all,
 			'data' => $hasil,
 		]);
 	}

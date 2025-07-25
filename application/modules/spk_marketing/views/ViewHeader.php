@@ -91,7 +91,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 											<th width='5%'>Length</th>
 											<th width='10%'>Harga Penawaran</th>
 											<th width='10%'>Harga Deal / Kg</th>
-											<th width='5%'>Qty (KG)</th>
+											<th width='5%'>Qty (<?= ($results['tipe_sheet'] == '1') ? 'Sheet' : 'KG' ?>)</th>
 											<th width='10%' hidden>Weight / Coil</th>
 											<th width='10%' hidden>Total Wight</th>
 											<th width='10%'>Total Harga</th>
@@ -116,8 +116,8 @@ foreach ($results['tr_spk'] as $tr_spk) {
 			<th>" . $dt->thickness . "</th>
 			<th>" . $dt->width . "</th>
 			<th>" . $dt->length . "</th>
-			<th>" . $dt->harga_penawaran . "</th>
-			<th>" . $dt->harga_deal . "</th>
+			<th>" . number_format($dt->harga_penawaran) . "</th>
+			<th>" . number_format($dt->harga_deal) . "</th>
 			<th>" . $dt->qty_produk . "</th>
 			<th hidden>" . $dt->weight . "</th>
 			<th>Rp. $thg ,-</th>
