@@ -161,7 +161,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 											<th width='10%'>Part Number</th>
 											<th width='10%'>Harga <br> Penawaran</th>
 											<th width='10%'>Harga Deal / Kg</th>
-											<th width='5%'>Qty (KG)</th>
+											<th width='5%'>Qty <?= ($results['tipe_sheet'] == 1) ? 'Sheet' : 'Kg' ?></th>
 											<th width='10%' hidden>Weight / Coil</th>
 											<th width='10%' hidden>Total<br>Weight</th>
 											<th width='10%'>Total Harga</th>
