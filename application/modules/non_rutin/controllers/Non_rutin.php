@@ -7,7 +7,7 @@ class Non_rutin extends Admin_Controller
 
 	protected $viewPermission 	= 'PR_Department.View';
 	protected $addPermission  	= 'PR_Department.Add';
-	protected $managePermission = 'PR_Department.Manage';	
+	protected $managePermission = 'PR_Department.Manage';
 	protected $deletePermission = 'PR_Department.Delete';
 
 	protected $viewPermission1 	= 'Approval_PR_Depart_Head.View';
@@ -529,7 +529,7 @@ class Non_rutin extends Admin_Controller
 				$title_tingkat = 'Management';
 			endif;
 
-			$get_list_coa = $this->db->select('a.*')->from(DBACC.'.coa_master a')->order_by('a.no_perkiraan', 'asc')->get()->result_array();
+			$get_list_coa = $this->db->select('a.*')->from(DBACC . '.coa_master a')->order_by('a.no_perkiraan', 'asc')->get()->result_array();
 
 			$get_departement = $this->db->get_where('ms_department', ['deleted_by' => null])->result();
 			$data = array(

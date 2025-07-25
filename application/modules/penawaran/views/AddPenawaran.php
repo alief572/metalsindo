@@ -29,7 +29,7 @@ foreach ($results['headpenawaran'] as $headpenawaran) {
 										<option value="">-- Pilih Type --</option>
 										<?php foreach ($results['inventory_3'] as $inventory_3) {
 										?>
-											<option value="<?= $inventory_3->id_category3 ?>"><?= strtoupper(strtolower($inventory_3->nama . '|' . $inventory_3->maker . '|' . $inventory_3->negara)) ?></option>
+											<option value="<?= $inventory_3->id_category3 ?>"><?= strtoupper(strtolower($inventory_3->nama . '|' . $inventory_3->maker . '|' . $inventory_3->negara . '|' . $inventory_3->id_category3)) ?></option>
 										<?php } ?>
 									</select>
 								</div>
