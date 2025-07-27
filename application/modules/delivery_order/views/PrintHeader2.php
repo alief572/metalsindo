@@ -282,27 +282,17 @@
             $width       = "";
             $length      = "";
             $i = 0;
+            $loop = 0;
             foreach ($dt as $dtl) {
                 $get_material_bentuk = $this->db->get_where('ms_inventory_category3', array('id_category3' => $dtl->id_material))->row();
 
                 if ($i > 0) {
-
                     if ($id_material != $dtl->id_material) {
 
 
 
             ?>
 
-                        <tr>
-                            <td bgcolor="#c9c9c9"></td>
-                            <td bgcolor="#c9c9c9"></td>
-                            <td bgcolor="#c9c9c9"></td>
-                            <td bgcolor="#c9c9c9"></td>
-                            <td bgcolor="#c9c9c9" align="center"><?= number_format($qty, 2) ?> </td>
-                            <td bgcolor="#c9c9c9" align="center"><?= number_format($qty_sheet, 2) ?> </td>
-                            <td bgcolor="#c9c9c9" align="center"><?= number_format($berat, 2) ?></td>
-                            <td bgcolor="#c9c9c9"></td>
-                        </tr>
 
                         <?php
                         $qty = 0;
@@ -312,16 +302,7 @@
                         if ($width != $dtl->width || $length != $dtl->length) {
                         ?>
 
-                            <tr>
-                                <td bgcolor="#c9c9c9"></td>
-                                <td bgcolor="#c9c9c9"></td>
-                                <td bgcolor="#c9c9c9"></td>
-                                <td bgcolor="#c9c9c9"></td>
-                                <td bgcolor="#c9c9c9" align="center"><?= number_format($qty, 2) ?> </td>
-                                <td bgcolor="#c9c9c9" align="center"><?= number_format($qty_sheet, 2) ?> </td>
-                                <td bgcolor="#c9c9c9" align="center"><?= number_format($berat, 2) ?></td>
-                                <td bgcolor="#c9c9c9"></td>
-                            </tr>
+
 
                 <?php
 
@@ -367,6 +348,7 @@
 
 
                 $spec = number_format($dtl->thickness, 2) . ' x ' . floatval($dtl->width) . ' x ' . $length;
+                $loop++;
                 ?>
                 <tr>
                     <td width="8" align="center"><?= $loop ?></td>
@@ -390,16 +372,7 @@
                 $berat = $berat + $dtl->weight_mat;
             }
             ?>
-            <tr>
-                <td bgcolor="#c9c9c9"></td>
-                <td bgcolor="#c9c9c9"></td>
-                <td bgcolor="#c9c9c9"></td>
-                <td bgcolor="#c9c9c9"></td>
-                <td bgcolor="#c9c9c9" align="center"><?= number_format($qty, 2) ?> </td>
-                <td bgcolor="#c9c9c9" align="center"><?= number_format($qty_sheet, 2) ?> </td>
-                <td bgcolor="#c9c9c9" align="center"><?= number_format($berat, 2) ?></td>
-                <td bgcolor="#c9c9c9"></td>
-            </tr>
+
             <tr>
                 <th bgcolor="#c9c9c9" rowspan='2' align="center" valign="middle" width="8"></th>
                 <th bgcolor="#c9c9c9" rowspan='2' align="center" valign="middle" width="110">TOTAL</th>
