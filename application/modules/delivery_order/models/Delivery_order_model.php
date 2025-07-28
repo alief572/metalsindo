@@ -399,24 +399,12 @@ class Delivery_order_model extends BF_Model
 		}
 		$this->db->group_by('a.id_delivery_order');
 		$this->db->order_by('a.id_delivery_order', 'desc');
+
+		$db_clone = clone $this->db;
+		$count_all = $db_clone->count_all_results();
+
 		$this->db->limit($length, $start);
 		$query = $this->db->get();
-
-		$this->db->select('a.*, b.name_customer as name_customer');
-		$this->db->from('tr_delivery_order a');
-		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		if (!empty($search)) {
-			$this->db->group_start();
-			$this->db->like('DATE_FORMAT(a.tgl_delivery_order, "%d-%M-%Y")', $search['value'], 'both');
-			$this->db->or_like('a.no_surat', $search['value'], 'both');
-			$this->db->or_like('a.no_spk_marketing', $search['value'], 'both');
-			$this->db->or_like('b.name_customer', $search['value'], 'both');
-			$this->db->or_like('a.type', $search['value'], 'both');
-			$this->db->group_end();
-		}
-		$this->db->group_by('a.id_delivery_order');
-		$this->db->order_by('a.id_delivery_order', 'desc');
-		$query_all = $this->db->get();
 
 		$hasil = [];
 
@@ -507,8 +495,8 @@ class Delivery_order_model extends BF_Model
 
 		echo json_encode([
 			"draw" => $draw,
-			"recordsTotal" => $query_all->num_rows(),
-			"recordsFiltered" => $query_all->num_rows(),
+			"recordsTotal" => $count_all,
+			"recordsFiltered" => $count_all,
 			"data" => $hasil
 		]);
 	}
