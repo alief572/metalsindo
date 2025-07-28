@@ -287,8 +287,10 @@
             $TOT_PPH = 0;
 
             $ttl_sheet = 0;
+            $ttl_kgs = 0;
+            $ttl_amount = 0;
             foreach ($detail as $detail) {
-                $TOT_PPH += $detail->jumlahharga * $detail->pajak / 100;
+
                 $HS = number_format($detail->hargasatuan, 3);
                 $JH = number_format($detail->jumlahharga, 3);
                 if (strtolower($header->loi) == 'lokal') {
@@ -296,7 +298,7 @@
                     $JH = number_format($detail->jumlahharga, 2);
                 }
                 if ($check_sheet > 0) {
-
+                    $TOT_PPH += (($detail->totalwidth * $detail->total_weight) * $detail->hargasatuan) * $detail->pajak / 100;
                     $total_weight_kgs = ($detail->totalwidth);
                     $harga_satuan_kgs = ($detail->hargasatuan * $detail->total_weight);
 
@@ -308,15 +310,18 @@
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
                         <td width='50' align='right'>" . number_format($total_weight_kgs, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($detail->hargasatuan, 2) . "</td>
+                        <td width='50' align='right'>" . number_format($detail->hargasatuan * $detail->total_weight, 2) . "</td>
                         <td width='50' align='right'>" . number_format($detail->totalwidth * $detail->total_weight, 2) . "</td>
                         <td width='50' align='right'>" . $HS . "</td>
-                        <td width='80' align='right'>" . number_format($detail->jumlahharga, 2) . "</td>
+                        <td width='80' align='right'>" . number_format(($detail->totalwidth * $detail->total_weight) * $detail->hargasatuan, 2) . "</td>
                         <td width='50'>" . $detail->description . "</td>
                     </tr>";
 
                     $ttl_sheet += ($total_weight_kgs);
+                    $ttl_kgs += ($detail->totalwidth * $detail->total_weight);
+                    $ttl_amount += ((($detail->totalwidth * $detail->total_weight) * $detail->hargasatuan) + ((($detail->totalwidth * $detail->total_weight) * $detail->hargasatuan) * $detail->pajak / 100));
                 } else {
+                    $TOT_PPH += $detail->jumlahharga * $detail->pajak / 100;
                     echo "	
                     <tr >
                         <td width='150'>" . $detail->nama . "</td>
@@ -327,6 +332,8 @@
                         <td width='80' align='right'>" . $JH . "</td>
                         <td width='130'>" . $detail->description . "</td>
                     </tr>";
+
+                    $ttl_amount += $detail->jumlahharga;
                 }
                 $CIF = "";
             } ?>
@@ -375,9 +382,9 @@
 
                     <td align="right"><?= number_format($ttl_sheet, 2) ?></td>
                     <td align="right"></td>
-                    <td align="right"><?= number_format($detailsum[0]->sumtotalwidth, 2) ?></td>
+                    <td align="right"><?= number_format($ttl_kgs, 2) ?></td>
                     <td align="right"></td>
-                    <td align="right"><?= $TOTHEAD ?></td>
+                    <td align="right"><?= number_format($ttl_amount, 2) ?></td>
                     <td align="center"></td>
                 <?php
                 } else {
