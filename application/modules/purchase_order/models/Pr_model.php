@@ -335,7 +335,7 @@ class Pr_model extends BF_Model
 		}
 
 		$db_clone = clone $this->db;
-		$count_all = $db_clone->count_all_results(); // ✅ will preserve original query state
+		$count_all = $db_clone->count_all_results();
 
 		$this->db->order_by('a.no_po', 'desc');
 		$this->db->limit($length, $start);
@@ -391,7 +391,7 @@ class Pr_model extends BF_Model
 				'no' => $no,
 				'no_po' => $item['no_surat'],
 				'tanggal_po' => date('d-M-Y', strtotime($item['tanggal'])),
-				'supplier' => strtoupper($item['nmsup']),
+				'supplier' => strtoupper($item['namesup']),
 				'progress_pr' => $status,
 				'action' => $option
 			];
