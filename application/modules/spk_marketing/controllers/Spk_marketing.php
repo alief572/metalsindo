@@ -60,7 +60,7 @@ class Spk_marketing extends Admin_Controller
 		$this->template->render('index_slitting');
 	}
 
-	public function addHeader($id_bentuk)
+	public function addHeader()
 	{
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
@@ -122,7 +122,7 @@ class Spk_marketing extends Admin_Controller
 		];
 		$this->template->set('results', $data);
 		$this->template->title('Add SPK Marketing');
-		$this->template->render('AddHeader_Sheet');
+		$this->template->render('addHeader_Sheet');
 	}
 
 	public function addHeaderSlitting()
