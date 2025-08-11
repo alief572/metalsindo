@@ -7,9 +7,6 @@ class Auth
     protected $ci;
     protected $user;
 
-    protected $site_key;
-    protected $secret_key;
-
     public function __construct()
     {
         $this->ci = &get_instance();
@@ -21,9 +18,6 @@ class Auth
         ));
 
         $this->user = $this->ci->session->userdata('app_session');
-
-        $this->site_key = '6LfRy6ErAAAAAIh8BomRhCz8Y4iOyR8OIm95qOwA';
-        $this->secret_key = '6LfRy6ErAAAAALA6QN1Gwd8HtnyR0ljIOZuK023B';
     }
 
     public function is_login()
@@ -68,7 +62,7 @@ class Auth
         return $userdata;
     }
 
-    public function login($username = "", $password = "", $token)
+    public function login($username = "", $password = "")
     {
         if ($this->is_login()) {
             redirect('/');
@@ -92,48 +86,28 @@ class Auth
             return FALSE;
         }
 
-        $urlVeryfy    = "https://www.google.com/recaptcha/api/siteverify?secret=" . urlencode($this->secret_key) . "&response=" . urlencode($token);
-        $resGoogle     = json_decode(file_get_contents($urlVeryfy));
-        //print_r($resGoogle);
+        if (password_verify($password, $user->password)) {
+            //Buat Session
+            $array = array();
+            foreach ($user as $key => $usr) {
+                $array[$key] = $usr;
+            }
 
-        if (!$resGoogle->success) {
-            $pesan = 'Gagal validasi reCAPTCHA Google...!';
-            $this->ci->session->set_flashdata('error_captcha', $pesan);
-            redirect('login');
-        } else if ($resGoogle->score < 0.5 || $resGoogle->action !== 'auth') {
-            $pesan = 'Gagal, terdeteksi login mencurigakan. Silahkan coba lagi...!';
-            $this->ci->session->set_flashdata('error_captcha', $pesan);
-            redirect('login');
-        } else if ($resGoogle->success && $resGoogle->score >= 0.5) {
-            if (password_verify($password, $user->password)) {
-                //Buat Session
-                $array = array();
-                foreach ($user as $key => $usr) {
-                    $array[$key] = $usr;
-                }
+            $this->ci->session->set_userdata('app_session', $array);
+            //Set User Data
+            $this->user = $this->ci->session->userdata('app_session');
+            //Update Login Terakhir
+            $ip_address = ($this->ci->input->ip_address()) == "::1" ? "127.0.0.1" : $this->ci->input->ip_address();
+            $this->ci->users_model->update($this->user_id(), array('login_terakhir' => date('Y-m-d H:i:s'), 'ip' => $ip_address));
 
-                $this->ci->session->set_userdata('app_session', $array);
-                //Set User Data
-                $this->user = $this->ci->session->userdata('app_session');
-                //Update Login Terakhir
-                $ip_address = ($this->ci->input->ip_address()) == "::1" ? "127.0.0.1" : $this->ci->input->ip_address();
-                $this->ci->users_model->update($this->user_id(), array('login_terakhir' => date('Y-m-d H:i:s'), 'ip' => $ip_address));
-
-                $requested_page = $this->ci->session->userdata('requested_page');
-                if ($requested_page != '') {
-                    //redirect($requested_page);
-                    redirect("/");
-                }
-
+            $requested_page = $this->ci->session->userdata('requested_page');
+            if ($requested_page != '') {
+                //redirect($requested_page);
                 redirect("/");
             }
-        } else {
-            $pesan = 'Gagal login, silahkan coba lagi...!';
-            $this->ci->session->set_flashdata('error_captcha', $pesan);
-            redirect('login');
+
+            redirect("/");
         }
-
-
 
         $this->ci->template->set_message(lang('users_wrong_password'), 'error');
         $this->ci->template->message();
