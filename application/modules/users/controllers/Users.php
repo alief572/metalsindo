@@ -16,12 +16,18 @@ class Users extends Front_Controller
      * 
      */
 
+    protected $site_key;
+    protected $secret_key;
+
     public function __construct()
     {
         parent::__construct();
         $this->load->model(array('identitas_model'));
         $this->load->library('users/auth');
         $this->load->library('session');
+
+        $this->site_key = '6LeOwKErAAAAAMhxTtTAamQHIajF3lrVPi9t4jnb';
+        $this->secret_key = '6LeOwKErAAAAAGQCsxvNnaqpi5rIwTsruxXeUGAa';
     }
 
     public function index()
