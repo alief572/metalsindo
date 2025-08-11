@@ -214,8 +214,9 @@
 <script src="https://www.google.com/recaptcha/api.js?render=<?= $sitekey; ?>"></script>
 <script src="<?php echo base_url(); ?>assets/login/js/index.js"></script>
 <script type="text/javascript">
+  var site_key = "<?= $sitekey ?>";
   grecaptcha.ready(function() {
-    grecaptcha.execute(sit_key, {
+    grecaptcha.execute(site_key, {
       action: 'login'
     }).then(function(token) {
       document.getElementById('recaptcha_token').value = token;
