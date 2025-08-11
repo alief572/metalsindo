@@ -22,8 +22,8 @@ class Auth
 
         $this->user = $this->ci->session->userdata('app_session');
 
-        $this->site_key = '6LeOwKErAAAAAMhxTtTAamQHIajF3lrVPi9t4jnb';
-        $this->secret_key = '6LeOwKErAAAAAGQCsxvNnaqpi5rIwTsruxXeUGAa';
+        $this->site_key = '6LfRy6ErAAAAAIh8BomRhCz8Y4iOyR8OIm95qOwA';
+        $this->secret_key = '6LfRy6ErAAAAALA6QN1Gwd8HtnyR0ljIOZuK023B';
     }
 
     public function is_login()
@@ -92,6 +92,24 @@ class Auth
             return FALSE;
         }
 
+        $urlVeryfy    = "https://www.google.com/recaptcha/api/siteverify?secret=" . urlencode($this->secret_key) . "&response=" . urlencode($token);
+        $resGoogle     = json_decode(file_get_contents($urlVeryfy));
+        //print_r($resGoogle);
+
+        if (!$resGoogle->success) {
+            $pesan = 'Gagal validasi reCAPTCHA Google...!';
+            $this->session->set_flashdata('error_captcha', $pesan);
+            redirect('login');
+        } else if ($resGoogle->score < 0.5 || $resGoogle->action !== 'auth') {
+            $pesan = 'Gagal, terdeteksi login mencurigakan. Silahkan coba lagi...!';
+            $this->session->set_flashdata('error_captcha', $pesan);
+            redirect('login');
+        } else {
+            $pesan = 'Gagal login, silahkan coba lagi...!';
+            $this->session->set_flashdata('error_captcha', $pesan);
+            redirect('login');
+        }
+
         if (password_verify($password, $user->password)) {
             //Buat Session
             $array = array();
@@ -110,24 +128,6 @@ class Auth
             if ($requested_page != '') {
                 //redirect($requested_page);
                 redirect("/");
-            }
-
-            $urlVeryfy    = "https://www.google.com/recaptcha/api/siteverify?secret=" . urlencode($this->secret_key) . "&response=" . urlencode($token);
-            $resGoogle     = json_decode(file_get_contents($urlVeryfy));
-            //print_r($resGoogle);
-
-            if (!$resGoogle->success) {
-                $pesan = 'Gagal validasi reCAPTCHA Google...!';
-                $this->session->set_flashdata('error_captcha', $pesan);
-                redirect('login');
-            } else if ($resGoogle->score < 0.5 || $resGoogle->action !== 'auth') {
-                $pesan = 'Gagal, terdeteksi login mencurigakan. Silahkan coba lagi...!';
-                $this->session->set_flashdata('error_captcha', $pesan);
-                redirect('login');
-            } else {
-                $pesan = 'Gagal login, silahkan coba lagi...!';
-                $this->session->set_flashdata('error_captcha', $pesan);
-                redirect('login');
             }
 
             redirect("/");
