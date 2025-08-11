@@ -104,34 +104,36 @@ class Auth
             $pesan = 'Gagal, terdeteksi login mencurigakan. Silahkan coba lagi...!';
             $this->ci->session->set_flashdata('error_captcha', $pesan);
             redirect('login');
+        } else if ($resGoogle->success && $resGoogle->score >= 0.5) {
+            if (password_verify($password, $user->password)) {
+                //Buat Session
+                $array = array();
+                foreach ($user as $key => $usr) {
+                    $array[$key] = $usr;
+                }
+
+                $this->ci->session->set_userdata('app_session', $array);
+                //Set User Data
+                $this->user = $this->ci->session->userdata('app_session');
+                //Update Login Terakhir
+                $ip_address = ($this->ci->input->ip_address()) == "::1" ? "127.0.0.1" : $this->ci->input->ip_address();
+                $this->ci->users_model->update($this->user_id(), array('login_terakhir' => date('Y-m-d H:i:s'), 'ip' => $ip_address));
+
+                $requested_page = $this->ci->session->userdata('requested_page');
+                if ($requested_page != '') {
+                    //redirect($requested_page);
+                    redirect("/");
+                }
+
+                redirect("/");
+            }
         } else {
             $pesan = 'Gagal login, silahkan coba lagi...!';
             $this->ci->session->set_flashdata('error_captcha', $pesan);
             redirect('login');
         }
 
-        if (password_verify($password, $user->password)) {
-            //Buat Session
-            $array = array();
-            foreach ($user as $key => $usr) {
-                $array[$key] = $usr;
-            }
 
-            $this->ci->session->set_userdata('app_session', $array);
-            //Set User Data
-            $this->user = $this->ci->session->userdata('app_session');
-            //Update Login Terakhir
-            $ip_address = ($this->ci->input->ip_address()) == "::1" ? "127.0.0.1" : $this->ci->input->ip_address();
-            $this->ci->users_model->update($this->user_id(), array('login_terakhir' => date('Y-m-d H:i:s'), 'ip' => $ip_address));
-
-            $requested_page = $this->ci->session->userdata('requested_page');
-            if ($requested_page != '') {
-                //redirect($requested_page);
-                redirect("/");
-            }
-
-            redirect("/");
-        }
 
         $this->ci->template->set_message(lang('users_wrong_password'), 'error');
         $this->ci->template->message();
