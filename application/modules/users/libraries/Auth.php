@@ -98,15 +98,15 @@ class Auth
 
         if (!$resGoogle->success) {
             $pesan = 'Gagal validasi reCAPTCHA Google...!';
-            $this->session->set_flashdata('error_captcha', $pesan);
+            $this->ci->session->set_flashdata('error_captcha', $pesan);
             redirect('login');
         } else if ($resGoogle->score < 0.5 || $resGoogle->action !== 'auth') {
             $pesan = 'Gagal, terdeteksi login mencurigakan. Silahkan coba lagi...!';
-            $this->session->set_flashdata('error_captcha', $pesan);
+            $this->ci->session->set_flashdata('error_captcha', $pesan);
             redirect('login');
         } else {
             $pesan = 'Gagal login, silahkan coba lagi...!';
-            $this->session->set_flashdata('error_captcha', $pesan);
+            $this->ci->session->set_flashdata('error_captcha', $pesan);
             redirect('login');
         }
 
