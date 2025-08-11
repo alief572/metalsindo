@@ -190,11 +190,6 @@
 
 <div class="wrapper">
   <?= form_open($this->uri->uri_string(), array('id' => 'frm_login', 'name' => 'frm_login', 'class' => 'login')) ?>
-  <?php if ($this->session->flashdata('error_captcha')): ?>
-    <div class="alert alert-danger">
-      <?= $this->session->flashdata('error_captcha'); ?>
-    </div>
-  <?php endif; ?>
   <p class="title">Log in</p>
   <input type="text" name="username" placeholder="Username" value="<?= set_value('username') ?>" required autofocus>
   <i class="fa fa-user"></i>
