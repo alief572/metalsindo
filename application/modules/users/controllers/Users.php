@@ -56,7 +56,7 @@ class Users extends Front_Controller
 
             if (!$resGoogle->success) {
                 $pesan = 'Gagal validasi reCAPTCHA Google...!';
-                $this->session->set_flashdata('error', $pesan);
+                $this->session->set_flashdata('error_captcha', $pesan);
                 redirect('/');
             } else if ($resGoogle->score < 0.5 || $resGoogle->action !== 'auth') {
                 $pesan = 'Gagal, terdeteksi login mencurigakan. Silahkan coba lagi...!';
