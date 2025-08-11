@@ -50,32 +50,11 @@ class Users extends Front_Controller
             $password = $this->security->xss_clean($this->input->post('password'));
             $token = $this->security->xss_clean($this->input->post('recaptcha_token'));
 
-            $urlVeryfy    = "https://www.google.com/recaptcha/api/siteverify?secret=" . urlencode($this->secret_key) . "&response=" . urlencode($token);
-            $resGoogle     = json_decode(file_get_contents($urlVeryfy));
-            //print_r($resGoogle);
-
-            if (!$resGoogle->success) {
-                $pesan = 'Gagal validasi reCAPTCHA Google...!';
-                $this->session->set_flashdata('error_captcha', $pesan);
-                redirect('/');
-            } else if ($resGoogle->score < 0.5 || $resGoogle->action !== 'auth') {
-                $pesan = 'Gagal, terdeteksi login mencurigakan. Silahkan coba lagi...!';
-                $this->session->set_flashdata('error_captcha', $pesan);
-                redirect('/');
-            } else if ($resGoogle->success && $resGoogle->score >= 0.5) {
-                $this->auth->login($username, $password);
-            } else {
-                $pesan = 'Gagal login, silahkan coba lagi...!';
-                $this->session->set_flashdata('error_captcha', $pesan);
-                redirect('/');
-            }
+            $this->auth->login($username, $password, $token);
         }
 
-        $siteKey = '6LeOwKErAAAAAMhxTtTAamQHIajF3lrVPi9t4jnb';
-        $secretKey = '6LeOwKErAAAAAGQCsxvNnaqpi5rIwTsruxXeUGAa';
-
-        $this->template->set('sitekey', $siteKey);
-        $this->template->set('secretkey', $secretKey);
+        $this->template->set('sitekey', $this->site_key);
+        $this->template->set('secretkey', $this->secret_key);
         $this->template->set('idt', $identitas);
         $this->template->set_theme('default');
         $this->template->set_layout('login');
