@@ -52,7 +52,8 @@ class Users extends Front_Controller
 
             $urlVeryfy    = "https://www.google.com/recaptcha/api/siteverify?secret=" . urlencode($this->secret_key) . "&response=" . urlencode($token);
             $resGoogle     = json_decode(file_get_contents($urlVeryfy));
-            //print_r($resGoogle);
+            print_r($resGoogle);
+            exit;
 
             if (!$resGoogle->success) {
                 $pesan = 'Gagal validasi reCAPTCHA Google...!';
