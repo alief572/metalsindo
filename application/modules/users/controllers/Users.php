@@ -46,9 +46,9 @@ class Users extends Front_Controller
         $identitas = $this->identitas_model->find_by(array('ididentitas' => 1)); // By Muhaemin => Di Form Login
 
         if (isset($_POST['login'])) {
-            $username = $this->input->post('username');
-            $password = $this->input->post('password');
-            $token = $this->input->post('token');
+            $username = $this->security->xss_clean($this->input->post('username'));
+            $password = $this->security->xss_clean($this->input->post('password'));
+            $token = $this->security->xss_clean($this->input->post('recaptcha_token'));
 
             $urlVeryfy    = "https://www.google.com/recaptcha/api/siteverify?secret=" . urlencode($this->secret_key) . "&response=" . urlencode($token);
             $resGoogle     = json_decode(file_get_contents($urlVeryfy));
