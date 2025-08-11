@@ -60,7 +60,7 @@ class Users extends Front_Controller
                 $this->session->set_flashdata('error_captcha', $pesan);
 
                 redirect('login');
-            } else if ($resGoogle->score < 0.5 || $resGoogle->action !== 'auth') {
+            } else if ($resGoogle->score < 0.5 || $resGoogle->action !== 'login') {
                 $pesan = 'Gagal, terdeteksi login mencurigakan. Silahkan coba lagi...!';
                 $this->session->set_flashdata('error_captcha', $pesan);
 
