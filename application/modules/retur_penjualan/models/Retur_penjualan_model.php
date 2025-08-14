@@ -9,292 +9,405 @@
 
 class Retur_penjualan_model extends BF_Model
 {
-    /**
-     * @var string  User Table Name
-     */
-    protected $table_name = 'ms_inventory_category3';
-    protected $key        = 'id';
+	/**
+	 * @var string  User Table Name
+	 */
+	protected $table_name = 'ms_inventory_category3';
+	protected $key        = 'id';
 
-    /**
-     * @var string Field name to use for the created time column in the DB table
-     * if $set_created is enabled.
-     */
-    protected $created_field = 'created_on';
+	/**
+	 * @var string Field name to use for the created time column in the DB table
+	 * if $set_created is enabled.
+	 */
+	protected $created_field = 'created_on';
 
-    /**
-     * @var string Field name to use for the modified time column in the DB
-     * table if $set_modified is enabled.
-     */
-    protected $modified_field = 'modified_on';
+	/**
+	 * @var string Field name to use for the modified time column in the DB
+	 * table if $set_modified is enabled.
+	 */
+	protected $modified_field = 'modified_on';
 
-    /**
-     * @var bool Set the created time automatically on a new record (if true)
-     */
-    protected $set_created = true;
+	/**
+	 * @var bool Set the created time automatically on a new record (if true)
+	 */
+	protected $set_created = true;
 
-    /**
-     * @var bool Set the modified time automatically on editing a record (if true)
-     */
-    protected $set_modified = true;
-    /**
-     * @var string The type of date/time field used for $created_field and $modified_field.
-     * Valid values are 'int', 'datetime', 'date'.
-     */
-    /**
-     * @var bool Enable/Disable soft deletes.
-     * If false, the delete() method will perform a delete of that row.
-     * If true, the value in $deleted_field will be set to 1.
-     */
-    protected $soft_deletes = true;
+	/**
+	 * @var bool Set the modified time automatically on editing a record (if true)
+	 */
+	protected $set_modified = true;
+	/**
+	 * @var string The type of date/time field used for $created_field and $modified_field.
+	 * Valid values are 'int', 'datetime', 'date'.
+	 */
+	/**
+	 * @var bool Enable/Disable soft deletes.
+	 * If false, the delete() method will perform a delete of that row.
+	 * If true, the value in $deleted_field will be set to 1.
+	 */
+	protected $soft_deletes = true;
 
-    protected $date_format = 'datetime';
+	protected $date_format = 'datetime';
 
-    /**
-     * @var bool If true, will log user id in $created_by_field, $modified_by_field,
-     * and $deleted_by_field.
-     */
-    protected $log_user = true;
+	/**
+	 * @var bool If true, will log user id in $created_by_field, $modified_by_field,
+	 * and $deleted_by_field.
+	 */
+	protected $log_user = true;
 
-    /**
-     * Function construct used to load some library, do some actions, etc.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-		
-    function generate_code($kode='') {
-      $query = $this->db->query("SELECT MAX(id_retur) as max_id FROM tr_retur_penjualan");
-      $row = $query->row_array();
-      $thn = date('y');
-      $max_id = $row['max_id'];
-      $max_id1 =(int) substr($max_id,3,5);
-      $counter = $max_id1 +1;
-      $idcust = "R".$thn.str_pad($counter, 5, "0", STR_PAD_LEFT);
-      return $idcust;
+	/**
+	 * Function construct used to load some library, do some actions, etc.
+	 */
+	public function __construct()
+	{
+		parent::__construct();
 	}
-	
-	
-	function BuatNomor($kode='') {
-	$bulan = date('m');
-	$thn = date('Y');
-	$tahun = date('y');
-		if ($bulan=='01'){$romawi = 'I';}
-		elseif ($bulan=='02'){$romawi = 'II';}
-		elseif ($bulan=='03'){$romawi = 'III';}
-		elseif ($bulan=='04'){$romawi = 'IV';}
-		elseif ($bulan=='05'){$romawi = 'V';}
-		elseif ($bulan=='06'){$romawi = 'VI';}
-		elseif ($bulan=='07'){$romawi = 'VII';}
-		elseif ($bulan=='08'){$romawi = 'VIII';}
-		elseif ($bulan=='09'){$romawi = 'IX';}
-		elseif ($bulan=='10'){$romawi = 'X';}
-		elseif ($bulan=='11'){$romawi = 'XI';}
-		elseif ($bulan=='12'){$romawi = 'XII';}
+
+	function generate_code($kode = '')
+	{
+		$query = $this->db->query("SELECT MAX(id_retur) as max_id FROM tr_retur_penjualan");
+		$row = $query->row_array();
+		$thn = date('y');
+		$max_id = $row['max_id'];
+		$max_id1 = (int) substr($max_id, 3, 5);
+		$counter = $max_id1 + 1;
+		$idcust = "R" . $thn . str_pad($counter, 5, "0", STR_PAD_LEFT);
+		return $idcust;
+	}
+
+
+	function BuatNomor($kode = '')
+	{
+		$bulan = date('m');
+		$thn = date('Y');
+		$tahun = date('y');
+		if ($bulan == '01') {
+			$romawi = 'I';
+		} elseif ($bulan == '02') {
+			$romawi = 'II';
+		} elseif ($bulan == '03') {
+			$romawi = 'III';
+		} elseif ($bulan == '04') {
+			$romawi = 'IV';
+		} elseif ($bulan == '05') {
+			$romawi = 'V';
+		} elseif ($bulan == '06') {
+			$romawi = 'VI';
+		} elseif ($bulan == '07') {
+			$romawi = 'VII';
+		} elseif ($bulan == '08') {
+			$romawi = 'VIII';
+		} elseif ($bulan == '09') {
+			$romawi = 'IX';
+		} elseif ($bulan == '10') {
+			$romawi = 'X';
+		} elseif ($bulan == '11') {
+			$romawi = 'XI';
+		} elseif ($bulan == '12') {
+			$romawi = 'XII';
+		}
 		$blnthn = date('Y-m');
-      $query = $this->db->query("SELECT MAX(no_retur) as max_id FROM tr_retur_penjualan WHERE Year(tahun)='$thn' AND month(tahun)='$bulan'");
-      $row = $query->row_array();
-     // $thn = date('T');
-      $max_id = $row['max_id'];
-      $max_id1 =(int) substr($max_id,-4);
-      $counter = $max_id1 +1;
-      $idcust = "RTR-SPK/".$tahun."/".$romawi."/".sprintf("%04s",$counter);
-      return $idcust;
+		$query = $this->db->query("SELECT MAX(no_retur) as max_id FROM tr_retur_penjualan WHERE Year(tahun)='$thn' AND month(tahun)='$bulan'");
+		$row = $query->row_array();
+		// $thn = date('T');
+		$max_id = $row['max_id'];
+		$max_id1 = (int) substr($max_id, -4);
+		$counter = $max_id1 + 1;
+		$idcust = "RTR-SPK/" . $tahun . "/" . $romawi . "/" . sprintf("%04s", $counter);
+		return $idcust;
 	}
-	
-	public function CariMaterial($id_crcl){
+
+	public function CariMaterial($id_crcl)
+	{
 		$this->db->select('a.*, b.nama as nama3, b.hardness as hardness, c.nama as nama2');
 		$this->db->from('dt_inquery_transaksi a');
-		$this->db->join('ms_inventory_category3 b','b.id_category3=a.id_category3');
-		$this->db->join('ms_inventory_category2 c','c.id_category2=b.id_category2');
+		$this->db->join('ms_inventory_category3 b', 'b.id_category3=a.id_category3');
+		$this->db->join('ms_inventory_category2 c', 'c.id_category2=b.id_category2');
 		$this->db->order_by('a.id_dt_inquery', DESC);
-		$this->db->where('a.no_inquery',$id_crcl);
-		$query = $this->db->get();	
+		$this->db->where('a.no_inquery', $id_crcl);
+		$query = $this->db->get();
 		return $query->result();
 	}
-	
-	public function CariSPK(){
+
+	public function CariSPK()
+	{
 		$this->db->select('a.*, b.name_customer as name_customer');
 		$this->db->from('tr_spk_marketing a');
-		$this->db->join('master_customers b','b.id_customer=a.id_customer');
+		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
 		$this->db->order_by('a.id_spkmarketing', DESC);
-		$query = $this->db->get();	
+		$query = $this->db->get();
 		return $query->result();
 	}
-	public function CariRetur(){
+	public function CariRetur()
+	{
 		$this->db->select('a.*, b.name_customer as name_customer');
 		$this->db->from('tr_retur_penjualan a');
-		$this->db->join('master_customers b','b.id_customer=a.id_customer');
+		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
 		$this->db->order_by('a.id_retur', DESC);
-		$query = $this->db->get();	
+		$query = $this->db->get();
 		return $query->result();
 	}
-	
-	
-	public function getHeaderPenawaran($id){
+
+
+	public function getHeaderPenawaran($id)
+	{
 		$this->db->select('a.*, b.name_customer as name_customer, b.address_office as address_office, b.telephone as telephone,b.fax as fax');
 		$this->db->from('tr_penawaran a');
-		$this->db->join('master_customers b','b.id_customer=a.id_customer');
-		$this->db->where('a.no_penawaran',$id);
-		$query = $this->db->get();	
+		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+		$this->db->where('a.no_penawaran', $id);
+		$query = $this->db->get();
 		return $query->result();
 	}
-		public function caristok($id_crcl){
+	public function caristok($id_crcl)
+	{
 		$this->db->select('a.*, b.density as density');
 		$this->db->from('stock_material a');
-		$this->db->join('ms_inventory_category3 b','b.id_category3=a.id_category3');
-		$this->db->where('a.id_category3',$id_crcl);
-		$query = $this->db->get();	
+		$this->db->join('ms_inventory_category3 b', 'b.id_category3=a.id_category3');
+		$this->db->where('a.id_category3', $id_crcl);
+		$query = $this->db->get();
 		return $query->result();
 	}
-		public function PrintDetail($id){
+	public function PrintDetail($id)
+	{
 		$this->db->select('a.*, b.nama as nama3,b.hardness as hardness, c.nama as nama2 , d.nilai_dimensi as nilai');
 		$this->db->from('child_penawaran a');
-		$this->db->join('ms_inventory_category3 b','b.id_category3=a.id_category3');
-		$this->db->join('ms_inventory_category2 c','c.id_category2=b.id_category2');
-		$this->db->join('child_inven_dimensi d','d.id_category3=a.id_category3');
-		$this->db->where('a.no_penawaran',$id);
-		$query = $this->db->get();	
+		$this->db->join('ms_inventory_category3 b', 'b.id_category3=a.id_category3');
+		$this->db->join('ms_inventory_category2 c', 'c.id_category2=b.id_category2');
+		$this->db->join('child_inven_dimensi d', 'd.id_category3=a.id_category3');
+		$this->db->where('a.no_penawaran', $id);
+		$query = $this->db->get();
 		return $query->result();
 	}
 	function level_2($inventory_1)
-    {
+	{
 		$search = "deleted='0' and id_type='$inventory_1'";
-        $this->db->where($search);
-        $this->db->order_by('id_category1', 'ASC');
-        return $this->db->from('ms_inventory_category1')
-            ->get()
-            ->result();
-    }
-    function level_3($id_inventory2)
-    {
+		$this->db->where($search);
+		$this->db->order_by('id_category1', 'ASC');
+		return $this->db->from('ms_inventory_category1')
+			->get()
+			->result();
+	}
+	function level_3($id_inventory2)
+	{
 		$search = "deleted='0' and id_category1='$id_inventory2'";
-        $this->db->where($search);
-        $this->db->order_by('id_category2', 'ASC');
-        return $this->db->from('ms_inventory_category2')
-            ->get()
-            ->result();
-    }
-	    function compotition($id_inventory2)
-    {
+		$this->db->where($search);
+		$this->db->order_by('id_category2', 'ASC');
+		return $this->db->from('ms_inventory_category2')
+			->get()
+			->result();
+	}
+	function compotition($id_inventory2)
+	{
 		$search = "deleted='0' and id_category1='$id_inventory2'";
-        $this->db->where($search);
-        $this->db->order_by('id_compotition', 'ASC');
-        return $this->db->from('ms_compotition')
-            ->get()
-            ->result();
-    }
-		    function bentuk($id_bentuk)
-    {
+		$this->db->where($search);
+		$this->db->order_by('id_compotition', 'ASC');
+		return $this->db->from('ms_compotition')
+			->get()
+			->result();
+	}
+	function bentuk($id_bentuk)
+	{
 		$search = "deleted='0' and id_bentuk='$id_bentuk'";
-        $this->db->where($search);
-        $this->db->order_by('id_dimensi', 'ASC');
-        return $this->db->from('ms_dimensi')
-            ->get()
-            ->result();
-    }
-	    function level_4($id_inventory3)
-    {
-        $this->db->where('id_category2', $id_inventory3);
-        $this->db->order_by('id_category3', 'ASC');
-        return $this->db->from('ms_inventory_category3')
-            ->get()
-            ->result();
-    }
+		$this->db->where($search);
+		$this->db->order_by('id_dimensi', 'ASC');
+		return $this->db->from('ms_dimensi')
+			->get()
+			->result();
+	}
+	function level_4($id_inventory3)
+	{
+		$this->db->where('id_category2', $id_inventory3);
+		$this->db->order_by('id_category3', 'ASC');
+		return $this->db->from('ms_inventory_category3')
+			->get()
+			->result();
+	}
 
- 	public function get_data($table,$where_field='',$where_value=''){
-		if($where_field !='' && $where_value!=''){
-			$query = $this->db->get_where($table, array($where_field=>$where_value));
-		}else{
+	public function get_data($table, $where_field = '', $where_value = '')
+	{
+		if ($where_field != '' && $where_value != '') {
+			$query = $this->db->get_where($table, array($where_field => $where_value));
+		} else {
 			$query = $this->db->get($table);
 		}
-		
+
 		return $query->result();
 	}
-	
-    function getById($id)
-    {
-       return $this->db->get_where('inven_lvl2',array('id_inventory2' => $id))->row_array();
-    }
 
-	public function get_data_category(){
+	function getById($id)
+	{
+		return $this->db->get_where('inven_lvl2', array('id_inventory2' => $id))->row_array();
+	}
+
+	public function get_data_category()
+	{
 		$search = "a.deleted='0'";
 		$this->db->select('a.*, b.nama as nama_category2, c.nilai_dimensi as nilai_dimensi,d.nm_bentuk as nm_bentuk');
 		$this->db->from('ms_inventory_category3 a');
-		$this->db->join('ms_inventory_category2 b','b.id_category2 =a.id_category2');
-		$this->db->join('child_inven_dimensi c','c.id_category3 =a.id_category3');
-		$this->db->join('ms_bentuk d','d.id_bentuk =a.id_bentuk');
+		$this->db->join('ms_inventory_category2 b', 'b.id_category2 =a.id_category2');
+		$this->db->join('child_inven_dimensi c', 'c.id_category3 =a.id_category3');
+		$this->db->join('ms_bentuk d', 'd.id_bentuk =a.id_bentuk');
 		$this->db->where($search);
-		$query = $this->db->get();		
+		$query = $this->db->get();
 		return $query->result();
 	}
-	
-	public function getpenawaran($id){
+
+	public function getpenawaran($id)
+	{
 		$search = "a.no_penawaran='$id' ";
 		$this->db->select('a.*, b.nama as nama_category3, b.hardness as hardness, c.nama as nama_category2, d.nilai_dimensi as thickness');
 		$this->db->from('child_penawaran a');
-		$this->db->join('ms_inventory_category3 b','b.id_category3 =a.id_category3');
-		$this->db->join('ms_inventory_category2 c','c.id_category2 =b.id_category2');
-		$this->db->join('child_inven_dimensi d','d.id_category3 =b.id_category3');
-		$this->db->where('a.no_penawaran',$id);
-		$query = $this->db->get();		
+		$this->db->join('ms_inventory_category3 b', 'b.id_category3 =a.id_category3');
+		$this->db->join('ms_inventory_category2 c', 'c.id_category2 =b.id_category2');
+		$this->db->join('child_inven_dimensi d', 'd.id_category3 =b.id_category3');
+		$this->db->where('a.no_penawaran', $id);
+		$query = $this->db->get();
 		return $query->result();
 	}
-	
-	public function getview($id){
+
+	public function getview($id)
+	{
 		$this->db->select('a.*, b.nama as nama_type, c.nama as nama_category1, d.nama as nama_category2');
 		$this->db->from('ms_inventory_category3 a');
-		$this->db->join('ms_inventory_type b','b.id_type=a.id_type');
-		$this->db->join('ms_inventory_category1 c','c.id_category1 =a.id_category1');
-		$this->db->join('ms_inventory_category2 d','d.id_category2 =a.id_category2');
-		$this->db->where('a.id_category3',$id);
-		$query = $this->db->get();		
+		$this->db->join('ms_inventory_type b', 'b.id_type=a.id_type');
+		$this->db->join('ms_inventory_category1 c', 'c.id_category1 =a.id_category1');
+		$this->db->join('ms_inventory_category2 d', 'd.id_category2 =a.id_category2');
+		$this->db->where('a.id_category3', $id);
+		$query = $this->db->get();
 		return $query->result();
 	}
-	
-	public function get_child_compotition($id){
+
+	public function get_child_compotition($id)
+	{
 		$this->db->select('a.*, b.name_compotition as name_compotition');
 		$this->db->from('dt_material_compotition a');
-		$this->db->join('ms_material_compotition b','b.id_compotition=a.id_compotition');
-		$this->db->where('a.id_category3',$id);
-		$query = $this->db->get();		
+		$this->db->join('ms_material_compotition b', 'b.id_compotition=a.id_compotition');
+		$this->db->where('a.id_category3', $id);
+		$query = $this->db->get();
 		return $query->result();
 	}
-	public function get_child_dimention($id){
+	public function get_child_dimention($id)
+	{
 		$this->db->select('a.*, b.dimensi_bentuk as dimensi_bentuk');
 		$this->db->from('dt_material_dimensi a');
-		$this->db->join('child_dimensi_bentuk b','b.id_dimensi_bentuk=a.id_dimensi_bentuk');
-		$this->db->where('a.id_category3',$id);
-		$query = $this->db->get();		
+		$this->db->join('child_dimensi_bentuk b', 'b.id_dimensi_bentuk=a.id_dimensi_bentuk');
+		$this->db->where('a.id_category3', $id);
+		$query = $this->db->get();
 		return $query->result();
 	}
-	public function get_child_suplier($id){
+	public function get_child_suplier($id)
+	{
 		$this->db->select('a.*, b.name_supplier as name_supplier');
 		$this->db->from('dt_material_supplier a');
-		$this->db->join('master_supplier b','b.id_supplier=a.id_supplier');
-		$this->db->where('a.id_category3',$id);
-		$query = $this->db->get();		
+		$this->db->join('master_supplier b', 'b.id_supplier=a.id_supplier');
+		$this->db->where('a.id_category3', $id);
+		$query = $this->db->get();
 		return $query->result();
 	}
-	
-	public function getSpek($id){
+
+	public function getSpek($id)
+	{
 		$this->db->select('a.*, b.name_compotition as name_compotition');
 		$this->db->from('dt_material_compotition a');
-		$this->db->join('ms_material_compotition b','b.id_compotition = a.id_compotition');
-		$this->db->where('a.id_category3',$id);
-		$query = $this->db->get();		
+		$this->db->join('ms_material_compotition b', 'b.id_compotition = a.id_compotition');
+		$this->db->where('a.id_category3', $id);
+		$query = $this->db->get();
 		return $query->result();
 	}
-	
-	public function CariSPKRetur(){
+
+	public function CariSPKRetur()
+	{
 		$this->db->select('a.*, b.name_customer as name_customer');
 		$this->db->from('tr_spk_marketing_retur a');
-		$this->db->join('master_customers b','b.id_customer=a.id_customer');
+		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
 		$this->db->order_by('a.id_spkmarketing', DESC);
-		$query = $this->db->get();	
+		$query = $this->db->get();
 		return $query->result();
 	}
 
 
+	public function get_retur_incoming()
+	{
+		$ENABLE_ADD     = has_permission('Retur_Penjualan.Add');
+		$ENABLE_MANAGE  = has_permission('Retur_Penjualan.Manage');
+		$ENABLE_VIEW    = has_permission('Retur_Penjualan.View');
+		$ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 
+		$post = $this->input->post();
+
+		$draw = $post['draw'];
+		$length = $post['length'];
+		$start = $post['start'];
+		$search = $post['search'];
+
+		$this->db->select('a.*, b.name_customer as name_customer');
+		$this->db->from('tr_spk_marketing a');
+		$this->db->join('master_customers b', 'b.id_customer = a.id_customer');
+
+		if (!empty($search['value'])) {
+			$this->db->group_start();
+			$this->db->like('a.tgl_spk_marketing', $search['value'], 'both');
+			$this->db->or_like('a.no_surat', $search['value'], 'both');
+			$this->db->or_like('b.name_customer', $search['value'], 'both');
+			$this->db->group_end();
+		}
+
+		$db_clone = clone $this->db;
+		$count_all = $db_clone->count_all_results();
+
+		$this->db->order_by('a.id_spkmarketing', 'desc');
+		$this->db->limit($length, $start);
+		$get_data = $this->db->get()->result();
+
+		$hasil = [];
+		$no = (0 + $start);
+
+		foreach ($get_data as $item) {
+			$no++;
+
+			$id_spkmarketing = $item->id_spkmarketing;
+
+			$so = $item->no_surat;
+			$invoice = $this->db->query("select no_surat FROM tr_delivery_order WHERE no_spk_marketing='$so'")->result();
+			$separator = ',';
+			$allinv = array();
+			foreach ($invoice as $inv) {
+				$allinv[] = $inv->no_surat;
+			}
+
+			$invc =  implode($separator, $allinv);
+
+			$status = '';
+			if ($item->status_approve == '1') {
+				$status = '<span class="badge bg-green">Approve</span>';
+			} else {
+				$status = '<span class="badge bg-red">Belum di Approve</span>';
+			}
+
+			$action = '';
+
+			if ($ENABLE_MANAGE) {
+				$action = '<a class="btn btn-info btn-sm" href="' . base_url('/retur_penjualan/proses_incoming/' . $item->id_spkmarketing) . '" title="Edit"><i class="fa fa-edit">&nbsp;</i></i></a></a>';
+			}
+
+			$hasil[] = [
+				'no' => $no,
+				'tanggal_spk_terbit' => date('d F Y', strtotime($item->tgl_spk_marketing)),
+				'no_spk' => $item->no_surat,
+				'customer' => $item->name_customer,
+				'no_do' => $invc,
+				'status' => $status,
+				'action' => $action
+			];
+		}
+
+		$response = [
+			'draw' => intval($draw),
+			'recordsTotal' => $count_all,
+			'recordsFiltered' => $count_all,
+			'data' => $hasil
+		];
+
+		echo json_encode($response);
+	}
 }
