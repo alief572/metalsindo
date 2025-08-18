@@ -327,7 +327,7 @@ class Retur_penjualan extends Admin_Controller
 		];
 		//Add Data
 		$this->db->insert('tr_spk_marketing_retur', $data);
-		$this->db->update('tr_retur_penjualan', ['sts' => '1'], ['id' => $post['id2']]);
+		$this->db->update('tr_retur_penjualan', ['sts' => '1'], ['id_retur' => $post['id2']]);
 
 		$numb1 = 0;
 		foreach ($_POST['dp'] as $dp) {
