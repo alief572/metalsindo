@@ -232,7 +232,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 						</div>
 						<center>
 							<button type="submit" class="btn btn-success btn-sm" name="save" id="simpan-com"><i class="fa fa-save"></i>Simpan</button>
-							<a class="btn btn-danger btn-sm" href="<?= base_url('/retur_penjualan/incoming/') ?>" title="Edit">Kembali</a>
+							<a class="btn btn-danger btn-sm" href="<?= base_url('/retur_penjualan/incoming_retur/') ?>" title="Edit">Kembali</a>
 						</center>
 					</div>
 				</div>
@@ -352,7 +352,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 										showConfirmButton: false,
 										allowOutsideClick: false
 									});
-									window.location.href = base_url + active_controller + '/incoming';
+									window.location.href = base_url + active_controller + '/incoming_retur';
 								} else {
 
 									if (data.status == 2) {
