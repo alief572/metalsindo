@@ -11,6 +11,8 @@ foreach ($results['tr_spk'] as $tr_spk) {
 <div class="box box-primary">
 	<div class="box-body">
 		<form id="data-form" method="post">
+			<input type="hidden" name="id" value="<?= $id ?>">
+			<input type="hidden" name="id2" value="<?= $id2 ?>">
 			<div class="col-sm-12">
 				<div class="input_fields_wrap2">
 					<div class="row">

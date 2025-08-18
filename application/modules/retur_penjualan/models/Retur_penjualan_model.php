@@ -143,6 +143,8 @@ class Retur_penjualan_model extends BF_Model
 		$this->db->select('a.*, b.name_customer as name_customer');
 		$this->db->from('tr_retur_penjualan a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+		$this->db->where('a.sts <>', '1');
+		$this->db->or_where('a.sts', null);
 		$this->db->order_by('a.id_retur', DESC);
 		$query = $this->db->get();
 		return $query->result();
