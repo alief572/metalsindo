@@ -377,8 +377,16 @@ class Retur_penjualan extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$data = $this->Retur_penjualan_model->CariSPKRetur();
-		$this->template->set('results', $data);
+
+		$this->db->select('a.*, b.name_customer as name_customer');
+		$this->db->from('tr_spk_marketing_retur a');
+		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+		$this->db->where('a.sts <>', '1');
+		$this->db->or_where('a.sts', null);
+		$this->db->order_by('a.id_spkmarketing', 'desc');
+		$query = $this->db->get();
+
+		$this->template->set('results', $query->result());
 		$this->template->title('Retur Penjualan');
 		$this->template->render('delivery_retur');
 	}
@@ -391,10 +399,11 @@ class Retur_penjualan extends Admin_Controller
 
 		$id = $this->uri->segment('3');
 		$this->template->page_icon('fa fa-users');
-		$dt = $this->db->query("SELECT * FROM dt_spkmarketing WHERE id_spkmarketing = '$id' AND deal=1")->result();
-		$hd = $this->db->query("SELECT * FROM tr_spk_marketing WHERE id_spkmarketing = '$id'")->row();
+		$dt = $this->db->query("SELECT * FROM dt_spkmarketing_retur WHERE id_spkmarketing = '$id' AND deal=1")->result();
+		$hd = $this->db->query("SELECT * FROM tr_spk_marketing_retur WHERE id_spkmarketing = '$id'")->row();
 		// print_r($dt);
 		// exit;
+		$this->template->set('id', $id);
 		$this->template->set('hd', $hd);
 		$this->template->set('dt', $dt);
 		$this->template->title('Delivery Retur Penjualan');
@@ -441,8 +450,7 @@ class Retur_penjualan extends Admin_Controller
 				$id_dtspk = $hd['id_dtspk'];
 
 
-				//$this->db->query("UPDATE dt_spkmarketing SET status_do ='CLS' WHERE id ='$id_dtspk'");
-
+				$this->db->query("UPDATE dt_spkmarketing_retur SET status_do ='CLS' WHERE id ='$id_dtspk'");
 			}
 		}
 
@@ -571,6 +579,7 @@ class Retur_penjualan extends Admin_Controller
 
 		$this->db->trans_start();
 		$this->db->insert('tr_delivery_order', $data);
+		$this->db->update('tr_spk_marketing_retur', ['sts' => '1'], ['id_spkmarketing' => $post['id']]);
 		if (!empty($_POST['dp'])) {
 			$this->db->insert_batch('dt_delivery_order_child', $ArrDetail);
 		}
