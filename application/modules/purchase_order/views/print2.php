@@ -302,7 +302,9 @@
                     $total_weight_kgs = ($detail->totalwidth);
                     $harga_satuan_kgs = ($detail->hargasatuan * $detail->total_weight);
 
-                    $total_weight_sheet = (!empty($detail->total_weight) && $detail->total_weight !== null && $detail->total_weight > 0) ? $detail->total_weight : 0;
+                    $get_detail_pr = $this->db->get_where('dt_trans_pr', ['id_dt_pr' => $detail->id_dt_pr])->row();
+
+                    $total_weight_sheet = (!empty($get_detail_pr->qty_sheet) && $get_detail_pr->qty_sheet !== null && $get_detail_pr->qty_sheet > 0) ? ($total_weight_kgs / $get_detail_pr->weight_sheet) : 0;
 
                     echo "	
                     <tr >
@@ -310,10 +312,10 @@
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
                         <td width='50' align='right'>" . number_format($total_weight_kgs, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($detail->hargasatuan * $detail->total_weight, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($detail->totalwidth * $detail->total_weight, 2) . "</td>
+                        <td width='50' align='right'>" . number_format($detail->hargasatuan * $total_weight_sheet, 2) . "</td>
+                        <td width='50' align='right'>" . number_format($detail->total_weight, 2) . "</td>
                         <td width='50' align='right'>" . $HS . "</td>
-                        <td width='80' align='right'>" . number_format(($detail->totalwidth * $detail->total_weight) * $detail->hargasatuan, 2) . "</td>
+                        <td width='80' align='right'>" . number_format(($detail->total_weight) * $detail->hargasatuan, 2) . "</td>
                         <td width='50'>" . $detail->description . "</td>
                     </tr>";
 
