@@ -560,7 +560,8 @@ class Purchase_order extends Admin_Controller
 
 				$material_ttlweight = (!empty($get_material) && $get_material->total_weight !== null) ? $get_material->total_weight : 0;
 
-				$totalweight = round($value['totalweight'] / $material_ttlweight);
+				// $totalweight = round($value['totalweight'] / $material_ttlweight);
+				$totalweight = round($value['totalweight']);
 			} else {
 				$totalweight = $value['totalweight'];
 			}
