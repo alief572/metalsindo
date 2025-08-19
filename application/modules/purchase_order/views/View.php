@@ -231,7 +231,7 @@ foreach ($results['head'] as $head) {
 											<th width='7%'>Description</th>
 											<th hidden width='7%'>Width</th>
 											<th hidden width='7%'>Qty (Unit)</th>
-											<th width='7%'>Total <?= ($results['tipe_sheet'] == 1) ? 'Sheet' : 'Weight' ?></th>
+											<th width='7%'>Total Weight</th>
 											<th width='7%'>Total Length</th>
 											<th hidden width='10%'>Rate LME</th>
 											<th hidden width='7%'>Alloy Price</th>

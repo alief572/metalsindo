@@ -300,7 +300,7 @@ foreach ($results['head'] as $head) {
                                             <th width='8%'>Description</th>
                                             <th width='7%'>Width</th>
                                             <th width='7%'>Length</th>
-                                            <th width='7%'>Total Sheet</th>
+                                            <th width='7%'>Total Weight</th>
                                             <th width='7%'>Unit Price</th>
                                             <th width='6%'>Disc %</th>
                                             <th width='6%'>Tax</th>
