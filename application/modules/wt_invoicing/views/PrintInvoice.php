@@ -563,7 +563,7 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 		<td width="100" align="left" border='0'>
 			<table>
 				<tr>
-					<td align='left'><b>MAKE CHECKS PAYABLE TO:</b></td>
+					<td align='left'><b>TRANSFER TO OUR BANK ACCOUNT:</b></td>
 				</tr>
 				<tr>
 					<td align='left'><b>PT. BANK OCBC NISP On Behalf of PT. METALSINDO PACIFIC</b></td>
