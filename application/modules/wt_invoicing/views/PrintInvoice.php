@@ -566,13 +566,13 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 					<td align='left'><b>MAKE CHECKS PAYABLE TO:</b></td>
 				</tr>
 				<tr>
-					<td align='left'><b>PT. BANK OCBC NISP On Behalf PT. METALSINDO PACIFIC</b></td>
+					<td align='left'><b>PT. BANK OCBC NISP On Behalf of PT. METALSINDO PACIFIC</b></td>
 				</tr>
 				<tr>
-					<td align='left'><b>Ruko Plaza Menteng B/1, Thamrin Lippo Cikarang</b></td>
+					<td align='left'><b>Ruko Plaza Menteng B/1, Thamrin, Lippo Cikarang</b></td>
 				</tr>
 				<tr>
-					<td align='left'><b>A/C. 10381004848-0(Multi Currency)</b></td>
+					<td align='left'><b>A/C: 103810048480 (Multi Currency)</b></td>
 				</tr>
 			</table>
 		</td>
