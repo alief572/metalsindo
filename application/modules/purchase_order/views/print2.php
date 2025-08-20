@@ -302,26 +302,29 @@
                     $total_weight_kgs = ($detail->totalwidth);
                     $harga_satuan_kgs = ($detail->hargasatuan * $detail->total_weight);
 
-                    $get_detail_pr = $this->db->get_where('dt_trans_pr', ['id_dt_pr' => $detail->id_dt_pr])->row();
+                    $get_detail_pr = $this->db->get_where('dt_trans_pr', ['id_dt_pr' => $detail->idpr])->row();
 
                     $total_weight_sheet = (!empty($get_detail_pr->qty_sheet) && $get_detail_pr->qty_sheet !== null && $get_detail_pr->qty_sheet > 0) ? ($total_weight_kgs / $get_detail_pr->weight_sheet) : 0;
+
+                    $total_sheet = (isset($get_detail_pr)) ? $get_detail_pr->qty_sheet : 0;
+                    $weight_per_sheet = (isset($get_detail_pr)) ? $get_detail_pr->weight_sheet : 0;
 
                     echo "	
                     <tr >
                         <td width='100'>" . wordwrap($detail->nama, 15, '<br>', true) . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
+                        <td width='50' align='right'>" . number_format($total_sheet, 2) . "</td>
+                        <td width='50' align='right'>" . number_format(($detail->hargasatuan * $weight_per_sheet), 2) . "</td>
                         <td width='50' align='right'>" . number_format($total_weight_kgs, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($detail->hargasatuan * $total_weight_sheet, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($detail->total_weight, 2) . "</td>
                         <td width='50' align='right'>" . $HS . "</td>
-                        <td width='80' align='right'>" . number_format(($detail->total_weight) * $detail->hargasatuan, 2) . "</td>
+                        <td width='80' align='right'>" . number_format(($total_weight_kgs) * $detail->hargasatuan, 2) . "</td>
                         <td width='50'>" . $detail->description . "</td>
                     </tr>";
 
-                    $ttl_sheet += ($total_weight_kgs);
-                    $ttl_kgs += ($detail->totalwidth * $detail->total_weight);
-                    $ttl_amount += ((($detail->totalwidth * $detail->total_weight) * $detail->hargasatuan) + ((($detail->totalwidth * $detail->total_weight) * $detail->hargasatuan) * $detail->pajak / 100));
+                    $ttl_sheet += ($total_sheet);
+                    $ttl_kgs += $total_weight_kgs;
+                    $ttl_amount += ((($detail->totalwidth) * $detail->hargasatuan) + ((($detail->totalwidth) * $detail->hargasatuan) * $detail->pajak / 100));
                 } else {
                     $TOT_PPH += $detail->jumlahharga * $detail->pajak / 100;
                     echo "	
