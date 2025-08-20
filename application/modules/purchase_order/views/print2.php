@@ -298,7 +298,7 @@
                     $JH = number_format($detail->jumlahharga, 2);
                 }
                 if ($check_sheet > 0) {
-                    $TOT_PPH += (($detail->totalwidth * $detail->total_weight) * $detail->hargasatuan) * $detail->pajak / 100;
+                    $TOT_PPH += (($detail->totalwidth) * $detail->hargasatuan) * $detail->pajak / 100;
                     $total_weight_kgs = ($detail->totalwidth);
                     $harga_satuan_kgs = ($detail->hargasatuan * $detail->total_weight);
 
