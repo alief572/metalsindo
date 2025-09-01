@@ -111,7 +111,7 @@ class Inventory_4_model extends BF_Model
 			$romawi = 'XII';
 		}
 		$blnthn = date('Y-m');
-		$query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_spk_marketing WHERE month(tgl_spk_marketing)='$bulan' and Year(tgl_spk_marketing)='$tahun'");
+		$query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_spk_marketing WHERE no_surat LIKE '%/" . $romawi . "/" . date('y', strtotime($tahun)) . "/%'");
 		// $query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_spk_marketing WHERE Year(tgl_spk_marketing)='$thn'");
 		$row = $query->row_array();
 		$thn = date('T');
