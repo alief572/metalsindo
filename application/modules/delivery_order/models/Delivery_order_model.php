@@ -150,13 +150,14 @@ class Delivery_order_model extends BF_Model
 			$romawi = 'XII';
 		}
 		$blnthn = date('Y-m');
-		$query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_delivery_order WHERE Year(tahun)='$thn'");
+		$query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_delivery_order WHERE no_surat LIKE '%/" . date('y', strtotime($thn)) . "/%'");
 		$row = $query->row_array();
 		//$thn = date('T');
 		$max_id = $row['max_id'];
 		$max_id1 = (int) substr($max_id, -4);
 		$counter = $max_id1 + 1;
 		$idcust = "DO-MP/" . $tahun . "/" . $romawi . "/" . sprintf("%04s", $counter);
+
 		return $idcust;
 	}
 	public function CariMaterial($id_crcl)
