@@ -155,7 +155,7 @@ class Inventory_4_model extends BF_Model
 			$romawi = 'XII';
 		}
 		$blnthn = date('Y-m');
-		$query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_penawaran WHERE Year(tahun)='$thn'");
+		$query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_penawaran WHERE no_surat LIKE '%/" . date('y', strtotime($thn)) . "/%'");
 		$row = $query->row_array();
 		// $thn = date('T');
 		$max_id = $row['max_id'];
