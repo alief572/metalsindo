@@ -342,24 +342,27 @@ class Retur_penjualan_model extends BF_Model
 		$start = $post['start'];
 		$search = $post['search'];
 
-		$this->db->select('a.*, b.name_customer as name_customer');
-		$this->db->from('tr_spk_marketing a');
-		$this->db->join('master_customers b', 'b.id_customer = a.id_customer');
-
-		if (!empty($search['value'])) {
-			$this->db->group_start();
-			$this->db->like('a.tgl_spk_marketing', $search['value'], 'both');
-			$this->db->or_like('a.no_surat', $search['value'], 'both');
-			$this->db->or_like('b.name_customer', $search['value'], 'both');
-			$this->db->group_end();
-		}
-
-		$db_clone = clone $this->db;
-		$count_all = $db_clone->count_all_results();
-
-		$this->db->order_by('a.id_spkmarketing', 'desc');
-		$this->db->limit($length, $start);
-		$get_data = $this->db->get()->result();
+		$sql = '
+			SELECT 
+				a.*,
+				b.name_customer as name_customer,
+				c.no_surat as no_do
+			FROM
+				tr_spk_marketing a
+				JOIN master_customers b ON b.id_customer = a.id_customer
+				LEFT JOIN tr_delivery_order c ON c.no_spk_marketing = a.no_surat
+			WHERE
+				1=1 AND (
+					a.tgl_spk_marketing LIKE "%' . $search['value'] . '%" OR
+					a.no_surat LIKE "%' . $search['value'] . '%" OR
+					b.name_customer LIKE "%' . $search['value'] . '%" OR
+					c.no_surat LIKE "%' . $search['value'] . '%"
+				)
+			GROUP BY a.id_spkmarketing
+			ORDER BY a.id_spkmarketing DESC
+		';
+		$count_all = $this->db->query($sql)->num_rows();
+		$get_data = $this->db->query($sql . ' LIMIT ' . $length . ' OFFSET ' . $start)->result();
 
 		$hasil = [];
 		$no = (0 + $start);
