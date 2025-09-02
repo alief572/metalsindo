@@ -150,7 +150,7 @@ class Delivery_order_model extends BF_Model
 			$romawi = 'XII';
 		}
 		$blnthn = date('Y-m');
-		$query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_delivery_order WHERE no_surat LIKE '%/" . date('y', strtotime($thn)) . "/%'");
+		$query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_delivery_order WHERE no_surat LIKE '%/" . date('y', strtotime($thn)) . "/" . $romawi . "/%'");
 		$row = $query->row_array();
 		//$thn = date('T');
 		$max_id = $row['max_id'];
