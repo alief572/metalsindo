@@ -150,7 +150,7 @@ class Wt_invoicing_model extends BF_Model
       $romawi = 'XII';
     }
     $blnthn = date('Y-m');
-    $query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_invoice WHERE Year(tahun)='$th'");
+    $query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_invoice WHERE no_surat LIKE '%/" . date('y', strtotime($th)) . "/" . $romawi . "/%'");
     $row = $query->row_array();
     $thn = date('T');
     $max_id = $row['max_id'];
@@ -527,7 +527,7 @@ class Wt_invoicing_model extends BF_Model
     $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
     $this->db->where("a.no_invoice <>", '');
     $this->db->where('a.status_close', '0');
-    if(!empty($search['value'])) {
+    if (!empty($search['value'])) {
       $this->db->group_start();
       $this->db->like('a.no_surat', $search['value'], 'both');
       $this->db->or_like('b.name_customer', $search['value'], 'both');
