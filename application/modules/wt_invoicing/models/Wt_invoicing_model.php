@@ -150,11 +150,11 @@ class Wt_invoicing_model extends BF_Model
       $romawi = 'XII';
     }
     $blnthn = date('Y-m');
-    $query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_invoice WHERE no_surat LIKE '%/" . date('y', strtotime($th)) . "/" . $romawi . "/%'");
+    $query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_invoice WHERE no_surat LIKE '%/" . date('y', strtotime($th)) . "/" . $romawi . "/%'");
     $row = $query->row_array();
     $thn = date('T');
     $max_id = $row['max_id'];
-    $max_id1 = (int) substr($max_id, -4);
+    $max_id1 = (int) $max_id;
     $counter = $max_id1 + 1;
     $idcust = "INV-MP/" . $tahun . "/" . $romawi . "/" . sprintf("%04s", $counter);
     return $idcust;
