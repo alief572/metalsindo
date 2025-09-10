@@ -352,7 +352,7 @@ class Retur_penjualan_model extends BF_Model
 				JOIN master_customers b ON b.id_customer = a.id_customer
 				LEFT JOIN tr_delivery_order c ON c.no_spk_marketing = a.no_surat
 			WHERE
-				1=1 AND (
+				1=1 AND c.no_surat IS NOT NULL AND (
 					a.tgl_spk_marketing LIKE "%' . $search['value'] . '%" OR
 					a.no_surat LIKE "%' . $search['value'] . '%" OR
 					b.name_customer LIKE "%' . $search['value'] . '%" OR

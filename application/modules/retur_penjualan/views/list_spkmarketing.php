@@ -235,7 +235,6 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 	function datatables() {
 		var datatables = $('#table_retur_incoming').dataTable({
 			serverSide: true,
-			processing: true,
 			stateSave: true,
 			paging: true,
 			destroy: true,
