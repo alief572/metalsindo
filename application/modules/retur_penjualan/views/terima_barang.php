@@ -185,6 +185,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 									<thead>
 										<tr class='bg-blue'>
 											<th width='5%'>Id Material</th>
+											<th width='5%'>No. DO</th>
 											<th width='30%'>Nama Material</th>
 											<th width='30%'>Lot Number</th>
 											<th width='10%'>Thickness</th>
@@ -205,6 +206,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 			<input type='text' class='form-control'   value='$dt->id_category3' id='dp_id_category3_$loop' data-role='qtip' required name='dp[$loop][id_category3]'>
 			<input type='hidden' class='form-control'   value='$dt->id_stock' id='dp_id_stok_$loop' data-role='qtip' required name='dp[$loop][id_stok]'>
 			</th>
+			<th>" . $dt->no_do . "</th>
 			<th><input type='text' class='form-control'   value='$dt->nama' id='dp_nama_$loop' data-role='qtip' required name='dp[$loop][nama]'></th>
 			<th><input type='text' class='form-control'   value='$dt->lotno' id='dp_lotno_$loop' data-role='qtip' required name='dp[$loop][lotno]'></th>
 			<th><input type='text' class='form-control'   value='$dt->thickness' id='dp_thickness_$loop' data-role='qtip' required name='dp[$loop][thickness]'></th>

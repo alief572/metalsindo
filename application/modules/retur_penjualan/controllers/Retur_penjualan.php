@@ -56,11 +56,10 @@ class Retur_penjualan extends Admin_Controller
 		$spkmkt = $nospk->no_surat;
 		$tr_spk = $this->Retur_penjualan_model->get_data('tr_spk_marketing', 'id_spkmarketing', $id);
 		// $dtspk = $this->Retur_penjualan_model->get_data('dt_spkmarketing',array('id_spkmarketing',$id));
-		$dtspk = $this->db->query("SELECT a.*, b.nama, b.maker FROM stock_material a
-		INNER JOIN ms_inventory_category3 b ON b.id_category3 = a.id_category3
+		$dtspk = $this->db->query("SELECT a.*, b.nama, b.maker, c.no_surat as no_do FROM stock_material a
+		JOIN ms_inventory_category3 b ON b.id_category3 = a.id_category3
+		JOIN tr_delivery_order c ON c.id_delivery_order = a.no_kirim
 		WHERE a.no_surat ='$spkmkt'")->result();
-
-
 
 		$penawaran = $this->Retur_penjualan_model->get_data('tr_penawaran');
 		$customer = $this->db
