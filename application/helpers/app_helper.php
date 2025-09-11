@@ -657,11 +657,11 @@ function get_dashboard_stock()
                             a.id_category2 AS category_lv2,
                             b.nama AS nm_lv1,
                             a.aktif AS status,
-                            c.berat
+                            0 as berat
                         ')
         ->from('ms_inventory_category2 a')
         ->join('ms_inventory_category1 b', 'a.id_category1=b.id_category1', 'left')
-        ->join('stock_lv2 c', 'a.id_category2=c.id2', 'left')
+        // ->join('stock_lv2 c', 'a.id_category2=c.id2', 'left')
         ->where('a.deleted', '0')
         ->get()
         ->result_array();
