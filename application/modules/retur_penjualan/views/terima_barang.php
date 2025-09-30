@@ -220,7 +220,11 @@ foreach ($results['tr_spk'] as $tr_spk) {
 
 											if ($results['check_sheet'] == 1) {
 												$qty_sheet = (isset($results['data_weight_per_sheet'][$dt->id_category3])) ? $results['data_weight_per_sheet'][$dt->id_category3] : '';
-												echo "<th><input type='text' class='form-control'   value='" . round($dt->total_kirim / $qty_sheet, 2) . "' id='dp_qty_sheet_$loop' data-role='qtip' required name='dp[$loop][qty_sheet]'></th>";
+												$val_sheet = 0;
+												if ($dt->total_kirim > 0 && $qty_sheet > 0) {
+													$val_sheet = round($dt->total_kirim / $qty_sheet, 2);
+												}
+												echo "<th><input type='text' class='form-control'   value='" . $val_sheet . "' id='dp_qty_sheet_$loop' data-role='qtip' required name='dp[$loop][qty_sheet]'></th>";
 											}
 
 											echo "
