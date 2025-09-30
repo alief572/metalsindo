@@ -59,7 +59,7 @@ class Retur_penjualan extends Admin_Controller
 		$dtspk = $this->db->query("SELECT a.*, b.nama, b.maker, b.id_bentuk, b.total_weight, c.no_surat as no_do FROM stock_material a
 		JOIN ms_inventory_category3 b ON b.id_category3 = a.id_category3
 		JOIN tr_delivery_order c ON c.id_delivery_order = a.no_kirim
-		WHERE a.no_surat ='$spkmkt'")->result();
+		WHERE a.no_surat ='$spkmkt' ORDER BY c.no_surat ASC")->result();
 
 		$check_sheet = 0;
 
