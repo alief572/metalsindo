@@ -163,7 +163,7 @@ class Wt_invoicing_model extends BF_Model
       'XII' => 12
     ];
 
-    $bulan_kode = substr($kode, 10, 3);
+    $bulan_kode = substr($kode, 9, 3);
     $bulan_kode2 = str_replace('/', '', $bulan_kode);
     $bulan_kode3 = $romawiToString[$bulan_kode2];
 
