@@ -118,12 +118,10 @@ class Wt_invoicing_model extends BF_Model
   function BuatNomor($kode = '')
   {
 
-    // $bulan =date("m",strtotime($tanggal));
-    // $tahun =date("Y",strtotime($tanggal));
-
     $bulan = date('m');
     $th = date('Y');
     $tahun = date('y');
+
     if ($bulan == '01') {
       $romawi = 'I';
     } elseif ($bulan == '02') {
@@ -149,14 +147,34 @@ class Wt_invoicing_model extends BF_Model
     } elseif ($bulan == '12') {
       $romawi = 'XII';
     }
+
+    $romawiToString = [
+      'I' => 1,
+      'II' => 2,
+      'III' => 3,
+      'IV' => 4,
+      'V' => 5,
+      'VI' => 6,
+      'VII' => 7,
+      'VIII' => 8,
+      'IX' => 9,
+      'X' => 10,
+      'XI' => 11,
+      'XII' => 12
+    ];
+
+    $bulan_kode = substr($kode, 10, 3);
+    $bulan_kode2 = str_replace('/', '', $bulan_kode);
+    $bulan_kode3 = $romawiToString[$bulan_kode2];
+
     $blnthn = date('Y-m');
-    $query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_invoice WHERE no_surat LIKE '%/" . date('y', strtotime($th)) . "/" . $romawi . "/%'");
+    $query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_invoice WHERE no_surat LIKE '%/" . date('y', strtotime($th)) . "/" . $bulan_kode2 . "/%'");
     $row = $query->row_array();
     $thn = date('T');
     $max_id = $row['max_id'];
     $max_id1 = (int) $max_id;
     $counter = $max_id1 + 1;
-    $idcust = "INV-MP/" . $tahun . "/" . $romawi . "/" . sprintf("%04s", $counter);
+    $idcust = "INV-MP/" . $tahun . "/" . $bulan_kode2 . "/" . sprintf("%04s", $counter);
     return $idcust;
   }
 
@@ -319,7 +337,7 @@ class Wt_invoicing_model extends BF_Model
     // $where2 = "a.status<>'7'";
     // $this->db->where($where);
     // $this->db->where($where2);
-    $this->db->order_by('a.id', DESC);
+    $this->db->order_by('a.id', 'DESC');
     $query = $this->db->get();
     return $query->result();
   }
@@ -333,7 +351,7 @@ class Wt_invoicing_model extends BF_Model
     $where2 = "a.status_close ='0'";
     $this->db->where($where);
     $this->db->where($where2);
-    $this->db->order_by('a.no_invoice', DESC);
+    $this->db->order_by('a.no_invoice', 'DESC');
     $query = $this->db->get();
     return $query->result();
   }
@@ -346,7 +364,7 @@ class Wt_invoicing_model extends BF_Model
     $where2 = "a.status_close ='1'";
     $this->db->where($where);
     $this->db->where($where2);
-    $this->db->order_by('a.no_invoice', DESC);
+    $this->db->order_by('a.no_invoice', 'DESC');
     $query = $this->db->get();
     return $query->result();
   }
@@ -369,7 +387,7 @@ class Wt_invoicing_model extends BF_Model
     $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
     $where = "a.status_jurnal ='OPN'";
     $this->db->where($where);
-    $this->db->order_by('a.no_invoice', DESC);
+    $this->db->order_by('a.no_invoice', 'DESC');
     $query = $this->db->get();
     return $query->result();
   }
@@ -419,7 +437,7 @@ class Wt_invoicing_model extends BF_Model
     // $where2 = "a.status<>'7'";
     // $this->db->where($where);
     // $this->db->where($where2);
-    $this->db->order_by('a.no_invoice', DESC);
+    $this->db->order_by('a.no_invoice', 'DESC');
     $query = $this->db->get();
     return $query->result();
   }
