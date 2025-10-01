@@ -149,14 +149,33 @@ class Delivery_order_model extends BF_Model
 		} elseif ($bulan == '12') {
 			$romawi = 'XII';
 		}
+
+		$romawiToString = [
+			'I' => 1,
+			'II' => 2,
+			'III' => 3,
+			'IV' => 4,
+			'V' => 5,
+			'VI' => 6,
+			'VII' => 7,
+			'VIII' => 8,
+			'IX' => 9,
+			'X' => 10,
+			'XI' => 11,
+			'XII' => 12
+		];
+
+		$bulan_kode = substr($kode, 11, 2);
+		$bulan_kode2 = $romawiToString[$bulan_kode];
+
 		$blnthn = date('Y-m');
-		$query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_delivery_order WHERE no_surat LIKE '%/" . date('y', strtotime($thn)) . "/" . $romawi . "/%'");
+		$query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_delivery_order WHERE no_surat LIKE '%/" . date('y', strtotime($thn)) . "/" . $bulan_kode . "/%'");
 		$row = $query->row_array();
 		//$thn = date('T');
 		$max_id = $row['max_id'];
 		$max_id1 = (int) $max_id;
 		$counter = $max_id1 + 1;
-		$idcust = "DO-MP/" . $tahun . "/" . $romawi . "/" . sprintf("%04s", $counter);
+		$idcust = "DO-MP/" . $tahun . "/" . $bulan_kode . "/" . sprintf("%04s", $counter);
 
 		return $idcust;
 	}
@@ -166,7 +185,7 @@ class Delivery_order_model extends BF_Model
 		$this->db->from('dt_inquery_transaksi a');
 		$this->db->join('ms_inventory_category3 b', 'b.id_category3=a.id_category3');
 		$this->db->join('ms_inventory_category2 c', 'c.id_category2=b.id_category2');
-		$this->db->order_by('a.id_dt_inquery', DESC);
+		$this->db->order_by('a.id_dt_inquery', 'DESC');
 		$this->db->where('a.no_inquery', $id_crcl);
 		$query = $this->db->get();
 		return $query->result();
@@ -177,7 +196,7 @@ class Delivery_order_model extends BF_Model
 		$this->db->select('a.*, b.name_customer as name_customer');
 		$this->db->from('tr_delivery_order a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		$this->db->order_by('a.id_delivery_order', DESC);
+		$this->db->order_by('a.id_delivery_order', 'DESC');
 		$query = $this->db->get();
 		return $query->result();
 	}
@@ -186,7 +205,7 @@ class Delivery_order_model extends BF_Model
 		$this->db->select('a.*, b.name_customer as name_customer');
 		$this->db->from('tr_delivery_order a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		$this->db->order_by('a.id_delivery_order', DESC);
+		$this->db->order_by('a.id_delivery_order', 'DESC');
 		$this->db->where('a.status_approve', '1');
 		$this->db->where('a.status_invoice', 'OPN');
 		$query = $this->db->get();
