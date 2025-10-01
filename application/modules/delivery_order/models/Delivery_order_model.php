@@ -165,17 +165,18 @@ class Delivery_order_model extends BF_Model
 			'XII' => 12
 		];
 
-		$bulan_kode = substr($kode, 11, 2);
-		$bulan_kode2 = $romawiToString[$bulan_kode];
+		$bulan_kode = substr($kode, 11, 3);
+		$bulan_kode2 = str_replace('/', '', $bulan_kode);
+		$bulan_kode3 = $romawiToString[$bulan_kode2];
 
 		$blnthn = date('Y-m');
-		$query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_delivery_order WHERE no_surat LIKE '%/" . date('y', strtotime($thn)) . "/" . $bulan_kode . "/%'");
+		$query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_delivery_order WHERE no_surat LIKE '%/" . date('y', strtotime($thn)) . "/" . $bulan_kode2 . "/%'");
 		$row = $query->row_array();
 		//$thn = date('T');
 		$max_id = $row['max_id'];
 		$max_id1 = (int) $max_id;
 		$counter = $max_id1 + 1;
-		$idcust = "DO-MP/" . $tahun . "/" . $bulan_kode . "/" . sprintf("%04s", $counter);
+		$idcust = "DO-MP/" . $tahun . "/" . $bulan_kode2 . "/" . sprintf("%04s", $counter);
 
 		return $idcust;
 	}
