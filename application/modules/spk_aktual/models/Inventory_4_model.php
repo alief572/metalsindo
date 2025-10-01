@@ -446,7 +446,7 @@ class Inventory_4_model extends BF_Model
 		if (!empty($search['value'])) {
 			$this->db->group_start();
 			$this->db->like('a.id_spk_aktual', $search['value'], 'both');
-			$this->db->or_like('a.no_spk_produksi', $search['value'], 'both');
+			$this->db->or_like('a.no_surat_produksi', $search['value'], 'both');
 			$this->db->or_like('c.name_customer', $search['value'], 'both');
 			$this->db->or_like('a.nama_material', $search['value'], 'both');
 			$this->db->or_like('DATE_FORMAT(a.created_on, "%d-%m-%Y %H:%i:%s")', $search['value'], 'both');
@@ -465,7 +465,7 @@ class Inventory_4_model extends BF_Model
 		if (!empty($search['value'])) {
 			$this->db->group_start();
 			$this->db->like('a.id_spk_aktual', $search['value'], 'both');
-			$this->db->or_like('a.no_spk_produksi', $search['value'], 'both');
+			$this->db->or_like('a.no_surat_produksi', $search['value'], 'both');
 			$this->db->or_like('c.name_customer', $search['value'], 'both');
 			$this->db->or_like('a.nama_material', $search['value'], 'both');
 			$this->db->or_like('DATE_FORMAT(a.created_on, "%d-%m-%Y %H:%i:%s")', $search['value'], 'both');
