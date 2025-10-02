@@ -168,7 +168,7 @@ class Wt_invoicing_model extends BF_Model
     $bulan_kode3 = $romawiToString[$bulan_kode2];
 
     $blnthn = date('Y-m');
-    $query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_invoice WHERE no_surat LIKE '%/" . date('y', strtotime($th)) . "/" . $bulan_kode2 . "/%'");
+    $query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_invoice WHERE no_surat LIKE '%/" . date('y', strtotime($th)) . "%'");
     $row = $query->row_array();
     $thn = date('T');
     $max_id = $row['max_id'];
