@@ -1342,7 +1342,7 @@ class Delivery_order extends Admin_Controller
 
 
 		$code 		= $this->Delivery_order_model->generate_code();
-		$no_surat 	= $this->Delivery_order_model->BuatNomor();
+		$no_surat 	= $this->Delivery_order_model->BuatNomor($post['no_surat']);
 
 		$tipe = $post['tipe'];
 
