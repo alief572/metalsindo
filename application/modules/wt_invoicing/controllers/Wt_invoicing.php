@@ -448,7 +448,7 @@ class Wt_invoicing extends Admin_Controller
 
 		$id = $this->Wt_invoicing_model->generate_id();
 		$code = $this->Wt_invoicing_model->generate_code();
-		$no_surat = $this->Wt_invoicing_model->BuatNomor();
+		$no_surat = $this->Wt_invoicing_model->BuatNomor($post['no_do']);
 
 		$this->db->trans_begin();
 
