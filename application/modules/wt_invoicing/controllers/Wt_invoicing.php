@@ -60,8 +60,7 @@ class Wt_invoicing extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$data = $this->Inventory_4_model->CariSPK();
-		$this->template->set('results', $data);
+
 		$this->template->title('Invoicing');
 		$this->template->render('index_spk_marketing');
 	}
@@ -2591,5 +2590,10 @@ class Wt_invoicing extends Admin_Controller
 	public function get_monitoring_invoice()
 	{
 		$this->Wt_invoicing_model->get_monitoring_invoice();
+	}
+
+	public function get_data_spk_marketing()
+	{
+		$this->Wt_invoicing_model->get_data_spk_marketing();
 	}
 }
