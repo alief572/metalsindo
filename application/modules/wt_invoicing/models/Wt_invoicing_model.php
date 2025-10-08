@@ -555,4 +555,78 @@ class Wt_invoicing_model extends BF_Model
     $this->db->order_by('a.no_invoice', 'desc');
     $query = $this->db->get();
   }
+
+  public function get_data_spk_marketing()
+  {
+    $draw = $this->input->post('draw');
+    $length = $this->input->post('length');
+    $start = $this->input->post('start');
+    $search = $this->input->post('search');
+
+    $this->db->select('a.*, b.name_customer as name_customer, SUM(c.total_harga) as total');
+    $this->db->from('tr_spk_marketing a');
+    $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+    $this->db->join('dt_spkmarketing c', 'c.id_spkmarketing = a.id_spkmarketing');
+
+    if (!empty($search['value'])) {
+      $this->db->group_start();
+      $this->db->like('a.tgl_spk_marketing',  $search['value'], 'both');
+      $this->db->or_like('a.no_surat', $search['value'], 'both');
+      $this->db->or_like('b.nm_customer', $search['value'], 'both');
+      $this->db->group_end();
+    }
+
+    $this->db->group_by('a.no_surat');
+
+    $db_clone_filtered = clone $this->db;
+    $count_filtered = $db_clone_filtered->count_all_results();
+
+    $this->db->order_by('a.id_spkmarketing', 'DESC');
+    $this->db->limit($length, $start);
+
+    $get_data = $this->db->get()->result();
+
+    $no = (0 + $start);
+    $hasil = [];
+    foreach ($get_data as $row) {
+      $no++;
+
+      $sts = '';
+
+      if ($row->status_approve == '1') {
+        $sts = '<label class="label label-success">Approved</label>';
+      } else {
+        $sts = '<label class="label label-danger">Belum di Approve</label>';
+      }
+
+      if (has_permission($this->managePermission)) {
+        $action = '
+          <a class="btn btn-success btn-sm" href="' . base_url(' / wt_invoicing / createInvoice / ' . $row->id_spkmarketing) . '" title="Create Invoice" data-no_inquiry="' . $row->no_inquiry . '"><i class="fa fa-check">&nbsp;Create Invoice</i></a>
+        ';
+
+        $action .= '
+          <a class="btn btn-warning btn-sm" href="' . base_url(' / wt_invoicing / createProformaInvoice / ' . $row->id_spkmarketing) . '" title="Create Proforma Invoice" data-no_inquiry="' . $row->no_inquiry . '"><i class="fa fa-check">&nbsp;Create Proforma Invoice</i></a>
+        ';
+      }
+
+      $hasil[] = [
+        'no' => $no,
+        'tanggal_spk_terbit' => date('d F Y', strtotime($row->tgl_spk_marketing)),
+        'no_spk' => $row->no_surat,
+        'customer' => $row->name_customer,
+        'nilai_spk' => number_format($row->total, 2),
+        'status' => $sts,
+        'action' => $action
+      ];
+    }
+
+    $response = [
+      'draw' => intval($draw),
+      'recordsTotal' => $count_filtered,
+      'recordsFiltered' => $count_filtered,
+      'data' => $hasil
+    ];
+
+    echo json_encode($response);
+  }
 }
