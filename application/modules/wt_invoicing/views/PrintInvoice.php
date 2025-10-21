@@ -455,7 +455,18 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 				$this->db->where('a.id_material', $detail->id_category3);
 				$get_detail_spkmkt = $this->db->get()->row();
 
-				$qty_invoice = round(($detail->qty_invoice / round($get_inventory->total_weight)));
+				$qty_invoice = 0;
+
+				$this->db->select('a.qty_order');
+				$this->db->from('dt_delivery_order_child a');
+				$this->db->where('a.id_delivery_order', $header->id_do);
+				$this->db->where('a.id_material', $detail->id_category3);
+				$get_qty_invoice = $this->db->get()->result();
+				foreach ($get_qty_invoice as $item_invoice) {
+					$qty_invoice += round($item_invoice->qty_order / $get_inventory->total_weight);
+				}
+
+				// $qty_invoice = (($detail->qty_invoice));
 				// $qty_invoice = round(($get_detail_spkmkt->qty_produk));
 
 				$totqty += $qty_invoice;
@@ -471,7 +482,7 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 		?>
 			<tr>
 				<td align="left">&nbsp;<?= $no ?></td>
-				<td align="center"><?= number_format($qty_invoice, 2) ?></td>
+				<td align="center"><?= number_format($qty_invoice) ?></td>
 				<td align="center"><?= $satuan ?></td>
 				<td align="left" width="350">&nbsp;<?= $tipe . ' ' . $detail->nama_produk . ', ' . $detail->tobe_size . ', ' . $detail->part_number ?></td>
 				<td align="right"><?= number_format($harga_satuan, 2) ?></td>
