@@ -455,8 +455,8 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 				$this->db->where('a.id_material', $detail->id_category3);
 				$get_detail_spkmkt = $this->db->get()->row();
 
-				// $qty_invoice = round(($detail->qty_invoice / round($get_inventory->total_weight)));
-				$qty_invoice = round(($get_detail_spkmkt->qty_produk));
+				$qty_invoice = round(($detail->qty_invoice / round($get_inventory->total_weight)));
+				// $qty_invoice = round(($get_detail_spkmkt->qty_produk));
 
 				$totqty += $qty_invoice;
 				$totharga += ($detail->harga_satuan * $qty_invoice);
