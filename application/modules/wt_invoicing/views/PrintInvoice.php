@@ -432,14 +432,6 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 			$qty_invoice = $detail->qty_invoice;
 			if ($get_inventory['id_bentuk'] == 'B2000002') {
 
-				$this->db->select('a.price_sheet, a.qty_sheet');
-				$this->db->from('child_penawaran a');
-				$this->db->join('tr_spk_marketing b', 'b.no_penawaran = a.no_penawaran');
-				$this->db->join('tr_invoice c', 'c.no_so = b.id_spkmarketing');
-				$this->db->where('c.no_so', $detail->no_so);
-				$this->db->where('a.id_category3', $detail->id_category3);
-				$get_sheets_detail = $this->db->get()->row_array();
-
 				$get_inventory = $this->db->get_where('ms_inventory_category3', array('id_category3' => $detail->id_category3))->row();
 
 				$density = $get_inventory->density;
@@ -457,7 +449,14 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 					}
 				}
 
-				$qty_invoice = round(($detail->qty_invoice / ($density * $thickness * $width * $length / 1000000)));
+				$this->db->select('a.qty_produk');
+				$this->db->from('dt_spkmarketing a');
+				$this->db->where('a.id_spkmarketing', $detail->no_so);
+				$this->db->where('a.id_material', $detail->id_category3);
+				$get_detail_spkmkt = $this->db->get()->row();
+
+				// $qty_invoice = round(($detail->qty_invoice / round($get_inventory->total_weight)));
+				$qty_invoice = round(($get_detail_spkmkt->qty_produk));
 
 				$totqty += $qty_invoice;
 				$totharga += ($detail->harga_satuan * $qty_invoice);
