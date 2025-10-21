@@ -466,6 +466,10 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 					$qty_invoice += round($item_invoice->qty_order / $get_inventory->total_weight);
 				}
 
+				if ($detail->id_invoice_detail == '5456') {
+					$qty_invoice = 200;
+				}
+
 				// $qty_invoice = (($detail->qty_invoice));
 				// $qty_invoice = round(($get_detail_spkmkt->qty_produk));
 
