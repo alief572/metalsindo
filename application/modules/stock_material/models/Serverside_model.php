@@ -269,7 +269,7 @@ class Serverside_model extends BF_Model
 					" . $where_series . "
 					" . $where_komponen . "
                     " . $where_search . "
-					AND a.aktif='Y' AND a.id_gudang = '3' AND sisa_spk > 0 AND sisa_spk > delivery_book
+					AND a.aktif='Y' AND a.id_gudang = '3' AND sisa_spk > 0 AND sisa_spk > IF(delivery_book IS NULL, 0, delivery_book)
                 ";
 		// echo $sql; exit;
 
