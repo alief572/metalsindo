@@ -78,8 +78,8 @@ class Penawaran extends Admin_Controller
 		$data['detail']  = $this->Inventory_4_model->PrintDetail($id);
 
 		$tipe_sheet = 0;
-		foreach($data['detail'] as $item) :
-			if($item->id_bentuk == 'B2000002' && $tipe_sheet == 0) {
+		foreach ($data['detail'] as $item) :
+			if ($item->id_bentuk == 'B2000002' && $tipe_sheet == 0) {
 				$tipe_sheet = 1;
 			}
 		endforeach;
@@ -610,11 +610,11 @@ class Penawaran extends Admin_Controller
 		if ($berat > $nilaimax) {
 			$profitaa	= $this->db->query("SELECT * FROM ms_profit_material WHERE alloy = '$inven1' AND minimum < '$berat' AND maksimum  IS NULL   ")->result();
 			$nilai_profit = $profitaa[0]->profit;
-			$aaa = huhu;
+			$aaa = 'huhu';
 		} else {
 			$profitaa	= $this->db->query("SELECT * FROM ms_profit_material WHERE  alloy = '$inven1' AND minimum < '$berat' AND maksimum >= '$berat'  ")->result();
 			$nilai_profit = $profitaa[0]->profit;
-			$aaa = hihi;
+			$aaa = 'hihi';
 		}
 		echo "$nilai_profit %";
 	}
@@ -1163,14 +1163,14 @@ class Penawaran extends Admin_Controller
 			$this->db->trans_rollback();
 			$status	= array(
 				'pesan'		=> 'Gagal Save Item. Thanks ...',
-				'code' => $id_bentuk,
+				'code' => $post['id_bentuk'],
 				'status'	=> 0
 			);
 		} else {
 			$this->db->trans_commit();
 			$status	= array(
 				'pesan'		=> 'Success Save Item. invenThanks ...',
-				'code' => $id_bentuk,
+				'code' => $post['id_bentuk'],
 				'status'	=> 1
 			);
 		}
@@ -1249,14 +1249,14 @@ class Penawaran extends Admin_Controller
 			$this->db->trans_rollback();
 			$status	= array(
 				'pesan'		=> 'Gagal Save Item. Thanks ...',
-				'code' => $id_bentuk,
+				'code' => $post['id_bentuk'],
 				'status'	=> 0
 			);
 		} else {
 			$this->db->trans_commit();
 			$status	= array(
 				'pesan'		=> 'Success Save Item. invenThanks ...',
-				'code' => $id_bentuk,
+				'code' => $post['id_bentuk'],
 				'status'	=> 1
 			);
 		}
@@ -1299,19 +1299,19 @@ class Penawaran extends Admin_Controller
 		foreach ($_POST['hd1'] as $h1) {
 			$numb1++;
 			$header1 =  array(
-				'id_type'		        => $h1[inventory_1],
-				'id_category1'		    => $h1[inventory_2],
-				'id_category2'		    => $h1[inventory_3],
-				'nama'		        	=> $h1[nm_inventory],
-				'maker'		        	=> $h1[maker],
-				'density'		        => $h1[density],
-				'hardness'		        => $h1[hardness],
-				'id_bentuk'		        => $h1[id_bentuk],
-				'id_surface'		    => $h1[id_surface],
-				'mountly_forecast'		=> $h1[mountly_forecast],
-				'safety_stock'		    => $h1[safety_stock],
-				'order_point'		    => $h1[order_point],
-				'maksimum'		    	=> $h1[maksimum],
+				'id_type'		        => $h1['inventory_1'],
+				'id_category1'		    => $h1['inventory_2'],
+				'id_category2'		    => $h1['inventory_3'],
+				'nama'		        	=> $h1['nm_inventory'],
+				'maker'		        	=> $h1['maker'],
+				'density'		        => $h1['density'],
+				'hardness'		        => $h1['hardness'],
+				'id_bentuk'		        => $h1['id_bentuk'],
+				'id_surface'		    => $h1['id_surface'],
+				'mountly_forecast'		=> $h1['mountly_forecast'],
+				'safety_stock'		    => $h1['safety_stock'],
+				'order_point'		    => $h1['order_point'],
+				'maksimum'		    	=> $h1['maksimum'],
 				'aktif'					=> 'aktif',
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
@@ -1329,9 +1329,9 @@ class Penawaran extends Admin_Controller
 				$numb2++;
 				$data1 =  array(
 					'id_category3' => $id,
-					'id_suplier' => $d1[id_supplier],
-					'lead' => $d1[lead],
-					'minimum' => $d1[minimum],
+					'id_suplier' => $d1['id_supplier'],
+					'lead' => $d1['lead'],
+					'minimum' => $d1['minimum'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1349,8 +1349,8 @@ class Penawaran extends Admin_Controller
 				$numb3++;
 				$comp =  array(
 					'id_category3' => $id,
-					'id_compotition' => $c1[id_compotition],
-					'nilai_compotition' => $c1[jumlah_kandungan],
+					'id_compotition' => $c1['id_compotition'],
+					'nilai_compotition' => $c1['jumlah_kandungan'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1368,8 +1368,8 @@ class Penawaran extends Admin_Controller
 				$numb4++;
 				$dms =  array(
 					'id_category3' => $id,
-					'id_dimensi' => $dm[id_dimensi],
-					'nilai_dimensi' => $dm[nilai_dimensi],
+					'id_dimensi' => $dm['id_dimensi'],
+					'nilai_dimensi' => $dm['nilai_dimensi'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1474,7 +1474,7 @@ class Penawaran extends Admin_Controller
 		foreach ($dim as $key => $ensi): $numb++;
 			echo "<tr>
 					  <td hidden align='left'>
-					  <input type='text' name='dimens[$numb][id_dimensi]' readonly class='form-control'  value='$cmp->id_dimensi'>
+					  <input type='text' name='dimens[$numb][id_dimensi]' readonly class='form-control'  value='" . $ensi['id_dimensi'] . "'>
 					  </td>
 					  <td align='left'>
 					  $ensi->nm_dimensi
@@ -1499,26 +1499,26 @@ class Penawaran extends Admin_Controller
 			$numb1++;
 
 			$header1 =  array(
-				'id_type'		        => $h1[inventory_1],
-				'id_category1'		    => $h1[inventory_2],
-				'id_category2'		    => $h1[inventory_3],
-				'nama'		        	=> $h1[nm_inventory],
-				'maker'		        	=> $h1[maker],
-				'density'		        => $h1[density],
-				'hardness'		        => $h1[hardness],
-				'id_bentuk'		        => $h1[id_bentuk],
-				'id_surface'		    => $h1[id_surface],
-				'mountly_forecast'		=> $h1[mountly_forecast],
-				'safety_stock'		    => $h1[safety_stock],
-				'order_point'		    => $h1[order_point],
-				'maksimum'		    	=> $h1[maksimum],
+				'id_type'		        => $h1['inventory_1'],
+				'id_category1'		    => $h1['inventory_2'],
+				'id_category2'		    => $h1['inventory_3'],
+				'nama'		        	=> $h1['nm_inventory'],
+				'maker'		        	=> $h1['maker'],
+				'density'		        => $h1['density'],
+				'hardness'		        => $h1['hardness'],
+				'id_bentuk'		        => $h1['id_bentuk'],
+				'id_surface'		    => $h1['id_surface'],
+				'mountly_forecast'		=> $h1['mountly_forecast'],
+				'safety_stock'		    => $h1['safety_stock'],
+				'order_point'		    => $h1['order_point'],
+				'maksimum'		    	=> $h1['maksimum'],
 				'aktif'					=> 'aktif',
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
 				'deleted'			=> '0'
 			);
 			//Add Data
-			$this->db->where('id_category3', $id)->update("ms_inventory_category3", $data);
+			$this->db->where('id_category3', $id)->update("ms_inventory_category3", $header1);
 		}
 		$this->db->delete('child_inven_suplier', array('id_category3' => $id));
 		if (empty($_POST['data1'])) {
@@ -1528,9 +1528,9 @@ class Penawaran extends Admin_Controller
 				$numb2++;
 				$data1 =  array(
 					'id_category3' => $code,
-					'id_suplier' => $d1[id_supplier],
-					'lead' => $d1[lead],
-					'minimum' => $d1[minimum],
+					'id_suplier' => $d1['id_supplier'],
+					'lead' => $d1['lead'],
+					'minimum' => $d1['minimum'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1546,8 +1546,8 @@ class Penawaran extends Admin_Controller
 				$numb3++;
 				$comp =  array(
 					'id_category3' => $code,
-					'id_compotition' => $c1[id_compotition],
-					'nilai_compotition' => $c1[jumlah_kandungan],
+					'id_compotition' => $c1['id_compotition'],
+					'nilai_compotition' => $c1['jumlah_kandungan'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1563,8 +1563,8 @@ class Penawaran extends Admin_Controller
 				$numb4++;
 				$dms =  array(
 					'id_category3' => $code,
-					'id_dimensi' => $dm[id_dimensi],
-					'nilai_dimensi' => $dm[nilai_dimensi],
+					'id_dimensi' => $dm['id_dimensi'],
+					'nilai_dimensi' => $dm['nilai_dimensi'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1602,26 +1602,26 @@ class Penawaran extends Admin_Controller
 			$numb1++;
 
 			$header1 =  array(
-				'id_type'		        => $h1[inventory_1],
-				'id_category1'		    => $h1[inventory_2],
-				'id_category2'		    => $h1[inventory_3],
-				'nama'		        	=> $h1[nm_inventory],
-				'maker'		        	=> $h1[maker],
-				'density'		        => $h1[density],
-				'hardness'		        => $h1[hardness],
-				'id_bentuk'		        => $h1[id_bentuk],
-				'id_surface'		    => $h1[id_surface],
-				'mountly_forecast'		=> $h1[mountly_forecast],
-				'safety_stock'		    => $h1[safety_stock],
-				'order_point'		    => $h1[order_point],
-				'maksimum'		    	=> $h1[maksimum],
+				'id_type'		        => $h1['inventory_1'],
+				'id_category1'		    => $h1['inventory_2'],
+				'id_category2'		    => $h1['inventory_3'],
+				'nama'		        	=> $h1['nm_inventory'],
+				'maker'		        	=> $h1['maker'],
+				'density'		        => $h1['density'],
+				'hardness'		        => $h1['hardness'],
+				'id_bentuk'		        => $h1['id_bentuk'],
+				'id_surface'		    => $h1['id_surface'],
+				'mountly_forecast'		=> $h1['mountly_forecast'],
+				'safety_stock'		    => $h1['safety_stock'],
+				'order_point'		    => $h1['order_point'],
+				'maksimum'		    	=> $h1['maksimum'],
 				'aktif'					=> 'aktif',
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
 				'deleted'			=> '0'
 			);
 			//Add Data
-			$this->db->where('id_category3', $id)->update("ms_inventory_category3", $data);
+			$this->db->where('id_category3', $id)->update("ms_inventory_category3", $header1);
 		}
 		if (empty($_POST['data1'])) {
 		} else {
@@ -1630,9 +1630,9 @@ class Penawaran extends Admin_Controller
 				$numb2++;
 				$data1 =  array(
 					'id_category3' => $id,
-					'id_suplier' => $d1[id_supplier],
-					'lead' => $d1[lead],
-					'minimum' => $d1[minimum],
+					'id_suplier' => $d1['id_supplier'],
+					'lead' => $d1['lead'],
+					'minimum' => $d1['minimum'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1648,8 +1648,8 @@ class Penawaran extends Admin_Controller
 				$numb3++;
 				$comp =  array(
 					'id_category3' => $id,
-					'id_compotition' => $c1[id_compotition],
-					'nilai_compotition' => $c1[jumlah_kandungan],
+					'id_compotition' => $c1['id_compotition'],
+					'nilai_compotition' => $c1['jumlah_kandungan'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1665,8 +1665,8 @@ class Penawaran extends Admin_Controller
 				$numb4++;
 				$dms =  array(
 					'id_category3' => $id,
-					'id_dimensi' => $dm[id_dimensi],
-					'nilai_dimensi' => $dm[nilai_dimensi],
+					'id_dimensi' => $dm['id_dimensi'],
+					'nilai_dimensi' => $dm['nilai_dimensi'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1990,7 +1990,8 @@ class Penawaran extends Admin_Controller
 		print_r($no_surat);
 	}
 
-	public function get_data_penawaran() {
+	public function get_data_penawaran()
+	{
 		$this->Inventory_4_model->get_data_penawaran();
 	}
 }
