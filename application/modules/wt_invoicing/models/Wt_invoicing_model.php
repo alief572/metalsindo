@@ -525,7 +525,7 @@ class Wt_invoicing_model extends BF_Model
           $this->db->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order');
           $this->db->where('c.no_surat', $item['no_do']);
           $this->db->where('b.id_material', $item_sheet->id_category3);
-          $this->db->group_by('a.lotno');
+          $this->db->group_by('a.id');
           $get_qty_sheet = $this->db->get()->result();
 
           $qty_sheet = 0;
