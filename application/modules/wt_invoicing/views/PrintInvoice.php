@@ -462,6 +462,7 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 				$this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
 				$this->db->where('b.id_delivery_order', $header->id_do);
 				$this->db->where('b.id_material', $detail->id_category3);
+				$this->db->group_by('a.lotno');
 				$get_qty_invoice = $this->db->get()->result();
 				foreach ($get_qty_invoice as $item_invoice) {
 					$qty_invoice += $item_invoice->qty_sheet;
