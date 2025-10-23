@@ -517,10 +517,22 @@ class Wt_invoicing_model extends BF_Model
 
       if ($tipe_sheet == '1') {
         $nilai_invoice = 0;
-        foreach ($get_detail_sheet as $item_sheet) {
-          $get_detail_spkmkt = $this->db->get_where('dt_spkmarketing', ['id_spkmarketing' => $item_sheet->no_so, 'id_material' => $item_sheet->id_category3])->row();
 
-          $nilai_invoice += ($get_detail_spkmkt->qty_produk * $item_sheet->harga_satuan);
+        foreach ($get_detail_sheet as $item_sheet) {
+          $this->db->select('a.qty_sheet');
+          $this->db->from('stock_material a');
+          $this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
+          $this->db->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order');
+          $this->db->where('c.no_surat', $item['no_do']);
+          $this->db->where('b.id_material', $item_sheet->id_category3);
+          $get_qty_sheet = $this->db->get()->result();
+
+          $qty_sheet = 0;
+          foreach ($get_qty_sheet as $item_qty_sheet) {
+            $qty_sheet += $item_qty_sheet->qty_sheet;
+          }
+
+          $nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet);
         }
       } else {
         $nilai_invoice = $item['nilai_invoice'];
