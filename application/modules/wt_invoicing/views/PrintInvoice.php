@@ -457,18 +457,20 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 
 				$qty_invoice = 0;
 
-				$this->db->select('a.qty_order');
-				$this->db->from('dt_delivery_order_child a');
-				$this->db->where('a.id_delivery_order', $header->id_do);
-				$this->db->where('a.id_material', $detail->id_category3);
+				$this->db->select('a.qty_sheet');
+				$this->db->from('stock_material a');
+				$this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
+				$this->db->where('b.id_delivery_order', $header->id_do);
+				$this->db->where('b.id_material', $detail->id_category3);
 				$get_qty_invoice = $this->db->get()->result();
 				foreach ($get_qty_invoice as $item_invoice) {
-					$qty_invoice += round($item_invoice->qty_order / $get_inventory->total_weight);
+					$qty_invoice += $item_invoice->qty_sheet;
 				}
 
-				if ($detail->id_invoice_detail == '5456') {
-					$qty_invoice = 200;
-				}
+
+				// if ($detail->id_invoice_detail == '5456') {
+				// 	$qty_invoice = 200;
+				// }
 
 				// $qty_invoice = (($detail->qty_invoice));
 				// $qty_invoice = round(($get_detail_spkmkt->qty_produk));
