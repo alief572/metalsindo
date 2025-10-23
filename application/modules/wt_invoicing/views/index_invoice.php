@@ -27,14 +27,12 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 					<th>Nomor Do</th>
 					<th>Nilai<br>Invoice</th>
 					<th>Tanggal<br>Invoice</th>
-					<?php if ($ENABLE_MANAGE) : ?>
-						<th>Action</th>
-					<?php endif; ?>
+					<th>Action</th>
 				</tr>
 			</thead>
 
 			<tbody>
-				
+
 			</tbody>
 		</table>
 	</div>
@@ -149,8 +147,6 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 			}
 		})
 	});
-
-
 
 	// CLOSE PENAWARAN
 	$(document).on('click', '.close_penawaran', function(e) {

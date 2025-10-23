@@ -452,6 +452,10 @@ class Wt_invoicing_model extends BF_Model
     $this->db->select('a.*, b.name_customer as name_customer');
     $this->db->from('tr_invoice a');
     $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+
+    $db_clone1 = clone $this->db;
+    $count_all = $db_clone1->count_all_results();
+
     if (!empty($search['value'])) {
       $this->db->group_start();
       $this->db->like('a.no_surat', $search['value'], 'both');
@@ -462,27 +466,14 @@ class Wt_invoicing_model extends BF_Model
       $this->db->or_like('a.tgl_invoice', $search['value'], 'both');
       $this->db->group_end();
     }
+
+    $db_clone2 = clone $this->db;
+    $count_filtered = $db_clone2->count_all_results();
+
     $this->db->order_by('a.id', 'desc');
     $this->db->limit($length, $start);
 
     $get_data = $this->db->get();
-
-    $this->db->select('a.*, b.name_customer as name_customer');
-    $this->db->from('tr_invoice a');
-    $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-    if (!empty($search['value'])) {
-      $this->db->group_start();
-      $this->db->like('a.no_surat', $search['value'], 'both');
-      $this->db->or_like('b.name_customer', $search['value'], 'both');
-      $this->db->or_like('a.note', $search['value'], 'both');
-      $this->db->or_like('a.no_do', $search['value'], 'both');
-      $this->db->or_like('a.nilai_invoice', $search['value'], 'both');
-      $this->db->or_like('a.tgl_invoice', $search['value'], 'both');
-      $this->db->group_end();
-    }
-    $this->db->order_by('a.id', 'desc');
-
-    $get_data_all = $this->db->get();
 
     $hasil = [];
 
@@ -513,13 +504,36 @@ class Wt_invoicing_model extends BF_Model
         $action .= ' <a class="btn btn-warning btn-sm" href="' . base_url('/wt_invoicing/PrintPackinglistSlitting/' . $item['no_invoice']) . '" target="_blank" title="Packinglist Slitting" data-no_inquiry="' . $item['no_inquiry'] . '"><i class="fa fa-print"></i></a> ';
       endif;
 
+
+
+      $this->db->select('a.*');
+      $this->db->from('tr_invoice_detail a');
+      $this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3');
+      $this->db->where('a.no_invoice', $item['no_invoice']);
+      $this->db->where('b.id_bentuk', 'B2000002');
+      $get_detail_sheet = $this->db->get()->result();
+
+      $tipe_sheet = (count($get_detail_sheet) > 0) ? '1' : '0';
+
+      if ($tipe_sheet == '1') {
+        $nilai_invoice = 0;
+        foreach ($get_detail_sheet as $item_sheet) {
+          $get_detail_spkmkt = $this->db->get_where('dt_spkmarketing', ['id_spkmarketing' => $item_sheet->no_so, 'id_material' => $item_sheet->id_category3])->row();
+
+          $nilai_invoice += ($get_detail_spkmkt->qty_produk * $item_sheet->harga_satuan);
+        }
+      } else {
+        $nilai_invoice = $item['nilai_invoice'];
+      }
+
+
       $hasil[] = [
         'no' => $no,
         'no_invoice' => $item['no_surat'],
         'nama_customer' => strtoupper($item['name_customer']),
         'term' => $item['note'],
         'nomor_do' => $item['no_do'],
-        'nilai_invoice' => number_format($item['nilai_invoice']),
+        'nilai_invoice' => number_format($nilai_invoice),
         'tanggal_invoice' => date('d-F-Y', strtotime($item['tgl_invoice'])),
         'action' => $action
       ];
@@ -527,8 +541,8 @@ class Wt_invoicing_model extends BF_Model
 
     echo json_encode([
       'draw' => intval($draw),
-      'recordsTotal' => $get_data_all->num_rows(),
-      'recordsFiltered' => $get_data_all->num_rows(),
+      'recordsTotal' => $count_all,
+      'recordsFiltered' => $count_filtered,
       'data' => $hasil
     ]);
   }
