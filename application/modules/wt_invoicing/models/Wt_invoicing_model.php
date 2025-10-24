@@ -534,7 +534,7 @@ class Wt_invoicing_model extends BF_Model
             $qty_sheet += $item_qty_sheet->qty_sheet;
           }
 
-          $nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet);
+          $nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet) + (($item_sheet->harga_satuan * $qty_sheet) * 11 / 100);
         }
       } else {
         $nilai_invoice = $item['nilai_invoice'];
