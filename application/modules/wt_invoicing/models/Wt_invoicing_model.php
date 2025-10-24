@@ -537,7 +537,18 @@ class Wt_invoicing_model extends BF_Model
           $nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet) + (($item_sheet->harga_satuan * $qty_sheet) * 11 / 100);
         }
       } else {
-        $nilai_invoice = $item['nilai_invoice'];
+        $this->db->select('SUM(ROUND(a.qty_invoice) * a.harga_satuan) as ttl_harga');
+        $this->db->from('tr_invoice_detail a');
+        $this->db->where('a.no_invoice', $item['no_invoice']);
+        $get_total_invoice = $this->db->get()->row();
+
+        $ttl_harga = $get_total_invoice->ttl_harga;
+
+        $dpp_nilai_lain = ceil(11 / 12 * $ttl_harga);
+        $ppn = ($dpp_nilai_lain * 12 / 100);
+        $grand_total = ($ttl_harga + $ppn);
+
+        $nilai_invoice = $grand_total;
       }
 
 
