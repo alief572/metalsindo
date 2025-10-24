@@ -429,7 +429,7 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 			endif;
 
 			$harga_satuan = $detail->harga_satuan;
-			$qty_invoice = ($detail->qty_invoice);
+			$qty_invoice = round($detail->qty_invoice);
 			if ($get_inventory['id_bentuk'] == 'B2000002') {
 
 				$get_inventory = $this->db->get_where('ms_inventory_category3', array('id_category3' => $detail->id_category3))->row();
@@ -484,13 +484,13 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 				// $qty_invoice = $get_sheets_detail['qty_sheet'];
 			} else {
 				$totqty += $qty_invoice;
-				$totharga += $detail->total_harga;
+				$totharga += ($harga_satuan * $qty_invoice);
 			}
 
 		?>
 			<tr>
 				<td align="left">&nbsp;<?= $no ?></td>
-				<td align="center"><?= number_format($qty_invoice, 2) ?></td>
+				<td align="center"><?= number_format($qty_invoice) ?></td>
 				<td align="center"><?= $satuan ?></td>
 				<td align="left" width="350">&nbsp;<?= $tipe . ' ' . $detail->nama_produk . ', ' . $detail->tobe_size . ', ' . $detail->part_number ?></td>
 				<td align="right"><?= number_format($harga_satuan, 2) ?></td>
