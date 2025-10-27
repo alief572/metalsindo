@@ -490,7 +490,7 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 		?>
 			<tr>
 				<td align="left">&nbsp;<?= $no ?></td>
-				<td align="center"><?= number_format($qty_invoice) ?></td>
+				<td align="center"><?= number_format($qty_invoice, 2) ?></td>
 				<td align="center"><?= $satuan ?></td>
 				<td align="left" width="350">&nbsp;<?= $tipe . ' ' . $detail->nama_produk . ', ' . $detail->tobe_size . ', ' . $detail->part_number ?></td>
 				<td align="right"><?= number_format($harga_satuan, 2) ?></td>
