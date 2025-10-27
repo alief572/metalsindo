@@ -483,7 +483,8 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 				$harga_satuan = $detail->harga_satuan;
 				// $qty_invoice = $get_sheets_detail['qty_sheet'];
 			} else {
-				$totqty += $qty_invoice;
+				$qty_invoice = $detail->qty_invoice;
+				$totqty += $detail->qty_invoice;
 				$totharga += ($harga_satuan * $qty_invoice);
 			}
 
