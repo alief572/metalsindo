@@ -298,7 +298,7 @@
 				?>
 					<tr>
 						<td width='40' align="center"><?= $detail->bentuk_material ?></td>
-						<td width='100'><?= $detail->lotno ?></td>
+						<td width='80'><?= $detail->lotno ?></td>
 						<td width='40'><?= $detail->nama2 ?></td>
 						<td width='50' align='center'><?= $detail->spek ?></td>
 						<td width='22' align='center'><?= ucfirst(strtolower($detail->nm_surface)) ?></td>
