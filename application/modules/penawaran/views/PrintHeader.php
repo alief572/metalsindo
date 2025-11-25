@@ -390,12 +390,12 @@
 						<?php
 						if ($tipe_sheet == '1') {
 						?>
-							<td width='25' align='right'>Rp <?= number_format($detail->price_sheet) ?></td>
+							<td width='30' align='right'>Rp <?= number_format($detail->price_sheet) ?></td>
 						<?php
 						} else {
 						?>
 
-							<td width='25' align='right'>Rp <?= number_format($detail->harga_penawaran_cust) ?></td>
+							<td width='30' align='right'>Rp <?= number_format($detail->harga_penawaran_cust) ?></td>
 
 						<?php
 						}
