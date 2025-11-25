@@ -297,37 +297,37 @@
 					$roll = $jumlahroll[0]->no_penawaran;
 				?>
 					<tr>
-						<td align="center"><?= $detail->bentuk_material ?></td>
-						<td '><?= $detail->lotno ?></td>
-						<td ><?= $detail->nama2 ?></td>
-						<td  align=' center'><?= $detail->spek ?></td>
-						<td align='center'><?= ucfirst(strtolower($detail->nm_surface)) ?></td>
-						<td align='center'><?= $detail->hardness ?></td>
-						<td align='center'><?= number_format($detail->thickness, 2); ?></td>
-						<td align='center'><?= $detail->width; ?></td>
-						<td align='center'><?php if ($detail->length <= 0) {
-												echo "C";
-											} else {
-												echo number_format($detail->length, 2);
-											}; ?></td>
+						<td width='40' align="center"><?= $detail->bentuk_material ?></td>
+						<td width='100'><?= $detail->lotno ?></td>
+						<td width='40'><?= $detail->nama2 ?></td>
+						<td width='50' align='center'><?= $detail->spek ?></td>
+						<td width='22' align='center'><?= ucfirst(strtolower($detail->nm_surface)) ?></td>
+						<td width='22' align='center'><?= $detail->hardness ?></td>
+						<td width='22' align='center'><?= number_format($detail->thickness, 2); ?></td>
+						<td width='22' align='center'><?= $detail->width; ?></td>
+						<td width='22' align='center'><?php if ($detail->length <= 0) {
+															echo "C";
+														} else {
+															echo number_format($detail->length, 2);
+														}; ?></td>
 
-						<td align='right'>$ <?= number_format($detail->harga_dolar, 2) ?></td>
+						<td width='22' align='right'>$ <?= number_format($detail->harga_dolar, 2) ?></td>
 						<?php
 						if ($tipe_sheet == '1') {
 						?>
-							<td align='right'>Rp <?= number_format($detail->price_sheet) ?></td>
+							<td width='22' align='right'>Rp <?= number_format($detail->price_sheet) ?></td>
 						<?php
 						} else {
 						?>
 
-							<td align='right'>Rp <?= number_format($detail->harga_penawaran_cust) ?></td>
+							<td width='22' align='right'>Rp <?= number_format($detail->harga_penawaran_cust) ?></td>
 
 						<?php
 						}
 						?>
 
 
-						<td align='left'><?= $detail->keterangan ?></td>
+						<td width='50' align='left'><?= $detail->keterangan ?></td>
 					</tr>
 				<?php
 				}
