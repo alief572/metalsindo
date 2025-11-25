@@ -327,7 +327,7 @@
 						?>
 
 
-						<td width='70' align='left'><?= $detail->keterangan ?></td>
+						<td width='50' align='left'><?= $detail->keterangan ?></td>
 					</tr>
 				<?php
 				}
