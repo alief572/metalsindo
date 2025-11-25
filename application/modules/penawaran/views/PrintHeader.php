@@ -263,11 +263,11 @@
 		$kurs	= $this->db->query("SELECT * FROM mata_uang WHERE kode = 'IDR' ")->result();
 		$nominal = $kurs[0]->kurs;
 	?>
-		<table class='gridtable' cellpadding='0' cellspacing='0' width='100%' style='width:100% !important; vertical-align:top;'>
+		<table class='gridtable' cellpadding='0' cellspacing='0' width='90%' style='width:90% !important; vertical-align:top;'>
 			<tbody>
 				<tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
 					<td align="center" rowspan='2'>UNIT</td>
-					<td align="center" rowspan='2' width="10">PART</td>
+					<td align="center" rowspan='2'>PART</td>
 					<td align="center" rowspan='2'>ITEM</td>
 					<td align="center" colspan='6'>DESCRIPTION OF MERCHANDISE</td>
 					<?php
