@@ -269,25 +269,25 @@
 					<td align="center" rowspan='2'>UNIT</td>
 					<td align="center" rowspan='2' width="10">PART</td>
 					<td align="center" rowspan='2'>ITEM</td>
-					<td width='90' align="center" colspan='6'>DESCRIPTION OF MERCHANDISE</td>
+					<td align="center" colspan='6'>DESCRIPTION OF MERCHANDISE</td>
 					<?php
 					if ($tipe_sheet == '1') {
-						echo '<td width="50 align="center" colspan="2">PRICE/SHEET</td>';
+						echo '<td  align="center" colspan="2">PRICE/SHEET</td>';
 					} else {
-						echo '<td width="50 align="center" colspan="2">PRICE/KG</td>';
+						echo '<td  align="center" colspan="2">PRICE/KG</td>';
 					}
 					?>
-					<td width='70' align="center" rowspan='2'>REMARKS</td>
+					<td align="center" rowspan='2'>REMARKS</td>
 				</tr>
 				<tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
-					<td width='50' align="center">Alloy</td>
-					<td width='22' align="center">Surface</td>
-					<td width='22' align="center">Hard</td>
-					<td width='22' align="center">Thick</td>
-					<td width='22' align="center">Width</td>
-					<td width='22' align="center">Length</td>
-					<td width='22' align="center">USD</td>
-					<td width='22' align="center">IDR</td>
+					<td align="center">Alloy</td>
+					<td align="center">Surface</td>
+					<td align="center">Hard</td>
+					<td align="center">Thick</td>
+					<td align="center">Width</td>
+					<td align="center">Length</td>
+					<td align="center">USD</td>
+					<td align="center">IDR</td>
 				</tr>
 				<?php
 				$a = 0;
