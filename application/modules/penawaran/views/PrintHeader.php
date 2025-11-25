@@ -267,7 +267,7 @@
 			<tbody>
 				<tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
 					<td align="center" rowspan='2'>UNIT</td>
-					<td align="center" rowspan='2' width='100'>PART</td>
+					<td align="center" rowspan='2'>PART</td>
 					<td align="center" rowspan='2'>ITEM</td>
 					<td width='90' align="center" colspan='6'>DESCRIPTION OF MERCHANDISE</td>
 					<?php
