@@ -333,7 +333,7 @@
 				}
 				?>
 				<tr>
-					<td height='40' colspan='11'>Note : <br><br> <?= nl2br($header->note) ?></td>
+					<td height='40' colspan='12'>Note : <br><br> <?= nl2br($header->note) ?></td>
 				</tr>
 			</tbody>
 		</table>
