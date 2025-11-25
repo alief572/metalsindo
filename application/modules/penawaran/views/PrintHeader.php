@@ -373,7 +373,7 @@
 				?>
 					<tr>
 						<td width='40' align="center"><?= $detail->bentuk_material ?></td>
-						<td width='100'><?= $detail->lotno ?></td>
+						<td width='80'><?= $detail->lotno ?></td>
 						<td width='50'><?= $detail->nama2 ?></td>
 
 						<td width='45' align='center'><?= $detail->spek ?></td>
@@ -390,12 +390,12 @@
 						<?php
 						if ($tipe_sheet == '1') {
 						?>
-							<td width='22' align='right'>Rp <?= number_format($detail->price_sheet) ?></td>
+							<td width='25' align='right'>Rp <?= number_format($detail->price_sheet) ?></td>
 						<?php
 						} else {
 						?>
 
-							<td width='22' align='right'>Rp <?= number_format($detail->harga_penawaran_cust) ?></td>
+							<td width='25' align='right'>Rp <?= number_format($detail->harga_penawaran_cust) ?></td>
 
 						<?php
 						}
