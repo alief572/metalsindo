@@ -401,13 +401,13 @@
 						}
 						?>
 
-						<td width='50' align='left'><?= $detail->keterangan ?></td>
+						<td width='60' align='left'><?= $detail->keterangan ?></td>
 					</tr>
 				<?php
 				}
 				?>
 				<tr>
-					<td height='40' colspan='11'>Note : <br><br> <?= nl2br($header->note) ?></td>
+					<td height='50' colspan='11'>Note : <br><br> <?= nl2br($header->note) ?></td>
 				</tr>
 			</tbody>
 		</table>
