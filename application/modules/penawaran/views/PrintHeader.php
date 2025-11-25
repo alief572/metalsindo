@@ -267,7 +267,7 @@
 			<tbody>
 				<tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
 					<td align="center" rowspan='2'>UNIT</td>
-					<td align="center" rowspan='2'>PART</td>
+					<td align="center" rowspan='2' width="10">PART</td>
 					<td align="center" rowspan='2'>ITEM</td>
 					<td width='90' align="center" colspan='6'>DESCRIPTION OF MERCHANDISE</td>
 					<?php
@@ -449,7 +449,7 @@
 			<td align="center" valign="middle"></td>
 			<td align="center" valign="middle"></td>
 			<td align="center" valign="middle"></td>
-			<td align="center" valign="middle"><img src='<?= $sroot; ?>/assets/images/ttd_metalsindo.jpg' alt="" height='100' width='220'></td>
+			<td align="center" valign="middle"><img src='assets/images/ttd_metalsindo.jpg' alt="" height='100' width='220'></td>
 		</tr>
 		<tr>
 			<td align="center" valign="middle"></td>
