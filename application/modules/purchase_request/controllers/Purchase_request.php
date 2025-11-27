@@ -707,7 +707,7 @@ class Purchase_request extends Admin_Controller
 			$idameter = ($get_material->id_bentuk !== 'B2000002') ? $used['idameter'] : 0;
 			$odameter = ($get_material->id_bentuk !== 'B2000002') ? str_replace(',', '', $used['odameter']) : 0;
 			$qty_sheet = ($get_material->id_bentuk == 'B2000002') ? str_replace(',', '', $used['qtysheet']) : 0;
-			$weight_sheet = ($get_material->id_bentuk == 'B2000002') ? str_replace(',', '', $used['weightsheet']) : 0;
+			$weight_sheet = ($get_material->id_bentuk == 'B2000002') ? $get_material->total_weight : 0;
 
 			$dt =  array(
 				'no_pr'					=> $code,
