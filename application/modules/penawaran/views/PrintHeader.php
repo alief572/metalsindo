@@ -263,31 +263,31 @@
 		$kurs	= $this->db->query("SELECT * FROM mata_uang WHERE kode = 'IDR' ")->result();
 		$nominal = $kurs[0]->kurs;
 	?>
-		<table class='gridtable' cellpadding='0' cellspacing='0' width='100%' style='width:100% !important; vertical-align:top;'>
+		<table class='gridtable' cellpadding='0' cellspacing='0' width='90%' style='width:90% !important; vertical-align:top;'>
 			<tbody>
 				<tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
 					<td align="center" rowspan='2'>UNIT</td>
-					<td align="center" rowspan='2' width='100'>PART</td>
+					<td align="center" rowspan='2'>PART</td>
 					<td align="center" rowspan='2'>ITEM</td>
-					<td width='90' align="center" colspan='6'>DESCRIPTION OF MERCHANDISE</td>
+					<td align="center" colspan='6'>DESCRIPTION OF MERCHANDISE</td>
 					<?php
 					if ($tipe_sheet == '1') {
-						echo '<td width="50 align="center" colspan="2">PRICE/SHEET</td>';
+						echo '<td  align="center" colspan="2">PRICE/SHEET</td>';
 					} else {
-						echo '<td width="50 align="center" colspan="2">PRICE/KG</td>';
+						echo '<td  align="center" colspan="2">PRICE/KG</td>';
 					}
 					?>
-					<td width='70' align="center" rowspan='2'>REMARKS</td>
+					<td align="center" rowspan='2'>REMARKS</td>
 				</tr>
 				<tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
-					<td width='50' align="center">Alloy</td>
-					<td width='22' align="center">Surface</td>
-					<td width='22' align="center">Hard</td>
-					<td width='22' align="center">Thick</td>
-					<td width='22' align="center">Width</td>
-					<td width='22' align="center">Length</td>
-					<td width='22' align="center">USD</td>
-					<td width='22' align="center">IDR</td>
+					<td align="center">Alloy</td>
+					<td align="center">Surface</td>
+					<td align="center">Hard</td>
+					<td align="center">Thick</td>
+					<td align="center">Width</td>
+					<td align="center">Length</td>
+					<td align="center">USD</td>
+					<td align="center">IDR</td>
 				</tr>
 				<?php
 				$a = 0;
@@ -298,7 +298,7 @@
 				?>
 					<tr>
 						<td width='40' align="center"><?= $detail->bentuk_material ?></td>
-						<td width='100'><?= $detail->lotno ?></td>
+						<td width='80'><?= $detail->lotno ?></td>
 						<td width='40'><?= $detail->nama2 ?></td>
 						<td width='50' align='center'><?= $detail->spek ?></td>
 						<td width='22' align='center'><?= ucfirst(strtolower($detail->nm_surface)) ?></td>
@@ -327,13 +327,13 @@
 						?>
 
 
-						<td width='70' align='left'><?= $detail->keterangan ?></td>
+						<td width='50' align='left'><?= $detail->keterangan ?></td>
 					</tr>
 				<?php
 				}
 				?>
 				<tr>
-					<td height='40' colspan='11'>Note : <br><br> <?= nl2br($header->note) ?></td>
+					<td height='40' colspan='12'>Note : <br><br> <?= nl2br($header->note) ?></td>
 				</tr>
 			</tbody>
 		</table>
@@ -373,7 +373,7 @@
 				?>
 					<tr>
 						<td width='40' align="center"><?= $detail->bentuk_material ?></td>
-						<td width='100'><?= $detail->lotno ?></td>
+						<td width='80'><?= $detail->lotno ?></td>
 						<td width='50'><?= $detail->nama2 ?></td>
 
 						<td width='45' align='center'><?= $detail->spek ?></td>
@@ -390,24 +390,24 @@
 						<?php
 						if ($tipe_sheet == '1') {
 						?>
-							<td width='22' align='right'>Rp <?= number_format($detail->price_sheet) ?></td>
+							<td width='50' align='right'>Rp <?= number_format($detail->price_sheet) ?></td>
 						<?php
 						} else {
 						?>
 
-							<td width='22' align='right'>Rp <?= number_format($detail->harga_penawaran_cust) ?></td>
+							<td width='50' align='right'>Rp <?= number_format($detail->harga_penawaran_cust) ?></td>
 
 						<?php
 						}
 						?>
 
-						<td width='50' align='left'><?= $detail->keterangan ?></td>
+						<td width='60' align='left'><?= $detail->keterangan ?></td>
 					</tr>
 				<?php
 				}
 				?>
 				<tr>
-					<td height='40' colspan='11'>Note : <br><br> <?= nl2br($header->note) ?></td>
+					<td height='50' colspan='11'>Note : <br><br> <?= nl2br($header->note) ?></td>
 				</tr>
 			</tbody>
 		</table>
@@ -449,7 +449,7 @@
 			<td align="center" valign="middle"></td>
 			<td align="center" valign="middle"></td>
 			<td align="center" valign="middle"></td>
-			<td align="center" valign="middle"><img src='<?= $sroot; ?>/assets/images/ttd_metalsindo.jpg' alt="" height='100' width='220'></td>
+			<td align="center" valign="middle"><img src='assets/images/ttd_metalsindo.jpg' alt="" height='100' width='220'></td>
 		</tr>
 		<tr>
 			<td align="center" valign="middle"></td>

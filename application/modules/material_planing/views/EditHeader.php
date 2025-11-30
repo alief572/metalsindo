@@ -129,6 +129,7 @@ $tanggal = date('Y-m-d');
 									<th>Qty</th>
 									<th>Berat Coil</th>
 									<th>Total Berat</th>
+									<th>Total Sheet</th>
 									<th>Kirim</th>
 									<th>Booking</th>
 									<th>Keterangan</th>
@@ -151,6 +152,7 @@ $tanggal = date('Y-m-d');
 										<td align='center'>$stok->qty</td>
 										<td align='right'>$stok->weight</td>
 										<td align='right' id='weight_$stok->id_stock'>" . number_format($stok->totalweight - $stok->booking, 2) . "</td>";
+											echo '<td align="center">' . number_format($stok->qty_sheet) . '</td>';
 											echo "<td align='center'>";
 
 

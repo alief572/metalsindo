@@ -56,10 +56,22 @@ class Retur_penjualan extends Admin_Controller
 		$spkmkt = $nospk->no_surat;
 		$tr_spk = $this->Retur_penjualan_model->get_data('tr_spk_marketing', 'id_spkmarketing', $id);
 		// $dtspk = $this->Retur_penjualan_model->get_data('dt_spkmarketing',array('id_spkmarketing',$id));
-		$dtspk = $this->db->query("SELECT a.*, b.nama, b.maker, c.no_surat as no_do FROM stock_material a
+		$dtspk = $this->db->query("SELECT a.*, b.nama, b.maker, b.id_bentuk, b.total_weight, c.no_surat as no_do FROM stock_material a
 		JOIN ms_inventory_category3 b ON b.id_category3 = a.id_category3
 		JOIN tr_delivery_order c ON c.id_delivery_order = a.no_kirim
-		WHERE a.no_surat ='$spkmkt'")->result();
+		WHERE a.no_surat ='$spkmkt' ORDER BY c.no_surat ASC")->result();
+
+		$check_sheet = 0;
+
+		$data_weight_per_sheet = [];
+
+		foreach ($dtspk as $item) {
+			if ($check_sheet == 0 && $item->id_bentuk == 'B2000002') {
+				$check_sheet = 1;
+
+				$data_weight_per_sheet[$item->id_category3] = $item->total_weight;
+			}
+		}
 
 		$penawaran = $this->Retur_penjualan_model->get_data('tr_penawaran');
 		$customer = $this->db
@@ -80,6 +92,8 @@ class Retur_penjualan extends Admin_Controller
 			'customer' => $customer,
 			'karyawan' => $karyawan,
 			'mata_uang' => $mata_uang,
+			'check_sheet' => $check_sheet,
+			'data_weight_per_sheet' => $data_weight_per_sheet
 		];
 
 		$gudang	= $this->db->query("select * FROM ms_gudang ")->result();
@@ -166,6 +180,9 @@ class Retur_penjualan extends Admin_Controller
 					'id_stok'		    	=> $dp[id_stok],
 					'lotno'	    			=> $dp['lotno']
 				);
+				if (isset($dp['qty_sheet'])) {
+					$detRetur['total_sheet'] = $dp['qty_sheet'];
+				}
 				$this->db->insert('dt_returpenjualan', $detRetur);
 			}
 		}

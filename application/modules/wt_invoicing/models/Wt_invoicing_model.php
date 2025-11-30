@@ -118,12 +118,10 @@ class Wt_invoicing_model extends BF_Model
   function BuatNomor($kode = '')
   {
 
-    // $bulan =date("m",strtotime($tanggal));
-    // $tahun =date("Y",strtotime($tanggal));
-
     $bulan = date('m');
     $th = date('Y');
     $tahun = date('y');
+
     if ($bulan == '01') {
       $romawi = 'I';
     } elseif ($bulan == '02') {
@@ -149,14 +147,34 @@ class Wt_invoicing_model extends BF_Model
     } elseif ($bulan == '12') {
       $romawi = 'XII';
     }
+
+    $romawiToString = [
+      'I' => 1,
+      'II' => 2,
+      'III' => 3,
+      'IV' => 4,
+      'V' => 5,
+      'VI' => 6,
+      'VII' => 7,
+      'VIII' => 8,
+      'IX' => 9,
+      'X' => 10,
+      'XI' => 11,
+      'XII' => 12
+    ];
+
+    $bulan_kode = explode('/', $kode);
+    $bulan_kode2 = $bulan_kode[2];
+    $bulan_kode3 = $romawiToString[$bulan_kode2];
+
     $blnthn = date('Y-m');
-    $query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_invoice WHERE no_surat LIKE '%/" . date('y', strtotime($th)) . "/" . $romawi . "/%'");
+    $query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_invoice WHERE no_surat LIKE '%/" . date('y', strtotime($th)) . "%'");
     $row = $query->row_array();
     $thn = date('T');
     $max_id = $row['max_id'];
     $max_id1 = (int) $max_id;
     $counter = $max_id1 + 1;
-    $idcust = "INV-MP/" . $tahun . "/" . $romawi . "/" . sprintf("%04s", $counter);
+    $idcust = "INV-MP/" . $tahun . "/" . $bulan_kode2 . "/" . sprintf("%04s", $counter);
     return $idcust;
   }
 
@@ -319,7 +337,7 @@ class Wt_invoicing_model extends BF_Model
     // $where2 = "a.status<>'7'";
     // $this->db->where($where);
     // $this->db->where($where2);
-    $this->db->order_by('a.id', DESC);
+    $this->db->order_by('a.id', 'DESC');
     $query = $this->db->get();
     return $query->result();
   }
@@ -333,7 +351,7 @@ class Wt_invoicing_model extends BF_Model
     $where2 = "a.status_close ='0'";
     $this->db->where($where);
     $this->db->where($where2);
-    $this->db->order_by('a.no_invoice', DESC);
+    $this->db->order_by('a.no_invoice', 'DESC');
     $query = $this->db->get();
     return $query->result();
   }
@@ -346,7 +364,7 @@ class Wt_invoicing_model extends BF_Model
     $where2 = "a.status_close ='1'";
     $this->db->where($where);
     $this->db->where($where2);
-    $this->db->order_by('a.no_invoice', DESC);
+    $this->db->order_by('a.no_invoice', 'DESC');
     $query = $this->db->get();
     return $query->result();
   }
@@ -369,7 +387,7 @@ class Wt_invoicing_model extends BF_Model
     $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
     $where = "a.status_jurnal ='OPN'";
     $this->db->where($where);
-    $this->db->order_by('a.no_invoice', DESC);
+    $this->db->order_by('a.no_invoice', 'DESC');
     $query = $this->db->get();
     return $query->result();
   }
@@ -419,7 +437,7 @@ class Wt_invoicing_model extends BF_Model
     // $where2 = "a.status<>'7'";
     // $this->db->where($where);
     // $this->db->where($where2);
-    $this->db->order_by('a.no_invoice', DESC);
+    $this->db->order_by('a.no_invoice', 'DESC');
     $query = $this->db->get();
     return $query->result();
   }
@@ -434,6 +452,10 @@ class Wt_invoicing_model extends BF_Model
     $this->db->select('a.*, b.name_customer as name_customer');
     $this->db->from('tr_invoice a');
     $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+
+    $db_clone1 = clone $this->db;
+    $count_all = $db_clone1->count_all_results();
+
     if (!empty($search['value'])) {
       $this->db->group_start();
       $this->db->like('a.no_surat', $search['value'], 'both');
@@ -444,27 +466,14 @@ class Wt_invoicing_model extends BF_Model
       $this->db->or_like('a.tgl_invoice', $search['value'], 'both');
       $this->db->group_end();
     }
+
+    $db_clone2 = clone $this->db;
+    $count_filtered = $db_clone2->count_all_results();
+
     $this->db->order_by('a.id', 'desc');
     $this->db->limit($length, $start);
 
     $get_data = $this->db->get();
-
-    $this->db->select('a.*, b.name_customer as name_customer');
-    $this->db->from('tr_invoice a');
-    $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-    if (!empty($search['value'])) {
-      $this->db->group_start();
-      $this->db->like('a.no_surat', $search['value'], 'both');
-      $this->db->or_like('b.name_customer', $search['value'], 'both');
-      $this->db->or_like('a.note', $search['value'], 'both');
-      $this->db->or_like('a.no_do', $search['value'], 'both');
-      $this->db->or_like('a.nilai_invoice', $search['value'], 'both');
-      $this->db->or_like('a.tgl_invoice', $search['value'], 'both');
-      $this->db->group_end();
-    }
-    $this->db->order_by('a.id', 'desc');
-
-    $get_data_all = $this->db->get();
 
     $hasil = [];
 
@@ -495,13 +504,61 @@ class Wt_invoicing_model extends BF_Model
         $action .= ' <a class="btn btn-warning btn-sm" href="' . base_url('/wt_invoicing/PrintPackinglistSlitting/' . $item['no_invoice']) . '" target="_blank" title="Packinglist Slitting" data-no_inquiry="' . $item['no_inquiry'] . '"><i class="fa fa-print"></i></a> ';
       endif;
 
+
+
+      $this->db->select('a.*');
+      $this->db->from('tr_invoice_detail a');
+      $this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3');
+      $this->db->where('a.no_invoice', $item['no_invoice']);
+      $this->db->where('b.id_bentuk', 'B2000002');
+      $get_detail_sheet = $this->db->get()->result();
+
+      $tipe_sheet = (count($get_detail_sheet) > 0) ? '1' : '0';
+
+      if ($tipe_sheet == '1') {
+        $nilai_invoice = 0;
+
+        foreach ($get_detail_sheet as $item_sheet) {
+          $this->db->select('a.qty_sheet');
+          $this->db->from('stock_material a');
+          $this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
+          $this->db->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order');
+          $this->db->where('c.no_surat', $item['no_do']);
+          $this->db->where('b.id_material', $item_sheet->id_category3);
+          $this->db->where('a.no_kirim', $item['id_do']);
+          $this->db->group_by('a.id_stock');
+          $get_qty_sheet = $this->db->get()->result();
+
+          $qty_sheet = 0;
+          foreach ($get_qty_sheet as $item_qty_sheet) {
+            $qty_sheet += $item_qty_sheet->qty_sheet;
+          }
+
+          $nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet) + (($item_sheet->harga_satuan * $qty_sheet) * 11 / 100);
+        }
+      } else {
+        $this->db->select('SUM(ROUND(a.qty_invoice) * a.harga_satuan) as ttl_harga');
+        $this->db->from('tr_invoice_detail a');
+        $this->db->where('a.no_invoice', $item['no_invoice']);
+        $get_total_invoice = $this->db->get()->row();
+
+        $ttl_harga = $get_total_invoice->ttl_harga;
+
+        $dpp_nilai_lain = ceil(11 / 12 * $ttl_harga);
+        $ppn = ($dpp_nilai_lain * 12 / 100);
+        $grand_total = ($ttl_harga + $ppn);
+
+        $nilai_invoice = $grand_total;
+      }
+
+
       $hasil[] = [
         'no' => $no,
         'no_invoice' => $item['no_surat'],
         'nama_customer' => strtoupper($item['name_customer']),
         'term' => $item['note'],
         'nomor_do' => $item['no_do'],
-        'nilai_invoice' => number_format($item['nilai_invoice']),
+        'nilai_invoice' => number_format($nilai_invoice),
         'tanggal_invoice' => date('d-F-Y', strtotime($item['tgl_invoice'])),
         'action' => $action
       ];
@@ -509,8 +566,8 @@ class Wt_invoicing_model extends BF_Model
 
     echo json_encode([
       'draw' => intval($draw),
-      'recordsTotal' => $get_data_all->num_rows(),
-      'recordsFiltered' => $get_data_all->num_rows(),
+      'recordsTotal' => $count_all,
+      'recordsFiltered' => $count_filtered,
       'data' => $hasil
     ]);
   }
@@ -536,5 +593,79 @@ class Wt_invoicing_model extends BF_Model
     }
     $this->db->order_by('a.no_invoice', 'desc');
     $query = $this->db->get();
+  }
+
+  public function get_data_spk_marketing()
+  {
+    $draw = $this->input->post('draw');
+    $length = $this->input->post('length');
+    $start = $this->input->post('start');
+    $search = $this->input->post('search');
+
+    $this->db->select('a.*, b.name_customer as name_customer, SUM(c.total_harga) as total');
+    $this->db->from('tr_spk_marketing a');
+    $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+    $this->db->join('dt_spkmarketing c', 'c.id_spkmarketing = a.id_spkmarketing');
+
+    if (!empty($search['value'])) {
+      $this->db->group_start();
+      $this->db->like('a.tgl_spk_marketing',  $search['value'], 'both');
+      $this->db->or_like('a.no_surat', $search['value'], 'both');
+      $this->db->or_like('b.nm_customer', $search['value'], 'both');
+      $this->db->group_end();
+    }
+
+    $this->db->group_by('a.no_surat');
+
+    $db_clone_filtered = clone $this->db;
+    $count_filtered = $db_clone_filtered->count_all_results();
+
+    $this->db->order_by('a.id_spkmarketing', 'DESC');
+    $this->db->limit($length, $start);
+
+    $get_data = $this->db->get()->result();
+
+    $no = (0 + $start);
+    $hasil = [];
+    foreach ($get_data as $row) {
+      $no++;
+
+      $sts = '';
+
+      if ($row->status_approve == '1') {
+        $sts = '<label class="label label-success">Approved</label>';
+      } else {
+        $sts = '<label class="label label-danger">Belum di Approve</label>';
+      }
+
+      if (has_permission($this->managePermission)) {
+        $action = '
+          <a class="btn btn-success btn-sm" href="' . base_url(' / wt_invoicing / createInvoice / ' . $row->id_spkmarketing) . '" title="Create Invoice" data-no_inquiry="' . $row->no_inquiry . '"><i class="fa fa-check">&nbsp;Create Invoice</i></a>
+        ';
+
+        $action .= '
+          <a class="btn btn-warning btn-sm" href="' . base_url(' / wt_invoicing / createProformaInvoice / ' . $row->id_spkmarketing) . '" title="Create Proforma Invoice" data-no_inquiry="' . $row->no_inquiry . '"><i class="fa fa-check">&nbsp;Create Proforma Invoice</i></a>
+        ';
+      }
+
+      $hasil[] = [
+        'no' => $no,
+        'tanggal_spk_terbit' => date('d F Y', strtotime($row->tgl_spk_marketing)),
+        'no_spk' => $row->no_surat,
+        'customer' => $row->name_customer,
+        'nilai_spk' => number_format($row->total, 2),
+        'status' => $sts,
+        'action' => $action
+      ];
+    }
+
+    $response = [
+      'draw' => intval($draw),
+      'recordsTotal' => $count_filtered,
+      'recordsFiltered' => $count_filtered,
+      'data' => $hasil
+    ];
+
+    echo json_encode($response);
   }
 }
