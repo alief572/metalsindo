@@ -185,6 +185,22 @@ $tanggal = date('Y-m-d');
 		$('#simpan-com').click(function(e) {
 			e.preventDefault();
 
+			var jumlahKosong = $('.mandatory_sheet').filter(function() {
+				// this mengacu pada elemen saat ini yang sedang difilter
+				// .trim() digunakan untuk menghapus spasi di awal dan akhir
+				return $.trim(this.value) === '';
+			}).length;
+
+			if (jumlahKosong > 0) {
+				swal({
+					type: 'warning',
+					title: 'Warning !',
+					text: 'Input QTY Sheet untuk barang Sheet masih ada yang kosong !'
+				});
+
+				return false;
+			}
+
 			$(".chosen-select").removeAttr("disabled");
 			var deskripsi = $('#deskripsi').val();
 			var id_gudang = $('#id_gudang').val();

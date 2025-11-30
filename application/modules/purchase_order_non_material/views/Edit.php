@@ -537,7 +537,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 											echo '</td>';
 
 											echo '<td>';
-											echo '<select name="tipe_top_'.$no.'" class="tipe_top_'.$no.'" >';
+											echo '<select name="tipe_top_' . $no . '" class="tipe_top_' . $no . '" >';
 											echo '<option value="">- Tipe TOP -</option>';
 											echo '<option value="1" ' . $selected1 . '>CBD</option>';
 											echo '<option value="2" ' . $selected2 . '>2 Minggu</option>';
@@ -595,18 +595,18 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		TotalSemua()
 
 		$('.auto_num').autoNumeric('init', {
-			
+
 		});
 
-		$('#totalppn').autoNumeric('init',{
+		$('#totalppn').autoNumeric('init', {
 			vMin: 0,
 			vMax: 99999999999
 		});
-		$('#persenppn').autoNumeric('init',{
+		$('#persenppn').autoNumeric('init', {
 			vMin: 0,
 			vMax: 99999999999
 		});
-		
+
 
 		var max_fields2 = 10; //maximum input boxes allowed
 		var wrapper2 = $(".input_fields_wrap2"); //Fields wrapper
@@ -650,10 +650,10 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 					$('#data_request').html(data.list_mat);
 					$(".bilangan-desimal").maskMoney();
 					$('.autoNumeric3').autoNumeric('init', {
-						
+
 					});
 					$('.autoNumeric').autoNumeric({
-						
+
 					});
 					$('#expect_tanggal').val(data.min_date);
 				}
@@ -1024,7 +1024,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 						width: '100%'
 					});
 					$('.autoNumeric3').autoNumeric('init', {
-						
+
 					});
 				}
 			});
@@ -1413,7 +1413,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 		$(".ch_jumlah_ex").each(function() {
 			SUM_JMX += Number($(this).val().split(",").join(""));
 		});
-		$(".ch_ppn").each(function() {
+		$(".cng_nilai_ppn").each(function() {
 			SUM_PPN += Number($(this).val().split(",").join(""));
 		});
 		$(".disc_num").each(function() {

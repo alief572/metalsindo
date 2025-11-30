@@ -429,16 +429,8 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 			endif;
 
 			$harga_satuan = $detail->harga_satuan;
-			$qty_invoice = $detail->qty_invoice;
+			$qty_invoice = round($detail->qty_invoice);
 			if ($get_inventory['id_bentuk'] == 'B2000002') {
-
-				$this->db->select('a.price_sheet, a.qty_sheet');
-				$this->db->from('child_penawaran a');
-				$this->db->join('tr_spk_marketing b', 'b.no_penawaran = a.no_penawaran');
-				$this->db->join('tr_invoice c', 'c.no_so = b.id_spkmarketing');
-				$this->db->where('c.no_so', $detail->no_so);
-				$this->db->where('a.id_category3', $detail->id_category3);
-				$get_sheets_detail = $this->db->get()->row_array();
 
 				$get_inventory = $this->db->get_where('ms_inventory_category3', array('id_category3' => $detail->id_category3))->row();
 
@@ -457,7 +449,33 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 					}
 				}
 
-				$qty_invoice = round(($detail->qty_invoice / ($density * $thickness * $width * $length / 1000000)));
+				$this->db->select('a.qty_produk');
+				$this->db->from('dt_spkmarketing a');
+				$this->db->where('a.id_spkmarketing', $detail->no_so);
+				$this->db->where('a.id_material', $detail->id_category3);
+				$get_detail_spkmkt = $this->db->get()->row();
+
+				$qty_invoice = 0;
+
+				$this->db->select('a.qty_sheet');
+				$this->db->from('stock_material a');
+				$this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno AND b.id_material = a.id_category3');
+				$this->db->where('b.id_delivery_order', $header->id_do);
+				$this->db->where('b.id_material', $detail->id_category3);
+				$this->db->where('a.no_kirim', $header->id_do);
+				$this->db->group_by('a.id_stock');
+				$get_qty_invoice = $this->db->get()->result();
+				foreach ($get_qty_invoice as $item_invoice) {
+					$qty_invoice += $item_invoice->qty_sheet;
+				}
+
+
+				// if ($detail->id_invoice_detail == '5456') {
+				// 	$qty_invoice = 200;
+				// }
+
+				// $qty_invoice = (($detail->qty_invoice));
+				// $qty_invoice = round(($get_detail_spkmkt->qty_produk));
 
 				$totqty += $qty_invoice;
 				$totharga += ($detail->harga_satuan * $qty_invoice);
@@ -465,8 +483,9 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 				$harga_satuan = $detail->harga_satuan;
 				// $qty_invoice = $get_sheets_detail['qty_sheet'];
 			} else {
+				$qty_invoice = $detail->qty_invoice;
 				$totqty += $detail->qty_invoice;
-				$totharga += $detail->total_harga;
+				$totharga += ($harga_satuan * $qty_invoice);
 			}
 
 		?>

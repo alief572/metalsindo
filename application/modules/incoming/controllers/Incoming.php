@@ -395,6 +395,14 @@ class Incoming extends Admin_Controller
 			$totalweight = $this->db->query("SELECT * FROM dt_trans_pr WHERE id_dt_pr = '" . $no_pr . "'  ")->row();
 			$id_material  = $material->idmaterial;
 
+			$get_material = $this->db->get_where('ms_inventory_category3', ['id_category3' => $id_material])->row();
+
+			$id_bentuk = $get_material->id_bentuk;
+
+			$check_sheet = ($id_bentuk == 'B2000002') ? 1 : 0;
+
+			$mandatory_sheet = ($check_sheet == 1) ? 'mandatory_sheet' : '';
+
 			$idroll = $this->db->query("SELECT MAX(id_roll) as id_roll FROM stock_material WHERE id_category3='$id_material'")->row();
 
 
@@ -480,7 +488,7 @@ class Incoming extends Admin_Controller
 		<td><input  type='text' class='form-control input-sm autoNumeric' id='dt_aktual_" . $id . "_" . $no . "' 	onBlur='cariSelisih($id,$no)'		required name='dt[" . $id . "][detail][" . $no . "][aktual]' 	Placeholder='Berat Aktual'	></td>
 
 		<td>
-			<input type='text' class='form-control input-sm autoNumeric' id='dt_aktual_" . $id . "_" . $no . "' name='dt[" . $id . "][detail][" . $no . "][qty_sheet]' placeholder='Qty Sheet'>
+			<input type='text' class='form-control input-sm " . $mandatory_sheet . " autoNumeric' id='dt_aktual_" . $id . "_" . $no . "' name='dt[" . $id . "][detail][" . $no . "][qty_sheet]' placeholder='Qty Sheet'>
 		</td>
 		
 		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_selisih_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][selisih]' 	readonly	></td>

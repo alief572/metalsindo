@@ -269,7 +269,7 @@ class Serverside_model extends BF_Model
 					" . $where_series . "
 					" . $where_komponen . "
                     " . $where_search . "
-					AND a.aktif='Y' AND sisa_spk > 0
+					AND a.aktif='Y' AND a.id_gudang = '" . $gudang . "' AND sisa_spk > 0 AND sisa_spk > IF(delivery_book IS NULL, 0, delivery_book)
                 ";
 		// echo $sql; exit;
 
@@ -283,7 +283,6 @@ class Serverside_model extends BF_Model
 		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
 		$columns_order_by = array(
 			0 => 'id_stock'
-
 		);
 
 		$sql .= " ORDER BY d.nama,  " . $columns_order_by[$column_order] . " " . $column_dir . " ";

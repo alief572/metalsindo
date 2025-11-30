@@ -46,10 +46,10 @@ $tanggal = date('Y-m-d');
 											<?php } ?>
 										</select>
 									</div>
-									<div class="col-md-8" hidden>
-										<input type="text" class="form-control" id="nama_customer" onkeyup required name="nama_customer" readonly>
-										<input type="text" class="form-control" id="no_surat" onkeyup required name="no_surat" readonly>
-										<input type="text" class="form-control" id="id_customer" onkeyup required name="id_customer" readonly>
+									<div class="col-md-8">
+										<input type="hidden" class="form-control" id="nama_customer" onkeyup required name="nama_customer" readonly>
+										<input type="hidden" class="form-control" id="no_surat" onkeyup required name="no_surat" readonly>
+										<input type="hidden" class="form-control" id="id_customer" onkeyup required name="id_customer" readonly>
 									</div>
 								</div>
 							</div>

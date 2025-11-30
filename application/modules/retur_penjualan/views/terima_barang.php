@@ -37,7 +37,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 										<label for="customer">Tanggal</label>
 									</div>
 									<div class="col-md-8">
-										<input type="date" class="form-control" id="tgl_penawaran" value="<?= $tr_spk->tgl_spk_marketing ?>" onkeyup required name="tgl_penawaran" readonly>
+										<input type="date" class="form-control" id="tgl_penawaran" value="<?= $tr_spk->tgl_spk_marketing ?>" onkeyup required name="tgl_penawaran">
 									</div>
 								</div>
 							</div>
@@ -184,15 +184,20 @@ foreach ($results['tr_spk'] as $tr_spk) {
 								<table class='table table-bordered table-striped'>
 									<thead>
 										<tr class='bg-blue'>
-											<th width='5%'>Id Material</th>
-											<th width='5%'>No. DO</th>
-											<th width='30%'>Nama Material</th>
-											<th width='30%'>Lot Number</th>
-											<th width='10%'>Thickness</th>
-											<th width='10%'>Width</th>
-											<th width='10%'>Total Kirim (Kg)</th>
-											<th width='10%'>Diterima Di Gudang</th>
-											<th width='5%'>Retur</th>
+											<th>Id Material</th>
+											<th>No. DO</th>
+											<th>Nama Material</th>
+											<th>Lot Number</th>
+											<th>Thickness</th>
+											<th>Width</th>
+											<th>Total Kirim (Kg)</th>
+											<?php
+											if ($results['check_sheet'] == 1) {
+												echo '<th>Total Kirim (Sheet)</th>';
+											}
+											?>
+											<th>Diterima Di Gudang</th>
+											<th>Retur</th>
 										</tr>
 									</thead>
 									<tbody id="list_penawaran_slot">
@@ -211,7 +216,18 @@ foreach ($results['tr_spk'] as $tr_spk) {
 			<th><input type='text' class='form-control'   value='$dt->lotno' id='dp_lotno_$loop' data-role='qtip' required name='dp[$loop][lotno]'></th>
 			<th><input type='text' class='form-control'   value='$dt->thickness' id='dp_thickness_$loop' data-role='qtip' required name='dp[$loop][thickness]'></th>
 			<th><input type='text' class='form-control'   value='$dt->width' id='dp_width_$loop' data-role='qtip' required name='dp[$loop][width]'></th>
-			<th><input type='text' class='form-control'   value='$dt->total_kirim' id='dp_total_kirim_$loop' data-role='qtip' required name='dp[$loop][total_kirim]'></th>
+			<th><input type='text' class='form-control'   value='$dt->total_kirim' id='dp_total_kirim_$loop' data-role='qtip' required name='dp[$loop][total_kirim]'></th>";
+
+											if ($results['check_sheet'] == 1) {
+												$qty_sheet = (isset($results['data_weight_per_sheet'][$dt->id_category3])) ? $results['data_weight_per_sheet'][$dt->id_category3] : '';
+												$val_sheet = 0;
+												if ($dt->total_kirim > 0 && $qty_sheet > 0) {
+													$val_sheet = round($dt->total_kirim / $qty_sheet, 2);
+												}
+												echo "<th><input type='text' class='form-control'   value='" . $val_sheet . "' id='dp_qty_sheet_$loop' data-role='qtip' required name='dp[$loop][qty_sheet]'></th>";
+											}
+
+											echo "
 			<th><select class='form-control' id='dp_gudang_$loop' data-role='qtip' required name='dp[$loop][gudang]'>";
 											foreach ($gudang as $gudangx) {
 												$sel = ($gudangx->id_gudang == 3) ? 'selected' : '';
