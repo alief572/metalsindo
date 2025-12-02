@@ -278,8 +278,15 @@ class Control_do extends Admin_Controller
         foreach ($get_data as $item) {
             $no++;
 
+            $this->db->select('a.id');
+            $this->db->from('dt_delivery_order_child a');
+            $this->db->where('a.id_delivery_order', $item->id_delivery_order);
+            $this->db->where('a.qty_in <=', 0);
+            $this->db->where('a.qty_ng <=', 0);
+            $get_do_detail = $this->db->get()->num_rows();
+
             $btn_confirm = '';
-            if (has_permission($this->managePermission) && empty($item->confirm_do) && ($item->total_do - $item->total_delivered) > 0) {
+            if (has_permission($this->managePermission) && $get_do_detail > 0) {
                 $btn_confirm = '<button type="button" class="btn btn-sm btn-success confirm_do" data-id="' . $item->id_delivery_order . '" title="Confirm DO" ><i class="fa fa-check"></i></button>';
             }
 
