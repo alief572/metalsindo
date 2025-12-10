@@ -226,8 +226,10 @@ class Control_do extends Admin_Controller
         $this->db->from('tr_delivery_order a');
         $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
         $this->db->join('dt_delivery_order_child c', 'c.id_delivery_order = a.id_delivery_order');
+        $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
+        $this->db->where('d.no_invoice', null);
         $this->db->group_by('a.id_delivery_order');
         $count_all = $this->db->get()->num_rows();
 
@@ -235,8 +237,10 @@ class Control_do extends Admin_Controller
         $this->db->from('tr_delivery_order a');
         $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
         $this->db->join('dt_delivery_order_child c', 'c.id_delivery_order = a.id_delivery_order');
+        $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
+        $this->db->where('d.no_invoice', null);
 
         if (!empty($search)) {
             $this->db->group_start();
@@ -254,8 +258,10 @@ class Control_do extends Admin_Controller
         $this->db->from('tr_delivery_order a');
         $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
         $this->db->join('dt_delivery_order_child c', 'c.id_delivery_order = a.id_delivery_order');
+        $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
+        $this->db->where('d.no_invoice', null);
 
         if (!empty($search)) {
             $this->db->group_start();
