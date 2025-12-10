@@ -30,7 +30,10 @@
             echo '<td class="text-right">' . number_format($item->width) . '</td>';
             echo '<td class="text-right">' . number_format($item->length) . '</td>';
             echo '<td class="text-left">' . $item->lotno . '</td>';
-            echo '<td class="text-right">' . number_format($item->weight_mat, 2) . '</td>';
+            echo '<td class="text-right">';
+            echo number_format($item->weight_mat, 2);
+            echo '<input type="hidden" name="detail[' . $no . '][qty_do]" value="' . $item->weight_mat . '">';
+            echo '</td>';
             echo '<td>';
             echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_in]" value="' . $item->weight_mat . '">';
             echo '</td>';
@@ -43,6 +46,8 @@
         ?>
     </tbody>
 </table>
+
+<input type="hidden" name="no" value="<?= $no ?>">
 
 <script src="assets/js/autoNumeric.js"></script>
 
