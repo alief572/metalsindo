@@ -695,7 +695,7 @@ class Delivery_order extends Admin_Controller
 
 
 
-		$lot			= $this->db->query("SELECT * FROM stock_material WHERE id_gudang = '3' AND id_category3='$id_category3' AND width = $width  AND no_surat NOT LIKE '%%$no_penawaran%%' AND aktif='Y'")->result();
+		$lot			= $this->db->query("SELECT * FROM stock_material WHERE id_gudang = '3' AND id_category3='$id_category3' AND width = $width  AND no_surat NOT LIKE '%" . $no_penawaran . "%' AND aktif='Y'")->result();
 
 
 
