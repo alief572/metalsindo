@@ -156,6 +156,44 @@ class Control_do extends Admin_Controller
                     exit;
                 }
 
+                $get_stock = $this->db->get_where('stock_material', array('id_stock' => $item_do_detail->id_stock))->row_array();
+
+                $arr_stock_ng = [
+                    'id_category3' => $get_stock['id_category3'],
+                    'nama_material' => $get_stock['nama_material'],
+                    'width' => $get_stock['width'],
+                    'length' => $get_stock['length'],
+                    'id_bentuk' => $get_stock['id_bentuk'],
+                    'lotno' => $get_stock['lotno'],
+                    'qty' => $qty_ng,
+                    'weight' => $get_stock['weight'],
+                    'totalweight' => $get_stock['totalweight'],
+                    'booking' => $get_stock['booking'],
+                    'thickness' => $get_stock['thickness'],
+                    'aktif' => 'Y',
+                    'id_gudang' => '6',
+                    'created_by' => $this->auth->user_id(),
+                    'created_on' => date('Y-m-d H:i:s'),
+                    'no_po' => $get_stock['no_po'],
+                    'id_incoming' => $get_stock['id_incoming'],
+                    'lot_slitting' => $get_stock['lot_slitting'],
+                    'keterangan' => $get_stock['keterangan'],
+                    'status_do' => 'OPN',
+                    'tipe_material' => $get_stock['tipe_material'],
+                    'qty_sheet' => $get_stock['qty_sheet'],
+                    'sisa_spk' => $qty_ng
+                ];
+
+                if ($qty_ng > 0) {
+                    $insert_stock_ng = $this->db->insert('stock_material', $arr_stock_ng);
+                    if (!$insert_stock_ng) {
+                        $this->db->trans_rollback();
+
+                        print_r($this->db->last_query());
+                        exit;
+                    }
+                }
+
                 $arr_stock = [
                     'id_stock' => $item_do_detail->id_stock,
                     'status_do' => 'CLS',
@@ -225,7 +263,6 @@ class Control_do extends Admin_Controller
         $this->db->select('a.id_delivery_order');
         $this->db->from('tr_delivery_order a');
         $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
-        $this->db->join('dt_delivery_order_child c', 'c.id_delivery_order = a.id_delivery_order');
         $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
@@ -236,7 +273,6 @@ class Control_do extends Admin_Controller
         $this->db->select('a.id_delivery_order');
         $this->db->from('tr_delivery_order a');
         $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
-        $this->db->join('dt_delivery_order_child c', 'c.id_delivery_order = a.id_delivery_order');
         $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
@@ -254,10 +290,9 @@ class Control_do extends Admin_Controller
 
         $count_filter = $this->db->get()->num_rows();
 
-        $this->db->select('a.*, b.name_customer, SUM(c.weight_mat) as total_do, SUM(c.qty_in) as total_delivered');
+        $this->db->select('a.*, b.name_customer');
         $this->db->from('tr_delivery_order a');
         $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
-        $this->db->join('dt_delivery_order_child c', 'c.id_delivery_order = a.id_delivery_order');
         $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
@@ -291,6 +326,14 @@ class Control_do extends Admin_Controller
             $this->db->where('a.qty_ng <=', 0);
             $get_do_detail = $this->db->get()->num_rows();
 
+            $this->db->select('SUM(a.weight_mat) as total_do, SUM(a.qty_in) as total_delivered');
+            $this->db->from('dt_delivery_order_child a');
+            $this->db->where('a.id_delivery_order', $item->id_delivery_order);
+            $get_total = $this->db->get()->row();
+
+            $total_do = (!empty($get_total->total_do)) ? $get_total->total_do : 0;
+            $total_delivered = (!empty($get_total->total_delivered)) ? $get_total->total_delivered : 0;
+
             $btn_confirm = '';
             if (has_permission($this->managePermission) && $get_do_detail > 0) {
                 $btn_confirm = '<button type="button" class="btn btn-sm btn-success confirm_do" data-id="' . $item->id_delivery_order . '" title="Confirm DO" ><i class="fa fa-check"></i></button>';
@@ -302,9 +345,9 @@ class Control_do extends Admin_Controller
                 'no_do' => $item->no_surat,
                 'spk_marketing' => $item->no_spk_marketing,
                 'customer' => $item->name_customer,
-                'qty_order' => number_format($item->total_do, 2),
-                'qty_delivery' => number_format($item->total_delivered, 2),
-                'balance' => number_format($item->total_do - $item->total_delivered, 2),
+                'qty_order' => number_format($total_do, 2),
+                'qty_delivery' => number_format($total_delivered, 2),
+                'balance' => number_format($total_do - $total_delivered, 2),
                 'option' => $btn_confirm
             ];
         }
