@@ -46,7 +46,7 @@ thead input {
 			
 			$numb=0; foreach($results AS $record){ $numb++; 
 			$id_delivery_order = $record->id_delivery_order;
-			$totalharga	= $this->db->query("SELECT SUM(weight_mat) as total FROM dt_delivery_order_child WHERE id_delivery_order='$id_delivery_order' ")->result();
+			$totalharga	= $this->db->query("SELECT SUM(qty_in) as total FROM dt_delivery_order_child WHERE id_delivery_order='$id_delivery_order' ")->result();
 			$detail2    = $this->db->query("SELECT SUM(weight_mat) as total FROM dt_delivery_order_child_scrap WHERE id_delivery_order='$id_delivery_order' ")->result();
 			
 			
