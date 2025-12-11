@@ -390,7 +390,9 @@ class Incoming extends Admin_Controller
 			$no_pr  = $material->idpr;
 			$id_dt_po  = $material->id_dt_po;
 
-			$material_pr = $this->db->query("SELECT * FROM dt_trans_pr WHERE id_dt_pr = '" . $no_pr . "'  ")->row();
+
+
+			$totalweight = $this->db->query("SELECT * FROM dt_trans_pr WHERE id_dt_pr = '" . $no_pr . "'  ")->row();
 			$id_material  = $material->idmaterial;
 
 			$get_material = $this->db->get_where('ms_inventory_category3', ['id_category3' => $id_material])->row();
@@ -451,16 +453,8 @@ class Incoming extends Admin_Controller
 		Length     : " . number_format($material->panjang, 2) . " <br>
 		Ttl PO    : " . number_format($material->totalwidth, 2) . "<br>
 		Blm Diterima: " . number_format(($material->totalwidth - $incoming->incoming) * -1, 2) . " <br>
-		";
 
-		if($get_material->id_bentuk == 'B2000002'){
-			$qty_sheet = $material_pr->qty_sheet;
-
-			echo "Ttl PO (Sheet) : " . $qty_sheet . " <br>";
-			echo "Blm Diterima (Sheet) : " . number_format(($qty_sheet - $incoming->qty_sheet) * -1, 2) . " <br>";
-		}
-
-		echo "
+		
 		<input  type='hidden' 		value='" . number_format($thick->thickness, 2) . "'		class='form-control input-sm text-right' id='dt_thickness_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][thickness]' 		readonly>
 		
 		<input  type='hidden' 		value='" . number_format($dens->density, 2) . "'		class='form-control input-sm text-right' id='dt_density_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][density]' 		readonly>
