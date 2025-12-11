@@ -468,11 +468,11 @@ class Delivery_order_model extends BF_Model
 						<a class="btn btn-info btn-sm" href="' . base_url('/delivery_order/editHeader/' . $item->id_delivery_order) . '" title="Edit"><i class="fa fa-edit"></i></i></a>
 					';
 				}
-				if (has_permission($this->managePermission)) {
-					$button .= '
-						<button type="text" class="btn btn-success btn-sm release" title="Release" data-id="' . $item->id_delivery_order . '"><i class="fa fa-check"></i></button>
-					';
-				}
+				// if (has_permission($this->managePermission)) {
+				// 	$button .= '
+				// 		<button type="text" class="btn btn-success btn-sm release" title="Release" data-id="' . $item->id_delivery_order . '"><i class="fa fa-check"></i></button>
+				// 	';
+				// }
 			}
 
 			$this->db->select('SUM(a.weight_mat) as total_fg');
