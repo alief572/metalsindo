@@ -3348,11 +3348,13 @@ class Spk_aktual extends Admin_Controller
 		$this->template->render('AddHeader_view');
 	}
 
-	public function get_list_produksi() {
+	public function get_list_produksi()
+	{
 		$this->Inventory_4_model->get_list_produksi();
 	}
 
-	public function get_history_produksi() {
+	public function get_history_produksi()
+	{
 		$this->Inventory_4_model->get_history_produksi();
 	}
 }
