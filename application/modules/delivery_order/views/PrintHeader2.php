@@ -330,7 +330,7 @@
                     }
                 }
 
-                $SUMKG += $dtl->weight_mat;
+                $SUMKG += $dtl->qty_in;
                 $SUMQTY += ($get_material_bentuk->id_bentuk == 'B2000001') ? $dtl->qty_order : 0;
                 $SUMQTY_SHEET += $sheet_qty;
 
@@ -357,7 +357,7 @@
                     <td width="145" align="left"><?= $dtl->lotno ?></td>
                     <td width="20" align="center"><?= ($get_material_bentuk->id_bentuk == 'B2000001') ? number_format($dtl->qty_order, 0) : '' ?></td>
                     <td width="25" align="center"><?= number_format($sheet_qty) ?></td>
-                    <td width="20" align="right"><?= $dtl->weight_mat; ?></td>
+                    <td width="20" align="right"><?= $dtl->qty_in; ?></td>
                     <td width="60" align="center"><?= $dtl->remark ?></td>
                 </tr>
 
@@ -369,7 +369,7 @@
                 $id_material = $dtl->id_material;
                 $qty += ($get_material_bentuk->id_bentuk == 'B2000001') ? $dtl->qty_order : 0;
                 $qty_sheet += $sheet_qty;
-                $berat = $berat + $dtl->weight_mat;
+                $berat = $berat + $dtl->qty_in;
             }
             ?>
 
