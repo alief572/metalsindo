@@ -22,3 +22,5 @@ application/config/constants.php
 #/vendor/
 /uploads/*
 /assets/files/*
+
+php.ini
