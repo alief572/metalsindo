@@ -123,37 +123,42 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 		// alert(no);
 
 		var sts = 1;
+		// var sts = 1;
 		for (i = 1; i <= no; i++) {
 			var qty_do = parseFloat($('input[name="detail[' + i + '][qty_do]"]').val());
 			var qty_in = parseFloat($('input[name="detail[' + i + '][qty_in]"]').val());
 			var qty_ng = parseFloat($('input[name="detail[' + i + '][qty_ng]"]').val());
 
-			if ((qty_in + qty_ng) > qty_do) {
-				Swal.fire({
-					icon: 'warning',
-					title: 'Warning !',
-					text: 'Mohon maaf, qty input yang melebihi qty DO !',
-					showConfirmButton: false,
-					showCancelButton: false,
-					allowOutsideClick: false,
-					allowEscapeKey: false,
-					timer: 3000
-				});
-				return false;
-			}
+			if (sts == 1) {
+				if ((qty_in + qty_ng) > qty_do) {
+					Swal.fire({
+						icon: 'warning',
+						title: 'Warning !',
+						text: 'Mohon maaf, qty input yang melebihi qty DO !',
+						showConfirmButton: false,
+						showCancelButton: false,
+						allowOutsideClick: false,
+						allowEscapeKey: false,
+						timer: 3000
+					});
+					sts = 0;
+					return false;
+				}
 
-			if ((qty_in + qty_ng) !== qty_do) {
-				Swal.fire({
-					icon: 'warning',
-					title: 'Warning !',
-					text: 'Mohon maaf, total qty input harus sama dengan qty DO !',
-					showConfirmButton: false,
-					showCancelButton: false,
-					allowOutsideClick: false,
-					allowEscapeKey: false,
-					timer: 3000
-				});
-				return false;
+				if ((qty_in + qty_ng) !== qty_do) {
+					Swal.fire({
+						icon: 'warning',
+						title: 'Warning !',
+						text: 'Mohon maaf, total qty input harus sama dengan qty DO !',
+						showConfirmButton: false,
+						showCancelButton: false,
+						allowOutsideClick: false,
+						allowEscapeKey: false,
+						timer: 3000
+					});
+					sts = 0;
+					return false;
+				}
 			}
 		}
 
