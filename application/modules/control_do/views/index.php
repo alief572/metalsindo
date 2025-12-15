@@ -141,6 +141,20 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 				});
 				return false;
 			}
+
+			if ((qty_in + qty_ng) !== qty_do) {
+				Swal.fire({
+					icon: 'warning',
+					title: 'Warning !',
+					text: 'Mohon maaf, total qty input harus sama dengan qty DO !',
+					showConfirmButton: false,
+					showCancelButton: false,
+					allowOutsideClick: false,
+					allowEscapeKey: false,
+					timer: 3000
+				});
+				return false;
+			}
 		}
 
 		Swal.fire({
