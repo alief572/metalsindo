@@ -461,6 +461,7 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 				$this->db->from('stock_material a');
 				$this->db->where('a.no_kirim', $header->id_do);
 				$this->db->where('a.id_category3', $detail->id_category3);
+				$this->db->where('a.aktif', 'N');
 				// $this->db->where('a.no_kirim', $header->id_do);
 				$this->db->group_by('a.id_stock');
 				$get_qty_invoice = $this->db->get()->result();
