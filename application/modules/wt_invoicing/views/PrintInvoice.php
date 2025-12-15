@@ -459,9 +459,8 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 
 				$this->db->select('a.qty_sheet');
 				$this->db->from('stock_material a');
-				$this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno AND b.id_material = a.id_category3');
-				$this->db->where('b.id_delivery_order', $header->id_do);
-				$this->db->where('b.id_material', $detail->id_category3);
+				$this->db->where('a.no_kirim', $header->id_do);
+				$this->db->where('a.id_category3', $detail->id_category3);
 				// $this->db->where('a.no_kirim', $header->id_do);
 				$this->db->group_by('a.id_stock');
 				$get_qty_invoice = $this->db->get()->result();
