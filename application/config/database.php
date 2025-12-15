@@ -76,9 +76,15 @@ $query_builder = true;
 
 $db['default'] = array(
     'dsn' => '',
+<<<<<<< HEAD
     'hostname' => 'localhost',
     'username' => 'metalsindo',
     'password' => '93892ifkqKHD^&(hjh',
+=======
+    'hostname' => '192.168.2.121',
+    'username' => 'alief',
+    'password' => 'sdk*^HkfJKjkefJFJLEJLE',
+>>>>>>> e6c68e3a58bf44cb82c395e2016c2ac1af3cc7a2
     'database' => 'metalsindo_live',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
@@ -99,9 +105,15 @@ $db['default'] = array(
 
 $db['accounting'] = array(
     'dsn'    => '',
+<<<<<<< HEAD
     'hostname' => 'localhost',
     'username' => 'metalsindo',
     'password' => '93892ifkqKHD^&(hjh',
+=======
+    'hostname' => '192.168.2.121',
+    'username' => 'alief',
+    'password' => 'sdk*^HkfJKjkefJFJLEJLE',
+>>>>>>> e6c68e3a58bf44cb82c395e2016c2ac1af3cc7a2
     'database' => 'gl_metalsindo_live',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
@@ -118,6 +130,7 @@ $db['accounting'] = array(
     'failover' => array(),
     'save_queries' => TRUE
 );
+<<<<<<< HEAD
 
 $db['cms'] = array(
     'dsn' => '',
@@ -140,3 +153,5 @@ $db['cms'] = array(
     'failover' => array(),
     'save_queries' => true,
 );
+=======
+>>>>>>> e6c68e3a58bf44cb82c395e2016c2ac1af3cc7a2

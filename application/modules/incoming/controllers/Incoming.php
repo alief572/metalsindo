@@ -453,8 +453,21 @@ class Incoming extends Admin_Controller
 		Length     : " . number_format($material->panjang, 2) . " <br>
 		Ttl PO    : " . number_format($material->totalwidth, 2) . "<br>
 		Blm Diterima: " . number_format(($material->totalwidth - $incoming->incoming) * -1, 2) . " <br>
+<<<<<<< HEAD
 
 		
+=======
+		";
+
+			if ($get_material->id_bentuk == 'B2000002') {
+				$qty_sheet = $material_pr->qty_sheet;
+
+				echo "Ttl PO (Sheet) : " . $qty_sheet . " <br>";
+				echo "Blm Diterima (Sheet) : " . number_format(($qty_sheet - $incoming->qty_sheet) * -1, 2) . " <br>";
+			}
+
+			echo "
+>>>>>>> e6c68e3a58bf44cb82c395e2016c2ac1af3cc7a2
 		<input  type='hidden' 		value='" . number_format($thick->thickness, 2) . "'		class='form-control input-sm text-right' id='dt_thickness_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][thickness]' 		readonly>
 		
 		<input  type='hidden' 		value='" . number_format($dens->density, 2) . "'		class='form-control input-sm text-right' id='dt_density_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][density]' 		readonly>
@@ -488,7 +501,7 @@ class Incoming extends Admin_Controller
 		<td><input  type='text' class='form-control input-sm autoNumeric' id='dt_aktual_" . $id . "_" . $no . "' 	onBlur='cariSelisih($id,$no)'		required name='dt[" . $id . "][detail][" . $no . "][aktual]' 	Placeholder='Berat Aktual'	></td>
 
 		<td>
-			<input type='text' class='form-control input-sm " . $mandatory_sheet . " autoNumeric' id='dt_aktual_" . $id . "_" . $no . "' name='dt[" . $id . "][detail][" . $no . "][qty_sheet]' placeholder='Qty Sheet'>
+			<input type='text' class='form-control input-sm " . $mandatory_sheet . " qty_sheet autoNumeric' id='dt_aktual_" . $id . "_" . $no . "' name='dt[" . $id . "][detail][" . $no . "][qty_sheet]' placeholder='Qty Sheet'>
 		</td>
 		
 		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_selisih_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][selisih]' 	readonly	></td>
