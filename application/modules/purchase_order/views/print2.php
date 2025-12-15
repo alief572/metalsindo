@@ -167,13 +167,15 @@
     <table border="0" width='100%'>
         <tr>
             <td align="left">
-                <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'>
+                <!-- <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'> -->
+                <img src='assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'>
             </td>
             <td align="left">
                 <h5 style="text-align: left;">PT METALSINDO PACIFIC</h5>
             </td>
             <td align="right" width="483">
-                <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/img/ISO_9001V1.jpg' alt="" height='30' width='60'>
+                <!-- <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/img/ISO_9001V1.jpg' alt="" height='30' width='60'> -->
+                <img src='assets/img/ISO_9001V1.jpg' alt="" height='30' width='60'>
             </td>
         </tr>
     </table>
@@ -314,7 +316,7 @@
                         <td width='100'>" . wordwrap($detail->nama, 15, '<br>', true) . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($total_sheet, 2) . "</td>
+                        <td width='50' align='right'>" . number_format(($total_weight_kgs / $weight_per_sheet), 2) . "</td>
                         <td width='50' align='right'>" . number_format(($detail->hargasatuan * $weight_per_sheet), 2) . "</td>
                         <td width='50' align='right'>" . number_format($total_weight_kgs, 2) . "</td>
                         <td width='50' align='right'>" . $HS . "</td>
@@ -322,7 +324,7 @@
                         <td width='50'>" . $detail->description . "</td>
                     </tr>";
 
-                    $ttl_sheet += ($total_sheet);
+                    $ttl_sheet += ($total_weight_kgs / $weight_per_sheet);
                     $ttl_kgs += $total_weight_kgs;
                     $ttl_amount += ((($detail->totalwidth) * $detail->hargasatuan) + ((($detail->totalwidth) * $detail->hargasatuan) * $detail->pajak / 100));
                 } else {

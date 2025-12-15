@@ -421,6 +421,7 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 					data: 'action'
 				}
 			],
+			serverSide: true,
 			responsive: true,
 			processing: true,
 			serverSide: true,

@@ -55,24 +55,24 @@ class Users extends Front_Controller
             // print_r($resGoogle);
             // exit;
 
-            if (!$resGoogle->success) {
-                $pesan = 'Gagal validasi reCAPTCHA Google...!';
-                $this->session->set_flashdata('error_captcha', $pesan);
+            // if (!$resGoogle->success) {
+            //     $pesan = 'Gagal validasi reCAPTCHA Google...!';
+            //     $this->session->set_flashdata('error_captcha', $pesan);
 
-                redirect('login');
-            } else if ($resGoogle->score < 0.2 || $resGoogle->action !== 'login') {
-                $pesan = 'Gagal, terdeteksi login mencurigakan. Silahkan coba lagi...!';
-                $this->session->set_flashdata('error_captcha', $pesan);
+            //     redirect('login');
+            // } else if ($resGoogle->score < 0.2 || $resGoogle->action !== 'login') {
+            //     $pesan = 'Gagal, terdeteksi login mencurigakan. Silahkan coba lagi...!';
+            //     $this->session->set_flashdata('error_captcha', $pesan);
 
-                redirect('login');
-            } else if ($resGoogle->success && $resGoogle->score >= 0.2) {
-                $this->auth->login($username, $password, $token);
-            } else {
-                $pesan = 'Gagal login, silahkan coba lagi...!';
-                $this->session->set_flashdata('error_captcha', $pesan);
+            //     redirect('login');
+            // } else if ($resGoogle->success && $resGoogle->score >= 0.2) {
+            $this->auth->login($username, $password, $token);
+            // } else {
+            //     $pesan = 'Gagal login, silahkan coba lagi...!';
+            //     $this->session->set_flashdata('error_captcha', $pesan);
 
-                redirect('login');
-            }
+            //     redirect('login');
+            // }
         }
 
         $this->template->set('sitekey', $this->site_key);

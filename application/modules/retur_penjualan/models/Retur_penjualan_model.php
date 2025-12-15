@@ -358,7 +358,7 @@ class Retur_penjualan_model extends BF_Model
 					b.name_customer LIKE "%' . $search['value'] . '%" OR
 					c.no_surat LIKE "%' . $search['value'] . '%"
 				)
-			GROUP BY a.id_spkmarketing
+			GROUP BY a.id_spkmarketing, a.no_surat
 			ORDER BY a.id_spkmarketing DESC
 		';
 		$count_all = $this->db->query($sql)->num_rows();
