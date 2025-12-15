@@ -112,7 +112,7 @@ $process = (!empty($header)) ? $kgPro : '';
 										<?php foreach ($results['material'] as $material) {
 											$selx = ($id_material == $material->id_category3) ? 'selected' : '';
 										?>
-											<option value="<?= $material->id_category3 ?>" <?= $selx; ?>><?= ucfirst(strtolower($material->nama)) ?>|<?= ucfirst(strtolower($material->maker)) ?></option>
+											<option value="<?= $material->id_category3 ?>" <?= $selx; ?>><?= $material->id_category3 ?>|<?= ucfirst(strtolower($material->nama)) ?>|<?= ucfirst(strtolower($material->maker)) ?></option>
 										<?php } ?>
 									</select>
 								</div>
