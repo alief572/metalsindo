@@ -1499,8 +1499,6 @@ class Purchase_order extends Admin_Controller
 
 		$data['check_sheet'] = $check_sheet;
 
-
-
 		$this->load->view('print2', $data);
 		$html = ob_get_contents();
 
