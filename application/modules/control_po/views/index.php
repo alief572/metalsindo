@@ -36,7 +36,7 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 			</thead>
 
 			<tbody>
-				
+
 			</tbody>
 		</table>
 	</div>
@@ -80,8 +80,7 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 				url: siteurl + active_controller + 'get_control_po',
 				dataType: 'json'
 			},
-			columns: [
-				{
+			columns: [{
 					data: 'no'
 				},
 				{
