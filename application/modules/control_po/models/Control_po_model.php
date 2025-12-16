@@ -58,7 +58,7 @@ class Control_po_model extends BF_Model
             $option = '<button type="button" class="btn btn-sm btn-primary detail" data-id_po="' . $item->id_dt_po . '"><i class="fa fa-eye"></i></button>';
 
             if ($item->close_po == 'N') {
-                $option .= ' <button> type="button" class="btn btn-sm btn-success checked" data-id_po="' . $item->id_dt_po . '"><i class="fa fa-check"></i></button>';
+                $option .= ' <button type="button" class="btn btn-sm btn-success checked" data-id_po="' . $item->id_dt_po . '"><i class="fa fa-check"></i></button>';
             }
 
             $get_incoming = $this->db->get_where('dt_incoming', array('id_dt_po' => $item->id_dt_po))->row();
