@@ -129,21 +129,21 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 			if (qty_do.length < 1) {
 				qty_do = 0;
 			} else {
-				qty_do = qty_do.split(','), join('');
+				qty_do = qty_do.split(',').join('');
 				qty_do = parseFloat(qty_do);
 			}
 			var qty_in = $('input[name="detail[' + i + '][qty_in]"]').val();
 			if (qty_in.length < 1) {
 				qty_in = 0;
 			} else {
-				qty_in = qty_in.split(','), join('');
+				qty_in = qty_in.split(',').join('');
 				qty_in = parseFloat(qty_in);
 			}
 			var qty_ng = $('input[name="detail[' + i + '][qty_ng]"]').val();
 			if (qty_ng.length < 1) {
 				qty_ng = 0;
 			} else {
-				qty_ng = qty_ng.split(','), join('');
+				qty_ng = qty_ng.split(',').join('');
 				qty_ng = parseFloat(qty_ng);
 			}
 
