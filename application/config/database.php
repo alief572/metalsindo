@@ -83,6 +83,7 @@ $db['default'] = array(
     'ports' => '3306',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
+    'port' => '8732',
     'pconnect' => false,
     'db_debug' => (ENVIRONMENT !== 'production'),
     'cache_on' => false,
@@ -118,4 +119,26 @@ $db['accounting'] = array(
     'stricton' => FALSE,
     'failover' => array(),
     'save_queries' => TRUE
+);
+
+$db['cms'] = array(
+    'dsn' => '',
+    'hostname' => 'localhost',
+    'username' => 'metalsindo',
+    'password' => '93892ifkqKHD^&(hjh',
+    'database' => 'GL_UBER',
+    'dbdriver' => 'mysqli',
+    'dbprefix' => '',
+    'pconnect' => false,
+    'db_debug' => (ENVIRONMENT !== 'production'),
+    'cache_on' => false,
+    'cachedir' => '',
+    'char_set' => 'utf8',
+    'dbcollat' => 'utf8_general_ci',
+    'swap_pre' => '',
+    'encrypt' => false,
+    'compress' => false,
+    'stricton' => false,
+    'failover' => array(),
+    'save_queries' => true,
 );
