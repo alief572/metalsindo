@@ -85,6 +85,13 @@ class Control_po extends Admin_Controller
         echo json_encode($status);
     }
 
+    public function download_excel()
+    {
+        $get_data_control_po = $this->db->get('view_control_po')->result_array();
+
+        $this->load->view('download_excel', array('data_control_po' => $get_data_control_po));
+    }
+
     public function get_control_po()
     {
         $this->Control_po_model->get_control_po();

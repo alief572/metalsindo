@@ -65,6 +65,11 @@ class Control_po_model extends BF_Model
 
             $incoming = (!empty($get_incoming->width_recive)) ? $get_incoming->width_recive : 0;
 
+            $status = '<span class="badge bg-green">Open</span>';
+            if ($item->close_po == 'Y') {
+                $status = '<span class="badge bg-red">Closed</span>';
+            }
+
             $hasil[] = [
                 'no' => $no,
                 'no_pr' => $item->no_pr,
@@ -75,6 +80,7 @@ class Control_po_model extends BF_Model
                 'qty_order' => number_format($item->qty_po, 2),
                 'qty_receive' => number_format($incoming, 2),
                 'balance' => number_format(($item->qty_po - $incoming), 2),
+                'status' => $status,
                 'option' => $option
             ];
         }
