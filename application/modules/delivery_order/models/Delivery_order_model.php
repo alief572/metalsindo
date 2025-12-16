@@ -180,6 +180,7 @@ class Delivery_order_model extends BF_Model
 
 		return $idcust;
 	}
+
 	public function CariMaterial($id_crcl)
 	{
 		$this->db->select('a.*, b.nama as nama3, b.hardness as hardness, c.nama as nama2');
@@ -206,9 +207,15 @@ class Delivery_order_model extends BF_Model
 		$this->db->select('a.*, b.name_customer as name_customer');
 		$this->db->from('tr_delivery_order a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+		$this->db->join('dt_delivery_order_child c', 'c.id_delivery_order = a.id_delivery_order', 'left');
 		$this->db->order_by('a.id_delivery_order', 'DESC');
 		$this->db->where('a.status_approve', '1');
 		$this->db->where('a.status_invoice', 'OPN');
+		$this->db->group_start();
+		$this->db->where('c.qty_in >', 0);
+		$this->db->or_where('c.qty_ng >', 0);
+		$this->db->group_end();
+		$this->db->group_by('a.id_delivery_order');
 		$query = $this->db->get();
 		return $query->result();
 	}
@@ -468,11 +475,11 @@ class Delivery_order_model extends BF_Model
 						<a class="btn btn-info btn-sm" href="' . base_url('/delivery_order/editHeader/' . $item->id_delivery_order) . '" title="Edit"><i class="fa fa-edit"></i></i></a>
 					';
 				}
-				// if (has_permission($this->managePermission)) {
-				// 	$button .= '
-				// 		<button type="text" class="btn btn-success btn-sm release" title="Release" data-id="' . $item->id_delivery_order . '"><i class="fa fa-check"></i></button>
-				// 	';
-				// }
+				if (has_permission($this->managePermission)) {
+					$button .= '
+						<button type="text" class="btn btn-success btn-sm release" title="Release" data-id="' . $item->id_delivery_order . '"><i class="fa fa-check"></i></button>
+					';
+				}
 			}
 
 			$this->db->select('SUM(a.weight_mat) as total_fg');

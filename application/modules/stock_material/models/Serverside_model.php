@@ -285,7 +285,7 @@ class Serverside_model extends BF_Model
 			0 => 'id_stock'
 		);
 
-		$sql .= " ORDER BY d.nama,  " . $columns_order_by[$column_order] . " " . $column_dir . " ";
+		$sql .= " ORDER BY   " . $columns_order_by[$column_order] . " " . $column_dir . " ";
 		$sql .= " LIMIT " . $limit_start . " ," . $limit_length . " ";
 
 		$data['query'] = $this->db->query($sql);
