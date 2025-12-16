@@ -453,21 +453,16 @@ class Incoming extends Admin_Controller
 		Length     : " . number_format($material->panjang, 2) . " <br>
 		Ttl PO    : " . number_format($material->totalwidth, 2) . "<br>
 		Blm Diterima: " . number_format(($material->totalwidth - $incoming->incoming) * -1, 2) . " <br>
-<<<<<<< HEAD
-
-		
-=======
 		";
 
 			if ($get_material->id_bentuk == 'B2000002') {
-				$qty_sheet = $material_pr->qty_sheet;
+				$qty_sheet = $totalweight->qty_sheet;
 
 				echo "Ttl PO (Sheet) : " . $qty_sheet . " <br>";
 				echo "Blm Diterima (Sheet) : " . number_format(($qty_sheet - $incoming->qty_sheet) * -1, 2) . " <br>";
 			}
 
 			echo "
->>>>>>> e6c68e3a58bf44cb82c395e2016c2ac1af3cc7a2
 		<input  type='hidden' 		value='" . number_format($thick->thickness, 2) . "'		class='form-control input-sm text-right' id='dt_thickness_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][thickness]' 		readonly>
 		
 		<input  type='hidden' 		value='" . number_format($dens->density, 2) . "'		class='form-control input-sm text-right' id='dt_density_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][density]' 		readonly>
@@ -525,7 +520,7 @@ class Incoming extends Admin_Controller
 		//$idroll 	= $_GET['idroll']+$_GET['no'];
 
 		$roll = $_GET['idroll'] + 1;
-		$idroll = $id_material . "-" . str_pad($roll, 3, "0", STR_PAD_LEFT);
+		// $idroll = $id_material . "-" . str_pad($roll, 3, "0", STR_PAD_LEFT);
 
 		$mt     = $this->db->query("SELECT * FROM tr_purchase_order WHERE no_po = '" . $no_po . "'  ")->row();
 		$no_surat = $mt->no_surat;
@@ -544,6 +539,14 @@ class Incoming extends Admin_Controller
 			$dens = $this->db->query("SELECT density FROM view_material WHERE id_category3='$id_material' AND bentuk='$bentuk'")->row();
 
 			$thick = $this->db->query("SELECT nilai_dimensi as thickness FROM view_material WHERE id_category3='$id_material' AND bentuk='$bentuk' AND nama='THICKNESS'")->row();
+
+			$get_material = $this->db->get_where('ms_inventory_category3', ['id_category3' => $id_material])->row();
+
+			$id_bentuk = $get_material->id_bentuk;
+
+			$check_sheet = ($id_bentuk == 'B2000002') ? 1 : 0;
+
+			$mandatory_sheet = ($check_sheet == 1) ? 'mandatory_sheet' : '';
 
 			$no++;
 			echo "
@@ -607,7 +610,7 @@ class Incoming extends Admin_Controller
 		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_aktual_" . $id . "_" . $no . "' 		onBlur='cariSelisih($id,$no)'	required name='dt[" . $id . "][detail][" . $no . "][aktual]' 	Placeholder='Berat Aktual'	></td>
 
 		<td>
-			<input type='text' class='form-control input-sm autoNumeric' id='dt_qty_sheet_" . $id . "_" . $no . "' required name='dt[" . $id . "][detail][" . $no . "][qty_sheet]' placeholder='Qty Sheet'>
+			<input type='text' class='form-control input-sm " . $mandatory_sheet . " qty_sheet autoNumeric' id='dt_qty_sheet_" . $id . "_" . $no . "' required name='dt[" . $id . "][detail][" . $no . "][qty_sheet]' placeholder='Qty Sheet'>
 		</td>
 		
 		<td						><input  type='text' 											class='form-control input-sm autoNumeric' id='dt_selisih_" . $id . "_" . $no . "' 			required name='dt[" . $id . "][detail][" . $no . "][selisih]'  	readonly	></td>
