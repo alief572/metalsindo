@@ -595,7 +595,22 @@ class Penawaran extends Admin_Controller
 		$komisi = $_GET['komisi'];
 		$profit = $_GET['bottom'] * $_GET['profit'] / 100;
 		$hasil = $bottom + $komisi + $profit;
-		echo "<input type='text' class='form-control autoNumeric' value='$hasil' id='harga_penawaran'  required name='harga_penawaran' placeholder='Bentuk Material'>";
+
+		$id_category3 = $_GET['id_category3'];
+
+		$get_material = $this->db->get_where('ms_inventory_category3', array('id_category3' => $id_category3))->row_array();
+
+
+
+		$response = [
+			'inputan' => "<input type='text' class='form-control autoNumeric' value='$hasil' id='harga_penawaran'  required name='harga_penawaran' placeholder='Bentuk Material'>",
+			'harga' => ($get_material['id_bentuk'] == 'B2000002') ? number_format($hasil, 2) : 0
+		];
+
+		header('Content-Type: application/json');
+		http_response_code(200);
+
+		echo json_encode($response);
 	}
 	function carimsprofit()
 	{
