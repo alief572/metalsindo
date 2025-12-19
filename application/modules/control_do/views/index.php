@@ -119,6 +119,67 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 	$(document).on('submit', '#frm_data', function(e) {
 		e.preventDefault();
 
+		var no = $('input[name="no"]').val();
+		// alert(no);
+
+		var sts = 1;
+		// var sts = 1;
+		for (i = 1; i <= no; i++) {
+			var qty_do = $('input[name="detail[' + i + '][qty_do]"]').val();
+			if (qty_do.length < 1) {
+				qty_do = 0;
+			} else {
+				qty_do = qty_do.split(',').join('');
+				qty_do = parseFloat(qty_do);
+			}
+			var qty_in = $('input[name="detail[' + i + '][qty_in]"]').val();
+			if (qty_in.length < 1) {
+				qty_in = 0;
+			} else {
+				qty_in = qty_in.split(',').join('');
+				qty_in = parseFloat(qty_in);
+			}
+			var qty_ng = $('input[name="detail[' + i + '][qty_ng]"]').val();
+			if (qty_ng.length < 1) {
+				qty_ng = 0;
+			} else {
+				qty_ng = qty_ng.split(',').join('');
+				qty_ng = parseFloat(qty_ng);
+			}
+
+			if (sts == 1) {
+				if ((qty_in + qty_ng) > qty_do) {
+					Swal.fire({
+						icon: 'warning',
+						title: 'Warning !',
+						text: 'Mohon maaf, qty input yang melebihi qty DO !',
+						showConfirmButton: false,
+						showCancelButton: false,
+						allowOutsideClick: false,
+						allowEscapeKey: false,
+						timer: 3000
+					});
+					sts = 0;
+					return false;
+				}
+
+				if ((qty_in + qty_ng) !== qty_do) {
+					Swal.fire({
+						icon: 'warning',
+						title: 'Warning !',
+						text: 'Mohon maaf, total qty input harus sama dengan qty DO !',
+						showConfirmButton: false,
+						showCancelButton: false,
+						allowOutsideClick: false,
+						allowEscapeKey: false,
+						timer: 3000
+					});
+					sts = 0;
+					return false;
+				}
+			}
+		}
+
 		Swal.fire({
 			icon: 'warning',
 			title: 'Are you sure ?',

@@ -140,7 +140,7 @@ $tanggal = date('Y-m-d');
 							<th width='3'></th>
 							<th width='5'></th>
 							<th width='5'><input type="text" class="form-control" id="total_incoming" required name="total_incoming" readonly></th>
-							<th width='5'></th>
+							<th width='5'><input type="text" class="form-control" id="total_incoming_sheet" required name="total_incoming_sheet" readonly></th>
 							<th width='5' hidden></th>
 							<th width='5'></th>
 						</tr>
@@ -181,6 +181,25 @@ $tanggal = date('Y-m-d');
 		var max_fields2 = 10; //maximum input boxes allowed
 		var wrapper2 = $(".input_fields_wrap2"); //Fields wrapper
 		var add_button2 = $(".add_field_button2"); //Add button ID
+
+
+		$(document).on('change', '.qty_sheet', function() {
+			var ttl_qty_sheet = 0;
+			$('.qty_sheet').each(function(index) {
+				var value = $(this).val();
+
+				if (!value) {
+					value = 0;
+				} else {
+					value = value.split(',').join('');
+					value = parseFloat(value);
+				}
+
+				ttl_qty_sheet += value;
+			});
+
+			$('#total_incoming_sheet').val(number_format(ttl_qty_sheet));
+		})
 
 		$('#simpan-com').click(function(e) {
 			e.preventDefault();

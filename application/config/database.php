@@ -76,12 +76,14 @@ $query_builder = true;
 
 $db['default'] = array(
     'dsn' => '',
-    'hostname' => '192.168.2.121',
-    'username' => 'alief',
-    'password' => 'sdk*^HkfJKjkefJFJLEJLE',
+    'hostname' => 'localhost',
+    'username' => 'metalsindo',
+    'password' => '93892ifkqKHD^&(hjh',
     'database' => 'metalsindo_live',
+    'ports' => '3306',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
+    'port' => '8732',
     'pconnect' => false,
     'db_debug' => (ENVIRONMENT !== 'production'),
     'cache_on' => false,
@@ -98,10 +100,11 @@ $db['default'] = array(
 
 $db['accounting'] = array(
     'dsn'    => '',
-    'hostname' => '192.168.2.121',
-    'username' => 'alief',
-    'password' => 'sdk*^HkfJKjkefJFJLEJLE',
+    'hostname' => 'localhost',
+    'username' => 'metalsindo',
+    'password' => '93892ifkqKHD^&(hjh',
     'database' => 'gl_metalsindo_live',
+    'ports' => '3306',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
     'pconnect' => FALSE,
@@ -116,4 +119,26 @@ $db['accounting'] = array(
     'stricton' => FALSE,
     'failover' => array(),
     'save_queries' => TRUE
+);
+
+$db['cms'] = array(
+    'dsn' => '',
+    'hostname' => 'localhost',
+    'username' => 'metalsindo',
+    'password' => '93892ifkqKHD^&(hjh',
+    'database' => 'GL_UBER',
+    'dbdriver' => 'mysqli',
+    'dbprefix' => '',
+    'pconnect' => false,
+    'db_debug' => (ENVIRONMENT !== 'production'),
+    'cache_on' => false,
+    'cachedir' => '',
+    'char_set' => 'utf8',
+    'dbcollat' => 'utf8_general_ci',
+    'swap_pre' => '',
+    'encrypt' => false,
+    'compress' => false,
+    'stricton' => false,
+    'failover' => array(),
+    'save_queries' => true,
 );

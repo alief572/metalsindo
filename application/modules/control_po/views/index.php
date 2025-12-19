@@ -15,6 +15,7 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 
 <div class="box">
 	<div class="box-header">
+		<a href="control_po/download_excel" class="btn btn-sm btn-success" target="_blank" title="Download Excel"><i class="fa fa-download"></i> Download Excel</a>
 	</div>
 	<!-- /.box-header -->
 	<!-- /.box-header -->
@@ -31,12 +32,13 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 					<th>Qty Order (Kg)</th>
 					<th>Qty Receive (Kg)</th>
 					<th>Balance</th>
+					<th>Status</th>
 					<th>Option</th>
 				</tr>
 			</thead>
 
 			<tbody>
-				
+
 			</tbody>
 		</table>
 	</div>
@@ -80,8 +82,7 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 				url: siteurl + active_controller + 'get_control_po',
 				dataType: 'json'
 			},
-			columns: [
-				{
+			columns: [{
 					data: 'no'
 				},
 				{
@@ -107,6 +108,9 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 				},
 				{
 					data: 'balance'
+				},
+				{
+					data: 'status'
 				},
 				{
 					data: 'option'
