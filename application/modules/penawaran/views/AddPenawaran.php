@@ -600,7 +600,30 @@ foreach ($results['headpenawaran'] as $headpenawaran) {
 			}
 		});
 
-
+		$.ajax({
+			type: 'post',
+			url: siteurl + 'penawaran/get_last_sheet_price',
+			data: {
+				'id_category3': id_category3
+			},
+			cache: false,
+			dataType: 'json',
+			success: function(result) {
+				$('#price_sheet').autoNumeric('set', result.price_sheet);
+			},
+			error: function(result) {
+				swal({
+					type: 'error',
+					title: 'Error !',
+					text: result.msg,
+					showConfirmButton: false,
+					showCancelButton: false,
+					allowOutsideClick: false,
+					allowEscapeKey: false,
+					timer: 3000
+				});
+			}
+		});
 	}
 
 	function hitungkomisi() {
