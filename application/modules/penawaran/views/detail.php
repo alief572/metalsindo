@@ -242,8 +242,6 @@ foreach ($results['header'] as $header) {
 				});
 			}
 		})
-
-
 	});
 
 	$(document).on('click', '.view', function() {
