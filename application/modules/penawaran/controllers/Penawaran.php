@@ -2009,4 +2009,40 @@ class Penawaran extends Admin_Controller
 	{
 		$this->Inventory_4_model->get_data_penawaran();
 	}
+
+	public function get_last_sheet_price()
+	{
+		$id_category3 = $this->input->post('id_category3');
+
+		try {
+			$this->db->select('a.price_sheet');
+			$this->db->from('child_penawaran a');
+			$this->db->where('id_category3', $id_category3);
+			$this->db->where('a.id_bentuk', 'B2000002');
+			$this->db->order_by('a.created_on', 'desc');
+			$this->db->limit(1);
+			$get_data = $this->db->get()->row();
+
+			$price_sheet = 0;
+			if (!empty($get_data)) {
+				$price_sheet = $get_data->price_sheet;
+			}
+
+			http_response_code(200);
+
+			$response = [
+				'price_sheet' => $price_sheet
+			];
+
+			echo json_encode($response);
+		} catch (Exception $e) {
+			http_response_code(500);
+
+			$response = [
+				'msg' => $e->getMessage()
+			];
+
+			echo json_encode($response);
+		}
+	}
 }
