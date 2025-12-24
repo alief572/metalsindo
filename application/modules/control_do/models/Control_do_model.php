@@ -19,4 +19,14 @@ class Control_do_model extends BF_Model
 
         return $get_data;
     }
+
+    public function do_detail_scrap($id_delivery_order)
+    {
+        $this->db->select('a.*');
+        $this->db->from('dt_delivery_order_child_scrap a');
+        $this->db->where('a.id_delivery_order', $id_delivery_order);
+        $get_data = $this->db->get()->result();
+
+        return $get_data;
+    }
 }
