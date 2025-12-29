@@ -595,7 +595,22 @@ class Penawaran extends Admin_Controller
 		$komisi = $_GET['komisi'];
 		$profit = $_GET['bottom'] * $_GET['profit'] / 100;
 		$hasil = $bottom + $komisi + $profit;
-		echo "<input type='text' class='form-control autoNumeric' value='$hasil' id='harga_penawaran'  required name='harga_penawaran' placeholder='Bentuk Material'>";
+
+		$id_category3 = $_GET['id_category3'];
+
+		$get_material = $this->db->get_where('ms_inventory_category3', array('id_category3' => $id_category3))->row_array();
+
+
+
+		$response = [
+			'inputan' => "<input type='text' class='form-control autoNumeric' value='$hasil' id='harga_penawaran'  required name='harga_penawaran' placeholder='Bentuk Material'>",
+			'harga' => ($get_material['id_bentuk'] == 'B2000002') ? number_format($hasil, 2) : 0
+		];
+
+		header('Content-Type: application/json');
+		http_response_code(200);
+
+		echo json_encode($response);
 	}
 	function carimsprofit()
 	{
@@ -1993,5 +2008,41 @@ class Penawaran extends Admin_Controller
 	public function get_data_penawaran()
 	{
 		$this->Inventory_4_model->get_data_penawaran();
+	}
+
+	public function get_last_sheet_price()
+	{
+		$id_category3 = $this->input->post('id_category3');
+
+		try {
+			$this->db->select('a.price_sheet');
+			$this->db->from('child_penawaran a');
+			$this->db->where('id_category3', $id_category3);
+			$this->db->where('a.id_bentuk', 'B2000002');
+			$this->db->order_by('a.created_on', 'desc');
+			$this->db->limit(1);
+			$get_data = $this->db->get()->row();
+
+			$price_sheet = 0;
+			if (!empty($get_data)) {
+				$price_sheet = $get_data->price_sheet;
+			}
+
+			http_response_code(200);
+
+			$response = [
+				'price_sheet' => $price_sheet
+			];
+
+			echo json_encode($response);
+		} catch (Exception $e) {
+			http_response_code(500);
+
+			$response = [
+				'msg' => $e->getMessage()
+			];
+
+			echo json_encode($response);
+		}
 	}
 }

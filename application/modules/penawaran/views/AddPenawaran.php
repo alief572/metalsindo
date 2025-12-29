@@ -600,19 +600,45 @@ foreach ($results['headpenawaran'] as $headpenawaran) {
 			}
 		});
 
-
+		$.ajax({
+			type: 'post',
+			url: siteurl + 'penawaran/get_last_sheet_price',
+			data: {
+				'id_category3': id_category3
+			},
+			cache: false,
+			dataType: 'json',
+			success: function(result) {
+				$('#price_sheet').autoNumeric('set', result.price_sheet);
+			},
+			error: function(result) {
+				swal({
+					type: 'error',
+					title: 'Error !',
+					text: result.msg,
+					showConfirmButton: false,
+					showCancelButton: false,
+					allowOutsideClick: false,
+					allowEscapeKey: false,
+					timer: 3000
+				});
+			}
+		});
 	}
 
 	function hitungkomisi() {
 		var bottom = getNum($("#bottom").val().split(",").join(""));
 		var komisi = getNum($("#komisi").val().split(",").join(""));
 		var profit = getNum($("#profit").val().split(",").join(""));
+		var id_category3 = $('#id_category3').val();
 		$.ajax({
 			type: "GET",
 			url: siteurl + 'penawaran/hitung_komisi',
-			data: "&bottom=" + bottom + "&komisi=" + komisi + "&profit=" + profit,
+			data: "&bottom=" + bottom + "&komisi=" + komisi + "&profit=" + profit + "&id_category3=" + id_category3,
+			dataType: 'json',
 			success: function(html) {
-				$("#tempat_penawaran").html(html);
+				$("#tempat_penawaran").html(html.inputan);
+				$('#price_sheet').val(html.harga);
 				$('.autoNumeric').autoNumeric();
 			}
 		});
