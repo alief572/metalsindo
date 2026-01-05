@@ -171,6 +171,7 @@ class Wt_invoicing_model extends BF_Model
 
     if ($tahun_do !== $tahun) {
       $bulan_kode2 = $romawi;
+      $th = $tahun_do;
     }
 
     $blnthn = date('Y-m');
