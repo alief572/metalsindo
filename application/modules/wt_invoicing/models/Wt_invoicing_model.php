@@ -640,11 +640,11 @@ class Wt_invoicing_model extends BF_Model
 
       if (has_permission($this->managePermission)) {
         $action = '
-          <a class="btn btn-success btn-sm" href="' . base_url(' / wt_invoicing / createInvoice / ' . $row->id_spkmarketing) . '" title="Create Invoice" data-no_inquiry="' . $row->no_inquiry . '"><i class="fa fa-check">&nbsp;Create Invoice</i></a>
+          <a class="btn btn-success btn-sm" href="' . base_url('/wt_invoicing/createInvoice/' . $row->id_spkmarketing) . '" title="Create Invoice" data-no_inquiry="' . $row->no_inquiry . '"><i class="fa fa-check">&nbsp;Create Invoice</i></a>
         ';
 
         $action .= '
-          <a class="btn btn-warning btn-sm" href="' . base_url(' / wt_invoicing / createProformaInvoice / ' . $row->id_spkmarketing) . '" title="Create Proforma Invoice" data-no_inquiry="' . $row->no_inquiry . '"><i class="fa fa-check">&nbsp;Create Proforma Invoice</i></a>
+          <a class="btn btn-warning btn-sm" href="' . base_url('/wt_invoicing/createProformaInvoice/' . $row->id_spkmarketing) . '" title="Create Proforma Invoice" data-no_inquiry="' . $row->no_inquiry . '"><i class="fa fa-check">&nbsp;Create Proforma Invoice</i></a>
         ';
       }
 
