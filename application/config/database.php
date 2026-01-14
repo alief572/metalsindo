@@ -79,12 +79,7 @@ $db['default'] = array(
     'hostname' => 'localhost',
     'username' => 'metalsindo',
     'password' => '93892ifkqKHD^&(hjh',
-<<<<<<< HEAD
     'database' => 'metalsindo_dev',
-=======
-    'database' => 'metalsindo_live',
-    'ports' => '3306',
->>>>>>> d96420255d1da43f7f217a5223e4d9b20fbfe0f4
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
     'port' => '8732',
@@ -107,12 +102,7 @@ $db['accounting'] = array(
     'hostname' => 'localhost',
     'username' => 'metalsindo',
     'password' => '93892ifkqKHD^&(hjh',
-<<<<<<< HEAD
     'database' => 'gl_metalsindo_dev',
-=======
-    'database' => 'gl_metalsindo_live',
-    'ports' => '3306',
->>>>>>> d96420255d1da43f7f217a5223e4d9b20fbfe0f4
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
     'pconnect' => FALSE,
@@ -132,13 +122,8 @@ $db['accounting'] = array(
 $db['cms'] = array(
     'dsn' => '',
     'hostname' => 'localhost',
-<<<<<<< HEAD
     'username' => 'alief',
     'password' => 'sdk*^HkfJKjkefJFJLEJLE',
-=======
-    'username' => 'metalsindo',
-    'password' => '93892ifkqKHD^&(hjh',
->>>>>>> d96420255d1da43f7f217a5223e4d9b20fbfe0f4
     'database' => 'GL_UBER',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
