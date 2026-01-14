@@ -305,19 +305,30 @@
                     $harga_satuan_kgs = ($detail->hargasatuan * $detail->total_weight);
 
                     $get_detail_pr = $this->db->get_where('dt_trans_pr', ['id_dt_pr' => $detail->idpr])->row();
+                    $get_material = $this->db->get_where('ms_inventory_category3', ['id_category3' => $detail->idmaterial])->row();
 
                     $total_weight_sheet = (!empty($get_detail_pr->qty_sheet) && $get_detail_pr->qty_sheet !== null && $get_detail_pr->qty_sheet > 0) ? ($total_weight_kgs / $get_detail_pr->weight_sheet) : 0;
 
                     $total_sheet = (isset($get_detail_pr)) ? $get_detail_pr->qty_sheet : 0;
                     $weight_per_sheet = (isset($get_detail_pr)) ? $get_detail_pr->weight_sheet : 0;
 
+                    $weight_sheet = (!empty($get_detail_pr->qty_sheet)) ? $get_detail_pr->qty_sheet : 0;
+
+                    $harga_sheet = ($detail->hargasatuan * $get_material->total_weight);
+
+
                     echo "	
                     <tr >
                         <td width='100'>" . wordwrap($detail->nama, 15, '<br>', true) . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
+<<<<<<< HEAD
                         <td width='50' align='right'>" . number_format(($total_weight_kgs / $weight_per_sheet), 2) . "</td>
                         <td width='50' align='right'>" . number_format(($detail->hargasatuan * $weight_per_sheet), 2) . "</td>
+=======
+                        <td width='50' align='right'>" . number_format($weight_sheet, 2) . "</td>
+                        <td width='50' align='right'>" . number_format($harga_sheet, 2) . "</td>
+>>>>>>> d96420255d1da43f7f217a5223e4d9b20fbfe0f4
                         <td width='50' align='right'>" . number_format($total_weight_kgs, 2) . "</td>
                         <td width='50' align='right'>" . $HS . "</td>
                         <td width='80' align='right'>" . number_format(($total_weight_kgs) * $detail->hargasatuan, 2) . "</td>

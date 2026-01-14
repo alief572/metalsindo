@@ -176,7 +176,7 @@ $get_stocklot = $this->db->get_where('stock_material', array('id_stock' => $tr_s
 									   <input  type='number' class='form-control'  	 value='1' 	 id='used_qtyaktual_$i$loop' onkeyup='HitungTotalCoil($i$loop)' required name='dt[$i$loop][qtyaktual][]'>
 									</th>
 									<th>
-									<input type='text' class='form-control dt_qtywidth autoNumeric'  	onblur='HitungTotalberat($i$loop)'	value='$dt_spk->width' 	 id='used_qtywidth_$i$loop' required name='dt[$i$loop][qtywidth][]' tabindex='1'>
+									<input type='text' class='form-control dt_qtywidth'  	onblur='HitungTotalberat($i$loop)'	value='$dt_spk->width' 	 id='used_qtywidth_$i$loop' required name='dt[$i$loop][qtywidth][]' tabindex='1'>
 									<input type='hidden' class='form-control'   		value='$dt_spk->id_dt_spkproduksi' id='id_dt_spkproduksi_$i$loop' required name='dt[$i$loop][id_dt_spkproduksi][]'>
 									<input type='hidden' class='form-control dt_width autoNumeric'  		value='0' 	 id='used_totalaktual_$i$loop' required name='dt[$i$loop][totalaktual][]' readonly>
 									</th>

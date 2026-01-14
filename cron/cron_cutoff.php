@@ -50,7 +50,7 @@ ini_set('display_errors', 1);
 	
 
   
-      $conn=mysql_connect("localhost","root","Annabell2018");
+      $conn=mysql_connect("localhost","metalsindo","93892ifkqKHD^&(hjh");
 	  mysql_select_db("importa_dev");
 	  
 
