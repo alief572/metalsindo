@@ -56,6 +56,11 @@ class Control_po_model extends BF_Model
             $no++;
 
             $option = '<button type="button" class="btn btn-sm btn-primary detail" data-id_po="' . $item->id_dt_po . '"><i class="fa fa-eye"></i></button>';
+<<<<<<< HEAD
+
+            if ($item->close_po == 'N') {
+                $option .= ' <button> type="button" class="btn btn-sm btn-success checked" data-id_po="' . $item->id_dt_po . '"><i class="fa fa-check"></i></button>';
+=======
 
             if ($item->close_po == 'N') {
                 $option .= ' <button type="button" class="btn btn-sm btn-success checked" data-id_po="' . $item->id_dt_po . '"><i class="fa fa-check"></i></button>';
@@ -68,7 +73,12 @@ class Control_po_model extends BF_Model
             $status = '<span class="badge bg-green">Open</span>';
             if ($item->close_po == 'Y') {
                 $status = '<span class="badge bg-red">Closed</span>';
+>>>>>>> d96420255d1da43f7f217a5223e4d9b20fbfe0f4
             }
+
+            $get_incoming = $this->db->get_where('dt_incoming', array('id_dt_po' => $item->id_dt_po))->row();
+
+            $incoming = (!empty($get_incoming->width_recive)) ? $get_incoming->width_recive : 0;
 
             $hasil[] = [
                 'no' => $no,
@@ -80,7 +90,10 @@ class Control_po_model extends BF_Model
                 'qty_order' => number_format($item->qty_po, 2),
                 'qty_receive' => number_format($incoming, 2),
                 'balance' => number_format(($item->qty_po - $incoming), 2),
+<<<<<<< HEAD
+=======
                 'status' => $status,
+>>>>>>> d96420255d1da43f7f217a5223e4d9b20fbfe0f4
                 'option' => $option
             ];
         }
