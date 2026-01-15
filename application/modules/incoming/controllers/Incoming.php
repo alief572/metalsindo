@@ -456,7 +456,11 @@ class Incoming extends Admin_Controller
 		";
 
 			if ($get_material->id_bentuk == 'B2000002') {
+<<<<<<< HEAD
+				$qty_sheet = $material_pr->qty_sheet;
+=======
 				$qty_sheet = $totalweight->qty_sheet;
+>>>>>>> d96420255d1da43f7f217a5223e4d9b20fbfe0f4
 
 				echo "Ttl PO (Sheet) : " . $qty_sheet . " <br>";
 				echo "Blm Diterima (Sheet) : " . number_format(($qty_sheet - $incoming->qty_sheet) * -1, 2) . " <br>";
