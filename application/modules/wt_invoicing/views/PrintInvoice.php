@@ -457,7 +457,7 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 
 				$qty_invoice = 0;
 
-				$this->db->select('a.qty_sheet');
+				$this->db->select('a.lotno, a.qty_sheet');
 				$this->db->from('stock_material a');
 				$this->db->where('a.no_kirim', $header->id_do);
 				$this->db->where('a.id_category3', $detail->id_category3);
@@ -466,7 +466,17 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 				$this->db->group_by('a.id_stock');
 				$get_qty_invoice = $this->db->get()->result();
 				foreach ($get_qty_invoice as $item_invoice) {
-					$qty_invoice += $item_invoice->qty_sheet;
+					$this->db->select('a.id');
+					$this->db->from('dt_delivery_order_child a');
+					$this->db->where('a.id_delivery_order', $header->id_do);
+					$this->db->where('a.id_material', $detail->id_category3);
+					$this->db->where('a.lotno', $item_invoice->lotno);
+					$this->db->where('a.qty_in >', 0);
+					$check_control = $this->db->get()->row();
+
+					if(count($check_control) > 0) {
+						$qty_invoice += $item_invoice->qty_sheet;
+					}
 				}
 
 
