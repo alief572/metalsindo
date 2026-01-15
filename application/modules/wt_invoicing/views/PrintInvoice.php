@@ -429,7 +429,7 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 			endif;
 
 			$harga_satuan = 0;
-
+ 
 			$this->db->select('a.harga_deal');
 			$this->db->from('dt_spkmarketing a');
 			$this->db->where('a.id_spkmarketing', $detail->no_so);
