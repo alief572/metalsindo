@@ -171,11 +171,11 @@ class Wt_invoicing_model extends BF_Model
 
     if ($tahun_do !== $tahun) {
       $bulan_kode2 = $romawi;
-      $th = $tahun_do;
+      $th = date('Y', strtotime($tahun_do . '-01-01'));
     }
 
     $blnthn = date('Y-m');
-    $query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_invoice WHERE no_surat LIKE '%/" . date('y', strtotime($th)) . "%'");
+    $query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_invoice WHERE no_surat LIKE '%/" . date('y', strtotime($th . '-01-01')) . "%'");
     $row = $query->row_array();
     $thn = date('T');
     $max_id = $row['max_id'];
