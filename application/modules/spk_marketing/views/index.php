@@ -293,9 +293,9 @@ $ENABLE_DELETE  = has_permission('SPK_marketing.Delete');
 			});
 		} else {
 			if (pilih_bentuk == 'B2000002') {
-				window.location.href = siteurl + active_controller + 'addHeader_Sheet'
+				window.location.href = siteurl + active_controller + '/addHeader_Sheet'
 			} else {
-				window.location.href = siteurl + active_controller + 'addHeader'
+				window.location.href = siteurl + active_controller + '/addHeader'
 			}
 		}
 	}
