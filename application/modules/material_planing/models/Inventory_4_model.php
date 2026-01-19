@@ -396,6 +396,14 @@ class Inventory_4_model extends BF_Model
 				$total_sheet = round($item->qty_produk / $get_material->total_weight);
 			}
 
+			$this->db->select('a.nilai_dimensi');
+			$this->db->from('child_inven_dimensi a');
+			$this->db->where('a.id_category3', $item->id_material);
+			$this->db->where('a.id_dimensi', '33');
+			$get_length = $this->db->get()->row();
+
+			$length = ($item->length <= 0 && !empty($get_length->nilai_dimensi)) ? $get_length->nilai_dimensi : 0; 
+
 			$hasil[] = [
 				'no' => $no,
 				'no_spk' => $item->no_surat,
@@ -404,7 +412,7 @@ class Inventory_4_model extends BF_Model
 				'no_aloy' => $item->no_alloy,
 				'thickness' => $item->thickness,
 				'width' => $item->width,
-				'length' => $item->length,
+				'length' => number_format($length, 2),
 				'delivery_date' => date('d-M-Y', strtotime($item->delivery)),
 				'total_weight' => number_format($item->qty_produk),
 				'total_sheet' => number_format($total_sheet),
