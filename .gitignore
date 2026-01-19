@@ -24,3 +24,4 @@ application/config/constants.php
 /assets/files/*
 
 php.ini
+application/config/config.php
