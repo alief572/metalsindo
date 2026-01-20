@@ -488,7 +488,7 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 					$this->db->where('a.qty_in >', 0);
 					$check_control = $this->db->get()->row();
 
-					if (count($check_control) > 0) {
+					if(count($check_control) > 0) {
 						$qty_invoice += $item_invoice->qty_sheet;
 					}
 				}
