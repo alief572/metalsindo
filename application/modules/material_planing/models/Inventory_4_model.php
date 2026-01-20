@@ -402,7 +402,12 @@ class Inventory_4_model extends BF_Model
 			$this->db->where('a.id_dimensi', '33');
 			$get_length = $this->db->get()->row();
 
-			$length = ($item->length <= 0 && !empty($get_length->nilai_dimensi)) ? $get_length->nilai_dimensi : 0; 
+			if($get_material->id_bentuk == 'B2000002') {
+				$length = $get_length->nilai_dimensi; 
+			} else {
+				$length = $item->length;
+			}
+
 
 			$hasil[] = [
 				'no' => $no,
