@@ -279,7 +279,12 @@ class MX_Loader extends CI_Loader
 			$view = $_view;
 		}
 
-		return $this->_ci_load(array('_ci_view' => $view, '_ci_vars' => $this->_ci_prepare_view_vars($vars), '_ci_return' => $return));
+		// Kita hapus pemanggilan _ci_prepare_view_vars karena di CI 3 terbaru sudah tidak ada/berubah
+		return $this->_ci_load(array(
+			'_ci_view' => $view,
+			'_ci_vars' => $this->_ci_object_to_array($vars),
+			'_ci_return' => $return
+		));
 	}
 
 	protected function &_ci_get_component($component)

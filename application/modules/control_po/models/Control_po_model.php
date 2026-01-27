@@ -35,11 +35,11 @@ class Control_po_model extends BF_Model
         if (!empty($search['value'])) {
             $this->db->group_start();
             $this->db->like('a.no_surat', $search['value'], 'both');
-            $this->db->or_like('a.no_surat', $search['value'], 'both');
+            $this->db->or_like('a.no_surat_po', $search['value'], 'both');
             $this->db->or_like('a.name_suplier', $search['value'], 'both');
             $this->db->or_like('a.nama_material', $search['value'], 'both');
             $this->db->or_like('a.width', $search['value'], 'both');
-            $this->db->or_like('a.qty_order', $search['value'], 'both');
+            $this->db->or_like('a.qty_po', $search['value'], 'both');
             $this->db->group_end();
         }
 
