@@ -12,10 +12,41 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
 <link rel="stylesheet" href="https://cdn.datatables.net/2.3.0/css/dataTables.dataTables.min.css">
+<link rel="stylesheet" href="<?php echo base_url('assets/css/select2.css'); ?>">
 
 <div class="box">
 	<div class="box-header">
-		<a href="control_po/download_excel" class="btn btn-sm btn-success" target="_blank" title="Download Excel"><i class="fa fa-download"></i> Download Excel</a>
+		<div class="row">
+			<div class="col-md-3">
+				<select name="no_po" id="" class="form-control form-control-sm select2">
+					<option value="">- Select No. PO -</option>
+					<?php foreach ($list_po as $row) { ?>
+						<option value="<?= $row->no_po ?>"><?= $row->no_surat ?></option>
+					<?php } ?>
+				</select>
+			</div>
+			<div class="col-md-3">
+				<select name="suplier" id="" class="form-control form-control-sm select2">
+					<option value="">- Select Supplier -</option>
+					<?php foreach ($list_suplier as $row) { ?>
+						<option value="<?= $row->id_suplier ?>"><?= $row->name_suplier ?></option>
+					<?php } ?>
+				</select>
+			</div>
+			<div class="col-md-3">
+				<select name="barang" id="" class="form-control form-control-sm select2">
+					<option value="">- Select Barang -</option>
+					<?php foreach ($list_barang as $row) { ?>
+						<option value="<?= $row->idmaterial ?>"><?= $row->idmaterial ?> - <?= $row->nama_material ?></option>
+					<?php } ?>
+				</select>
+			</div>
+			<div class="col-md-3">
+				<button type="button" class="btn btn-sm btn-primary search"><i class="fa fa-search"></i> Search</button>
+				<button type="button" class="btn btn-sm btn-danger reset"><i class="fa fa-close"></i> Reset</button>
+				<button type="button" class="btn btn-sm btn-success download_excel" title="Download Excel"><i class="fa fa-download"></i> Excel</button>
+			</div>
+		</div>
 	</div>
 	<!-- /.box-header -->
 	<!-- /.box-header -->
@@ -67,10 +98,48 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 
 <!-- DataTables -->
 <script src="https://cdn.datatables.net/2.3.0/js/dataTables.min.js"></script>
+<script src="<?= base_url('assets/js/select2.js') ?>"></script>
 
 <!-- page script -->
 <script type="text/javascript">
+	$('.select2').select2({
+		width: '100%'
+	});
+
+	$(document).on('click', '.search', function(e) {
+		e.preventDefault();
+		DataTables();
+	});
+
+	$(document).on('click', '.reset', function(e) {
+		e.preventDefault();
+		$('select[name="no_po"]').val('').trigger('change');
+		$('select[name="suplier"]').val('').trigger('change');
+		$('select[name="barang"]').val('').trigger('change');
+		DataTables();
+	});
+
+	$(document).on('click', '.download_excel', function(e) {
+		e.preventDefault();
+		var no_po = $('select[name="no_po"]').val();
+		var suplier = $('select[name="suplier"]').val();
+		var barang = $('select[name="barang"]').val();
+
+		var query = $.param({
+			no_po: no_po,
+			suplier: suplier,
+			barang: barang
+		});
+
+		var url = siteurl + 'control_po/download_excel?' + query;
+		window.location.href = url;
+	});
+
 	function DataTables() {
+		var no_po = $('select[name="no_po"]').val();
+		var suplier = $('select[name="suplier"]').val();
+		var barang = $('select[name="barang"]').val();
+
 		var DataTables = $('#example1').dataTable({
 			serverSide: true,
 			processing: true,
@@ -80,7 +149,12 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 			ajax: {
 				type: 'post',
 				url: siteurl + active_controller + 'get_control_po',
-				dataType: 'json'
+				dataType: 'json',
+				data: function(d) {
+					d.no_po = no_po;
+					d.suplier = suplier;
+					d.barang = barang;
+				}
 			},
 			columns: [{
 					data: 'no'
