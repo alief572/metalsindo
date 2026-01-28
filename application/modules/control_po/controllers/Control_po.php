@@ -97,8 +97,10 @@ class Control_po extends Admin_Controller
         $no_po = $this->input->get('no_po');
         $suplier = $this->input->get('suplier');
         $barang = $this->input->get('barang');
+        $tahun = $this->input->get('tahun');
+        $bulan = $this->input->get('bulan');
 
-        $get_data_control_po = $this->Control_po_model->get_data_control_po($no_po, $suplier, $barang);
+        $get_data_control_po = $this->Control_po_model->get_data_control_po($no_po, $suplier, $barang, $tahun, $bulan);
 
         $this->load->view('download_excel', array('data_control_po' => $get_data_control_po));
     }
