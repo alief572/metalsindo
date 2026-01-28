@@ -26,4 +26,4 @@ application/config/database.php
 # /system/*
 php.ini
 application/config/config.php
-# application/config/constants.php
+application/config/constants.php
