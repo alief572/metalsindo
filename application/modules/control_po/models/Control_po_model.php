@@ -115,11 +115,6 @@ class Control_po_model extends BF_Model
             $this->db->or_like('a.no_surat_po', $search['value'], 'both');
             $this->db->or_like('a.name_suplier', $search['value'], 'both');
             $this->db->or_like('a.nama_material', $search['value'], 'both');
-<<<<<<< HEAD
-            $this->db->or_like('a.width', $search['value'], 'both');
-            $this->db->or_like('a.qty_po', $search['value'], 'both');
-=======
->>>>>>> 1d207e8d3a000f04f092d2a1ff68efb48e7fd519
             $this->db->group_end();
         }
 
@@ -165,18 +160,6 @@ class Control_po_model extends BF_Model
                 $option .= ' <button type="button" class="btn btn-sm btn-success checked" data-id_po="' . $item->id_dt_po . '"><i class="fa fa-check"></i></button>';
             }
 
-<<<<<<< HEAD
-	    // $get_incoming = $this->db->get_where('dt_incoming', array('id_dt_po' => $item->id_dt_po))->row();
-
-	    $this->db->select('COALESCE(SUM(a.width_recive), 0) as total_received');
-	    $this->db->from('dt_incoming a');
-	    $this->db->where('a.id_dt_po', $item->id_dt_po);
-	    $get_incoming = $this->db->get()->row();
-
-            $incoming = (!empty($get_incoming->total_received)) ? $get_incoming->total_received : 0;
-
-=======
->>>>>>> 1d207e8d3a000f04f092d2a1ff68efb48e7fd519
             $hasil[] = [
                 'no'          => $no,
                 'no_pr'       => $item->no_pr,
