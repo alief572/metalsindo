@@ -23,5 +23,7 @@ application/config/constants.php
 /uploads/*
 /assets/files/*
 
+# /system/*
 php.ini
 application/config/config.php
+application/config/constants.php
