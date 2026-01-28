@@ -26,13 +26,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 //$config['base_url'] = 'http://localhost/labgit/dms';
 $root = "https://" .$_SERVER['HTTP_HOST'];
 $root .= str_replace(basename($_SERVER['SCRIPT_NAME']), "", $_SERVER['SCRIPT_NAME']);
-<<<<<<< HEAD
 $config['base_url'] = $root;
 // $config['base_url'] = 'http://localhost:8080';
-=======
-// $config['base_url'] = $root;
-$config['base_url'] = 'http://localhost:8080';
->>>>>>> f981bdfdc4df5b0957e6f5ab197962b8a5f38b8b
 
 
 //$config['base_url'] = 'http://localhost/importa/importa_release/';
