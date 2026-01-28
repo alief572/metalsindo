@@ -140,6 +140,9 @@ class Control_po_model extends BF_Model
         foreach ($get_data->result() as $item) {
             $no++;
 
+<<<<<<< HEAD
+            $option = '<button type="button" class="btn btn-sm btn-primary detail" data-id_po="' . $item->id_dt_po . '"><i class="fa fa-eye"></i></button>';
+=======
             // Ambil data incoming (Cukup panggil sekali saja)
             // $get_incoming = $this->db->get_where('dt_incoming', array('id_dt_po' => $item->id_dt_po))->row();
             $this->db->select('COALESCE(SUM(a.width_recive), 0) as total_received');
@@ -148,6 +151,7 @@ class Control_po_model extends BF_Model
             $get_incoming = $this->db->get()->row();
 
             $incoming = (!empty($get_incoming->total_received)) ? $get_incoming->total_received : 0;
+>>>>>>> f981bdfdc4df5b0957e6f5ab197962b8a5f38b8b
 
             // Status badge
             $status = ($item->close_po == 'Y')
@@ -160,6 +164,22 @@ class Control_po_model extends BF_Model
                 $option .= ' <button type="button" class="btn btn-sm btn-success checked" data-id_po="' . $item->id_dt_po . '"><i class="fa fa-check"></i></button>';
             }
 
+<<<<<<< HEAD
+            $get_incoming = $this->db->get_where('dt_incoming', array('id_dt_po' => $item->id_dt_po))->row();
+
+            $incoming = (!empty($get_incoming->width_recive)) ? $get_incoming->width_recive : 0;
+
+            $status = '<span class="badge bg-green">Open</span>';
+            if ($item->close_po == 'Y') {
+                $status = '<span class="badge bg-red">Closed</span>';
+            }
+
+            $get_incoming = $this->db->get_where('dt_incoming', array('id_dt_po' => $item->id_dt_po))->row();
+
+            $incoming = (!empty($get_incoming->width_recive)) ? $get_incoming->width_recive : 0;
+
+=======
+>>>>>>> f981bdfdc4df5b0957e6f5ab197962b8a5f38b8b
             $hasil[] = [
                 'no'          => $no,
                 'no_pr'       => $item->no_pr,
@@ -169,9 +189,15 @@ class Control_po_model extends BF_Model
                 'width'       => number_format($item->width_po, 2),
                 'qty_order'   => number_format($item->qty_po, 2),
                 'qty_receive' => number_format($incoming, 2),
+<<<<<<< HEAD
+                'balance' => number_format(($item->qty_po - $incoming), 2),
+                'status' => $status,
+                'option' => $option
+=======
                 'balance'     => number_format(($item->qty_po - $incoming), 2),
                 'status'      => $status,
                 'option'      => $option
+>>>>>>> f981bdfdc4df5b0957e6f5ab197962b8a5f38b8b
             ];
         }
 

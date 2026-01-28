@@ -103,7 +103,10 @@ class Control_po extends Admin_Controller
         $this->load->view('download_excel', array('data_control_po' => $get_data_control_po));
     }
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> f981bdfdc4df5b0957e6f5ab197962b8a5f38b8b
     public function get_control_po()
     {
         $this->Control_po_model->get_control_po();
