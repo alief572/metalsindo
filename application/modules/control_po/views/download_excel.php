@@ -11,6 +11,7 @@ header("Expires: 0");
             <th style="text-align: center;">#</th>
             <th style="text-align: center;">No. PR</th>
             <th style="text-align: center;">No. PO</th>
+            <th style="text-align: center;">Tanggal PO</th>
             <th style="text-align: center;">Supplier</th>
             <th style="text-align: center;">Material</th>
             <th style="text-align: center;">Width</th>
