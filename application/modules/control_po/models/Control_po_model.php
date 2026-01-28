@@ -19,6 +19,53 @@ class Control_po_model extends BF_Model
         parent::__construct();
     }
 
+    public function get_data_control_po($no_po = null, $suplier = null, $barang = null) {
+        $this->db->select('a.*');
+        $this->db->from('view_control_po a');
+        if(!empty($no_po)) {
+            $this->db->where('a.no_po', $no_po);
+        }
+        if(!empty($suplier)) {
+            $this->db->where('a.suplier', $suplier);
+        }
+        if(!empty($barang)) {
+            $this->db->where('a.idmaterial', $barang);
+        }
+        $get_data = $this->db->get()->result_array();
+
+        return $get_data;
+    }
+
+    public function get_all_po() {
+        $this->db->select('a.*');
+        $this->db->from('tr_purchase_order a');
+        $this->db->order_by('a.no_surat', 'DESC');
+        $get_data = $this->db->get()->result();
+
+        return $get_data;
+    }
+
+    public function get_po_supplier() {
+        $this->db->select('a.id_suplier, b.name_suplier');
+        $this->db->from('tr_purchase_order a');
+        $this->db->join('master_supplier b', 'a.id_suplier = b.id_suplier');
+        $this->db->group_by('a.id_suplier, b.name_suplier');
+        $this->db->order_by('b.name_suplier', 'ASC');
+        $get_data = $this->db->get()->result();
+
+        return $get_data;
+    }
+
+    public function get_po_barang() {
+        $this->db->select('a.idmaterial, a.nama_material');
+        $this->db->from('view_control_po a');
+        $this->db->group_by('a.idmaterial');
+        $this->db->order_by('a.idmaterial', 'DESC');
+        $get_data = $this->db->get()->result();
+
+        return $get_data;
+    }
+
     public function get_control_po()
     {
         $draw   = $this->input->post('draw');
@@ -26,6 +73,10 @@ class Control_po_model extends BF_Model
         $start  = $this->input->post('start');
         $search = $this->input->post('search');
         $order  = $this->input->post('order'); // Ambil data order dari DataTable
+
+        $no_po = $this->input->post('no_po'); // Inputan PO filter
+        $suplier = $this->input->post('suplier'); // Inputan Supplier filter
+        $barang = $this->input->post('barang'); // Inputan Barang filter
 
         // Mapping kolom: Indeks array harus sesuai dengan urutan kolom di HTML/JS
         $column_order = [
@@ -42,6 +93,16 @@ class Control_po_model extends BF_Model
 
         $this->db->select('a.*');
         $this->db->from('view_control_po a');
+
+        if(!empty($no_po)) {
+            $this->db->where('a.no_po', $no_po);
+        }
+        if(!empty($suplier)) {
+            $this->db->where('a.suplier', $suplier);
+        }
+        if(!empty($barang)) {
+            $this->db->where('a.idmaterial', $barang);
+        }
 
         // Count All (Tanpa Filter)
         $db_clone = clone $this->db;
@@ -86,7 +147,7 @@ class Control_po_model extends BF_Model
             $this->db->where('a.id_dt_po', $item->id_dt_po);
             $get_incoming = $this->db->get()->row();
 
-            $incoming = (!empty($get_incoming->width_recive)) ? $get_incoming->total_received : 0;
+            $incoming = (!empty($get_incoming->total_received)) ? $get_incoming->total_received : 0;
 
             // Status badge
             $status = ($item->close_po == 'Y')
