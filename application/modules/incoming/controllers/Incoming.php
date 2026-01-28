@@ -1578,7 +1578,7 @@ class Incoming extends Admin_Controller
 			<tr>
   	      		<!--<td width="8%" style="text-align: center;">-->
 				<td style="text-align:center; font-weight: bold; font-size:12pt">
-  	      			<img src="assets/images/logo.png" style="height: 40px;width: auto;">PT METALSINDO PASIFIC
+  	      			<img src="assets/images/logo.png" style="height: 40px;width: auto;">PT METALSINDO PACIFIC
   	      		</td>
   	      	</tr>
 			</table>
@@ -1634,7 +1634,7 @@ class Incoming extends Admin_Controller
         <hr>
        	<div id="footer">
         <table>
-            <tr><td>PT METALSINDO PASIFIC - Printed By ' . ucwords($session['username']) . ' On ' . $tglprint . ' </td></tr>
+            <tr><td>PT METALSINDO PACIFIC - Printed By ' . ucwords($session['username']) . ' On ' . $tglprint . ' </td></tr>
         </table>
         </div>
         ');

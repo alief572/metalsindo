@@ -4,18 +4,22 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     container_name: metalsindo
+    restart: no
     ports:
       - "8080:80"
     volumes:
-      - .:/var/www/html
+      - .:/var/www/html:delegated # 'delegated' bikin akses file lebih kenceng di Docker Desktop
       - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
+    environment:
+      - TZ=Asia/Jakarta
     depends_on:
-      - db
+      db:
+        condition: service_healthy # Biar web nunggu DB bener-bener siap (bukan cuma kontainernya jalan)
 
   db:
     image: mysql:5.7
     container_name: db_metalsindo
-    restart: always
+    restart: no
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: db_metalsindo
@@ -23,6 +27,11 @@ services:
       - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
+    healthcheck: # Mengecek apakah MySQL sudah siap menerima koneksi
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   db_data:

@@ -38,6 +38,13 @@ class Control_po extends Admin_Controller
         $session = $this->session->userdata('app_session');
         $this->template->page_icon('fa fa-users');
 
+        $list_po = $this->Control_po_model->get_all_po();
+        $list_suplier = $this->Control_po_model->get_po_supplier();
+        $list_barang = $this->Control_po_model->get_po_barang();
+
+        $this->template->set('list_po', $list_po);
+        $this->template->set('list_suplier', $list_suplier);
+        $this->template->set('list_barang', $list_barang);
         $this->template->title('Control PO');
         $this->template->render('index');
     }
@@ -87,11 +94,19 @@ class Control_po extends Admin_Controller
 
     public function download_excel()
     {
-        $get_data_control_po = $this->db->get('view_control_po')->result_array();
+        $no_po = $this->input->get('no_po');
+        $suplier = $this->input->get('suplier');
+        $barang = $this->input->get('barang');
+
+        $get_data_control_po = $this->Control_po_model->get_data_control_po($no_po, $suplier, $barang);
 
         $this->load->view('download_excel', array('data_control_po' => $get_data_control_po));
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> f981bdfdc4df5b0957e6f5ab197962b8a5f38b8b
     public function get_control_po()
     {
         $this->Control_po_model->get_control_po();
