@@ -19,7 +19,7 @@ class Control_po_model extends BF_Model
         parent::__construct();
     }
 
-    public function get_data_control_po($no_po = null, $suplier = null, $barang = null) {
+    public function get_data_control_po($no_po = null, $suplier = null, $barang = null,$tahun = null, $bulan = null) {
         $this->db->select('a.*');
         $this->db->from('view_control_po a');
         if(!empty($no_po)) {
@@ -31,6 +31,13 @@ class Control_po_model extends BF_Model
         if(!empty($barang)) {
             $this->db->where('a.idmaterial', $barang);
         }
+        if(!empty($tahun)) {
+            $this->db->where('YEAR(a.tanggal_po)', $tahun);
+        }
+        if(!empty($bulan)) {
+            $this->db->where('MONTH(a.tanggal_po)', $bulan);
+        }
+
         $get_data = $this->db->get()->result_array();
 
         return $get_data;
@@ -77,6 +84,8 @@ class Control_po_model extends BF_Model
         $no_po = $this->input->post('no_po'); // Inputan PO filter
         $suplier = $this->input->post('suplier'); // Inputan Supplier filter
         $barang = $this->input->post('barang'); // Inputan Barang filter
+        $tahun = $this->input->post('tahun'); // Inputan Tahun filter
+        $bulan = $this->input->post('bulan'); // Inputan Bulan filter
 
         // Mapping kolom: Indeks array harus sesuai dengan urutan kolom di HTML/JS
         $column_order = [
@@ -102,6 +111,12 @@ class Control_po_model extends BF_Model
         }
         if(!empty($barang)) {
             $this->db->where('a.idmaterial', $barang);
+        }
+        if(!empty($tahun)) {
+            $this->db->where('YEAR(a.tanggal_po)', $tahun);
+        }
+        if(!empty($bulan)) {
+            $this->db->where('MONTH(a.tanggal_po)', $bulan);
         }
 
         // Count All (Tanpa Filter)
@@ -164,6 +179,7 @@ class Control_po_model extends BF_Model
                 'no'          => $no,
                 'no_pr'       => $item->no_pr,
                 'no_po'       => $item->no_surat_po,
+                'tanggal_po'  => date('d-m-Y', strtotime($item->tanggal_po)),
                 'supplier'    => $item->name_suplier,
                 'material'    => $item->nama_material,
                 'width'       => number_format($item->width_po, 2),

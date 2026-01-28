@@ -19,7 +19,7 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 		<div class="row">
 			<div class="col-md-3">
 				<select name="no_po" id="" class="form-control form-control-sm select2">
-					<option value="">- Select No. PO -</option>
+					<option value="">- Pilih No. PO -</option>
 					<?php foreach ($list_po as $row) { ?>
 						<option value="<?= $row->no_po ?>"><?= $row->no_surat ?></option>
 					<?php } ?>
@@ -27,7 +27,7 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 			</div>
 			<div class="col-md-3">
 				<select name="suplier" id="" class="form-control form-control-sm select2">
-					<option value="">- Select Supplier -</option>
+					<option value="">- Pilih Supplier -</option>
 					<?php foreach ($list_suplier as $row) { ?>
 						<option value="<?= $row->id_suplier ?>"><?= $row->name_suplier ?></option>
 					<?php } ?>
@@ -35,10 +35,34 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 			</div>
 			<div class="col-md-3">
 				<select name="barang" id="" class="form-control form-control-sm select2">
-					<option value="">- Select Barang -</option>
+					<option value="">- Pilih Barang -</option>
 					<?php foreach ($list_barang as $row) { ?>
 						<option value="<?= $row->idmaterial ?>"><?= $row->idmaterial ?> - <?= $row->nama_material ?></option>
 					<?php } ?>
+				</select>
+			</div>
+			<div class="col-md-3">
+				<select name="tahun" id="" class="form-control form-control-sm select2">
+					<option value="">- Pilih Tahun -</option>
+					<?php
+					for ($i = date('Y'); $i >= 2020; $i--) {
+						echo '<option value="' . $i . '">' . $i . '</option>';
+					}
+					?>
+				</select>
+			</div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-md-3">
+				<select name="bulan" id="" class="form-control form-control-sm select2">
+					<option value="">- Pilih Bulan -</option>
+					<?php
+					for ($i = 1; $i <= 12; $i++) {
+						$month = date('F', mktime(0, 0, 0, $i, 1));
+						echo '<option value="' . $i . '">' . $month . '</option>';
+					}
+					?>
 				</select>
 			</div>
 			<div class="col-md-3">
@@ -57,6 +81,7 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 					<th>#</th>
 					<th>No.PR</th>
 					<th>No.PO</th>
+					<th>Tanggal PO</th>
 					<th>Supplier</th>
 					<th>Material</th>
 					<th>Width</th>
@@ -116,6 +141,8 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 		$('select[name="no_po"]').val('').trigger('change');
 		$('select[name="suplier"]').val('').trigger('change');
 		$('select[name="barang"]').val('').trigger('change');
+		$('select[name="tahun"]').val('').trigger('change');
+		$('select[name="bulan"]').val('').trigger('change');
 		DataTables();
 	});
 
@@ -124,11 +151,15 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 		var no_po = $('select[name="no_po"]').val();
 		var suplier = $('select[name="suplier"]').val();
 		var barang = $('select[name="barang"]').val();
+		var tahun = $('select[name="tahun"]').val();
+		var bulan = $('select[name="bulan"]').val();
 
 		var query = $.param({
 			no_po: no_po,
 			suplier: suplier,
-			barang: barang
+			barang: barang,
+			tahun: tahun,
+			bulan: bulan
 		});
 
 		var url = siteurl + 'control_po/download_excel?' + query;
@@ -139,6 +170,8 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 		var no_po = $('select[name="no_po"]').val();
 		var suplier = $('select[name="suplier"]').val();
 		var barang = $('select[name="barang"]').val();
+		var tahun = $('select[name="tahun"]').val();
+		var bulan = $('select[name="bulan"]').val();
 
 		var DataTables = $('#example1').dataTable({
 			serverSide: true,
@@ -154,6 +187,8 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 					d.no_po = no_po;
 					d.suplier = suplier;
 					d.barang = barang;
+					d.tahun = tahun;
+					d.bulan = bulan;
 				}
 			},
 			columns: [{
@@ -164,6 +199,9 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 				},
 				{
 					data: 'no_po'
+				},
+				{
+					data: 'tanggal_po'
 				},
 				{
 					data: 'supplier'
@@ -199,7 +237,7 @@ $ENABLE_DELETE  = has_permission('Control_PO.Delete');
 
 	$(document).on('click', '.detail', function(e) {
 		var id_detail = $(this).data('id_po');
-		$("#head_title").html("<b>Detial View</b>");
+		$("#head_title").html("<b>Detail View</b>");
 		$.ajax({
 			type: 'POST',
 			url: siteurl + 'control_po/modal_detail/' + id_detail,
