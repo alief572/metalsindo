@@ -27,16 +27,6 @@ header("Expires: 0");
             foreach ($data_control_po as $item) :
                 $no++;
 
-<<<<<<< HEAD
-	    // $get_incoming = $this->db->get_where('dt_incoming', array('id_dt_po' => $item['id_dt_po']))->row();
-	  	
-	    	$this->db->select('COALESCE(SUM(a.width_recive), 0) as total_received');
-            $this->db->from('dt_incoming a');
-            $this->db->where('a.id_dt_po', $item->id_dt_po);
-            $get_incoming = $this->db->get()->row();
-
-            $incoming = (!empty($get_incoming->total_received)) ? $get_incoming->total_received : 0;
-=======
                 // $get_incoming = $this->db->get_where('dt_incoming', array('id_dt_po' => $item['id_dt_po']))->row();
 
                 $this->db->select('COALESCE(SUM(a.width_recive), 0) as total_received');
@@ -45,7 +35,6 @@ header("Expires: 0");
                 $get_incoming = $this->db->get()->row();
 
                 $incoming = (!empty($get_incoming->total_received)) ? $get_incoming->total_received : 0;
->>>>>>> 1d207e8d3a000f04f092d2a1ff68efb48e7fd519
 
                 $status = 'Open';
                 if ($item['close_po'] == 'Y') {
