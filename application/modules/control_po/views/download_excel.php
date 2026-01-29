@@ -32,7 +32,7 @@ header("Expires: 0");
 
                 $this->db->select('COALESCE(SUM(a.width_recive), 0) as total_received');
                 $this->db->from('dt_incoming a');
-                $this->db->where('a.id_dt_po', $item->id_dt_po);
+                $this->db->where('a.id_dt_po', $item['id_dt_po']);
                 $get_incoming = $this->db->get()->row();
 
                 $incoming = (!empty($get_incoming->total_received)) ? $get_incoming->total_received : 0;
