@@ -85,4 +85,4 @@ defined('EXIT__AUTO_MIN')      or define('EXIT__AUTO_MIN', 9); // lowest automat
 defined('EXIT__AUTO_MAX')      or define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
 define('DBACC', 'gl_metalsindo_live');
-define('DBERP', 'db_metalsindo');
+define('DBERP', 'metalsindo_live');

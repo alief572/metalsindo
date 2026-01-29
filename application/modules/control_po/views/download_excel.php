@@ -46,6 +46,7 @@ header("Expires: 0");
                 echo '<td style="text-align: center;">' . $no . '</td>';
                 echo '<td style="text-align: center;">' . $item['no_pr'] . '</td>';
                 echo '<td style="text-align: center;">' . $item['no_surat_po'] . '</td>';
+                echo '<td style="text-align: center;">' . date('d-m-Y', strtotime($item['tanggal_po'])) . '</td>';
                 echo '<td style="text-align: left;">' . $item['name_suplier'] . '</td>';
                 echo '<td style="text-align: left;">' . $item['nama_material'] . '</td>';
                 echo '<td style="text-align: right;">' . number_format($item['width_po'], 2) . '</td>';
