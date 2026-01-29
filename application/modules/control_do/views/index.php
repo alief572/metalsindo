@@ -17,6 +17,7 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
 <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/select2.css') ?>">
 
 <div class="box">
 	<div class="box-header">
@@ -29,6 +30,81 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 	<!-- /.box-header -->
 	<div class="box-body">
 		<div class="pers1_div">
+			<div class="row">
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="filter_tahun">Tahun</label>
+						<select class="form-control form-control-sm select2" name="filter_tahun" id="filter_tahun">
+							<option value="">- Pilih Tahun -</option>
+							<?php
+							for ($i = date('Y'); $i >= 2020; $i--) {
+								echo '<option value="' . $i . '">' . $i . '</option>';
+							}
+							?>
+						</select>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="filter_bulan">Bulan</label>
+						<select class="form-control form-control-sm select2" name="filter_bulan" id="filter_bulan">
+							<option value="">- Pilih Bulan -</option>
+							<?php
+							for ($i = 1; $i <= 12; $i++) {
+								echo '<option value="' . $i . '">' . date('F', mktime(0, 0, 0, $i, 1)) . '</option>';
+							}
+							?>
+						</select>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="filter_no_do">No. DO</label>
+						<select class="form-control form-control-sm select2" name="filter_no_do" id="filter_no_do">
+							<option value="">- Select DO -</option>
+							<?php
+							foreach ($list_do as $do) {
+								echo '<option value="' . $do->no_surat . '">' . $do->no_surat . '</option>';
+							}
+							?>
+						</select>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="filter_no_spk">No. SPK Marketing</label>
+						<select class="form-control form-control-sm select2" name="filter_no_spk" id="filter_no_spk">
+							<option value="">- Select SPK Marketing -</option>
+							<?php
+							foreach ($list_spk_marketing as $spk_marketing) {
+								echo '<option value="' . $spk_marketing->no_surat . '">' . $spk_marketing->no_surat . '</option>';
+							}
+							?>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="filter_customer">Customer</label>
+						<select class="form-control form-control-sm select2" name="filter_customer" id="filter_customer">
+							<option value="">- Select Customer -</option>
+							<?php
+							foreach ($list_customer as $customer) {
+								echo '<option value="' . $customer->id_customer . '">' . $customer->name_customer . '</option>';
+							}
+							?>
+						</select>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<br>
+					<button type="button" class="btn btn-sm btn-primary" onclick="filterData()"><i class="fa fa-search"></i> Search</button>
+					<button type="button" class="btn btn-sm btn-danger" onclick="clearFilter()"><i class="fa fa-times"></i> Clear</button>
+					<button type="button" class="	btn btn-sm btn-success" onclick="downloadExcel()"><i class="fa fa-download"></i> Download Excel</button>
+				</div>
+			</div>
 			<table id="example2" class="table table-bordered table-striped">
 				<thead>
 					<tr>
@@ -48,6 +124,81 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 			</table>
 		</div>
 		<div class="pers2_div" hidden>
+			<div class="row">
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="filter_scrap_tahun">Tahun</label>
+						<select class="form-control form-control-sm select2" name="filter_scrap_tahun" id="filter_scrap_tahun">
+							<option value="">- Pilih Tahun -</option>
+							<?php
+							for ($i = date('Y'); $i >= 2020; $i--) {
+								echo '<option value="' . $i . '">' . $i . '</option>';
+							}
+							?>
+						</select>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="filter_scrap_bulan">Bulan</label>
+						<select class="form-control form-control-sm select2" name="filter_scrap_bulan" id="filter_scrap_bulan">
+							<option value="">- Pilih Bulan -</option>
+							<?php
+							for ($i = 1; $i <= 12; $i++) {
+								echo '<option value="' . $i . '">' . date('F', mktime(0, 0, 0, $i, 1)) . '</option>';
+							}
+							?>
+						</select>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="filter_scrap_no_do">No. DO</label>
+						<select class="form-control form-control-sm select2" name="filter_scrap_no_do" id="filter_scrap_no_do">
+							<option value="">- Select DO -</option>
+							<?php
+							foreach ($list_do as $do) {
+								echo '<option value="' . $do->no_surat . '">' . $do->no_surat . '</option>';
+							}
+							?>
+						</select>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="filter_scrap_no_spk">No. SPK Marketing</label>
+						<select class="form-control form-control-sm select2" name="filter_scrap_no_spk" id="filter_scrap_no_spk">
+							<option value="">- Select SPK Marketing -</option>
+							<?php
+							foreach ($list_spk_marketing as $spk_marketing) {
+								echo '<option value="' . $spk_marketing->no_surat . '">' . $spk_marketing->no_surat . '</option>';
+							}
+							?>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="filter_scrap_customer">Customer</label>
+						<select class="form-control form-control-sm select2" name="filter_scrap_customer" id="filter_scrap_customer">
+							<option value="">- Select Customer -</option>
+							<?php
+							foreach ($list_customer as $customer) {
+								echo '<option value="' . $customer->id_customer . '">' . $customer->name_customer . '</option>';
+							}
+							?>
+						</select>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<br>
+					<button type="button" class="btn btn-sm btn-primary" onclick="filterDataScrap()"><i class="fa fa-search"></i> Search</button>
+					<button type="button" class="btn btn-sm btn-danger" onclick="clearFilterScrap()"><i class="fa fa-times"></i> Clear</button>
+					<button type="button" class="	btn btn-sm btn-success" onclick="downloadExcelScrap()"><i class="fa fa-download"></i> Download Excel</button>
+				</div>
+			</div>
 			<table id="example3" class="table table-bordered table-striped">
 				<thead>
 					<tr>
@@ -118,10 +269,14 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 <script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
 <script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js') ?>"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="<?= base_url('assets/js/select2.js') ?>"></script>
 
 
 <!-- page script -->
 <script type="text/javascript">
+	$('.select2').select2({
+		width: '100%'
+	});
 	$(function() {
 		var table = $('#example1').DataTable({
 			orderCellsTop: true,
@@ -462,6 +617,34 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 		});
 	})
 
+	function filterData() {
+		datatables();
+	}
+
+	function filterDataScrap() {
+		datatables_scrap();
+	}
+
+	function clearFilter() {
+		$('select[name="filter_tahun"]').val('').trigger('change');
+		$('select[name="filter_bulan"]').val('').trigger('change');
+		$('select[name="filter_no_do"]').val('').trigger('change');
+		$('select[name="filter_no_spk"]').val('').trigger('change');
+		$('select[name="filter_customer"]').val('').trigger('change');
+
+		datatables();
+	}
+
+	function clearFilterScrap() {
+		$('select[name="filter_scrap_tahun"]').val('').trigger('change');
+		$('select[name="filter_scrap_bulan"]').val('').trigger('change');
+		$('select[name="filter_scrap_no_do"]').val('').trigger('change');
+		$('select[name="filter_scrap_no_spk"]').val('').trigger('change');
+		$('select[name="filter_scrap_customer"]').val('').trigger('change');
+
+		datatables_scrap();
+	}
+
 	function changeTab1() {
 		$('.pers1_div').show();
 		$('.pers2_div').hide();
@@ -476,7 +659,37 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 		datatables_scrap();
 	}
 
+	function downloadExcel() {
+		var tahun = $('select[name="filter_tahun"]').val();
+		var bulan = $('select[name="filter_bulan"]').val();
+		var no_do = $('select[name="filter_no_do"]').val();
+		var no_spk = $('select[name="filter_no_spk"]').val();
+		var customer = $('select[name="filter_customer"]').val();
+
+		var url = siteurl + active_controller + 'download_excel?tahun=' + tahun + '&bulan=' + bulan + '&no_do=' + no_do + '&no_spk=' + no_spk + '&customer=' + customer;
+
+		window.open(url, '_blank');
+	}
+
+	function downloadExcelScrap() {
+		var tahun = $('select[name="filter_scrap_tahun"]').val();
+		var bulan = $('select[name="filter_scrap_bulan"]').val();
+		var no_do = $('select[name="filter_scrap_no_do"]').val();
+		var no_spk = $('select[name="filter_scrap_no_spk"]').val();
+		var customer = $('select[name="filter_scrap_customer"]').val();
+
+		var url = siteurl + active_controller + 'download_excel_scrap?tahun=' + tahun + '&bulan=' + bulan + '&no_do=' + no_do + '&no_spk=' + no_spk + '&customer=' + customer;
+
+		window.open(url, '_blank');
+	}
+
 	function datatables() {
+		var tahun = $('select[name="filter_tahun"]').val();
+		var bulan = $('select[name="filter_bulan"]').val();
+		var no_do = $('select[name="filter_no_do"]').val();
+		var no_spk = $('select[name="filter_no_spk"]').val();
+		var customer = $('select[name="filter_customer"]').val();
+
 		var datatables = $('#example2').dataTable({
 			serverSide: true,
 			processing: true,
@@ -487,7 +700,14 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 				type: 'post',
 				url: siteurl + active_controller + 'get_data_control_do',
 				cache: false,
-				dataType: 'json'
+				dataType: 'json',
+				data: function(d) {
+					d.tahun = tahun;
+					d.bulan = bulan;
+					d.no_do = no_do;
+					d.no_spk = no_spk;
+					d.customer = customer;
+				}
 			},
 			columns: [{
 					data: 'no'
@@ -521,6 +741,12 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 	}
 
 	function datatables_scrap() {
+		var tahun = $('select[name="filter_scrap_tahun"]').val();
+		var bulan = $('select[name="filter_scrap_bulan"]').val();
+		var no_do = $('select[name="filter_scrap_no_do"]').val();
+		var no_spk = $('select[name="filter_scrap_no_spk"]').val();
+		var customer = $('select[name="filter_scrap_customer"]').val();
+
 		var datatables = $('#example3').dataTable({
 			serverSide: true,
 			processing: true,
@@ -531,7 +757,14 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 				type: 'post',
 				url: siteurl + active_controller + 'get_data_control_do_scrap',
 				cache: false,
-				dataType: 'json'
+				dataType: 'json',
+				data: function(d) {
+					d.tahun = tahun;
+					d.bulan = bulan;
+					d.no_do = no_do;
+					d.no_spk = no_spk;
+					d.customer = customer;
+				}
 			},
 			columns: [{
 					data: 'no'
