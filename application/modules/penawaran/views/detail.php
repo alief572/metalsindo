@@ -109,7 +109,7 @@ foreach ($results['header'] as $header) {
 		<?php endif; ?>
 		<a class="btn btn-primary btn-sm" href="<?= base_url('/penawaran') ?>" title="Detail">Back</a>
 		</a>
-		<button type="button" class="btn btn-default validasi_price_sheet" data-no_penawaran="<?= $header->no_penawaran ?>">Validasi Price Sheet</button>
+		<!-- <button type="button" class="btn btn-default validasi_price_sheet" data-no_penawaran="<?= $header->no_penawaran ?>">Validasi Price Sheet</button> -->
 		<span class="pull-right">
 		</span>
 	</div>
