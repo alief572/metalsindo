@@ -2,6 +2,7 @@
 foreach ($results['inventory_3'] as $inventory_3) {
 }
 ?>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <div class="box box-primary">
 	<div class="box-body">
 		<form id="data-form" method="post">
@@ -87,14 +88,15 @@ foreach ($results['inventory_3'] as $inventory_3) {
 
 	</div>
 </div>
-
-
-
-
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
 	//$('#input-kendaraan').hide();
 	var base_url = '<?php echo base_url(); ?>';
 	var active_controller = '<?php echo ($this->uri->segment(1)); ?>';
+
+	$('.select2').select2({
+		width: '100%'
+	});
 
 	$(document).ready(function() {
 		var data_pay = <?php echo json_encode($results['supplier']); ?>;
@@ -204,6 +206,9 @@ foreach ($results['inventory_3'] as $inventory_3) {
 			data: "adjus=" + adjus + "&id_material=" + id_material,
 			success: function(html) {
 				$('#form_lotno').html(html);
+				$('.select2').select2({
+					width: '100%'
+				});
 			}
 		});
 		if (adjus == "PLUS") {
