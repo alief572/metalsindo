@@ -1144,6 +1144,24 @@ class Penawaran extends Admin_Controller
 		} else {
 			$noinal = '1';
 		}
+
+		$get_barang = $this->Inventory_4_model->get_category3($post['id_category3']);
+
+		$qty_sheet = str_replace(',', '', $post['qty_sheet']);
+
+		if ($get_barang['id_bentuk'] == 'B2000002') {
+			if (empty($price_per_sheet) || $price_per_sheet == 0) {
+				$get_last_price = $this->Inventory_4_model->get_last_price_sheet($post['id_category3']);
+
+				$price_per_sheet = $get_last_price['price_sheet'];
+			} else {
+				$price_per_sheet = str_replace(',', '', $post['price_sheet']);
+			}
+		} else {
+			$price_per_sheet = 0;
+			$qty_sheet = 0;
+		}
+
 		$id = $post['id_child_penawaran'];
 		$dolar = $post['harga_penawaran'] / $nominal;
 		$data = [
@@ -1165,8 +1183,8 @@ class Penawaran extends Admin_Controller
 			'keterangan'			=> $post['keterangan'],
 			'harga_penawaran'		=> str_replace(',', '', $post['harga_penawaran']),
 			'harga_penawaran_cust'	=> str_replace(',', '', $post['harga_penawaran_cust']),
-			'price_sheet'	=> str_replace(',', '', $post['price_sheet']),
-			'qty_sheet'	=> str_replace(',', '', $post['qty_sheet']),
+			'price_sheet'	=> $price_per_sheet,
+			'qty_sheet'	=> $qty_sheet,
 			'harga_dolar'			=> $dolar,
 			'created_on'			=> date('Y-m-d H:i:s'),
 			'created_by'			=> $this->auth->user_id()
@@ -2043,6 +2061,39 @@ class Penawaran extends Admin_Controller
 			];
 
 			echo json_encode($response);
+		}
+	}
+
+	public function validasi_price_sheet()
+	{
+		$no_penawaran = $this->input->post('no_penawaran', true);
+
+		$get_detail_penawaran = $this->Inventory_4_model->get_penawaran_detail($no_penawaran);
+
+		$this->db->trans_begin();
+
+		try {
+			$arr_update = [];
+			foreach ($get_detail_penawaran as $detail) {
+				if ($detail->id_bentuk == 'B2000002' && $detail->price_sheet = 0) {
+					$get_last_price = $this->Inventory_4_model->get_last_sheet_price($detail->id_category3);
+
+					$arr_update[] = [
+						'id_child_penawaran' => $detail->id_child_penawaran,
+						'price_sheet' => $get_last_price['price_sheet']
+					];
+				}
+			}
+
+			if (!empty($arr_update)) {
+				$this->db->update_batch('child_penawaran', $arr_update, 'id_child_penawaran');
+			}
+
+			$this->db->trans_commit();
+			$this->output->set_status_header(200);
+		} catch (Exception $e) {
+			$this->db->trans_rollback();
+			$this->output->set_status_header(500);
 		}
 	}
 }
