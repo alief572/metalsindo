@@ -185,7 +185,7 @@ class Transaksi_inquiry extends Admin_Controller
 		];
 		$this->template->set('results', $data);
 		$this->template->title('Tambah Detail Inquery');
-		$this->template->render(ViewCrcl);
+		$this->template->render('ViewCrcl');
 	}
 	public function ViewRoll($id)
 	{
@@ -904,7 +904,7 @@ class Transaksi_inquiry extends Admin_Controller
 			$this->db->trans_rollback();
 			$status	= array(
 				'pesan'		=> 'CRCL Untuk Customer Tersebut Sudah Ada',
-				'code' => $id_bentuk,
+				'code' => (!empty($id_bentuk)) ? $id_bentuk : '',
 				'status'	=> 0
 			);
 		} else {
@@ -1515,7 +1515,7 @@ class Transaksi_inquiry extends Admin_Controller
 			$numb1++;
 			$produk = $_POST['hd1']['1']['id_bentuk'];
 			$header1 =  array(
-				'nm_bentuk'		        => $h1[nm_bentuk],
+				'nm_bentuk'		        => $h1['nm_bentuk'],
 				'modified_on'		=> date('Y-m-d H:i:s'),
 				'modified_by'		=> $this->auth->user_id(),
 				'deleted'			=> '0'
@@ -1532,7 +1532,7 @@ class Transaksi_inquiry extends Admin_Controller
 				$code = $_POST['hd1']['1']['id_bentuk'];
 				$data1 =  array(
 					'id_bentuk' => $code,
-					'nm_dimensi' => $d1[nm_dimensi],
+					'nm_dimensi' => $d1['nm_dimensi'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $session['id_user'],
@@ -1547,7 +1547,7 @@ class Transaksi_inquiry extends Admin_Controller
 
 			$info = $d2['id_dimensi'];
 			$data2 =  array(
-				'nm_dimensi' => $d2[nm_dimensi],
+				'nm_dimensi' => $d2['nm_dimensi'],
 				'deleted' => '0',
 				'modified_on' => date('Y-m-d H:i:s'),
 				'modified_by' => $session['id_user'],
