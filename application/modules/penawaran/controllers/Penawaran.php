@@ -1078,6 +1078,8 @@ class Penawaran extends Admin_Controller
 					'harga_penawaran'		=> str_replace(',', '', $author['harga_penawaran']),
 					'harga_penawaran_cust'	=> str_replace(',', '', $author['harga_penawaran_cust']),
 					'harga_dolar'			=> $author['harga_dolar'],
+					'price_sheet' 			=> $author['price_sheet'],
+					'qty_sheet' 			=> $author['qty_sheet'],
 					'created_on'			=> date('Y-m-d H:i:s'),
 					'created_by'			=> $this->auth->user_id()
 				];
