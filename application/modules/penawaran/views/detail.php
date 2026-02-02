@@ -109,6 +109,7 @@ foreach ($results['header'] as $header) {
 		<?php endif; ?>
 		<a class="btn btn-primary btn-sm" href="<?= base_url('/penawaran') ?>" title="Detail">Back</a>
 		</a>
+		<button type="button" class="btn btn-default validasi_price_sheet" data-no_penawaran="<?= $header->no_penawaran ?>">Validasi Price Sheet</button>
 		<span class="pull-right">
 		</span>
 	</div>
@@ -315,7 +316,33 @@ foreach ($results['header'] as $header) {
 					}
 				})
 			});
+	})
 
+	$(document).on('click', '.validasi_price_sheet', function() {
+		var no_penawaran = $(this).data('no_penawaran');
+
+		$.ajax({
+			type: 'POST',
+			url: siteurl + 'penawaran/validasi_price_sheet',
+			data: {
+				'no_penawaran': no_penawaran
+			},
+			dataType: 'json',
+			success: function(data) {
+				swal({
+					title: 'Berhasil !',
+					text: 'Validasi Harga Price Sheet Berhasil dilakukan !',
+					type: 'success',
+				})
+			},
+			error: function(xhr, status, error) {
+				swal({
+					title: "Error",
+					text: "Data error. Gagal request Ajax",
+					type: "error"
+				})
+			}
+		})
 	})
 
 	$(function() {
