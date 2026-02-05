@@ -490,7 +490,7 @@ class Inventory_4_model extends BF_Model
 	public function get_category3($id_category3)
 	{
 		$this->db->select('a.*');
-		$this->db->from('inventory_3 a');
+		$this->db->from('ms_inventory_category_3 a');
 		$this->db->where('a.id_category3', $id_category3);
 		return $this->db->get()->row_array();
 	}
