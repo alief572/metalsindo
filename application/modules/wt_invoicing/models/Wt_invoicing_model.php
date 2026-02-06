@@ -117,71 +117,43 @@ class Wt_invoicing_model extends BF_Model
   }
   function BuatNomor($kode = '')
   {
-
     $bulan = date('m');
-    $th = date('Y');
-    $tahun = date('y');
+    $tahun_full = date('Y'); // 2024
+    $tahun_short = date('y'); // 24
 
-    if ($bulan == '01') {
-      $romawi = 'I';
-    } elseif ($bulan == '02') {
-      $romawi = 'II';
-    } elseif ($bulan == '03') {
-      $romawi = 'III';
-    } elseif ($bulan == '04') {
-      $romawi = 'IV';
-    } elseif ($bulan == '05') {
-      $romawi = 'V';
-    } elseif ($bulan == '06') {
-      $romawi = 'VI';
-    } elseif ($bulan == '07') {
-      $romawi = 'VII';
-    } elseif ($bulan == '08') {
-      $romawi = 'VIII';
-    } elseif ($bulan == '09') {
-      $romawi = 'IX';
-    } elseif ($bulan == '10') {
-      $romawi = 'X';
-    } elseif ($bulan == '11') {
-      $romawi = 'XI';
-    } elseif ($bulan == '12') {
-      $romawi = 'XII';
-    }
-
-    $romawiToString = [
-      'I' => 1,
-      'II' => 2,
-      'III' => 3,
-      'IV' => 4,
-      'V' => 5,
-      'VI' => 6,
-      'VII' => 7,
-      'VIII' => 8,
-      'IX' => 9,
-      'X' => 10,
-      'XI' => 11,
-      'XII' => 12
+    // 1. Konversi Bulan ke Romawi (Lebih ringkas)
+    $array_romawi = [
+      '01' => 'I',
+      '02' => 'II',
+      '03' => 'III',
+      '04' => 'IV',
+      '05' => 'V',
+      '06' => 'VI',
+      '07' => 'VII',
+      '08' => 'VIII',
+      '09' => 'IX',
+      '10' => 'X',
+      '11' => 'XI',
+      '12' => 'XII'
     ];
+    $romawi = $array_romawi[$bulan];
 
-    $bulan_kode = explode('/', $kode);
-    $bulan_kode2 = $bulan_kode[2];
-    $bulan_kode3 = $romawiToString[$bulan_kode2];
+    // 2. Query cari nomor terakhir di TAHUN ini saja
+    // Kita cari yang formatnya .../24/... (sesuai tahun jalan)
+    $query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id 
+                               FROM tr_invoice 
+                               WHERE no_surat LIKE '%/" . $tahun_short . "/%'");
 
-    $tahun_do = $bulan_kode2[1];
-
-    if ($tahun_do !== $tahun) {
-      $bulan_kode2 = $romawi;
-      $th = date('Y', strtotime($tahun_do . '-01-01'));
-    }
-
-    $blnthn = date('Y-m');
-    $query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_invoice WHERE no_surat LIKE '%/" . date('y', strtotime($th . '-01-01')) . "%'");
     $row = $query->row_array();
-    $thn = date('T');
+
+    // 3. Logika Counter
     $max_id = $row['max_id'];
-    $max_id1 = (int) $max_id;
-    $counter = $max_id1 + 1;
-    $idcust = "INV-MP/" . $tahun . "/" . $bulan_kode2 . "/" . sprintf("%04s", $counter);
+    $counter = (int)$max_id + 1;
+
+    // 4. Generate Format Akhir: INV-MP/24/II/0001
+    // Pakai $tahun_short agar formatnya 24, bukan 2024
+    $idcust = "INV-MP/" . $tahun_short . "/" . $romawi . "/" . sprintf("%04s", $counter);
+
     return $idcust;
   }
 
