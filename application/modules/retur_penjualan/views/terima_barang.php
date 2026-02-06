@@ -190,6 +190,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 											<th>Lot Number</th>
 											<th>Thickness</th>
 											<th>Width</th>
+											<th>Length</th>
 											<th>Total Kirim (Kg)</th>
 											<?php
 											if ($results['check_sheet'] == 1) {
@@ -216,6 +217,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 			<th><input type='text' class='form-control'   value='$dt->lotno' id='dp_lotno_$loop' data-role='qtip' required name='dp[$loop][lotno]'></th>
 			<th><input type='text' class='form-control'   value='$dt->thickness' id='dp_thickness_$loop' data-role='qtip' required name='dp[$loop][thickness]'></th>
 			<th><input type='text' class='form-control'   value='$dt->width' id='dp_width_$loop' data-role='qtip' required name='dp[$loop][width]'></th>
+			<th><input type='text' class='form-control'   value='$dt->length' id='dp_length_$loop' data-role='qtip' required name='dp[$loop][length]'></th>
 			<th><input type='text' class='form-control'   value='$dt->total_kirim' id='dp_total_kirim_$loop' data-role='qtip' required name='dp[$loop][total_kirim]'></th>";
 
 											if ($results['check_sheet'] == 1) {

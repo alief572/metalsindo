@@ -168,6 +168,7 @@ class Retur_penjualan extends Admin_Controller
 					'id_material'		    => $dp[id_category3],
 					'thickness'		        => $dp[thickness],
 					'width'		        	=> $dp[width],
+					'length'		        => $dp[length],
 					'harga_deal'		    => $hargadeal,
 					'qty_produk'			=> 1,
 					'weight'		    	=> $totalretur,
