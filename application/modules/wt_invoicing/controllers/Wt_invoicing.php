@@ -206,8 +206,6 @@ class Wt_invoicing extends Admin_Controller
 			'headerso' => $hdso,
 		];
 
-
-
 		$this->template->set('results', $data);
 		$this->template->title('Create Invoice');
 		$this->template->render('create_invoice');
