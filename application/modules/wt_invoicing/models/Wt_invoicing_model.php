@@ -274,7 +274,9 @@ class Wt_invoicing_model extends BF_Model
     $where2 = "a.deal ='1'";
     $this->db->where($where);
     $this->db->where($where2);
+    $this->db->where('a.id_material IS NOT NULL');
     $query = $this->db->get();
+
     return $query->result();
   }
 
