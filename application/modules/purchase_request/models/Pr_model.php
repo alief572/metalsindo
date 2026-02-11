@@ -257,6 +257,42 @@ class Pr_model extends BF_Model
 		return $query->result();
 	}
 
+	public function render_status_pr($status)
+	{
+		switch ($status) {
+			case 1:
+				return '<span class="badge bg-yellow">Waiting</span>';
+				break;
+			case 2:
+				return '<span class="badge bg-green">Approved</span>';
+				break;
+			default:
+				return '<span class="badge bg-yellow">Waiting</span>';
+				break;
+		}
+	}
+
+	public function render_action_button($item)
+	{
+		$button = '';
+		if ($item->status == 1) {
+			$button .= "<a class='btn btn-primary btn-sm view' href='javascript:void(0)' title='View' data-no_pr='" . $item->no_pr . "'><i class='fa fa-eye'></i>
+				</a>";
+			$button .= " <a class='btn btn-success btn-sm' href='" . base_url('purchase_request/edit/' . $item->no_pr) . "' title='Edit' ><i class='fa fa-edit'></i></a>
+				<a class='btn btn-success btn-sm Approve' href='javascript:void(0)' title='Approve' data-no_pr='" . $item->no_pr . "'><i class='fa fa-check'></i>
+				</a>";
+		} else {
+			$button .= "<a class='btn btn-primary btn-sm view' href='javascript:void(0)' title='View' data-no_pr='" . $item->no_pr . "'><i class='fa fa-eye'></i>
+				</a>";
+
+			$button .= " <a class='btn btn-success btn-sm Approve' href='javascript:void(0)' title='Approve' data-no_pr='" . $item->no_pr . "'><i class='fa fa-check'></i>
+				</a>";
+		}
+
+		$button .= ' <button type="button" class="btn btn-sm btn-primary copy_pr" data-no_pr="' . $item->no_pr . '" title="Copy PR"><i class="fa fa-copy"></i></button>';
+
+		return $button;
+	}
 
 	public function get_purchase_request()
 	{
@@ -266,6 +302,10 @@ class Pr_model extends BF_Model
 
 		$this->db->select('a.no_pr, a.no_surat, a.tanggal, a.requestor, a.status, IF(a.status = 2, "Approved", "Waiting") as sts');
 		$this->db->from('tr_purchase_request a');
+
+		$db_clone = clone $this->db;
+		$count_all = $db_clone->count_all_results();
+
 		if (!empty($search)) {
 			$this->db->group_start();
 			$this->db->like('a.no_surat', $search['value'], 'both');
@@ -274,22 +314,13 @@ class Pr_model extends BF_Model
 			$this->db->or_like('IF(a.status = 2, "Approved", "Waiting")', $search['value'], 'both');
 			$this->db->group_end();
 		}
+
+		$db_clone = clone $this->db;
+		$count_filtered = $db_clone->count_all_results();
+
 		$this->db->order_by('a.no_surat', 'desc');
 		$this->db->limit($length, $start);
 		$query = $this->db->get();
-
-		$this->db->select('a.no_pr, a.no_surat, a.tanggal, a.requestor, a.status, IF(a.status = 2, "Approved", "Waiting") as sts');
-		$this->db->from('tr_purchase_request a');
-		if (!empty($search)) {
-			$this->db->group_start();
-			$this->db->like('a.no_surat', $search['value'], 'both');
-			$this->db->or_like('a.tanggal', $search['value'], 'both');
-			$this->db->or_like('a.requestor', $search['value'], 'both');
-			$this->db->or_like('IF(a.status = 2, "Approved", "Waiting")', $search['value'], 'both');
-			$this->db->group_end();
-		}
-		$this->db->order_by('a.no_surat', 'desc');
-		$query_all = $this->db->get();
 
 		$hasil = [];
 
@@ -299,37 +330,56 @@ class Pr_model extends BF_Model
 
 			$button = '';
 
-			if ($item->status == 1) {
-				$button .= "<a class='btn btn-primary btn-sm view' href='javascript:void(0)' title='View' data-no_pr='" . $item->no_pr . "'><i class='fa fa-eye'></i>
-				</a>";
-				$button .= " <a class='btn btn-success btn-sm' href='" . base_url('purchase_request/edit/' . $item->no_pr) . "' title='Edit' ><i class='fa fa-edit'></i></a>
-				<a class='btn btn-success btn-sm Approve' href='javascript:void(0)' title='Approve' data-no_pr='" . $item->no_pr . "'><i class='fa fa-check'></i>
-				</a>";
-			} else {
-				$button .= "<a class='btn btn-primary btn-sm view' href='javascript:void(0)' title='View' data-no_pr='" . $item->no_pr . "'><i class='fa fa-eye'></i>
-				</a>";
+			// if ($item->status == 1) {
+			// 	$button .= "<a class='btn btn-primary btn-sm view' href='javascript:void(0)' title='View' data-no_pr='" . $item->no_pr . "'><i class='fa fa-eye'></i>
+			// 	</a>";
+			// 	$button .= " <a class='btn btn-success btn-sm' href='" . base_url('purchase_request/edit/' . $item->no_pr) . "' title='Edit' ><i class='fa fa-edit'></i></a>
+			// 	<a class='btn btn-success btn-sm Approve' href='javascript:void(0)' title='Approve' data-no_pr='" . $item->no_pr . "'><i class='fa fa-check'></i>
+			// 	</a>";
+			// } else {
+			// 	$button .= "<a class='btn btn-primary btn-sm view' href='javascript:void(0)' title='View' data-no_pr='" . $item->no_pr . "'><i class='fa fa-eye'></i>
+			// 	</a>";
 
-				$button .= " <a class='btn btn-success btn-sm Approve' href='javascript:void(0)' title='Approve' data-no_pr='" . $item->no_pr . "'><i class='fa fa-check'></i>
-				</a>";
-			}
+			// 	$button .= " <a class='btn btn-success btn-sm Approve' href='javascript:void(0)' title='Approve' data-no_pr='" . $item->no_pr . "'><i class='fa fa-check'></i>
+			// 	</a>";
+			// }
+
+			$status = $this->render_status_pr($item->status);
+			$button = $this->render_action_button($item);
 
 			$hasil[] = [
 				'no' => $no,
 				'no_surat' => $item->no_surat,
 				'tanggal' => $item->tanggal,
 				'requestor' => $item->requestor,
-				'status' => $item->sts,
+				'status' => $status,
 				'option' => $button
 			];
 		}
 
 		$response = [
 			"draw" => intval($this->input->post('draw')),
-			"recordsTotal" => $query_all->num_rows(),
-			"recordsFiltered" => $query_all->num_rows(),
+			"recordsTotal" => $count_all,
+			"recordsFiltered" => $count_filtered,
 			"data" => $hasil,
 		];
 
 		echo json_encode($response);
+	}
+
+	public function get_pr($no_pr)
+	{
+		$this->db->select('a.*');
+		$this->db->from('tr_purchase_request a');
+		$this->db->where('a.no_pr', $no_pr);
+		return $this->db->get()->row();
+	}
+
+	public function get_dt_pr($no_pr)
+	{
+		$this->db->select('a.*');
+		$this->db->from('dt_trans_pr a');
+		$this->db->where('a.no_pr', $no_pr);
+		return $this->db->get()->result();
 	}
 }
