@@ -226,7 +226,7 @@ $ENABLE_DELETE  = has_permission('PR.Delete');
 						swal({
 							type: 'success',
 							title: 'Success !',
-							text: result.msg,
+							text: result.message,
 							allowOutsideClick: false,
 							allowEscapeKey: false,
 							showConfirmButton: false,
