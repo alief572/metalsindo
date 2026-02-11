@@ -37,7 +37,6 @@ class Purchase_request extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 
-		$this->template->set('list_bentuk', $get_bentuk);
 		$this->template->page_icon('fa fa-users');
 		$this->template->title('Purchase Request');
 		$this->template->render('index');
@@ -1432,6 +1431,79 @@ class Purchase_request extends Admin_Controller
                     </tr>";
 		endforeach;
 		echo "</select>";
+	}
+
+	public function copy_pr()
+	{
+		$no_pr = $this->input->post('no_pr', true);
+
+		$this->db->trans_begin();
+
+		try {
+			$data_pr = $this->Pr_model->get_pr($no_pr);
+			$data_dt_pr = $this->Pr_model->get_dt_pr($no_pr);
+
+			if (empty($data_pr) || empty($data_dt_pr)) {
+				throw new Exception("Data PR tidak ditemukan.");
+			} else {
+				$code = $this->Pr_model->generate_code();
+				$no_surat = $this->Pr_model->BuatNomor();
+
+				$arr_insert_header = [
+					'no_pr' => $code,
+					'no_surat' => $no_surat,
+					'tanggal' => date('Y-m-d'),
+					'requestor' => $this->auth->user_name(),
+					'status' => '1',
+					'created_on' => date('Y-m-d H:i:s'),
+					'created_by' => $this->auth->user_id()
+				];
+
+				$arr_insert_detail = [];
+				$no_detail = 0;
+				foreach ($data_dt_pr as $dt_pr) {
+					$no_detail++;
+					$arr_insert_detail[] = [
+						'no_pr' => $code,
+						'id_dt_pr' => $code . '-' . $no_detail,
+						'idmaterial' => $dt_pr->idmaterial,
+						'nama_material' => $dt_pr->nama_material,
+						'bentuk' => $dt_pr->bentuk,
+						'id_bentuk' => $dt_pr->id_bentuk,
+						'idameter' => $dt_pr->idameter,
+						'odameter' => $dt_pr->odameter,
+						'qty' => $dt_pr->qty,
+						'weight' => $dt_pr->weight,
+						'totalweight' => $dt_pr->totalweight,
+						'width' => $dt_pr->width,
+						'length' => $dt_pr->length,
+						'suplier' => $dt_pr->suplier,
+						'tanggal' => $dt_pr->tanggal,
+						'keterangan' => $dt_pr->keterangan,
+						'qty_sheet' => $dt_pr->qty_sheet,
+						'weight_sheet' => $dt_pr->weight_sheet
+					];
+				}
+
+				$insert_header = $this->db->insert('tr_purchase_request', $arr_insert_header);
+				if (!$insert_header) {
+					throw new Exception("Gagal menyalin header PR.");
+				}
+
+				$insert_detail = $this->db->insert_batch('dt_trans_pr', $arr_insert_detail);
+				if (!$insert_detail) {
+					throw new Exception("Gagal menyalin detail PR.");
+				}
+
+				$this->db->trans_commit();
+				set_status_header(200);
+				echo json_encode(['status' => true, 'message' => 'Berhasil menyalin PR.', 'no_pr' => $code]);
+			}
+		} catch (Exception $e) {
+			$this->db->trans_rollback();
+			set_status_header(500);
+			echo json_encode(['status' => false, 'message' => $e->getMessage()]);
+		}
 	}
 
 	public function get_purchase_request()
