@@ -486,4 +486,31 @@ class Inventory_4_model extends BF_Model
 			'data' => $hasil
 		]);
 	}
+
+	public function get_category3($id_category3)
+	{
+		$this->db->select('a.*');
+		$this->db->from('ms_inventory_category3 a');
+		$this->db->where('a.id_category3', $id_category3);
+		return $this->db->get()->row_array();
+	}
+
+	public function get_last_price_sheet($id_category3)
+	{
+		$this->db->select('a.price_sheet');
+		$this->db->from('child_penawaran a');
+		$this->db->where('a.id_category3', $id_category3);
+		$this->db->where('a.price_sheet >', 0);
+		$this->db->order_by('a.id_child_penawaran', 'DESC');
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
+
+	public function get_penawaran_detail($no_penawaran)
+	{
+		$this->db->select('a.*');
+		$this->db->from('child_penawaran a');
+		$this->db->where('a.no_penawaran', $no_penawaran);
+		return $this->db->get()->result_array();
+	}
 }

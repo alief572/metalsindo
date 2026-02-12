@@ -11,6 +11,7 @@ header("Expires: 0");
             <th style="text-align: center;">#</th>
             <th style="text-align: center;">No. PR</th>
             <th style="text-align: center;">No. PO</th>
+            <th style="text-align: center;">Tanggal PO</th>
             <th style="text-align: center;">Supplier</th>
             <th style="text-align: center;">Material</th>
             <th style="text-align: center;">Width</th>
@@ -31,7 +32,7 @@ header("Expires: 0");
 
                 $this->db->select('COALESCE(SUM(a.width_recive), 0) as total_received');
                 $this->db->from('dt_incoming a');
-                $this->db->where('a.id_dt_po', $item->id_dt_po);
+                $this->db->where('a.id_dt_po', $item['id_dt_po']);
                 $get_incoming = $this->db->get()->row();
 
                 $incoming = (!empty($get_incoming->total_received)) ? $get_incoming->total_received : 0;
@@ -45,6 +46,7 @@ header("Expires: 0");
                 echo '<td style="text-align: center;">' . $no . '</td>';
                 echo '<td style="text-align: center;">' . $item['no_pr'] . '</td>';
                 echo '<td style="text-align: center;">' . $item['no_surat_po'] . '</td>';
+                echo '<td style="text-align: center;">' . date('d-m-Y', strtotime($item['tanggal_po'])) . '</td>';
                 echo '<td style="text-align: left;">' . $item['name_suplier'] . '</td>';
                 echo '<td style="text-align: left;">' . $item['nama_material'] . '</td>';
                 echo '<td style="text-align: right;">' . number_format($item['width_po'], 2) . '</td>';

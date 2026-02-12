@@ -39,46 +39,7 @@ $ENABLE_DELETE  = has_permission('PR.Delete');
 			</thead>
 
 			<tbody>
-				<?php if (empty($results)) {
-				} else {
 
-					$numb = 0;
-					foreach ($results as $record) {
-						$numb++;
-						$ling = base_url('/purchase_request/edit/' . $record->no_pr);
-				?>
-						<tr>
-							<td><?= $numb; ?></td>
-							<td><?= $record->no_surat ?></td>
-							<td><?= $record->tanggal ?></td>
-							<td><?= $record->requestor ?></td>
-							<?php if ($record->status == '1') {
-								echo "<td>Waiting</td>";
-							} else {
-								echo "<td>Approved</td>";
-							} ?>
-							<?php if ($record->status == '1') {
-								echo "
-			<td style='padding-left:20px'>
-				<a class='btn btn-primary btn-sm view' href='javascript:void(0)' title='View' data-no_pr='$record->no_pr'><i class='fa fa-eye'></i>
-				</a>
-		<a class='btn btn-success btn-sm' href='$ling' title='Edit' ><i class='fa fa-edit'></i></a>
-				<a class='btn btn-success btn-sm Approve' href='javascript:void(0)' title='Approve' data-no_pr='$record->no_pr'><i class='fa fa-check'></i>
-				</a>
-			</td>";
-							} else {
-								echo "
-			<td style='padding-left:20px'>
-				<a class='btn btn-primary btn-sm view' href='javascript:void(0)' title='View' data-no_pr='$record->no_pr'><i class='fa fa-eye'></i>
-				</a>
-
-				<a class='btn btn-success btn-sm Approve' href='javascript:void(0)' title='Approve' data-no_pr='$record->no_pr'><i class='fa fa-check'></i>
-				</a>
-			</td>";
-							} ?>
-						</tr>
-				<?php }
-				}  ?>
 			</tbody>
 		</table>
 	</div>
@@ -193,7 +154,7 @@ $ENABLE_DELETE  = has_permission('PR.Delete');
 		// alert(id);
 		swal({
 				title: "Anda Yakin?",
-				text: "P.R. Akan Dihapus.",
+				text: "P.R. Akan Diapprove.",
 				type: "warning",
 				showCancelButton: true,
 				confirmButtonClass: "btn-info",
@@ -239,6 +200,53 @@ $ENABLE_DELETE  = has_permission('PR.Delete');
 			});
 
 	})
+
+	$(document).on('click', '.copy_pr', function() {
+		var no_pr = $(this).data('no_pr');
+
+		swal({
+				title: "Anda Yakin?",
+				text: "Akan Membuat P.R. Baru dari P.R. " + no_pr,
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonClass: "btn-info",
+				confirmButtonText: "Ya, Copy P.R.!",
+				cancelButtonText: "Batal",
+				closeOnConfirm: false
+			},
+			function() {
+				$.ajax({
+					type: 'POST',
+					url: siteurl + 'purchase_request/copy_pr',
+					dataType: "json",
+					data: {
+						'no_pr': no_pr
+					},
+					success: function(result) {
+						swal({
+							type: 'success',
+							title: 'Success !',
+							text: result.message,
+							allowOutsideClick: false,
+							allowEscapeKey: false,
+							showConfirmButton: false,
+							showCancelButton: false,
+							timer: 3000
+						}, function() {
+							window.location.reload(true);
+						});
+					},
+					error: function(xhr, status, error) {
+						swal({
+							title: "Error",
+							text: "Failed to process request: " + error,
+							type: "error"
+						})
+					}
+				})
+			});
+	});
+
 
 	$(function() {
 		// $('#example1 thead tr').clone(true).appendTo( '#example1 thead' );

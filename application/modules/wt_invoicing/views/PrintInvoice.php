@@ -429,15 +429,25 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 			endif;
 
 			$harga_satuan = 0;
- 
+
 			$this->db->select('a.harga_deal');
 			$this->db->from('dt_spkmarketing a');
 			$this->db->where('a.id_spkmarketing', $detail->no_so);
 			$this->db->where('a.id_material', $detail->id_category3);
 			$get_detail_spkmkt = $this->db->get()->row();
 
-			if(!empty($get_detail_spkmkt->harga_deal)) {
-				$harga_satuan = $get_detail_spkmkt->harga_deal;
+			// if (!empty($get_detail_spkmkt->harga_deal)) {
+			// 	$harga_satuan = $get_detail_spkmkt->harga_deal;
+			// } else {
+			// 	$harga_satuan = $detail->harga_satuan;
+			// }
+
+			if ($get_inventory['id_bentuk'] == 'B2000002') {
+				if (!empty($get_detail_spkmkt->harga_deal)) {
+					$harga_satuan = $get_detail_spkmkt->harga_deal;
+				} else {
+					$harga_satuan = $detail->harga_satuan;
+				}
 			} else {
 				$harga_satuan = $detail->harga_satuan;
 			}
@@ -488,7 +498,7 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 					$this->db->where('a.qty_in >', 0);
 					$check_control = $this->db->get()->row();
 
-					if(count($check_control) > 0) {
+					if (count($check_control) > 0) {
 						$qty_invoice += $item_invoice->qty_sheet;
 					}
 				}

@@ -14,10 +14,10 @@ if (!defined('BASEPATH')) {
 class Control_do extends Admin_Controller
 {
     //Permission
-    protected $viewPermission     = 'Control_PO.View';
-    protected $addPermission      = 'Control_PO.Add';
-    protected $managePermission = 'Control_PO.Manage';
-    protected $deletePermission = 'Control_PO.Delete';
+    protected $viewPermission     = 'Control_DO.View';
+    protected $addPermission      = 'Control_DO.Add';
+    protected $managePermission = 'Control_DO.Manage';
+    protected $deletePermission = 'Control_DO.Delete';
 
     public function __construct()
     {
@@ -36,6 +36,18 @@ class Control_do extends Admin_Controller
     {
         $this->auth->restrict($this->viewPermission);
         $session = $this->session->userdata('app_session');
+
+        $get_list_spk_marketing = $this->control_do_model->get_list_spk_marketing();
+        $get_list_customer = $this->control_do_model->get_list_customer();
+        $get_list_do = $this->control_do_model->get_list_do();
+
+        $data = [
+            'list_spk_marketing' => $get_list_spk_marketing,
+            'list_customer' => $get_list_customer,
+            'list_do' => $get_list_do
+        ];
+
+        $this->template->set($data);
         $this->template->page_icon('fa fa-users');
         $this->template->title('Control DO');
         $this->template->render('index');
@@ -417,14 +429,116 @@ class Control_do extends Admin_Controller
         echo json_encode($response);
     }
 
+    public function download_excel()
+    {
+        $tahun = $this->input->get('tahun', true);
+        $bulan = $this->input->get('bulan', true);
+        $no_do = $this->input->get('no_do', true);
+        $no_spk = $this->input->get('no_spk', true);
+        $customer = $this->input->get('customer', true);
+
+        // Your Excel download logic here
+        $this->db->select('a.*, b.name_customer');
+        $this->db->from('tr_delivery_order a');
+        $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
+        $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
+        $this->db->where('a.deleted', null);
+        $this->db->where('a.close_do', null);
+        $this->db->where('d.no_invoice', null);
+
+        if (!empty($tahun)) {
+            $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
+        }
+        if (!empty($bulan)) {
+            $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
+        }
+        if (!empty($no_do)) {
+            $this->db->where('a.no_surat', $no_do);
+        }
+        if (!empty($no_spk)) {
+            $this->db->where('a.no_spk_marketing', $no_spk);
+        }
+        if (!empty($customer)) {
+            $this->db->where('b.id_customer', $customer);
+        }
+
+        $this->db->group_by('a.id_delivery_order');
+        $get_data_control_do = $this->db->get()->result();
+
+        $arr_total_do = [];
+        $arr_total_delivered = [];
+        foreach ($get_data_control_do as $do_item) {
+            $totals = $this->control_do_model->get_total_do($do_item->id_delivery_order);
+            $arr_total_do[$do_item->id_delivery_order] = $totals->total_do;
+            $arr_total_delivered[$do_item->id_delivery_order] = $totals->total_delivered;
+        }
+
+        $data = [
+            'data_control_do' => $get_data_control_do,
+            'arr_total_do' => $arr_total_do,
+            'arr_total_delivered' => $arr_total_delivered
+        ];
+        $this->load->view('download_excel', $data);
+    }
+
+    public function download_excel_scrap()
+    {
+        $this->db->select('a.*, c.name_customer');
+        $this->db->from('tr_delivery_order a');
+        $this->db->join('dt_delivery_order_child_scrap b', 'b.id_delivery_order = a.id_delivery_order');
+        $this->db->join('master_customers c', 'c.id_customer = a.id_customer', 'left');
+        $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
+        $this->db->where('a.deleted', null);
+        $this->db->where('a.close_do', null);
+        $this->db->where('d.no_invoice', null);
+        if (!empty($tahun)) {
+            $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
+        }
+        if (!empty($bulan)) {
+            $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
+        }
+        if (!empty($no_do)) {
+            $this->db->where('a.no_surat', $no_do);
+        }
+        if (!empty($no_spk)) {
+            $this->db->where('a.no_spk_marketing', $no_spk);
+        }
+        if (!empty($customer)) {
+            $this->db->where('b.id_customer', $customer);
+        }
+        $this->db->group_by('a.id_delivery_order');
+        $get_data_control_do = $this->db->get()->result();
+
+        $arr_total_do = [];
+        $arr_total_delivered = [];
+        foreach ($get_data_control_do as $do_item) {
+            $totals = $this->control_do_model->get_total_do_scrap($do_item->id_delivery_order);
+            $arr_total_do[$do_item->id_delivery_order] = $totals->total_do;
+            $arr_total_delivered[$do_item->id_delivery_order] = $totals->total_delivered;
+        }
+
+        $data = [
+            'data_control_do' => $get_data_control_do,
+            'arr_total_do' => $arr_total_do,
+            'arr_total_delivered' => $arr_total_delivered
+        ];
+        $this->load->view('download_excel_scrap', $data);
+    }
+
     public function get_data_control_do()
     {
         $post = $this->input->post();
 
-        $draw = intval($post['draw']);
-        $length = $post['length'];
-        $start = $post['start'];
-        $search = $post['search']['value'];
+        $draw = intval($this->input->post('draw', true));
+        $length = $this->input->post('length', true);
+        $start = $this->input->post('start', true);
+        $search = $this->input->post('search', true)['value'];
+
+        $tahun = $this->input->post('tahun', true);
+        $bulan = $this->input->post('bulan', true);
+        $no_do = $this->input->post('no_do', true);
+        $no_spk = $this->input->post('no_spk', true);
+        $customer = $this->input->post('customer', true);
 
         $this->db->select('a.id_delivery_order');
         $this->db->from('tr_delivery_order a');
@@ -433,6 +547,23 @@ class Control_do extends Admin_Controller
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
         $this->db->where('d.no_invoice', null);
+
+        if (!empty($tahun)) {
+            $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
+        }
+        if (!empty($bulan)) {
+            $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
+        }
+        if (!empty($no_do)) {
+            $this->db->where('a.no_surat', $no_do);
+        }
+        if (!empty($no_spk)) {
+            $this->db->where('a.no_spk_marketing', $no_spk);
+        }
+        if (!empty($customer)) {
+            $this->db->where('b.id_customer', $customer);
+        }
+
         $this->db->group_by('a.id_delivery_order');
         $count_all = $this->db->get()->num_rows();
 
@@ -443,6 +574,22 @@ class Control_do extends Admin_Controller
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
         $this->db->where('d.no_invoice', null);
+
+        if (!empty($tahun)) {
+            $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
+        }
+        if (!empty($bulan)) {
+            $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
+        }
+        if (!empty($no_do)) {
+            $this->db->where('a.no_surat', $no_do);
+        }
+        if (!empty($no_spk)) {
+            $this->db->where('a.no_spk_marketing', $no_spk);
+        }
+        if (!empty($customer)) {
+            $this->db->where('b.id_customer', $customer);
+        }
 
         if (!empty($search)) {
             $this->db->group_start();
@@ -463,6 +610,22 @@ class Control_do extends Admin_Controller
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
         $this->db->where('d.no_invoice', null);
+
+        if (!empty($tahun)) {
+            $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
+        }
+        if (!empty($bulan)) {
+            $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
+        }
+        if (!empty($no_do)) {
+            $this->db->where('a.no_surat', $no_do);
+        }
+        if (!empty($no_spk)) {
+            $this->db->where('a.no_spk_marketing', $no_spk);
+        }
+        if (!empty($customer)) {
+            $this->db->where('b.id_customer', $customer);
+        }
 
         if (!empty($search)) {
             $this->db->group_start();
@@ -492,10 +655,12 @@ class Control_do extends Admin_Controller
             $this->db->where('a.qty_ng <=', 0);
             $get_do_detail = $this->db->get()->num_rows();
 
-            $this->db->select('SUM(a.weight_mat) as total_do, SUM(a.qty_in) as total_delivered');
-            $this->db->from('dt_delivery_order_child a');
-            $this->db->where('a.id_delivery_order', $item->id_delivery_order);
-            $get_total = $this->db->get()->row();
+            // $this->db->select('SUM(a.weight_mat) as total_do, SUM(a.qty_in) as total_delivered');
+            // $this->db->from('dt_delivery_order_child a');
+            // $this->db->where('a.id_delivery_order', $item->id_delivery_order);
+            // $get_total = $this->db->get()->row();
+
+            $get_total = $this->control_do_model->get_total_do($item->id_delivery_order);
 
             $total_do = (!empty($get_total->total_do)) ? $get_total->total_do : 0;
             $total_delivered = (!empty($get_total->total_delivered)) ? $get_total->total_delivered : 0;
@@ -530,12 +695,16 @@ class Control_do extends Admin_Controller
 
     public function get_data_control_do_scrap()
     {
-        $post = $this->input->post();
+        $draw = intval($this->input->post('draw', true));
+        $length = $this->input->post('length', true);
+        $start = $this->input->post('start', true);
+        $search = $this->input->post('search', true)['value'];
 
-        $draw = intval($post['draw']);
-        $length = $post['length'];
-        $start = $post['start'];
-        $search = $post['search']['value'];
+        $tahun = $this->input->post('tahun', true);
+        $bulan = $this->input->post('bulan', true);
+        $no_do = $this->input->post('no_do', true);
+        $no_spk = $this->input->post('no_spk', true);
+        $customer = $this->input->post('customer', true);
 
         $this->db->select('a.id_delivery_order');
         $this->db->from('tr_delivery_order a');
@@ -545,6 +714,21 @@ class Control_do extends Admin_Controller
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
         $this->db->where('d.no_invoice', null);
+        if (!empty($tahun)) {
+            $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
+        }
+        if (!empty($bulan)) {
+            $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
+        }
+        if (!empty($no_do)) {
+            $this->db->where('a.no_surat', $no_do);
+        }
+        if (!empty($no_spk)) {
+            $this->db->where('a.no_spk_marketing', $no_spk);
+        }
+        if (!empty($customer)) {
+            $this->db->where('b.id_customer', $customer);
+        }
         $this->db->group_by('a.id_delivery_order');
         $count_all = $this->db->get()->num_rows();
 
@@ -556,6 +740,22 @@ class Control_do extends Admin_Controller
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
         $this->db->where('d.no_invoice', null);
+
+        if (!empty($tahun)) {
+            $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
+        }
+        if (!empty($bulan)) {
+            $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
+        }
+        if (!empty($no_do)) {
+            $this->db->where('a.no_surat', $no_do);
+        }
+        if (!empty($no_spk)) {
+            $this->db->where('a.no_spk_marketing', $no_spk);
+        }
+        if (!empty($customer)) {
+            $this->db->where('b.id_customer', $customer);
+        }
 
         if (!empty($search)) {
             $this->db->group_start();
@@ -577,6 +777,22 @@ class Control_do extends Admin_Controller
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
         $this->db->where('d.no_invoice', null);
+
+        if (!empty($tahun)) {
+            $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
+        }
+        if (!empty($bulan)) {
+            $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
+        }
+        if (!empty($no_do)) {
+            $this->db->where('a.no_surat', $no_do);
+        }
+        if (!empty($no_spk)) {
+            $this->db->where('a.no_spk_marketing', $no_spk);
+        }
+        if (!empty($customer)) {
+            $this->db->where('b.id_customer', $customer);
+        }
 
         if (!empty($search)) {
             $this->db->group_start();
@@ -604,10 +820,7 @@ class Control_do extends Admin_Controller
             $this->db->where('a.qty_ng <=', 0);
             $get_do_detail = $this->db->get()->num_rows();
 
-            $this->db->select('SUM(a.weight_mat) as total_do, SUM(a.qty_in) as total_delivered');
-            $this->db->from('dt_delivery_order_child_scrap a');
-            $this->db->where('a.id_delivery_order', $item->id_delivery_order);
-            $get_total = $this->db->get()->row();
+            $get_total = $this->control_do_model->get_total_do_scrap($item->id_delivery_order);
 
             $total_do = (!empty($get_total->total_do)) ? $get_total->total_do : 0;
             $total_delivered = (!empty($get_total->total_delivered)) ? $get_total->total_delivered : 0;
