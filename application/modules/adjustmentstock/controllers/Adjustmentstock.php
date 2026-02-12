@@ -19,6 +19,7 @@ class Adjustmentstock extends Admin_Controller
 	protected $managePermission = 'Adjustment_Stock.Manage';
 	protected $deletePermission = 'Adjustment_Stock.Delete';
 
+
 	public function __construct()
 	{
 		parent::__construct();
