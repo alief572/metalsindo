@@ -152,6 +152,7 @@ class Control_do extends Admin_Controller
             if (isset($post['detail'][$no])) {
 
                 $qty_in = str_replace(',', '', $post['detail'][$no]['qty_in']);
+                $qty_fg = str_replace(',', '', $post['detail'][$no]['qty_fg']);
                 $qty_ng = str_replace(',', '', $post['detail'][$no]['qty_ng']);
 
                 $get_stock = $this->db->get_where('stock_material', ['id_stock' => $item_do_detail->id_stock])->row();
@@ -160,6 +161,7 @@ class Control_do extends Admin_Controller
                     'id_detail_do' => $item_do_detail->id,
                     'qty_do' => $item_do_detail->weight_mat,
                     'qty_in' => $qty_in,
+                    'qty_fg' => $qty_fg,
                     'qty_ng' => $qty_ng,
                     'created_by' => $this->auth->user_id(),
                     'created_at' => date('Y-m-d H:i:s')
@@ -176,6 +178,7 @@ class Control_do extends Admin_Controller
                 $arr_do_in_ng = [
                     'id' => $item_do_detail->id,
                     'qty_in' => ($item_do_detail->qty_in + $qty_in),
+                    'qty_fg' => ($item_do_detail->qty_fg + $qty_fg),
                     'qty_ng' => ($item_do_detail->qty_ng + $qty_ng)
                 ];
 
@@ -188,6 +191,42 @@ class Control_do extends Admin_Controller
                 }
 
                 $get_stock = $this->db->get_where('stock_material', array('id_stock' => $item_do_detail->id_stock))->row_array();
+
+                $arr_stock_fg = [
+                    'id_category3' => $get_stock['id_category3'],
+                    'nama_material' => $get_stock['nama_material'],
+                    'width' => $get_stock['width'],
+                    'length' => $get_stock['length'],
+                    'id_bentuk' => $get_stock['id_bentuk'],
+                    'lotno' => $get_stock['lotno'],
+                    'qty' => $qty_fg,
+                    'weight' => $get_stock['weight'],
+                    'totalweight' => $get_stock['totalweight'],
+                    'booking' => $get_stock['booking'],
+                    'thickness' => $get_stock['thickness'],
+                    'aktif' => 'Y',
+                    'id_gudang' => '3',
+                    'created_by' => $this->auth->user_id(),
+                    'created_on' => date('Y-m-d H:i:s'),
+                    'no_po' => $get_stock['no_po'],
+                    'id_incoming' => $get_stock['id_incoming'],
+                    'lot_slitting' => $get_stock['lot_slitting'],
+                    'keterangan' => $get_stock['keterangan'],
+                    'status_do' => 'OPN',
+                    'tipe_material' => $get_stock['tipe_material'],
+                    'qty_sheet' => $get_stock['qty_sheet'],
+                    'sisa_spk' => $qty_fg
+                ];
+
+                if ($qty_fg > 0) {
+                    $insert_stock_fg = $this->db->insert('stock_material', $arr_stock_fg);
+                    if (!$insert_stock_fg) {
+                        $this->db->trans_rollback();
+
+                        print_r($this->db->last_query());
+                        exit;
+                    }
+                }
 
                 $arr_stock_ng = [
                     'id_category3' => $get_stock['id_category3'],
@@ -299,6 +338,7 @@ class Control_do extends Admin_Controller
             if (isset($post['detail'][$no])) {
 
                 $qty_in = str_replace(',', '', $post['detail'][$no]['qty_in']);
+                $qty_fg = str_replace(',', '', $post['detail'][$no]['qty_fg']);
                 $qty_ng = str_replace(',', '', $post['detail'][$no]['qty_ng']);
 
                 $get_stock = $this->db->get_where('stock_material', ['id_stock' => $item_do_detail->id_stock])->row();
@@ -307,6 +347,7 @@ class Control_do extends Admin_Controller
                     'id_detail_do' => $item_do_detail->id,
                     'qty_do' => $item_do_detail->weight_mat,
                     'qty_in' => $qty_in,
+                    'qty_fg' => $qty_fg,
                     'qty_ng' => $qty_ng,
                     'created_by' => $this->auth->user_id(),
                     'created_at' => date('Y-m-d H:i:s')
@@ -323,6 +364,7 @@ class Control_do extends Admin_Controller
                 $arr_do_in_ng = [
                     'id' => $item_do_detail->id,
                     'qty_in' => ($item_do_detail->qty_in + $qty_in),
+                    'qty_fg' => ($item_do_detail->qty_fg + $qty_fg),
                     'qty_ng' => ($item_do_detail->qty_ng + $qty_ng)
                 ];
 
@@ -335,6 +377,42 @@ class Control_do extends Admin_Controller
                 }
 
                 $get_stock = $this->db->get_where('stock_material', array('id_stock' => $item_do_detail->id_stock))->row_array();
+
+                $arr_stock_fg = [
+                    'id_category3' => $get_stock['id_category3'],
+                    'nama_material' => $get_stock['nama_material'],
+                    'width' => $get_stock['width'],
+                    'length' => $get_stock['length'],
+                    'id_bentuk' => $get_stock['id_bentuk'],
+                    'lotno' => $get_stock['lotno'],
+                    'qty' => $qty_fg,
+                    'weight' => $get_stock['weight'],
+                    'totalweight' => $get_stock['totalweight'],
+                    'booking' => $get_stock['booking'],
+                    'thickness' => $get_stock['thickness'],
+                    'aktif' => 'Y',
+                    'id_gudang' => '3',
+                    'created_by' => $this->auth->user_id(),
+                    'created_on' => date('Y-m-d H:i:s'),
+                    'no_po' => $get_stock['no_po'],
+                    'id_incoming' => $get_stock['id_incoming'],
+                    'lot_slitting' => $get_stock['lot_slitting'],
+                    'keterangan' => $get_stock['keterangan'],
+                    'status_do' => 'OPN',
+                    'tipe_material' => $get_stock['tipe_material'],
+                    'qty_sheet' => $get_stock['qty_sheet'],
+                    'sisa_spk' => $qty_fg
+                ];
+
+                if ($qty_fg > 0) {
+                    $insert_stock_ng = $this->db->insert('stock_material', $arr_stock_fg);
+                    if (!$insert_stock_ng) {
+                        $this->db->trans_rollback();
+
+                        print_r($this->db->last_query());
+                        exit;
+                    }
+                }
 
                 $arr_stock_ng = [
                     'id_category3' => $get_stock['id_category3'],
@@ -652,6 +730,7 @@ class Control_do extends Admin_Controller
             $this->db->from('dt_delivery_order_child a');
             $this->db->where('a.id_delivery_order', $item->id_delivery_order);
             $this->db->where('a.qty_in <=', 0);
+            $this->db->where('a.qty_fg <=', 0);
             $this->db->where('a.qty_ng <=', 0);
             $get_do_detail = $this->db->get()->num_rows();
 
@@ -664,6 +743,8 @@ class Control_do extends Admin_Controller
 
             $total_do = (!empty($get_total->total_do)) ? $get_total->total_do : 0;
             $total_delivered = (!empty($get_total->total_delivered)) ? $get_total->total_delivered : 0;
+            $total_fg = (!empty($get_total->total_fg)) ? $get_total->total_fg : 0;
+            $total_ng = (!empty($get_total->total_ng)) ? $get_total->total_ng : 0;
 
             $btn_confirm = '';
             if (has_permission($this->managePermission) && $get_do_detail > 0) {
@@ -678,7 +759,8 @@ class Control_do extends Admin_Controller
                 'customer' => $item->name_customer,
                 'qty_order' => number_format($total_do, 2),
                 'qty_delivery' => number_format($total_delivered, 2),
-                'balance' => number_format($total_do - $total_delivered, 2),
+                'qty_fg' => number_format($total_fg, 2),
+                'balance' => number_format($total_ng, 2),
                 'option' => $btn_confirm
             ];
         }
@@ -817,6 +899,7 @@ class Control_do extends Admin_Controller
             $this->db->from('dt_delivery_order_child_scrap a');
             $this->db->where('a.id_delivery_order', $item->id_delivery_order);
             $this->db->where('a.qty_in <=', 0);
+            $this->db->where('a.qty_fg <=', 0);
             $this->db->where('a.qty_ng <=', 0);
             $get_do_detail = $this->db->get()->num_rows();
 
@@ -824,6 +907,8 @@ class Control_do extends Admin_Controller
 
             $total_do = (!empty($get_total->total_do)) ? $get_total->total_do : 0;
             $total_delivered = (!empty($get_total->total_delivered)) ? $get_total->total_delivered : 0;
+            $total_fg = (!empty($get_total->total_fg)) ? $get_total->total_fg : 0;
+            $total_ng = (!empty($get_total->total_ng)) ? $get_total->total_ng : 0;
 
             $btn_confirm = '';
             if (has_permission($this->managePermission) && $get_do_detail > 0) {
@@ -838,7 +923,8 @@ class Control_do extends Admin_Controller
                 'customer' => $item->name_customer,
                 'qty_order' => number_format($total_do, 2),
                 'qty_delivery' => number_format($total_delivered, 2),
-                'balance' => number_format($total_do - $total_delivered, 2),
+                'qty_fg' => number_format($total_fg, 2),
+                'balance' => number_format($total_ng, 2),
                 'option' => $btn_confirm
             ];
         endforeach;

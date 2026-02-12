@@ -114,8 +114,9 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 						<th class="text-center">SPK Marketing</th>
 						<th class="text-center">Customer</th>
 						<th class="text-center">Qty Order</th>
-						<th class="text-center">Qty Delivery</th>
-						<th class="text-centre">Balance</th>
+						<th class="text-center">Qty OK</th>
+						<th class="text-center">Qty FG</th>
+						<th class="text-centre">Qty NG</th>
 						<th class="text-center">Option</th>
 					</tr>
 				</thead>
@@ -196,7 +197,7 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 					<br>
 					<button type="button" class="btn btn-sm btn-primary" onclick="filterDataScrap()"><i class="fa fa-search"></i> Search</button>
 					<button type="button" class="btn btn-sm btn-danger" onclick="clearFilterScrap()"><i class="fa fa-times"></i> Clear</button>
-					<button type="button" class="	btn btn-sm btn-success" onclick="downloadExcelScrap()"><i class="fa fa-download"></i> Download Excel</button>
+					<button type="button" class="btn btn-sm btn-success" onclick="downloadExcelScrap()"><i class="fa fa-download"></i> Download Excel</button>
 				</div>
 			</div>
 			<table id="example3" class="table table-bordered table-striped">
@@ -208,8 +209,9 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 						<th class="text-center">SPK Marketing</th>
 						<th class="text-center">Customer</th>
 						<th class="text-center">Qty Order</th>
-						<th class="text-center">Qty Delivery</th>
-						<th class="text-centre">Balance</th>
+						<th class="text-center">Qty OK</th>
+						<th class="text-center">Qty FG</th>
+						<th class="text-centre">Qty NG</th>
 						<th class="text-center">Option</th>
 					</tr>
 				</thead>
@@ -383,6 +385,7 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 				qty_do = qty_do.split(',').join('');
 				qty_do = parseFloat(qty_do);
 			}
+
 			var qty_in = $('input[name="detail[' + i + '][qty_in]"]').val();
 			if (qty_in.length < 1) {
 				qty_in = 0;
@@ -390,6 +393,15 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 				qty_in = qty_in.split(',').join('');
 				qty_in = parseFloat(qty_in);
 			}
+
+			var qty_fg = $('input[name="detail[' + i + '][qty_fg]"]').val();
+			if (qty_fg.length < 1) {
+				qty_fg = 0;
+			} else {
+				qty_fg = qty_fg.split(',').join('');
+				qty_fg = parseFloat(qty_fg);
+			}
+
 			var qty_ng = $('input[name="detail[' + i + '][qty_ng]"]').val();
 			if (qty_ng.length < 1) {
 				qty_ng = 0;
@@ -399,7 +411,7 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 			}
 
 			if (sts == 1) {
-				if ((qty_in + qty_ng) > qty_do) {
+				if ((qty_in + qty_fg + qty_ng) > qty_do) {
 					Swal.fire({
 						icon: 'warning',
 						title: 'Warning !',
@@ -414,7 +426,8 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 					return false;
 				}
 
-				if ((qty_in + qty_ng) !== qty_do) {
+				if ((qty_in + qty_fg + qty_ng) !== qty_do) {
+					// alert((qty_in + qty_fg + qty_ng) + '-' + qty_do);
 					Swal.fire({
 						icon: 'warning',
 						title: 'Warning !',
@@ -515,6 +528,15 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 				qty_in = qty_in.split(',').join('');
 				qty_in = parseFloat(qty_in);
 			}
+
+			var qty_fg = $('input[name="detail[' + i + '][qty_fg]"]').val();
+			if (qty_fg.length < 1) {
+				qty_fg = 0;
+			} else {
+				qty_fg = qty_fg.split(',').join('');
+				qty_fg = parseFloat(qty_fg);
+			}
+
 			var qty_ng = $('input[name="detail[' + i + '][qty_ng]"]').val();
 			if (qty_ng.length < 1) {
 				qty_ng = 0;
@@ -524,7 +546,7 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 			}
 
 			if (sts == 1) {
-				if ((qty_in + qty_ng) > qty_do) {
+				if ((qty_in + qty_fg + qty_ng) > qty_do) {
 					Swal.fire({
 						icon: 'warning',
 						title: 'Warning !',
@@ -539,7 +561,7 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 					return false;
 				}
 
-				if ((qty_in + qty_ng) !== qty_do) {
+				if ((qty_in + qty_fg + qty_ng) !== qty_do) {
 					Swal.fire({
 						icon: 'warning',
 						title: 'Warning !',
@@ -731,6 +753,9 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 					data: 'qty_delivery'
 				},
 				{
+					data: 'qty_fg'
+				},
+				{
 					data: 'balance'
 				},
 				{
@@ -786,6 +811,9 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 				},
 				{
 					data: 'qty_delivery'
+				},
+				{
+					data: 'qty_fg'
 				},
 				{
 					data: 'balance'
