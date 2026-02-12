@@ -79,7 +79,7 @@ class Pr_model extends BF_Model
 		$bulan = date('m');
 		$tahun = date('Y');
 		$blnthn = date('Y-m');
-		$query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_purchase_request WHERE month(tanggal)='$bulan' and Year(tanggal)='$tahun'");
+		$query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_purchase_request WHERE Year(tanggal)='$tahun'");
 		$row = $query->row_array();
 		$thn = date('T');
 		$max_id = $row['max_id'];
