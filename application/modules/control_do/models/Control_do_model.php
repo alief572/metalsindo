@@ -65,7 +65,11 @@ class Control_do_model extends BF_Model
 
     public function get_total_do($id_delivery_order)
     {
+<<<<<<< HEAD
         $this->db->select('SUM(a.weight_mat) as total_do, SUM(a.qty_in) as total_delivered');
+=======
+        $this->db->select('SUM(a.weight_mat) as total_do, SUM(a.qty_in) as total_delivered, SUM(a.qty_fg) as total_fg, SUM(a.qty_ng) as total_ng');
+>>>>>>> 7411680fa6384d858a64750f9f6789eed3b5366f
         $this->db->from('dt_delivery_order_child a');
         $this->db->where('a.id_delivery_order', $id_delivery_order);
         $get_total = $this->db->get()->row();
@@ -75,7 +79,11 @@ class Control_do_model extends BF_Model
 
     public function get_total_do_scrap($id_delivery_order)
     {
+<<<<<<< HEAD
         $this->db->select('SUM(a.weight_mat) as total_do, SUM(a.qty_in) as total_delivered');
+=======
+        $this->db->select('SUM(a.weight_mat) as total_do, SUM(a.qty_in) as total_delivered, SUM(a.qty_fg) as total_fg, SUM(a.qty_ng) as total_ng');
+>>>>>>> 7411680fa6384d858a64750f9f6789eed3b5366f
         $this->db->from('dt_delivery_order_child_scrap a');
         $this->db->where('a.id_delivery_order', $id_delivery_order);
         $get_total = $this->db->get()->row();
