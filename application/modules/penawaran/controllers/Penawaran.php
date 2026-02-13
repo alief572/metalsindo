@@ -1150,10 +1150,7 @@ class Penawaran extends Admin_Controller
 		$get_barang = $this->Inventory_4_model->get_category3($post['id_category3']);
 
 		$qty_sheet = str_replace(',', '', $post['qty_sheet']);
-<<<<<<< HEAD
-=======
 		$price_per_sheet = str_replace(',', '', $post['price_sheet']);
->>>>>>> 7411680fa6384d858a64750f9f6789eed3b5366f
 
 		if ($get_barang['id_bentuk'] == 'B2000002') {
 			if (empty($price_per_sheet) || $price_per_sheet == 0) {
@@ -1164,13 +1161,8 @@ class Penawaran extends Admin_Controller
 				$price_per_sheet = str_replace(',', '', $post['price_sheet']);
 			}
 		} else {
-<<<<<<< HEAD
-			$price_per_sheet = 0;
-			$qty_sheet = 0;
-=======
 			$qty_sheet = str_replace(',', '', $post['qty_sheet']);
 			$price_per_sheet = str_replace(',', '', $post['price_sheet']);
->>>>>>> 7411680fa6384d858a64750f9f6789eed3b5366f
 		}
 
 		$id = $post['id_child_penawaran'];
