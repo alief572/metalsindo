@@ -178,7 +178,7 @@ $tanggal = date('Y-m-d');
 											<th width='10%'>Delivery Date</th>
 											<th width='10%'>CRCL</th>
 											<th>Keterangan</th>
-											<th width='5%'>Deal</th>
+											<th width='5%'>Deal <input type="checkbox" id="check_all"></th>
 										</tr>
 									</thead>
 									<tbody id="list_penawaran_slot">
@@ -203,6 +203,17 @@ $tanggal = date('Y-m-d');
 	//$('#input-kendaraan').hide();
 	var base_url = '<?php echo base_url(); ?>';
 	var active_controller = '<?php echo ($this->uri->segment(1)); ?>';
+	$(document).on('click', '#check_all', function() {
+		if (this.checked) {
+			$(':checkbox').each(function() {
+				this.checked = true;
+			});
+		} else {
+			$(':checkbox').each(function() {
+				this.checked = false;
+			});
+		}
+	});
 	$(document).ready(function() {
 		$('.select').select2({
 			width: '100%'
