@@ -1,8 +1,8 @@
 <?php
-$ENABLE_ADD     = has_permission('Adjustment_Stock.Add');
-$ENABLE_MANAGE  = has_permission('Adjustment_Stock.Manage');
-$ENABLE_VIEW    = has_permission('Adjustment_Stock.View');
-$ENABLE_DELETE  = has_permission('Adjustment_Stock.Delete');
+$ENABLE_ADD     = has_permission('Adjustmentstock.Add');
+$ENABLE_MANAGE  = has_permission('Adjustmentstock.Manage');
+$ENABLE_VIEW    = has_permission('Adjustmentstock.View');
+$ENABLE_DELETE  = has_permission('Adjustmentstock.Delete');
 $id_bentuk = $this->uri->segment(3);
 ?>
 <style type="text/css">
