@@ -366,7 +366,7 @@ class Adjustmentstock extends Admin_Controller
 	{
 		$adjus			= $_GET['adjus'];
 		$id_material	= $_GET['id_material'];
-		$lookstock 		= $this->db->query("SELECT * FROM stock_material WHERE id_category3 = '$id_material' ")->result();
+		$lookstock 		= $this->db->query("SELECT * FROM stock_material WHERE id_category3 = '$id_material' AND (lotno != '' AND lotno IS NOT NULL)")->result();
 		if ($adjus == 'PLUS') {
 			echo "<input type='text' class='form-control' id='lotno'  name='lotno' placeholder='Lot Number Metalsindo'>";
 		} elseif ($adjus == 'MINUS') {
