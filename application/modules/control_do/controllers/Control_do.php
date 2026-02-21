@@ -137,374 +137,225 @@ class Control_do extends Admin_Controller
 
     public function save_confirm_data()
     {
+        // Pastikan request adalah POST
+        if (!$this->input->is_ajax_request()) {
+            exit('No direct script access allowed');
+        }
+
         $post = $this->input->post();
-
         $do_detail = $this->control_do_model->do_detail($post['id_do']);
-
-        $valid = 1;
-        $msg = '';
 
         $this->db->trans_begin();
 
-        $no = 0;
-        foreach ($do_detail as $item_do_detail) {
-            $no++;
-            if (isset($post['detail'][$no])) {
+        try {
+            $no = 0;
+            foreach ($do_detail as $item_do_detail) {
+                $no++;
 
-                $qty_in = str_replace(',', '', $post['detail'][$no]['qty_in']);
-                $qty_fg = str_replace(',', '', $post['detail'][$no]['qty_fg']);
-                $qty_ng = str_replace(',', '', $post['detail'][$no]['qty_ng']);
+                // Skip jika data detail tidak dikirim dari form
+                if (!isset($post['detail'][$no])) continue;
 
-                $get_stock = $this->db->get_where('stock_material', ['id_stock' => $item_do_detail->id_stock])->row();
+                $d = $post['detail'][$no];
+                $qty_in = (float) str_replace(',', '', $d['qty_in']);
+                $qty_fg = (float) str_replace(',', '', $d['qty_fg']);
+                $qty_ng = (float) str_replace(',', '', $d['qty_ng']);
 
-                $arr_do_confirm = [
-                    'id_detail_do' => $item_do_detail->id,
-                    'qty_do' => $item_do_detail->weight_mat,
-                    'qty_in' => $qty_in,
-                    'qty_fg' => $qty_fg,
-                    'qty_ng' => $qty_ng,
-                    'created_by' => $this->auth->user_id(),
-                    'created_at' => date('Y-m-d H:i:s')
-                ];
+                // Ambil data stock sekali saja (sebagai array agar konsisten)
+                $get_stock = $this->db->get_where('stock_material', ['id_stock' => $item_do_detail->id_stock])->row_array();
 
-                $insert_confirm_do = $this->db->insert('dt_do_confirm', $arr_do_confirm);
-                if (!$insert_confirm_do) {
-                    $this->db->trans_rollback();
-
-                    print_r($this->db->last_query());
-                    exit;
+                if (!$get_stock) {
+                    throw new Exception("Data stock tidak ditemukan untuk ID: " . $item_do_detail->id_stock);
                 }
 
+                // 1. Insert ke dt_do_confirm
+                $arr_do_confirm = [
+                    'id_detail_do' => $item_do_detail->id,
+                    'qty_do'       => $item_do_detail->weight_mat,
+                    'qty_in'       => $qty_in,
+                    'qty_fg'       => $qty_fg,
+                    'qty_ng'       => $qty_ng,
+                    'created_by'   => $this->auth->user_id(),
+                    'created_at'   => date('Y-m-d H:i:s')
+                ];
+                $this->db->insert('dt_do_confirm', $arr_do_confirm);
+
+                // 2. Update dt_delivery_order_child (Akumulasi Qty)
                 $arr_do_in_ng = [
-                    'id' => $item_do_detail->id,
                     'qty_in' => ($item_do_detail->qty_in + $qty_in),
                     'qty_fg' => ($item_do_detail->qty_fg + $qty_fg),
                     'qty_ng' => ($item_do_detail->qty_ng + $qty_ng)
                 ];
+                $this->db->update('dt_delivery_order_child', $arr_do_in_ng, ['id' => $item_do_detail->id]);
 
-                $update_do_in_ng = $this->db->update('dt_delivery_order_child', $arr_do_in_ng, array('id' => $item_do_detail->id));
-                if (!$update_do_in_ng) {
-                    $this->db->trans_rollback();
+                // 3. Helper function untuk insert stock baru (FG & NG)
+                $this->_insert_new_stock($get_stock, $qty_fg, '3'); // Gudang FG
+                $this->_insert_new_stock($get_stock, $qty_ng, '6'); // Gudang NG
 
-                    print_r($this->db->last_query());
-                    exit;
-                }
-
-                $get_stock = $this->db->get_where('stock_material', array('id_stock' => $item_do_detail->id_stock))->row_array();
-
-                $arr_stock_fg = [
-                    'id_category3' => $get_stock['id_category3'],
-                    'nama_material' => $get_stock['nama_material'],
-                    'width' => $get_stock['width'],
-                    'length' => $get_stock['length'],
-                    'id_bentuk' => $get_stock['id_bentuk'],
-                    'lotno' => $get_stock['lotno'],
-                    'qty' => $qty_fg,
-                    'weight' => $get_stock['weight'],
-                    'totalweight' => $get_stock['totalweight'],
-                    'booking' => $get_stock['booking'],
-                    'thickness' => $get_stock['thickness'],
-                    'aktif' => 'Y',
-                    'id_gudang' => '3',
-                    'created_by' => $this->auth->user_id(),
-                    'created_on' => date('Y-m-d H:i:s'),
-                    'no_po' => $get_stock['no_po'],
-                    'id_incoming' => $get_stock['id_incoming'],
-                    'lot_slitting' => $get_stock['lot_slitting'],
-                    'keterangan' => $get_stock['keterangan'],
-                    'status_do' => 'OPN',
-                    'tipe_material' => $get_stock['tipe_material'],
-                    'qty_sheet' => $get_stock['qty_sheet'],
-                    'sisa_spk' => $qty_fg
-                ];
-
-                if ($qty_fg > 0) {
-                    $insert_stock_fg = $this->db->insert('stock_material', $arr_stock_fg);
-                    if (!$insert_stock_fg) {
-                        $this->db->trans_rollback();
-
-                        print_r($this->db->last_query());
-                        exit;
-                    }
-                }
-
-                $arr_stock_ng = [
-                    'id_category3' => $get_stock['id_category3'],
-                    'nama_material' => $get_stock['nama_material'],
-                    'width' => $get_stock['width'],
-                    'length' => $get_stock['length'],
-                    'id_bentuk' => $get_stock['id_bentuk'],
-                    'lotno' => $get_stock['lotno'],
-                    'qty' => $qty_ng,
-                    'weight' => $get_stock['weight'],
-                    'totalweight' => $get_stock['totalweight'],
-                    'booking' => $get_stock['booking'],
-                    'thickness' => $get_stock['thickness'],
-                    'aktif' => 'Y',
-                    'id_gudang' => '6',
-                    'created_by' => $this->auth->user_id(),
-                    'created_on' => date('Y-m-d H:i:s'),
-                    'no_po' => $get_stock['no_po'],
-                    'id_incoming' => $get_stock['id_incoming'],
-                    'lot_slitting' => $get_stock['lot_slitting'],
-                    'keterangan' => $get_stock['keterangan'],
-                    'status_do' => 'OPN',
-                    'tipe_material' => $get_stock['tipe_material'],
-                    'qty_sheet' => $get_stock['qty_sheet'],
-                    'sisa_spk' => $qty_ng
-                ];
-
-                if ($qty_ng > 0) {
-                    $insert_stock_ng = $this->db->insert('stock_material', $arr_stock_ng);
-                    if (!$insert_stock_ng) {
-                        $this->db->trans_rollback();
-
-                        print_r($this->db->last_query());
-                        exit;
-                    }
-                }
-
-                $arr_stock = [
-                    'id_stock' => $item_do_detail->id_stock,
-                    'status_do' => 'CLS',
-                    'sisa_spk' => ($get_stock->sisa_spk - $qty_in),
+                // 4. Update Stock Lama (Mark as CLS/Deleted)
+                $arr_stock_update = [
+                    'status_do'   => 'CLS',
+                    'sisa_spk'    => ($get_stock['sisa_spk'] - $qty_in),
                     'total_kirim' => $qty_in,
-                    'deleted' => '1',
-                    'aktif' => 'N',
-                    'no_kirim' => $item_do_detail->id_delivery_order
+                    'deleted'     => '1',
+                    'aktif'       => 'N',
+                    'no_kirim'    => $item_do_detail->id_delivery_order
                 ];
-                $update_stock = $this->db->update('stock_material', $arr_stock, array('id_stock' => $item_do_detail->id_stock));
-                if (!$update_stock) {
-                    $this->db->trans_rollback();
-
-                    print_r($this->db->last_query());
-                    exit;
-                }
+                $this->db->update('stock_material', $arr_stock_update, ['id_stock' => $item_do_detail->id_stock]);
             }
-        }
 
-        $arr_update_do_header = [
-            'status_approve' => '1',
-            'status_date' => date('Y-m-d H:i:s'),
-            'status_by' => $this->auth->user_id()
-        ];
+            // 5. Update Header DO
+            $this->db->update('tr_delivery_order', [
+                'status_approve' => '1',
+                'status_date'    => date('Y-m-d H:i:s'),
+                'status_by'      => $this->auth->user_id()
+            ], ['id_delivery_order' => $post['id_do']]);
 
-        $update_do_header = $this->db->update('tr_delivery_order', $arr_update_do_header, array('id_delivery_order' => $post['id_do']));
-        // if (!$update_do_header) {
-        // }
-        if (!$update_do_header) {
+            // Cek Transaksi
+            if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                $response = ['status' => 0, 'msg' => 'Gagal konfirmasi DO. Silahkan coba lagi.'];
+            } else {
+                $this->db->trans_commit();
+                $response = ['status' => 1, 'msg' => 'DO Berhasil Dikonfirmasi!'];
+
+                $this->control_do_model->kartu_stock($post['id_do']);
+            }
+        } catch (Exception $e) {
             $this->db->trans_rollback();
-
-            print_r($this->db->last_query());
-            exit;
+            $response = ['status' => 0, 'msg' => $e->getMessage()];
         }
-
-
-
-        if ($this->db->trans_status() === false) {
-            $this->db->trans_rollback();
-
-            $valid = 0;
-            $msg = (empty($msg)) ? 'Please try again later !' : $msg;
-        } else {
-            $this->db->trans_commit();
-
-            $valid = 1;
-            $msg = 'DO has been Confirmed !';
-        }
-
-        $response = [
-            'status' => $valid,
-            'msg' => $msg
-        ];
 
         echo json_encode($response);
     }
 
+    /**
+     * Helper private function untuk mengurangi duplikasi code insert stock
+     */
+    private function _insert_new_stock($base_stock, $qty, $gudang_id)
+    {
+        if ($qty <= 0) return;
+
+        $data = $base_stock;
+        unset($data['id_stock']); // Hapus ID lama agar auto-increment
+
+        $data['qty']        = $qty;
+        $data['sisa_spk']   = $qty;
+        $data['id_gudang']  = $gudang_id;
+        $data['status_do']  = 'OPN';
+        $data['aktif']      = 'Y';
+        $data['created_by'] = $this->auth->user_id();
+        $data['created_on'] = date('Y-m-d H:i:s');
+
+        return $this->db->insert('stock_material', $data);
+    }
+
     public function save_confirm_data_scrap()
     {
+        if (!$this->input->is_ajax_request()) {
+            exit('No direct script access allowed');
+        }
+
         $post = $this->input->post();
-
         $do_detail = $this->control_do_model->do_detail_scrap($post['id_do']);
-
-        $valid = 1;
-        $msg = '';
 
         $this->db->trans_begin();
 
-        $no = 0;
-        foreach ($do_detail as $item_do_detail) {
-            $no++;
-            if (isset($post['detail'][$no])) {
+        try {
+            $no = 0;
+            foreach ($do_detail as $item_do_detail) {
+                $no++;
 
-                $qty_in = str_replace(',', '', $post['detail'][$no]['qty_in']);
-                $qty_fg = str_replace(',', '', $post['detail'][$no]['qty_fg']);
-                $qty_ng = str_replace(',', '', $post['detail'][$no]['qty_ng']);
+                if (!isset($post['detail'][$no])) continue;
 
-                $get_stock = $this->db->get_where('stock_material', ['id_stock' => $item_do_detail->id_stock])->row();
+                $d = $post['detail'][$no];
+                $qty_in = (float) str_replace(',', '', $d['qty_in']);
+                $qty_fg = (float) str_replace(',', '', $d['qty_fg']);
+                $qty_ng = (float) str_replace(',', '', $d['qty_ng']);
 
-                $arr_do_confirm = [
-                    'id_detail_do' => $item_do_detail->id,
-                    'qty_do' => $item_do_detail->weight_mat,
-                    'qty_in' => $qty_in,
-                    'qty_fg' => $qty_fg,
-                    'qty_ng' => $qty_ng,
-                    'created_by' => $this->auth->user_id(),
-                    'created_at' => date('Y-m-d H:i:s')
-                ];
+                // Ambil data stock (sebagai array untuk konsistensi)
+                $get_stock = $this->db->get_where('stock_material', ['id_stock' => $item_do_detail->id_stock])->row_array();
 
-                $insert_confirm_do = $this->db->insert('dt_do_confirm_scrap', $arr_do_confirm);
-                if (!$insert_confirm_do) {
-                    $this->db->trans_rollback();
-
-                    print_r($this->db->last_query());
-                    exit;
+                if (!$get_stock) {
+                    throw new Exception("Data stock tidak ditemukan untuk ID: " . $item_do_detail->id_stock);
                 }
 
+                // 1. Insert ke dt_do_confirm_scrap
+                $arr_do_confirm = [
+                    'id_detail_do' => $item_do_detail->id,
+                    'qty_do'       => $item_do_detail->weight_mat,
+                    'qty_in'       => $qty_in,
+                    'qty_fg'       => $qty_fg,
+                    'qty_ng'       => $qty_ng,
+                    'created_by'   => $this->auth->user_id(),
+                    'created_at'   => date('Y-m-d H:i:s')
+                ];
+                $this->db->insert('dt_do_confirm_scrap', $arr_do_confirm);
+
+                // 2. Update dt_delivery_order_child_scrap
                 $arr_do_in_ng = [
-                    'id' => $item_do_detail->id,
                     'qty_in' => ($item_do_detail->qty_in + $qty_in),
                     'qty_fg' => ($item_do_detail->qty_fg + $qty_fg),
                     'qty_ng' => ($item_do_detail->qty_ng + $qty_ng)
                 ];
+                $this->db->update('dt_delivery_order_child_scrap', $arr_do_in_ng, ['id' => $item_do_detail->id]);
 
-                $update_do_in_ng = $this->db->update('dt_delivery_order_child_scrap', $arr_do_in_ng, array('id' => $item_do_detail->id));
-                if (!$update_do_in_ng) {
-                    $this->db->trans_rollback();
+                // 3. Insert stock baru (Reuse helper function di bawah)
+                $this->_process_stock_scrap($get_stock, $qty_fg, '3'); // Gudang FG
+                $this->_process_stock_scrap($get_stock, $qty_ng, '6'); // Gudang NG
 
-                    print_r($this->db->last_query());
-                    exit;
-                }
-
-                $get_stock = $this->db->get_where('stock_material', array('id_stock' => $item_do_detail->id_stock))->row_array();
-
-                $arr_stock_fg = [
-                    'id_category3' => $get_stock['id_category3'],
-                    'nama_material' => $get_stock['nama_material'],
-                    'width' => $get_stock['width'],
-                    'length' => $get_stock['length'],
-                    'id_bentuk' => $get_stock['id_bentuk'],
-                    'lotno' => $get_stock['lotno'],
-                    'qty' => $qty_fg,
-                    'weight' => $get_stock['weight'],
-                    'totalweight' => $get_stock['totalweight'],
-                    'booking' => $get_stock['booking'],
-                    'thickness' => $get_stock['thickness'],
-                    'aktif' => 'Y',
-                    'id_gudang' => '3',
-                    'created_by' => $this->auth->user_id(),
-                    'created_on' => date('Y-m-d H:i:s'),
-                    'no_po' => $get_stock['no_po'],
-                    'id_incoming' => $get_stock['id_incoming'],
-                    'lot_slitting' => $get_stock['lot_slitting'],
-                    'keterangan' => $get_stock['keterangan'],
-                    'status_do' => 'OPN',
-                    'tipe_material' => $get_stock['tipe_material'],
-                    'qty_sheet' => $get_stock['qty_sheet'],
-                    'sisa_spk' => $qty_fg
-                ];
-
-                if ($qty_fg > 0) {
-                    $insert_stock_ng = $this->db->insert('stock_material', $arr_stock_fg);
-                    if (!$insert_stock_ng) {
-                        $this->db->trans_rollback();
-
-                        print_r($this->db->last_query());
-                        exit;
-                    }
-                }
-
-                $arr_stock_ng = [
-                    'id_category3' => $get_stock['id_category3'],
-                    'nama_material' => $get_stock['nama_material'],
-                    'width' => $get_stock['width'],
-                    'length' => $get_stock['length'],
-                    'id_bentuk' => $get_stock['id_bentuk'],
-                    'lotno' => $get_stock['lotno'],
-                    'qty' => $qty_ng,
-                    'weight' => $get_stock['weight'],
-                    'totalweight' => $get_stock['totalweight'],
-                    'booking' => $get_stock['booking'],
-                    'thickness' => $get_stock['thickness'],
-                    'aktif' => 'Y',
-                    'id_gudang' => '6',
-                    'created_by' => $this->auth->user_id(),
-                    'created_on' => date('Y-m-d H:i:s'),
-                    'no_po' => $get_stock['no_po'],
-                    'id_incoming' => $get_stock['id_incoming'],
-                    'lot_slitting' => $get_stock['lot_slitting'],
-                    'keterangan' => $get_stock['keterangan'],
-                    'status_do' => 'OPN',
-                    'tipe_material' => $get_stock['tipe_material'],
-                    'qty_sheet' => $get_stock['qty_sheet'],
-                    'sisa_spk' => $qty_ng
-                ];
-
-                if ($qty_ng > 0) {
-                    $insert_stock_ng = $this->db->insert('stock_material', $arr_stock_ng);
-                    if (!$insert_stock_ng) {
-                        $this->db->trans_rollback();
-
-                        print_r($this->db->last_query());
-                        exit;
-                    }
-                }
-
-                $arr_stock = [
-                    'id_stock' => $item_do_detail->id_stock,
-                    'status_do' => 'CLS',
-                    'sisa_spk' => ($get_stock->sisa_spk - $qty_in),
+                // 4. Update Stock Lama (Mark as CLS)
+                $arr_stock_old = [
+                    'status_do'   => 'CLS',
+                    'sisa_spk'    => ($get_stock['sisa_spk'] - $qty_in),
                     'total_kirim' => $qty_in,
-                    'deleted' => '1',
-                    'aktif' => 'N',
-                    'no_kirim' => $item_do_detail->id_delivery_order
+                    'deleted'     => '1',
+                    'aktif'       => 'N',
+                    'no_kirim'    => $item_do_detail->id_delivery_order
                 ];
-                $update_stock = $this->db->update('stock_material', $arr_stock, array('id_stock' => $item_do_detail->id_stock));
-                if (!$update_stock) {
-                    $this->db->trans_rollback();
-
-                    print_r($this->db->last_query());
-                    exit;
-                }
+                $this->db->update('stock_material', $arr_stock_old, ['id_stock' => $item_do_detail->id_stock]);
             }
-        }
 
-        $arr_update_do_header = [
-            'status_approve' => '1',
-            'status_date' => date('Y-m-d H:i:s'),
-            'status_by' => $this->auth->user_id()
-        ];
+            // 5. Update Header DO
+            $this->db->update('tr_delivery_order', [
+                'status_approve' => '1',
+                'status_date'    => date('Y-m-d H:i:s'),
+                'status_by'      => $this->auth->user_id()
+            ], ['id_delivery_order' => $post['id_do']]);
 
-        $update_do_header = $this->db->update('tr_delivery_order', $arr_update_do_header, array('id_delivery_order' => $post['id_do']));
-        // if (!$update_do_header) {
-        // }
-        if (!$update_do_header) {
+            if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                $response = ['status' => 0, 'msg' => 'Gagal konfirmasi Scrap.'];
+            } else {
+                $this->db->trans_commit();
+                $response = ['status' => 1, 'msg' => 'Scrap DO has been Confirmed!'];
+            }
+        } catch (Exception $e) {
             $this->db->trans_rollback();
-
-            print_r($this->db->last_query());
-            exit;
+            $response = ['status' => 0, 'msg' => $e->getMessage()];
         }
-
-
-
-        if ($this->db->trans_status() === false) {
-            $this->db->trans_rollback();
-
-            $valid = 0;
-            $msg = (empty($msg)) ? 'Please try again later !' : $msg;
-        } else {
-            $this->db->trans_commit();
-
-            $valid = 1;
-            $msg = 'DO has been Confirmed !';
-        }
-
-        $response = [
-            'status' => $valid,
-            'msg' => $msg
-        ];
 
         echo json_encode($response);
+    }
+
+    /**
+     * Helper untuk insert stock baru agar DRY (Don't Repeat Yourself)
+     */
+    private function _process_stock_scrap($base_stock, $qty, $gudang_id)
+    {
+        if ($qty <= 0) return;
+
+        $new_stock = $base_stock;
+        unset($new_stock['id_stock']); // ID baru auto-increment
+
+        $new_stock['qty']        = $qty;
+        $new_stock['sisa_spk']   = $qty;
+        $new_stock['id_gudang']  = $gudang_id;
+        $new_stock['status_do']  = 'OPN';
+        $new_stock['aktif']      = 'Y';
+        $new_stock['created_by'] = $this->auth->user_id();
+        $new_stock['created_on'] = date('Y-m-d H:i:s');
+
+        return $this->db->insert('stock_material', $new_stock);
     }
 
     public function download_excel()

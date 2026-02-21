@@ -422,4 +422,200 @@ class Pr_model extends BF_Model
             'data' => $hasil
         ]);
     }
+
+    public function get_incoming_header($id_incoming)
+    {
+        $this->db->select('a.*');
+        $this->db->from('tr_incoming a');
+        $this->db->where('a.id_incoming', $id_incoming);
+        $get_data = $this->db->get()->row();
+
+        return $get_data;
+    }
+
+    public function get_incoming_detail($id_incoming)
+    {
+        $this->db->select('a.*');
+        $this->db->from('dt_incoming a');
+        $this->db->where('a.id_incoming', $id_incoming);
+        $get_data = $this->db->get()->result();
+
+        return $get_data;
+    }
+
+    public function get_incoming_detail_per_barang($id_incoming)
+    {
+        $this->db->select('a.*');
+        $this->db->from('dt_incoming a');
+        $this->db->where('a.id_incoming', $id_incoming);
+        $this->db->group_by('a.id_material, a.id_gudang');
+        $get_data = $this->db->get()->result();
+
+        return $get_data;
+    }
+
+    public function get_material($id_category3)
+    {
+        $this->db->select('a.*');
+        $this->db->from('ms_inventory_category3 a');
+        $this->db->where('a.id_category3', $id_category3);
+        $get_data = $this->db->get()->row();
+
+        return $get_data;
+    }
+
+    public function get_warehouse($id)
+    {
+        $this->db->select('a.*');
+        $this->db->from('ms_warehouse a');
+        $this->db->where('a.id', $id);
+        $get_data = $this->db->get()->row();
+
+        return $get_data;
+    }
+
+    public function akumulasi_stock($id_incoming)
+    {
+        $header = $this->get_incoming_header($id_incoming);
+        $detail_per_barang = $this->get_incoming_detail_per_barang($id_incoming);
+
+        // $arr_insert = [];
+        // $arr_update = [];
+
+        $this->db->trans_begin();
+
+        try {
+            foreach ($detail_per_barang as $item) {
+                $this->db->select('a.id');
+                $this->db->from('warehouse_stock a');
+                $this->db->where('a.id_material', $item->id_material);
+                $this->db->where('a.id_gudang', $item->id_gudang);
+                $check_stock = $this->db->get()->num_rows();
+
+                if ($check_stock > 0) {
+
+                    $this->db->select('SUM(a.width_recive) as ttl_qty_stock');
+                    $this->db->from('dt_incoming a');
+                    $this->db->where('a.id_incoming', $id_incoming);
+                    $this->db->where('a.id_material', $item->id_material);
+                    $this->db->where('a.id_gudang', $item->id_gudang);
+                    $get_akum_stock = $this->db->get()->row();
+
+                    $qty_stock = (!empty($get_akum_stock->ttl_qty_stock)) ? $get_akum_stock->ttl_qty_stock : 0;
+
+                    $arr_update = [
+                        'qty_stock' => $qty_stock
+                    ];
+
+                    $this->db->update('warehouse_stock', $arr_update, ['id_material' => $item->id_material, 'id_gudang' => $item->id_gudang]);
+                } else {
+                    $this->db->select('SUM(a.width_recive) as ttl_qty_stock');
+                    $this->db->from('dt_incoming a');
+                    $this->db->where('a.id_incoming', $id_incoming);
+                    $this->db->where('a.id_material', $item->id_material);
+                    $this->db->where('a.id_gudang', $item->id_gudang);
+                    $get_akum_stock = $this->db->get()->row();
+
+                    $qty_stock = (!empty($get_akum_stock->ttl_qty_stock)) ? $get_akum_stock->ttl_qty_stock : 0;
+
+                    $this->db->select('a.*');
+                    $this->db->from('ms_inventory_category3 a');
+                    $this->db->where('a.id_category3', $item->id_material);
+                    $get_material = $this->db->get()->row();
+
+                    $nm_material = (!empty($get_material->nama)) ? $get_material->nama : '';
+
+                    $this->db->select('a.wh_name');
+                    $this->db->from('ms_warehouse a');
+                    $this->db->where('a.id', $item->id_gudang);
+                    $get_gudang = $this->db->get()->row();
+
+                    $nm_gudang = (!empty($get_gudang->wh_name)) ? $get_gudang->wh_name : '';
+
+                    $arr_insert = [
+                        'id_material' => $item->id_material,
+                        'idmaterial' => $item->id_material,
+                        'nm_material' => $nm_material,
+                        'id_gudang' => $item->id_gudang,
+                        'kd_gudang' => $nm_gudang,
+                        'qty_stock' => $qty_stock,
+                        'qty_booking' => 0,
+                        'qty_rusak' => 0,
+                        'update_by' => $this->auth->user_id(),
+                        'update_date' => date('Y-m-d H:i:s')
+                    ];
+
+                    $this->db->insert('warehouse_stock', $arr_insert);
+                }
+            }
+
+            $this->db->trans_commit();
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+        }
+    }
+
+    public function kartu_stok($id_incoming)
+    {
+        $header = $this->get_incoming_header($id_incoming);
+        $detail_per_barang = $this->get_incoming_detail_per_barang($id_incoming);
+
+        $this->db->trans_begin();
+        try {
+            foreach ($detail_per_barang as $item) {
+                $this->db->select('a.qty_stock');
+                $this->db->from('warehouse_stock a');
+                $this->db->where('a.id_material', $item->id_material);
+                $this->db->where('a.id_gudang', $item->id_gudang);
+                $get_beginning = $this->db->get()->row();
+
+                $beginning = (!empty($get_beginning)) ? $get_beginning->qty_stock : 0;
+
+
+                $this->db->select('SUM(a.width_recive) as ttl_qty_stock');
+                $this->db->from('dt_incoming a');
+                $this->db->where('a.id_incoming', $id_incoming);
+                $this->db->where('a.id_material', $item->id_material);
+                $this->db->where('a.id_gudang', $item->id_gudang);
+                $get_akum_stock = $this->db->get()->row();
+
+                $qty_stock = (!empty($get_akum_stock->ttl_qty_stock)) ? $get_akum_stock->ttl_qty_stock : 0;
+
+                if ($beginning > 0) {
+                    $beginning -= $qty_stock;
+                }
+
+                $qty_stock_akhir = ($beginning + $qty_stock);
+
+                $get_material = $this->get_material($item->id_material);
+                $nm_material = (!empty($get_material->nama)) ? $get_material->nama : '';
+
+                $get_warehouse = $this->get_warehouse($item->id_gudang);
+                $nm_warehouse = (!empty($get_warehouse->wh_name)) ? $get_warehouse->wh_name : '';
+
+
+
+                $arr_insert_wh = [
+                    'id_material' => $item->id_material,
+                    'idmaterial' => $item->id_material,
+                    'nm_material' => $nm_material,
+                    'id_gudang_ke' => $item->id_gudang,
+                    'kd_gudang_ke' => $nm_warehouse,
+                    'qty_stock_awal' => $beginning,
+                    'qty_stock_akhir' => $qty_stock_akhir,
+                    'jumlah_mat' => $qty_stock,
+                    'no_ipp' => $id_incoming,
+                    'update_by' => $this->auth->user_id(),
+                    'update_date' => date('Y-m-d H:i:s'),
+                    'jenis_transaksi' => 'Incoming'
+                ];
+
+                $this->db->insert('warehouse_history', $arr_insert_wh);
+
+                $this->db->trans_commit();
+            }
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+        }
+    }
 }
