@@ -59,11 +59,27 @@ class Kartu_stock extends Admin_Controller
     $order = $this->input->post('order', true);
 
     $date_filter = $this->input->post('date_filter', true);
+    if (empty($date_filter)) {
+      $date_filter = date('Y-m-d');
+    }
     $gudang_filter = $this->input->post('gudang_filter', true);
 
-    $this->db->select('a.id_category3 as id_material, a.nama as nm_material, a.maker as nm_supplier');
-    $this->db->from('ms_inventory_category3 a');
-    $this->db->where('a.deleted', 0);
+    // $this->db->select('a.id_category3 as id_material, a.nama as nm_material, a.maker as nm_supplier');
+    // $this->db->from('ms_inventory_category3 a');
+    // $this->db->where('a.deleted', 0);
+
+    if ($date_filter == date('Y-m-d')) {
+      $this->db->select('a.id_material, a.nm_material, a.qty_stock, a.qty_booking, (a.qty_stock - a.qty_booking) as qty_free, b.maker as nm_supplier');
+      $this->db->from('warehouse_stock a');
+      $this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_material');
+      $this->db->where('a.id_gudang', $gudang_filter);
+    } else {
+      $this->db->select('a.id_material, a.nm_material, a.qty_stock, a.qty_booking, (a.qty_stock - a.qty_booking) as qty_free, b.maker as nm_supplier');
+      $this->db->from('warehouse_stock_backup a');
+      $this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_material');
+      $this->db->where('a.id_gudang', $gudang_filter);
+      $this->db->where('DATE_FORMAT(a.tgl, "%Y-%m-%d") = ', $date_filter);
+    }
 
     // $this->db->select('a.id_material, a.nm_material, a.ttl_stock, a.ttl_booking, a.ttl_stock_free, b.maker as nm_supplier');
     // $this->db->from('v_stock_lot_realtime a');
@@ -74,19 +90,19 @@ class Kartu_stock extends Admin_Controller
 
     if (!empty($search['value'])) {
       $this->db->group_start();
-      $this->db->like('a.nama', $search['value'], 'both');
-      $this->db->or_like('a.id_category3', $search['value'], 'both');
-      $this->db->or_like('a.maker', $search['value'], 'both');
+      $this->db->like('a.nm_material', $search['value'], 'both');
+      $this->db->or_like('a.id_material', $search['value'], 'both');
+      $this->db->or_like('b.maker', $search['value'], 'both');
       $this->db->group_end();
     }
 
     $count_filtered = $this->db->count_all_results('', false);
 
     if (!empty($order)) {
-      $columns = ['a.id_category3', 'a.nama', 'b.maker'];
+      $columns = ['a.id_material', 'a.nm_material', 'b.maker'];
       $this->db->order_by($columns[$order[0]['column']], $order[0]['dir']);
     } else {
-      $this->db->order_by('a.id_category3', 'DESC');
+      $this->db->order_by('a.id_material', 'DESC');
     }
 
     $this->db->limit($length, $start);
@@ -102,11 +118,11 @@ class Kartu_stock extends Admin_Controller
     foreach ($get_data as $item) {
       $no++;
 
-      $stock_unit = $this->kartu_stock_model->get_stock($item['id_material'], $this->input->post('gudang_filter'));
+      // $stock_unit = $this->kartu_stock_model->get_stock($item['id_material'], $this->input->post('gudang_filter'), $date_filter);
 
-      $qty_stock = (!empty($stock_unit->qty_stock)) ? $stock_unit->qty_stock : 0;
-      $qty_booking = (!empty($stock_unit->qty_booking)) ? $stock_unit->qty_booking : 0;
-      $qty_free = (!empty($stock_unit->qty_free)) ? $stock_unit->qty_free : 0;
+      $qty_stock = (!empty($item['qty_stock'])) ? $item['qty_stock'] : 0;
+      $qty_booking = (!empty($item['qty_booking'])) ? $item['qty_booking'] : 0;
+      $qty_free = (!empty($item['qty_free'])) ? $item['qty_free'] : 0;
 
       $action = $this->_render_action_history($item['id_material'], $gudang_filter);
 
@@ -203,52 +219,17 @@ class Kartu_stock extends Admin_Controller
   public function download_excel()
   {
     $tanggal = $this->uri->segment(3);
+    $id_gudang = $this->uri->segment(4);
 
-    $get_material = $this->db->get_where('new_inventory_4', ['deleted_by' => null, 'category' => 'material'])->result_array();
-    $get_satuan = $this->db->get_where('ms_satuan', ['deleted' => 'N'])->result_array();
-
-    $list_packing = [];
-    $list_unit = [];
-
-    foreach ($get_satuan as $item_satuan) {
-      if ($item_satuan['category'] == 'unit') {
-        $list_unit[$item_satuan['id']] = $item_satuan['code'];
-      } else {
-        $list_packing[$item_satuan['id']] = $item_satuan['code'];
-      }
-    }
-
-
-    if (date('Y-m-d', strtotime($tanggal)) == date('Y-m-d')) {
-      $this->db->select('a.id_material, a.nm_material, a.qty_stock as stok');
-      $this->db->from('warehouse_stock a');
-      $this->db->join('new_inventory_4 b', 'b.code_lv4 = a.id_material');
-      $this->db->where('a.id_gudang', 1);
-      $this->db->group_by('a.id_material');
-      $get_stok_material = $this->db->get()->result_array();
-    } else {
-      $this->db->select('a.id_material, a.nm_material, max(a.qty_stock) as stok');
-      $this->db->from('warehouse_stock_per_day a');
-      $this->db->where('DATE_FORMAT(a.hist_date, "%Y-%m-%d") = ', $tanggal);
-      $this->db->where('a.id_gudang', 1);
-      $this->db->group_by('a.id_material');
-      $get_stok_material = $this->db->get()->result_array();
-    }
-
-    $list_stok = [];
-    foreach ($get_stok_material as $item_stok) {
-      $list_stok[$item_stok['id_material']] = $item_stok['stok'];
-    }
+    $get_stock = $this->kartu_stock_model->get_stock_by_tgl($id_gudang, $tanggal);
+    $get_warehouse = $this->kartu_stock_model->get_warehouse($id_gudang);
 
     $data = [
-      'list_material' => $get_material,
-      'list_unit' => $list_unit,
-      'list_packing' => $list_packing,
-      'list_stok' => $list_stok,
-      'tanggal' => $tanggal
+      'tanggal' => $tanggal,
+      'list_stock' => $get_stock,
+      'data_gudang' => $get_warehouse
     ];
 
-    // $this->load->set('results', $data);
     $this->load->view('excel_stok_gudang_pusat', ['results' => $data]);
   }
 

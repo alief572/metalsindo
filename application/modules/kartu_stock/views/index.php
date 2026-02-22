@@ -187,7 +187,9 @@
       tanggal = '<?= date('Y-m-d') ?>';
     }
 
-    window.open(siteurl + active_controller + 'download_excel/' + tanggal, '_blank');
+    var gudang_filter = $('#gudang_filter').val();
+
+    window.open(siteurl + active_controller + 'download_excel/' + tanggal + '/' + gudang_filter, '_blank');
   });
 
   function UpdateStock() {
