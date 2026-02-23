@@ -320,7 +320,7 @@ class Inventory_4_model extends BF_Model
 		$length = $this->input->post('length');
 		$search = $this->input->post('search');
 
-		$this->db->select('a.*, c.name_customer as name_customer, b.no_surat as no_surat, c.id_customer, d.total_weight');
+		$this->db->select('a.*, a.length, c.name_customer as name_customer, b.no_surat as no_surat, c.id_customer, d.total_weight');
 		$this->db->from('dt_spkmarketing a');
 		$this->db->join('tr_spk_marketing b', 'b.id_spkmarketing=a.id_spkmarketing');
 		$this->db->join('master_customers c', 'c.id_customer=b.id_customer');
@@ -402,10 +402,10 @@ class Inventory_4_model extends BF_Model
 			$this->db->where('a.id_dimensi', '33');
 			$get_length = $this->db->get()->row();
 
-			if($get_material->id_bentuk == 'B2000002') {
-				$length = $get_length->nilai_dimensi; 
+			if ($get_material->id_bentuk == 'B2000002') {
+				$lengths = (!empty($item->length)) ? $item->length : $get_length->nilai_dimensi;
 			} else {
-				$length = $item->length;
+				$lengths = $item->length;
 			}
 
 
@@ -417,7 +417,7 @@ class Inventory_4_model extends BF_Model
 				'no_aloy' => $item->no_alloy,
 				'thickness' => $item->thickness,
 				'width' => $item->width,
-				'length' => number_format($length, 2),
+				'length' => number_format($lengths, 2),
 				'delivery_date' => date('d-M-Y', strtotime($item->delivery)),
 				'total_weight' => number_format($item->qty_produk),
 				'total_sheet' => number_format($total_sheet),
