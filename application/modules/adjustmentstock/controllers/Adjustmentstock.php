@@ -1855,6 +1855,7 @@ class Adjustmentstock extends Admin_Controller
 		$count_filtered_records = $this->db->count_all_results('', false);
 
 		// Pengurutan dan pembatasan data
+		$this->db->group_by('a.id_category3');
 		$this->db->order_by('a.created_on', 'DESC');
 		$this->db->limit($length, $start);
 		$query = $this->db->get();
