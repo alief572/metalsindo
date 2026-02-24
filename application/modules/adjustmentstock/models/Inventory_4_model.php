@@ -166,7 +166,6 @@ class Inventory_4_model extends BF_Model
 
 	public function get_stock()
 	{
-
 		$this->db->from('ms_inventory_category3 a');
 		$this->db->join('ms_inventory_type b', 'b.id_type=a.id_type');
 		$this->db->join('ms_inventory_category1 c', 'c.id_category1 =a.id_category1');
@@ -270,5 +269,25 @@ class Inventory_4_model extends BF_Model
 		$this->db->where('id_category3', $id_category3);
 		$query = $this->db->get();
 		return $query->row();
+	}
+
+	public function get_material_by_id($id_material)
+	{
+		$this->db->select('a.*');
+		$this->db->from('ms_inventory_category3 a');
+		$this->db->where('a.id_category3', $id_material);
+		$get_data = $this->db->get()->row();
+
+		return $get_data;
+	}
+
+	public function get_warehouse_by_id($id_gudang)
+	{
+		$this->db->select('a.*');
+		$this->db->from('ms_warehouse a');
+		$this->db->where('a.id', $id_gudang);
+		$get_data = $this->db->get()->row();
+
+		return $get_data;
 	}
 }
