@@ -19,6 +19,7 @@ class Adjustmentstock extends Admin_Controller
 	protected $managePermission = 'Adjustment_Stock.Manage';
 	protected $deletePermission = 'Adjustment_Stock.Delete';
 
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -913,6 +914,7 @@ class Adjustmentstock extends Admin_Controller
 				'user'					=> $this->auth->user_id()
 			];
 			$this->db->insert('adjustment_stock', $historical);
+
 			$data = [
 				'id_category3'			=> $post['id_material'],
 				'nama_material'			=> $post['nama_material'],
@@ -930,6 +932,78 @@ class Adjustmentstock extends Admin_Controller
 				'created_by'			=> $this->auth->user_id()
 			];
 			$this->db->insert('stock_material', $data);
+
+			$this->db->select('a.*');
+			$this->db->from('warehouse_stock a');
+			$this->db->where('a.id_material', $post['id_material']);
+			$this->db->where('a.id_gudang', $post['id_gudang']);
+			$query_stock = $this->db->get();
+
+			$get_material = $this->Inventory_4_model->get_material_by_id($post['id_material']);
+			$get_warehouse = $this->Inventory_4_model->get_warehouse_by_id($post['id_gudang']);
+
+			if ($query_stock->num_rows() > 0) {
+				$data_stock = $query_stock->row();
+
+				$arr_update_stock = [
+					'qty_stock' => ($data_stock->qty_stock + $post['total_jumlah_berat'])
+				];
+
+				$this->db->update('warehouse_stock', $arr_update_stock, ['id_material' => $post['id_material'], 'id_gudang' => $post['id_gudang']]);
+
+				$arr_kartu_stock = [
+					'id_material' => $post['id_material'],
+					'idmaterial' => $post['id_material'],
+					'nm_material' => $get_material->nama,
+					'id_gudang' => $post['id_gudang'],
+					'kd_gudang' => $get_warehouse->wh_name,
+					'id_gudang_ke' => $post['id_gudang'],
+					'kd_gudang_ke' => $get_warehouse->wh_name,
+					'qty_stock_awal' => $data_stock->qty_stock,
+					'qty_stock_akhir' => ($data_stock->qty_stock + $post['total_jumlah_berat']),
+					'no_ipp' => $code,
+					'jumlah_mat' => $post['total_jumlah_berat'],
+					'ket' => 'Adjustment Plus',
+					'update_by' => $this->auth->user_id(),
+					'update_date' => date('Y-m-d H:i:s'),
+					'jenis_transaksi' => 'Adjustment Plus'
+				];
+
+				$this->db->insert('warehouse_history', $arr_kartu_stock);
+			} else {
+
+				$arr_warehouse_stock = [
+					'id_material' => $post['id_material'],
+					'idmaterial' => $post['id_material'],
+					'nm_material' => $get_material->nama,
+					'id_gudang' => $post['id_gudang'],
+					'kd_gudang' => $get_warehouse->wh_name,
+					'qty_stock' => $post['total_jumlah_berat'],
+					'update_by' => $this->auth->user_id(),
+					'update_date' => date('Y-m-d H:i:s')
+				];
+
+				$this->db->insert('warehouse_stock', $arr_warehouse_stock);
+
+				$arr_kartu_stock = [
+					'id_material' => $post['id_material'],
+					'idmaterial' => $post['id_material'],
+					'nm_material' => $get_material->nama,
+					'id_gudang' => $post['id_gudang'],
+					'kd_gudang' => $get_warehouse->wh_name,
+					'id_gudang_ke' => $post['id_gudang'],
+					'kd_gudang_ke' => $get_warehouse->wh_name,
+					'qty_stock_akhir' => $post['total_jumlah_berat'],
+					'no_ipp' => $code,
+					'jumlah_mat' => $post['total_jumlah_berat'],
+					'ket' => 'Adjustment Plus',
+					'update_by' => $this->auth->user_id(),
+					'update_date' => date('Y-m-d H:i:s'),
+					'jenis_transaksi' => 'Adjustment Plus'
+				];
+
+				$this->db->insert('warehouse_history', $arr_kartu_stock);
+			}
 		} elseif ($adjustment == 'MINUS') {
 			$historical = [
 				'id_transaksi'			=> $code,
@@ -983,6 +1057,43 @@ class Adjustmentstock extends Admin_Controller
 				];
 				$this->db->where('id_stock', $id_stock)->update("stock_material", $data1);
 			};
+
+			$this->db->select('a.*');
+			$this->db->from('warehouse_stock a');
+			$this->db->where('a.id_material', $post['id_material']);
+			$this->db->where('a.id_gudang', $post['id_gudang']);
+			$query_stock = $this->db->get();
+
+			$get_material = $this->Inventory_4_model->get_material_by_id($post['id_material']);
+			$get_warehouse = $this->Inventory_4_model->get_warehouse_by_id($post['id_gudang']);
+
+			$data_stock = $query_stock->row();
+
+			$arr_update_stock = [
+				'qty_stock' => ($data_stock->qty_stock - $post['total_jumlah_berat'])
+			];
+
+			$this->db->update('warehouse_stock', $arr_update_stock, ['id_material' => $post['id_material'], 'id_gudang' => $post['id_gudang']]);
+
+			$arr_kartu_stock = [
+				'id_material' => $post['id_material'],
+				'idmaterial' => $post['id_material'],
+				'nm_material' => $get_material->nama,
+				'id_gudang' => $post['id_gudang'],
+				'kd_gudang' => $get_warehouse->wh_name,
+				'id_gudang_ke' => $post['id_gudang'],
+				'kd_gudang_ke' => $get_warehouse->wh_name,
+				'qty_stock_awal' => $data_stock->qty_stock,
+				'qty_stock_akhir' => ($data_stock->qty_stock - $post['total_jumlah_berat']),
+				'no_ipp' => $code,
+				'jumlah_mat' => $post['total_jumlah_berat'],
+				'ket' => 'Adjustment Minus',
+				'update_by' => $this->auth->user_id(),
+				'update_date' => date('Y-m-d H:i:s'),
+				'jenis_transaksi' => 'Adjustment Minus'
+			];
+
+			$this->db->insert('warehouse_history', $arr_kartu_stock);
 		} elseif ($adjustment == 'MUTASI') {
 			$id_gudang_baru		= $post['id_gudang_baru'];
 			$carigudangbaru = $this->db->query("SELECT * FROM ms_gudang WHERE id_gudang ='" . $id_gudang_baru . "' ")->result();
@@ -1078,6 +1189,116 @@ class Adjustmentstock extends Admin_Controller
 				];
 				$this->db->insert('stock_material', $data);
 			};
+
+			$this->db->select('a.*');
+			$this->db->from('warehouse_stock a');
+			$this->db->where('a.id_material', $post['id_material']);
+			$this->db->where('a.id_gudang', $post['id_gudang']);
+			$query_stock = $this->db->get();
+
+			$this->db->select('a.id');
+			$this->db->from('warehouse_stock a');
+			$this->db->where('a.id_material', $post['id_material']);
+			$this->db->where('a.id_gudang', $post['id_gudang_baru']);
+			$query_stock_baru = $this->db->get();
+
+			$get_material = $this->Inventory_4_model->get_material_by_id($post['id_material']);
+			$get_warehouse = $this->Inventory_4_model->get_warehouse_by_id($post['id_gudang']);
+			$get_warehouse_baru = $this->Inventory_4_model->get_warehouse_by_id($post['id_gudang_baru']);
+
+			$data_stock = $query_stock->row();
+			$data_stock_baru = $query_stock_baru->row();
+
+			$arr_update_stock_dari = [
+				'qty_stock' => ($data_stock->qty_stock - $post['total_jumlah_berat'])
+			];
+			$this->db->update('warehouse_stock', $arr_update_stock_dari, ['id_material' => $post['id_material'], 'id_gudang' => $post['id_gudang']]);
+
+			if ($query_stock_baru->num_rows() > 0) {
+				$this->db->update('warehouse_stock', ['qty_stock' => ($data_stock_baru->qty_stock + $post['total_jumlah_baru'])], ['id_material' => $post['id_material'], 'id_gudang' => $post['id_gudang_baru']]);
+			} else {
+				$arr_insert_stock_baru = [
+					'id_material' => $post['id_material'],
+					'idmaterial' => $post['id_material'],
+					'nm_material' => $get_material->nama,
+					'id_gudang' => $post['id_gudang_baru'],
+					'kd_gudang' => $get_warehouse_baru->wh_name,
+					'qty_stock' => $post['total_jumlah_berat'],
+					'update_by' => $this->auth->user_id(),
+					'update_date' => date('Y-m-d H:i:s')
+				];
+
+				$this->db->insert('warehouse_stock', $arr_insert_stock_baru);
+			}
+
+			$arr_kartu_stock_dari = [
+				'id_material' => $post['id_material'],
+				'idmaterial' => $post['id_material'],
+				'nm_material' => $get_material->nama,
+				'id_gudang' => $post['id_gudang'],
+				'kd_gudang' => $get_warehouse->wh_name,
+				'id_gudang_dari' => $post['id_gudang'],
+				'kd_gudang_dari' => $get_warehouse->wh_name,
+				'id_gudang_ke' => $post['id_gudang_baru'],
+				'kd_gudang_ke' => $get_warehouse_baru->wh_name,
+				'qty_stock_awal' => $data_stock->qty_stock,
+				'qty_stock_akhir' => ($data_stock->qty_stock - $post['total_jumlah_berat']),
+				'qty_booking_awal' => $data_stock->qty_booking,
+				'qty_booking_akhir' => $data_stock->qty_booking,
+				'no_ipp' => $code,
+				'jumlah_mat' => $post['total_jumlah_berat'],
+				'ket' => 'Adjustment Mutasi dari ' . $get_warehouse->wh_name . ' -> ' . $get_warehouse_baru->name,
+				'jenis_transaksi' => 'Adjustment Mutasi (-)',
+				'update_by' => $this->auth->user_id(),
+				'update_date' => date('Y-m-d H:i:s')
+			];
+
+			$this->db->insert('warehouse_history', $arr_kartu_stock_dari);
+
+			if ($query_stock_baru->num_rows() > 0) {
+				$arr_kartu_stock_ke = [
+					'id_material' => $post['id_material'],
+					'idmaterial' => $post['id_material'],
+					'nm_material' => $get_material->nama,
+					'id_gudang' => $post['id_gudang_baru'],
+					'kd_gudang' => $get_warehouse_baru->wh_name,
+					'id_gudang_dari' => $post['id_gudang'],
+					'kd_gudang_dari' => $get_warehouse->wh_name,
+					'id_gudang_ke' => $post['id_gudang_baru'],
+					'kd_gudang_ke' => $get_warehouse_baru->wh_name,
+					'qty_stock_awal' => $data_stock_baru->qty_stock,
+					'qty_stock_akhir' => ($data_stock_baru->qty_stock + $post['total_jumlah_berat']),
+					'qty_booking_awal' => $data_stock_baru->qty_booking,
+					'qty_booking_akhir' => $data_stock_baru->qty_booking,
+					'no_ipp' => $code,
+					'jumlah_mat' => $post['total_jumlah_berat'],
+					'ket' => 'Adjustment Mutasi dari ' . $get_warehouse->wh_name . ' -> ' . $get_warehouse_baru->name,
+					'jenis_transaksi' => 'Adjustment Mutasi (-)',
+					'update_by' => $this->auth->user_id(),
+					'update_date' => date('Y-m-d H:i:s')
+				];
+			} else {
+				$arr_kartu_stock_ke = [
+					'id_material' => $post['id_material'],
+					'idmaterial' => $post['id_material'],
+					'nm_material' => $get_material->nama,
+					'id_gudang' => $post['id_gudang_baru'],
+					'kd_gudang' => $get_warehouse_baru->wh_name,
+					'id_gudang_dari' => $post['id_gudang'],
+					'kd_gudang_dari' => $get_warehouse->wh_name,
+					'id_gudang_ke' => $post['id_gudang_baru'],
+					'kd_gudang_ke' => $get_warehouse_baru->wh_name,
+					'qty_stock_akhir' => $post['total_jumlah_berat'],
+					'no_ipp' => $code,
+					'jumlah_mat' => $post['total_jumlah_berat'],
+					'ket' => 'Adjustment Mutasi dari ' . $get_warehouse->wh_name . ' -> ' . $get_warehouse_baru->name,
+					'jenis_transaksi' => 'Adjustment Mutasi (+)',
+					'update_by' => $this->auth->user_id(),
+					'update_date' => date('Y-m-d H:i:s')
+				];
+			}
+
+			$this->db->insert('warehouse_history', $arr_kartu_stock_ke);
 		}
 		if ($this->db->trans_status() === FALSE) {
 			$this->db->trans_rollback();
