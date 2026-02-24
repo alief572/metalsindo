@@ -207,7 +207,8 @@ foreach ($results['inventory_3'] as $inventory_3) {
 			success: function(html) {
 				$('#form_lotno').html(html);
 				$('.select2').select2({
-					width: '100%'
+					width: '100%',
+					dropdownParent: $('#dialog-popup')
 				});
 			}
 		});
