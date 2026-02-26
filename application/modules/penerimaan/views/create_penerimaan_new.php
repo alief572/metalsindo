@@ -295,8 +295,6 @@ $alamat_cust =  $this->db->query("SELECT * FROM master_customers WHERE id_custom
 							$invoice = $this->db->query("SELECT * FROM tr_invoice WHERE id_customer ='$cust'")->result();
 							if ($invoice) {
 								foreach ($invoice as $ks => $vs) {
-<<<<<<< HEAD
-=======
 
 									$this->db->select('a.*');
 									$this->db->from('tr_invoice_detail a');
@@ -338,7 +336,6 @@ $alamat_cust =  $this->db->query("SELECT * FROM master_customers WHERE id_custom
 										$nilai_invoice = (!empty($get_ttl_invoice->ttl_invoice)) ? $get_ttl_invoice->ttl_invoice : 0;
 										$sisa_invoice_idr = $vs->sisa_invoice_idr;
 									}
->>>>>>> 75b6907329af60620ca1b5430384f5befb3f557d
 							?>
 									<tr>
 										<td><?php echo $vs->no_invoice ?></td>
