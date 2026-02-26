@@ -151,6 +151,21 @@
 		border-top: none;
 		border-bottom: none;
 	}
+
+	@media print {
+
+		/* Pastikan tabel tidak terputus di tengah baris */
+		table tr {
+			page-break-inside: avoid;
+			page-break-after: auto;
+		}
+
+		/* Paksa bagian total (footer) hanya muncul sekali di paling akhir */
+		.footer-summary {
+			page-break-inside: avoid;
+			display: block;
+		}
+	}
 </style>
 
 
@@ -532,9 +547,9 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 				<td align="right"><?= number_format(($harga_satuan * $qty_invoice), 2) ?></td>
 			</tr>
 		<? } ?>
-	</tbody>
-	<tfoot>
 
+
+		<!-- footer -->
 		<tr>
 			<th></th>
 			<th></th>
@@ -602,9 +617,8 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 
 		<?php
 		} ?>
+	</tbody>
 
-
-	</tfoot>
 
 </table>
 
