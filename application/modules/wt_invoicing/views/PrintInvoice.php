@@ -403,7 +403,8 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 
 <br>
 <table id="tables" class='gridtableX' border="1px">
-	<thead>
+	<tbody>
+		<!-- Header -->
 		<tr height='60'>
 			<th align="center" width="20">No</th>
 			<th align="center" width="60">Quantity</th>
@@ -413,9 +414,6 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 			<th align="center" width="110">Amount (IDR)</th>
 		</tr>
 		<tr></tr>
-
-	</thead>
-	<tbody>
 		<?php
 
 		$no = 0;
