@@ -21,9 +21,9 @@
           <i class="fa fa-download"></i> Download Excel
         </button>
       </div>
-      <div class="col-sm-1">
+      <!-- <div class="col-sm-1">
         <button type="button" class="btn btn-sm btn-danger" onclick="UpdateStock();">Update Stock</button>
-      </div>
+      </div> -->
     </div>
   </div>
   <!-- /.box-header -->

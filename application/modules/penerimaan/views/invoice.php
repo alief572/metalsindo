@@ -84,7 +84,7 @@
 												} else {
 												?>
  												<center>
- 													<button id="btn-<?php echo $vs->no_invoice ?>" class="btn btn-warning btn-sm" type="button" onclick="startmutasi('<?php echo $vs->no_invoice ?>', '<?php echo $vs->no_surat ?>','<?php echo addslashes($vs->nm_customer) ?>','<?php echo $vs->nilai_invoice ?>','<?php echo $vs->sisa_invoice_idr ?>')">
+ 													<button id="btn-<?php echo $vs->no_invoice ?>" class="btn btn-warning btn-sm" type="button" onclick="startmutasi('<?php echo $vs->no_invoice ?>', '<?php echo $vs->no_surat ?>','<?php echo addslashes($vs->nm_customer) ?>','<?php echo $nilai_invoice ?>','<?php echo $sisa_invoice_idr ?>')">
  														Pilih
  													</button>
  												</center>
