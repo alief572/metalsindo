@@ -140,6 +140,10 @@
             padding: 2px;
         }
 
+        th td {
+            font-size: 8px !important;
+        }
+
         #testtable {
             width: 100%;
         }
@@ -257,14 +261,15 @@
             ?>
 
                 <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
-                    <td align="center" width="100" style="font-size: 11px;">Material</td>
+                    <td align="center" width="15">No.</td>
+                    <td align="center" width="50" style="font-size: 11px;">Material</td>
                     <td align="center" width="30" style="font-size: 11px;">Width</td>
                     <td align="center" width="30" style="font-size: 11px;">Length</td>
-                    <td align="center" width="50" style="font-size: 11px;">Total Sheet</td>
+                    <td align="center" width="30" style="font-size: 11px;">Total Sheet</td>
                     <td align="center" width="50" style="font-size: 11px;">Unit Price <br> Sheet</td>
                     <td align="center" width="50" style="font-size: 11px;">Total Kgs</td>
                     <td align="center" width="50" style="font-size: 11px;">Unit Price <br> Kgs</td>
-                    <td align="center" width="80" style="font-size: 11px;">Amount</td>
+                    <td align="center" width="50" style="font-size: 11px;">Amount</td>
                     <td align="center" width="50" style="font-size: 11px;">Remarks</td>
                 </tr>
 
@@ -272,6 +277,7 @@
             } else {
             ?>
                 <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
+                    <td align="center" width="15">No.</td>
                     <td align="center" width='150'>Material</td>
                     <td align="center" width='30'>Width</td>
                     <td align="center" width='30'>Length</td>
@@ -291,6 +297,7 @@
             $ttl_sheet = 0;
             $ttl_kgs = 0;
             $ttl_amount = 0;
+            $no = 0;
             foreach ($detail as $detail) {
 
                 $HS = number_format($detail->hargasatuan, 3);
@@ -300,6 +307,7 @@
                     $JH = number_format($detail->jumlahharga, 2);
                 }
                 if ($check_sheet > 0) {
+                    $no++;
                     $TOT_PPH += (($detail->totalwidth) * $detail->hargasatuan) * $detail->pajak / 100;
                     $total_weight_kgs = ($detail->totalwidth);
                     $harga_satuan_kgs = ($detail->hargasatuan * $detail->total_weight);
@@ -316,17 +324,25 @@
 
                     $harga_sheet = ($detail->hargasatuan * $get_material->total_weight);
 
+                    $nama = $detail->nama;
+                    $exp_nama = explode('-', $nama);
+                    $nama_end = (!empty($exp_nama[6])) ? $exp_nama[6] : '';
+
+                    $nama_fix = str_replace('-HOT ROLLED', '', $nama);
+                    $nama_fix2 = str_replace('-COLD ROLLED', '', $nama_fix);
+
 
                     echo "	
                     <tr >
-                        <td width='100'>" . wordwrap($detail->nama, 15, '<br>', true) . "</td>
+                        <td width='5'>" . $no . "</td>
+                        <td width='100'>" . wordwrap($nama_fix2, 15, '<br>', true) . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($weight_sheet, 2) . "</td>
+                        <td width='20' align='right'>" . number_format($weight_sheet, 2) . "</td>
                         <td width='50' align='right'>" . number_format($harga_sheet, 2) . "</td>
                         <td width='50' align='right'>" . number_format($total_weight_kgs, 2) . "</td>
                         <td width='50' align='right'>" . $HS . "</td>
-                        <td width='80' align='right'>" . number_format(($total_weight_kgs) * $detail->hargasatuan, 2) . "</td>
+                        <td width='50' align='right'>" . number_format(($total_weight_kgs) * $detail->hargasatuan, 2) . "</td>
                         <td width='50'>" . $detail->description . "</td>
                     </tr>";
 
@@ -334,9 +350,11 @@
                     $ttl_kgs += $total_weight_kgs;
                     $ttl_amount += ((($detail->totalwidth) * $detail->hargasatuan) + ((($detail->totalwidth) * $detail->hargasatuan) * $detail->pajak / 100));
                 } else {
+                    $no++;
                     $TOT_PPH += $detail->jumlahharga * $detail->pajak / 100;
                     echo "	
                     <tr >
+                        <td width='5'>" . $no . "</td>
                         <td width='150'>" . $detail->nama . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
@@ -360,6 +378,7 @@
                         <td align="center" colspan='7'>PPN </td>
                         <td align="right"><?= number_format($TOT_PPH, 2) ?></td>
                         <td align="center"></td>
+                        <td align="center"></td>
                     </tr>
 
                 <?php
@@ -370,6 +389,7 @@
                         <td align="center" colspan='3'>PPN </td>
                         <td align="right" colspan='2'></td>
                         <td align="right"><?= number_format($TOT_PPH, 2) ?></td>
+                        <td align="center"></td>
                         <td align="center"></td>
                     </tr>
 
@@ -388,7 +408,7 @@
             }
             ?>
             <tr>
-                <td align="center" colspan='3'>Total </td>
+                <td align="center" colspan='4'>Total </td>
                 <?php
                 if ($check_sheet > 0) {
                 ?>
@@ -413,29 +433,76 @@
 
             </tr>
             <tr style='vertical-align:middle;'>
-                <td colspan='3' align="center">Issued Date</td>
-                <td colspan='3' align="center">
-                    <?php
-                    if ($header->cif == "Destination") {
-                        echo "Delivery To :";
-                    } else {
-                        echo "Delivery To";
-                    };
-                    ?>
-                </td>
-                <td colspan=3' align="center" width='40'>Eta Date</td>
+                <?php
+                if ($check_sheet > 0) {
+                ?>
+
+                    <td colspan='4' align="center">Issued Date</td>
+                    <td colspan='4' align="center">
+                        <?php
+                        if ($header->cif == "Destination") {
+                            echo "Delivery To :";
+                        } else {
+                            echo "Delivery To";
+                        };
+                        ?>
+                    </td>
+                    <td colspan='4' align="center" width='40'>Eta Date</td>
+
+                <?php
+                } else {
+                ?>
+
+                    <td colspan='3' align="center">Issued Date</td>
+                    <td colspan='3' align="center">
+                        <?php
+                        if ($header->cif == "Destination") {
+                            echo "Delivery To :";
+                        } else {
+                            echo "Delivery To";
+                        };
+                        ?>
+                    </td>
+                    <td colspan='3' align="center" width='40'>Eta Date</td>
+
+                <?php
+                }
+                ?>
             </tr>
 
-            <tr style='vertical-align:middle;'>
-                <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->tanggal)) ?></td>
-                <td colspan='3' align="center">PT Metalsindo Pacific<br>Cikarang, Indonesia</td>
-                <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->expect_tanggal)) ?></td>
-            </tr>
-            <tr style="vertical-align: middle;">
-                <td colspan="3" align="center">Payment Term</td>
-                <td colspan="3" align="center"><?= $header->term ?></td>
-                <td colspan="3" align="center"></td>
-            </tr>
+            <?php
+            if ($check_sheet > 0) {
+            ?>
+
+                <tr style='vertical-align:middle;'>
+                    <td colspan='4' align="center"><?= date('d-M-Y', strtotime($header->tanggal)) ?></td>
+                    <td colspan='4' align="center">PT Metalsindo Pacific<br>Cikarang, Indonesia</td>
+                    <td colspan='4' align="center"><?= date('d-M-Y', strtotime($header->expect_tanggal)) ?></td>
+                </tr>
+                <tr style="vertical-align: middle;">
+                    <td colspan="4" align="center">Payment Term</td>
+                    <td colspan="4" align="center"><?= $header->term ?></td>
+                    <td colspan="4" align="center"></td>
+                </tr>
+
+            <?php
+            } else {
+            ?>
+
+                <tr style='vertical-align:middle;'>
+                    <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->tanggal)) ?></td>
+                    <td colspan='3' align="center">PT Metalsindo Pacific<br>Cikarang, Indonesia</td>
+                    <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->expect_tanggal)) ?></td>
+                </tr>
+                <tr style="vertical-align: middle;">
+                    <td colspan="3" align="center">Payment Term</td>
+                    <td colspan="3" align="center"><?= $header->term ?></td>
+                    <td colspan="3" align="center"></td>
+                </tr>
+
+            <?php
+            }
+            ?>
 
 
         </tbody>
