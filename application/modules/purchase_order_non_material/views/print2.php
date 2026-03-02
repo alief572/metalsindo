@@ -509,7 +509,7 @@
 
                 <tr>
                     <td align="right" colspan='8' style="font-size: 8px;">Grand Total </td>
-                    <td align="right" style="font-size: 8px;"><?= $header->matauang . ' ' . number_format($header->subtotal) ?></td>
+                    <td align="right" style="font-size: 8px;"><?= $header->matauang . ' ' . number_format($header->subtotal + $header->total_ppn) ?></td>
 
                 </tr>
 
