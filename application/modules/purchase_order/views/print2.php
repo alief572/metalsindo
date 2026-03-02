@@ -335,7 +335,7 @@
                     echo "	
                     <tr >
                         <td width='5'>" . $no . "</td>
-                        <td width='100'>" . wordwrap($nama_fix2, 15, '<br>', true) . "</td>
+                        <td width='100'>" . wordwrap($nama_fix2, 15, "<br />\n", true) . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
                         <td width='20' align='right'>" . number_format($weight_sheet, 2) . "</td>
@@ -355,7 +355,7 @@
                     echo "	
                     <tr >
                         <td width='5'>" . $no . "</td>
-                        <td width='150'>" . $detail->nama . "</td>
+                        <td width='150'>" . wordwrap($detail->nama, 25, '<br />', true) . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
                         <td width='40' align='right'>" . number_format($detail->totalwidth, 2) . "</td>
