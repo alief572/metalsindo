@@ -238,11 +238,20 @@ class Control_do extends Admin_Controller
         $data = $base_stock;
         unset($data['id_stock']); // Hapus ID lama agar auto-increment
 
-        $data['qty']        = $qty;
+        $qty_sheet = 0;
+        $get_material = $this->db->get_where('ms_inventory_category3', ['id_category3' => $data['id_category3']])->row();
+
+        if (!empty($get_material->id_bentuk) && $get_material->id_bentuk == 'B2000002') {
+            $qty_sheet = ($qty / $get_material->total_weight);
+        }
+
+        $data['qty']        = 1;
         $data['sisa_spk']   = $qty;
+        $data['totalweight'] = $qty;
         $data['id_gudang']  = $gudang_id;
         $data['status_do']  = 'OPN';
         $data['aktif']      = 'Y';
+        $data['qty_sheet'] = $qty_sheet;
         $data['created_by'] = $this->auth->user_id();
         $data['created_on'] = date('Y-m-d H:i:s');
 
