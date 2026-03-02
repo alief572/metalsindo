@@ -1739,9 +1739,9 @@ class Purchase_order_non_material extends Admin_Controller
 				'hargasatuan'			=> str_replace(",", "", $used[hargasatuan]),
 				'jumlahharga'			=> str_replace(",", "", $used[jumlahharga]),
 				'ppn'					=> str_replace(",", "", $used[nilai_ppn]),
-				'ppn_persen'					=> str_replace(",", "", $used[persen_ppn]),
-				'persen_disc' => str_replace(",", "", $used[disc_persen]),
-				'nilai_disc' => str_replace(",", "", $used[disc_num]),
+				'ppn_persen'			=> str_replace(",", "", $used[persen_ppn]),
+				'persen_disc' 			=> str_replace(",", "", $used[disc_persen]),
+				'nilai_disc' 			=> str_replace(",", "", $used[disc_num]),
 				'harga_total'			=> str_replace(",", "", $used[totalharga]),
 				'note'					=> $used[note]
 			);
@@ -1771,14 +1771,18 @@ class Purchase_order_non_material extends Admin_Controller
 				}
 			}
 
-			// print_r($used[id]);
+			$this->db->update('dt_trans_po_non_material', $dt, ['id' => $used['id']]);
+			// print_r($this->db->last_query());
 			// exit;
-
-			$this->db->update('dt_trans_po_non_material', $dt, ['id' => $used[id]]);
 			// $nopr = $used[no_pr];
 			$dataupdate = [
 				'status_po'				=> 'CLS',
 			];
+
+			// print_r($used[id]);
+			// exit;
+
+
 
 			// $this->db->where('no_pr', $nopr)->update("tr_purchase_request", $dataupdate);
 		}
@@ -2030,19 +2034,19 @@ class Purchase_order_non_material extends Admin_Controller
 				}
 			}
 
-			if($data['header'][0]->tipe == 'pr depart') {
+			if ($data['header'][0]->tipe == 'pr depart') {
 				$get_tgl_dibutuhkan = $this->db->select('a.tgl_dibutuhkan')->from('rutin_non_planning_header a')->where_in('a.no_pr', $list_no_pr)->order_by('a.id', 'asc')->limit(1)->get()->row();
 
 				$data['tgl_dibutuhkan'] = (!empty($get_tgl_dibutuhkan)) ? $get_tgl_dibutuhkan->tgl_dibutuhkan : '';
 			}
 
-			if($data['header'][0]->tipe == 'pr asset') {
+			if ($data['header'][0]->tipe == 'pr asset') {
 				$get_tgl_dibutuhkan = $this->db->select('a.tgl_dibutuhkan')->from('tran_pr_detail a')->where_in('a.no_pr', $list_no_pr)->order_by('a.id', 'asc')->limit(1)->get()->row();
 
 				$data['tgl_dibutuhkan'] = (!empty($get_tgl_dibutuhkan)) ? $get_tgl_dibutuhkan->tgl_dibutuhkan : '';
 			}
 
-			
+
 
 
 			$data['no_pr'] = implode(', ', $list_no_pr);
@@ -2142,7 +2146,7 @@ class Purchase_order_non_material extends Admin_Controller
 		$html = ob_get_contents();
 
 		require_once('./assets/html2pdf/html2pdf/html2pdf.class.php');
-		$html2pdf = new HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(10, 5, 10, 5));
+		$html2pdf = new HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(5, 5, 5, 5));
 		$html2pdf->pdf->SetDisplayMode('fullpage');
 		$html = ob_get_contents();
 
