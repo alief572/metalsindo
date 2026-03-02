@@ -192,13 +192,15 @@
         <table border="0" width='100%'>
             <tr>
                 <td align="left">
-                    <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'>
+                    <!-- <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'> -->
+                    <img src='assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'>
                 </td>
                 <td align="left">
                     <h5 style="text-align: left;">PT METALSINDO PACIFIC</h5>
                 </td>
                 <td align="right" width="483">
-                    <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/img/ISO_9001V1.jpg' alt="" height='30' width='60'>
+                    <!-- <img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/img/ISO_9001V1.jpg' alt="" height='30' width='60'> -->
+                    <img src='assets/img/ISO_9001V1.jpg' alt="" height='30' width='60'>
                 </td>
             </tr>
         </table>
@@ -381,15 +383,15 @@
         <table class='gridtable' width="100%" cellpadding='0' cellspacing='0' style='margin-top: 10px; vertical-align:top;min-width: 400px !important; max-width: 750px !important;'>
             <tbody>
                 <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
-                    <td align="center">Code</td>
-                    <td align="center">Description</td>
-                    <td align="center">Unit Measurement</td>
-                    <td align="center">Qty Pack</td>
-                    <td align="center">Unit Packing</td>
-                    <td align="center">Price </td>
-                    <td align="center">Qty</td>
-                    <td align="center">Discount </td>
-                    <td align="center">Total </td>
+                    <td align="center" width="15">Code</td>
+                    <td align="center" width="20">Description</td>
+                    <td align="center" width="20">Unit Measurement</td>
+                    <td align="center" width="15">Qty Pack</td>
+                    <td align="center" width="15">Unit Packing</td>
+                    <td align="center" width="10">Price </td>
+                    <td align="center" width="10">Qty</td>
+                    <td align="center" width="20">Discount </td>
+                    <td align="center" width="20">Total </td>
                 </tr>
                 <?php
                 $CIF = "<br>" . $header->cif . "<br><br><br><br>";
@@ -438,15 +440,15 @@
 
                         echo "	
                         <tr >
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . $final_detail_code . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . $final_detail_nama . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='center'>" . ucfirst($satuan) . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . number_format($detail->qty / $konversi) . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . ucfirst($satuan_packing) . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $header->matauang . " " . $HS . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $detail->qty . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $header->matauang . " " . number_format($detail->nilai_disc) . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $header->matauang . " " . $JH . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;'>" . $final_detail_code . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;'>" . $final_detail_nama . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;' align='center'>" . ucfirst($satuan) . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;' align='right'>" . number_format($detail->qty / $konversi) . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;'>" . ucfirst($satuan_packing) . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;' align='right'>" . $header->matauang . " " . $HS . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;' align='right'>" . $detail->qty . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;' align='right'>" . $header->matauang . " " . number_format($detail->nilai_disc) . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;' align='right'>" . $header->matauang . " " . $JH . "</td>
                         </tr>";
                         $CIF = "";
                     } else {
@@ -454,14 +456,14 @@
 
                         echo "	
                         <tr >
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . $final_detail_code . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . $final_detail_nama . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='center'>" . ucfirst($satuan) . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . number_format($detail->qty / $konversi, 2) . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;'>" . ucfirst($satuan_packing) . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $header->matauang . " " . $HS . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $detail->qty . "</td>
-                            <td style='font-size: 8px; max-width: 250px !important; word-wrap: break-word;' align='right'>" . $header->matauang . " " . $JH . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;'>" . $final_detail_code . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;'>" . $final_detail_nama . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;' align='center'>" . ucfirst($satuan) . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;' align='right'>" . number_format($detail->qty / $konversi, 2) . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;'>" . ucfirst($satuan_packing) . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;' align='right'>" . $header->matauang . " " . $HS . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;' align='right'>" . $detail->qty . "</td>
+                            <td style='font-size: 8px; word-wrap: break-word;' align='right'>" . $header->matauang . " " . $JH . "</td>
                         </tr>";
                         $CIF = "";
                     }
@@ -514,16 +516,16 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td align="center" colspan="2">DELIVERY TO :</td>
-                    <td align="center" colspan="2">DELIVERY DATE :</td>
-                    <td align="center" colspan="2">PAYMENT TERMS :</td>
-                    <td align="center" colspan="3">DATE REQUIRED :</td>
+                    <td align="center" colspan="2" style="font-size: 8px;">DELIVERY TO :</td>
+                    <td align="center" colspan="2" style="font-size: 8px;">DELIVERY DATE :</td>
+                    <td align="center" colspan="2" style="font-size: 8px;">PAYMENT TERMS :</td>
+                    <td align="center" colspan="3" style="font-size: 8px;">DATE REQUIRED :</td>
                 </tr>
                 <tr>
-                    <td align="center" colspan="2">PT. METALSINDO PACIFIC, CIKARANG</td>
-                    <td align="center" colspan="2"><?= date('d-M-y', strtotime($header->delivery_date)) ?></td>
-                    <td align="center" colspan="2"><?= $terms ?></td>
-                    <td align="center" colspan="3"><?= (!empty($tgl_dibutuhkan)) ? date('d-M-y', strtotime($tgl_dibutuhkan)) : ''; ?></td>
+                    <td align="center" colspan="2" style="font-size: 8px;">PT. METALSINDO PACIFIC, CIKARANG</td>
+                    <td align="center" colspan="2" style="font-size: 8px;"><?= date('d-M-y', strtotime($header->delivery_date)) ?></td>
+                    <td align="center" colspan="2" style="font-size: 8px;"><?= $terms ?></td>
+                    <td align="center" colspan="3" style="font-size: 8px;"><?= (!empty($tgl_dibutuhkan)) ? date('d-M-y', strtotime($tgl_dibutuhkan)) : ''; ?></td>
                 </tr>
             </tfoot>
         </table>
@@ -571,31 +573,31 @@
         <br>
 
         <table class='gridtableX2' width='100%' cellpadding='0' cellspacing='0' border='0' align='left'>
-        <tr>
-            <td width="15"></td>
-            <td align='center' width="80">Received</td>
-            <td width='400'></td>
-            <td align='center'>Approved</td>
-        </tr>
-        <tr>
-            <td width="15"></td>
-            <td height='50' align='center'></td>
-            <td></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td width="15"></td>
-            <td><?= ($header->receiving_person !== '' && $header->receiving_person !== null) ? '(' . strtoupper($header->receiving_person) . ')' : '' ?></td>
-            <td></td>
-            <td align='center'><u>HARRY WIDJAJA</u></td>
-        </tr>
-        <tr>
-            <td width="15"></td>
-            <td></td>
-            <td></td>
-            <td align='center'>President Director</td>
-        </tr>
-    </table>
+            <tr>
+                <td width="15"></td>
+                <td align='center' width="80">Received</td>
+                <td width='400'></td>
+                <td align='center'>Approved</td>
+            </tr>
+            <tr>
+                <td width="15"></td>
+                <td height='50' align='center'></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td width="15"></td>
+                <td><?= ($header->receiving_person !== '' && $header->receiving_person !== null) ? '(' . strtoupper($header->receiving_person) . ')' : '' ?></td>
+                <td></td>
+                <td align='center'><u>HARRY WIDJAJA</u></td>
+            </tr>
+            <tr>
+                <td width="15"></td>
+                <td></td>
+                <td></td>
+                <td align='center'>President Director</td>
+            </tr>
+        </table>
 
     </body>
 
