@@ -1,156 +1,167 @@
-<html>
+<!-- <html> -->
 
-<head>
-    <style type="text/css">
-        .header_style_company {
-            padding: 15px;
-            color: black;
-            font-size: 20px;
-            vertical-align: bottom;
-        }
+<!-- <head> -->
+<style type="text/css">
+    .header_style_company {
+        padding: 15px;
+        color: black;
+        font-size: 20px;
+        vertical-align: bottom;
+    }
 
-        .header_style_company2 {
-            padding: 15px;
-            color: black;
-            font-size: 15px;
-            vertical-align: top;
-        }
+    .header_style_company2 {
+        padding: 15px;
+        color: black;
+        font-size: 15px;
+        vertical-align: top;
+    }
 
-        .header_style_alamat {
-            padding: 10px;
-            color: black;
-            font-size: 10px;
-        }
+    .header_style_alamat {
+        padding: 10px;
+        color: black;
+        font-size: 10px;
+    }
 
-        table.default {
-            font-family: arial, sans-serif;
-            font-size: 9px;
-            padding: 0px;
-        }
+    table.default {
+        font-family: arial, sans-serif;
+        font-size: 9px;
+        padding: 0px;
+    }
 
-        p {
-            font-family: arial, sans-serif;
-            font-size: 14px;
-        }
+    p {
+        font-family: arial, sans-serif;
+        font-size: 14px;
+    }
 
-        .font {
-            font-family: arial, sans-serif;
-            font-size: 14px;
-        }
+    .font {
+        font-family: arial, sans-serif;
+        font-size: 14px;
+    }
 
-        table.gridtable {
-            font-family: arial, sans-serif;
-            font-size: 11px;
-            color: #333333;
-            border: 1px solid #808080;
-            border-collapse: collapse;
-        }
+    table.gridtable {
+        font-family: arial, sans-serif;
+        font-size: 11px;
+        color: #333333;
+        border: 1px solid #808080;
+        border-collapse: collapse;
+    }
 
-        table.gridtable th {
-            padding: 6px;
-            background-color: #f7f7f7;
-            color: black;
-            border-color: #808080;
-            border-style: solid;
-            border-width: 1px;
-        }
+    table.gridtable th {
+        padding: 6px;
+        background-color: #f7f7f7;
+        color: black;
+        border-color: #808080;
+        border-style: solid;
+        border-width: 1px;
+    }
 
-        table.gridtable th.head {
-            padding: 6px;
-            background-color: #f7f7f7;
-            color: black;
-            border-color: #808080;
-            border-style: solid;
-            border-width: 1px;
-        }
+    table.gridtable th.head {
+        padding: 6px;
+        background-color: #f7f7f7;
+        color: black;
+        border-color: #808080;
+        border-style: solid;
+        border-width: 1px;
+    }
 
-        table.gridtable td {
-            border-width: 1px;
-            padding: 6px;
-            border-style: solid;
-            border-color: #808080;
-        }
+    table.gridtable td {
+        border-width: 1px;
+        padding: 6px;
+        border-style: solid;
+        border-color: #808080;
+    }
 
-        table.gridtable td.cols {
-            border-width: 1px;
-            padding: 6px;
-            border-style: solid;
-            border-color: #808080;
-        }
+    table.gridtable td.cols {
+        border-width: 1px;
+        padding: 6px;
+        border-style: solid;
+        border-color: #808080;
+    }
 
 
-        table.gridtable2 {
-            font-family: arial, sans-serif;
-            font-size: 12px;
-            color: #333333;
-            border-width: 1px;
-            border-color: #666666;
-            border-collapse: collapse;
-        }
+    table.gridtable2 {
+        font-family: arial, sans-serif;
+        font-size: 12px;
+        color: #333333;
+        border-width: 1px;
+        border-color: #666666;
+        border-collapse: collapse;
+    }
 
-        table.gridtable2 td {
-            border-width: 1px;
-            padding: 1px;
-            border-style: none;
-            border-color: #666666;
-            background-color: #ffffff;
-        }
+    table.gridtable2 td {
+        border-width: 1px;
+        padding: 1px;
+        border-style: none;
+        border-color: #666666;
+        background-color: #ffffff;
+    }
 
-        table.gridtable2 td.cols {
-            border-width: 1px;
-            padding: 1px;
-            border-style: none;
-            border-color: #666666;
-            background-color: #ffffff;
-        }
+    table.gridtable2 td.cols {
+        border-width: 1px;
+        padding: 1px;
+        border-style: none;
+        border-color: #666666;
+        background-color: #ffffff;
+    }
 
-        table.gridtableX {
-            font-family: arial, sans-serif;
-            font-size: 12px;
-            color: #333333;
-            border: none;
-            border-collapse: collapse;
-        }
+    table.gridtableX {
+        font-family: arial, sans-serif;
+        font-size: 12px;
+        color: #333333;
+        border: none;
+        border-collapse: collapse;
+    }
 
-        table.gridtableX td {
-            border-width: 1px;
-            padding: 6px;
-        }
+    table.gridtableX td {
+        border-width: 1px;
+        padding: 6px;
+    }
 
-        table.gridtableX td.cols {
-            border-width: 1px;
-            padding: 6px;
-        }
+    table.gridtableX td.cols {
+        border-width: 1px;
+        padding: 6px;
+    }
 
-        table.gridtableX2 {
-            font-family: arial, sans-serif;
-            font-size: 12px;
-            color: #333333;
-            border: none;
-            border-collapse: collapse;
-        }
+    table.gridtableX2 {
+        font-family: arial, sans-serif;
+        font-size: 12px;
+        color: #333333;
+        border: none;
+        border-collapse: collapse;
+    }
 
-        table.gridtableX2 td {
-            border-width: 1px;
-            padding: 2px;
-        }
+    table.gridtableX2 td {
+        border-width: 1px;
+        padding: 2px;
+    }
 
-        table.gridtableX2 td.cols {
-            border-width: 1px;
-            padding: 2px;
-        }
+    table.gridtableX2 td.cols {
+        border-width: 1px;
+        padding: 2px;
+    }
 
-        th td {
-            font-size: 8px !important;
-        }
+    th td {
+        font-size: 8px !important;
+    }
 
-        #testtable {
-            width: 100%;
-        }
-    </style>
-</head>
+    #testtable {
+        width: 100%;
+    }
+</style>
+<!-- </head>  -->
 
-<body>
+<page backtop="5mm" backbottom="5mm" backleft="5mm" backright="5mm">
+    <page_header>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="width: 70%;"></td>
+                <td style="width: 30%; text-align: right; font-size: 10px; font-family: arial; padding-right: 0mm; padding-top: 0mm;">
+                    Page No. [[page_cu]] / [[page_nb]]
+                </td>
+            </tr>
+        </table>
+    </page_header>
+
     <?php
     foreach ($header as $header) {
     }
@@ -306,6 +317,7 @@
                     $HS = number_format($detail->hargasatuan, 2);
                     $JH = number_format($detail->jumlahharga, 2);
                 }
+
                 if ($check_sheet > 0) {
                     $no++;
                     $TOT_PPH += (($detail->totalwidth) * $detail->hargasatuan) * $detail->pajak / 100;
@@ -544,6 +556,6 @@
     </table>
 
 
-</body>
+</page>
 
-</html>
+<!-- </html> -->
