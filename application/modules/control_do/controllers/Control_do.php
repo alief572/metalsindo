@@ -167,6 +167,18 @@ class Control_do extends Admin_Controller
                     throw new Exception("Data stock tidak ditemukan untuk ID: " . $item_do_detail->id_stock);
                 }
 
+                if ($get_stock['qty_sheet'] > 0) {
+                    $this->db->select('a.total_weight');
+                    $this->db->from('ms_inventory_category3 a');
+                    $this->db->where('a.id_category3', $get_stock['id_category3']);
+                    $get_material = $this->db->get()->row();
+                    $total_weight = $get_material->total_weight;
+
+                    $qty_sheet = ($qty_in / $total_weight);
+
+                    $this->db->update('stock_material', ['qty_sheet' => $qty_sheet], ['id_stock' => $item_do_detail->id_stock]);
+                }
+
                 // 1. Insert ke dt_do_confirm
                 $arr_do_confirm = [
                     'id_detail_do' => $item_do_detail->id,
@@ -286,6 +298,18 @@ class Control_do extends Admin_Controller
 
                 if (!$get_stock) {
                     throw new Exception("Data stock tidak ditemukan untuk ID: " . $item_do_detail->id_stock);
+                }
+
+                if ($get_stock['qty_sheet'] > 0) {
+                    $this->db->select('a.total_weight');
+                    $this->db->from('ms_inventory_category3 a');
+                    $this->db->where('a.id_category3', $get_stock['id_category3']);
+                    $get_material = $this->db->get()->row();
+                    $total_weight = $get_material->total_weight;
+
+                    $qty_sheet = ($qty_in / $total_weight);
+
+                    $this->db->update('stock_material', ['qty_sheet' => $qty_sheet], ['id_stock' => $item_do_detail->id_stock]);
                 }
 
                 // 1. Insert ke dt_do_confirm_scrap
