@@ -137,7 +137,7 @@ class Retur_penjualan extends Admin_Controller
 			];
 			//Add Data
 			$insert_header_retur = $this->db->insert('tr_retur_penjualan', $data);
-			if(!$insert_header_retur) {
+			if (!$insert_header_retur) {
 				throw new Exception('Data header retur gagal dibuat !');
 			}
 			$numb1 = 0;
@@ -190,7 +190,7 @@ class Retur_penjualan extends Admin_Controller
 					if (isset($dp['qty_sheet'])) {
 						$detRetur['total_sheet'] = $dp['qty_sheet'];
 					}
-					
+
 					$get_last_stock = $this->Retur_penjualan_model->get_last_stock($lotno);
 
 					$arr_stock_retur[] = [
@@ -210,7 +210,7 @@ class Retur_penjualan extends Admin_Controller
 						'created_by' => $this->auth->user_id(),
 						'created_on' => date('Y-m-d H:i:s'),
 						'lot_slitting' => $get_last_stock->lot_slitting,
-						'keterangan' => $get_last_stock->keterangan,
+						'keterangan' => $get_last_stock->keterangan . ' - RETUR (' . $code . ')',
 						'id_roll' => $get_last_stock->id_roll,
 						'panjang' => $get_last_stock->panjang,
 						'actual_berat' => $get_last_stock->actual_berat,
@@ -227,7 +227,7 @@ class Retur_penjualan extends Admin_Controller
 				}
 			}
 
-			if(!empty($detRetur)) {
+			if (!empty($detRetur)) {
 				$insert_detail_retur = $this->db->insert_batch('dt_returpenjualan', $detRetur);
 				if (!$insert_detail_retur) {
 					throw new Exception('Data detail retur gagal di input !');
