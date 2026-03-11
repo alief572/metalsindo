@@ -600,6 +600,9 @@ class Wt_invoicing_model extends BF_Model
 
     // Query langsung ke VIEW
     $this->db->from('v_spk_marketing');
+    $this->db->where('total_nilai_spk >', 0);
+
+    $count_all = $this->db->count_all_results('', FALSE);
 
     if (!empty($search['value'])) {
       $this->db->group_start();
@@ -646,7 +649,7 @@ class Wt_invoicing_model extends BF_Model
 
     echo json_encode([
       'draw'            => intval($draw),
-      'recordsTotal'    => $this->db->count_all('v_spk_marketing'),
+      'recordsTotal'    => $count_all,
       'recordsFiltered' => $count_filtered,
       'data'            => $hasil
     ]);
