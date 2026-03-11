@@ -60,7 +60,13 @@
 										$this->db->where('a.no_invoice', $vs->no_invoice);
 										$get_ttl_invoice = $this->db->get()->row();
 
-										$nilai_invoice = (!empty($get_ttl_invoice->ttl_invoice)) ? $get_ttl_invoice->ttl_invoice : 0;
+										$ttl_harga = $get_ttl_invoice->ttl_invoice;
+
+										$dpp_nilai_lain = ceil(11 / 12 * $ttl_harga);
+										$ppn = ($dpp_nilai_lain * 12 / 100);
+										$grand_total = ($ttl_harga + $ppn);
+
+										$nilai_invoice = $grand_total;
 										$sisa_invoice_idr = $vs->sisa_invoice_idr;
 									}
 									if ($sisa_invoice_idr > 0) {
