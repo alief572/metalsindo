@@ -1,4 +1,5 @@
  <div class="box box-primary">
+<<<<<<< HEAD
  	<div class="box-body">
  		<form id="data-form" method="post">
  			<div class="form-group row">
@@ -23,6 +24,32 @@
 							if ($invoice) {
 								foreach ($invoice as $ks => $vs) {
 
+=======
+    <div class="box-body">
+		<form id="data-form" method="post">
+		<div class="form-group row" >
+			 <table class="table table-bordered" width="100%" id="list_item_stok">
+              <thead>
+                  <tr>
+				      <th width="30%">Code</th>
+                      <th width="30%">No Invoice</th>
+                      <th width="30%">Nama Customer</th>
+                      <th width="30%">Total Invoice</th>
+					   <th width="30%">Sisa Invoice</th>
+                      <th width="2%" class="text-center">Aksi</th>  
+                  </tr>
+              </thead>
+              <tbody>
+                  <?php	
+				 
+				  $cust = $results['detail'];
+				  
+                  $invoice = $this->db->query("SELECT a.*, b.name_customer as nm_customer FROM tr_invoice a
+				                      INNER JOIN master_customers b ON a.id_customer=b.id_customer WHERE a.id_customer ='$cust' AND (a.sisa_invoice_idr >'0')")->result();
+				  if($invoice){
+					foreach($invoice as $ks=>$vs){
+
+>>>>>>> 9447b155 (Perbaikan - Penerimaan & Invoicing)
 									$this->db->select('a.*');
 									$this->db->from('tr_invoice_detail a');
 									$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3');
@@ -120,4 +147,8 @@
 
 
 
+<<<<<<< HEAD
  </script>
+=======
+ </script>
+>>>>>>> 9447b155 (Perbaikan - Penerimaan & Invoicing)
