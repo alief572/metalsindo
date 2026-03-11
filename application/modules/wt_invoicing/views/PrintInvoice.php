@@ -481,6 +481,8 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 
 				$qty_invoice = 0;
 
+
+
 				$this->db->select('a.lotno, a.qty_sheet');
 				$this->db->from('stock_material a');
 				$this->db->where('a.no_kirim', $header->id_do);
@@ -488,6 +490,7 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 				$this->db->where('a.aktif', 'N');
 				// $this->db->where('a.no_kirim', $header->id_do);
 				$this->db->group_by('a.id_stock');
+				$this->db->order_by('a.id_stock', 'desc');
 				$get_qty_invoice = $this->db->get()->result();
 				foreach ($get_qty_invoice as $item_invoice) {
 					$this->db->select('a.id');
