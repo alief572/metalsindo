@@ -115,11 +115,26 @@ class Wt_invoicing_model extends BF_Model
     $idcust = "F" . $thn . str_pad($counter, 5, "0", STR_PAD_LEFT);
     return $idcust;
   }
+
   function BuatNomor($kode = '')
   {
     $bulan = date('m');
     $tahun_full = date('Y'); // 2024
     $tahun_short = date('y'); // 24
+    if (!empty($kode)) {
+      $no_surat = $kode;
+
+      $this->db->select('a.tgl_delivery_order');
+      $this->db->from('tr_delivery_order a');
+      $this->db->where('a.no_surat', $no_surat);
+      $query = $this->db->get();
+      $row = $query->row_array();
+      $tgl_delivery_order = $row['tgl_delivery_order'];
+      $bulan = date('m', strtotime($tgl_delivery_order));
+      $tahun_full = date('Y', strtotime($tgl_delivery_order));
+      $tahun_short = date('y', strtotime($tgl_delivery_order));
+    }
+
 
     // 1. Konversi Bulan ke Romawi (Lebih ringkas)
     $array_romawi = [
@@ -507,7 +522,7 @@ class Wt_invoicing_model extends BF_Model
           $this->db->where('c.no_surat', $item['no_do']);
           $this->db->where('b.id_material', $item_sheet->id_category3);
           $this->db->where('a.no_kirim', $item['id_do']);
-          $this->db->group_by('a.id_stock');
+          // $this->db->group_by('a.id_stock');
           $get_qty_sheet = $this->db->get()->result();
 
           $qty_sheet = 0;
@@ -518,7 +533,7 @@ class Wt_invoicing_model extends BF_Model
           $nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet) + (($item_sheet->harga_satuan * $qty_sheet) * 11 / 100);
         }
       } else {
-        $this->db->select('SUM(ROUND(a.qty_invoice) * a.harga_satuan) as ttl_harga');
+        $this->db->select('SUM(a.qty_invoice * a.harga_satuan) as ttl_harga');
         $this->db->from('tr_invoice_detail a');
         $this->db->where('a.no_invoice', $item['no_invoice']);
         $get_total_invoice = $this->db->get()->row();
