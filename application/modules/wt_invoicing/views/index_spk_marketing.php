@@ -15,8 +15,6 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 
 <div class="box">
 	<div class="box-header">
-
-
 		<span class="pull-right">
 		</span>
 	</div>
@@ -35,7 +33,6 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 					<th width="13%">Action</th>
 				</tr>
 			</thead>
-
 			<tbody>
 
 			</tbody>
