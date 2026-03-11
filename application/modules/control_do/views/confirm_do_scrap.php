@@ -9,7 +9,8 @@
             <th class="text-center">Length</th>
             <th class="text-center">Lot No.</th>
             <th class="text-center">Qty DO</th>
-            <th class="text-center">Qty Terima</th>
+            <th class="text-center">Qty OK</th>
+            <th class="text-center">Qty FG</th>
             <th class="text-center">Qty NG</th>
         </tr>
     </thead>
@@ -36,6 +37,9 @@
             echo '</td>';
             echo '<td>';
             echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_in]" value="' . $item->weight_mat . '">';
+            echo '</td>';
+            echo '<td>';
+            echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_fg]" value="0">';
             echo '</td>';
             echo '<td>';
             echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_ng]" value="0">';

@@ -1,27 +1,27 @@
  <div class="box box-primary">
-    <div class="box-body">
-		<form id="data-form" method="post">
-		<div class="form-group row" >
-			 <table class="table table-bordered" width="100%" id="list_item_stok">
-              <thead>
-                  <tr>
-				      <th width="30%">Code</th>
-                      <th width="30%">No Invoice</th>
-                      <th width="30%">Nama Customer</th>
-                      <th width="30%">Total Invoice</th>
-					   <th width="30%">Sisa Invoice</th>
-                      <th width="2%" class="text-center">Aksi</th>  
-                  </tr>
-              </thead>
-              <tbody>
-                  <?php	
-				 
-				  $cust = $results['detail'];
-				  
-                  $invoice = $this->db->query("SELECT a.*, b.name_customer as nm_customer FROM tr_invoice a
+ 	<div class="box-body">
+ 		<form id="data-form" method="post">
+ 			<div class="form-group row">
+ 				<table class="table table-bordered" width="100%" id="list_item_stok">
+ 					<thead>
+ 						<tr>
+ 							<th width="30%">Code</th>
+ 							<th width="30%">No Invoice</th>
+ 							<th width="30%">Nama Customer</th>
+ 							<th width="30%">Total Invoice</th>
+ 							<th width="30%">Sisa Invoice</th>
+ 							<th width="2%" class="text-center">Aksi</th>
+ 						</tr>
+ 					</thead>
+ 					<tbody>
+ 						<?php
+
+							$cust = $results['detail'];
+
+							$invoice = $this->db->query("SELECT a.*, b.name_customer as nm_customer FROM tr_invoice a
 				                      INNER JOIN master_customers b ON a.id_customer=b.id_customer WHERE a.id_customer ='$cust' AND (a.sisa_invoice_idr >'0')")->result();
-				  if($invoice){
-					foreach($invoice as $ks=>$vs){
+							if ($invoice) {
+								foreach ($invoice as $ks => $vs) {
 
 									$this->db->select('a.*');
 									$this->db->from('tr_invoice_detail a');
@@ -60,13 +60,7 @@
 										$this->db->where('a.no_invoice', $vs->no_invoice);
 										$get_ttl_invoice = $this->db->get()->row();
 
-										$ttl_harga = $get_ttl_invoice->ttl_invoice;
-
-										$dpp_nilai_lain = ceil(11 / 12 * $ttl_harga);
-										$ppn = ($dpp_nilai_lain * 12 / 100);
-										$grand_total = ($ttl_harga + $ppn);
-
-										$nilai_invoice = $grand_total;
+										$nilai_invoice = (!empty($get_ttl_invoice->ttl_invoice)) ? $get_ttl_invoice->ttl_invoice : 0;
 										$sisa_invoice_idr = $vs->sisa_invoice_idr;
 									}
 									if ($sisa_invoice_idr > 0) {

@@ -1,152 +1,167 @@
-<html>
+<!-- <html> -->
 
-<head>
-    <style type="text/css">
-        .header_style_company {
-            padding: 15px;
-            color: black;
-            font-size: 20px;
-            vertical-align: bottom;
-        }
+<!-- <head> -->
+<style type="text/css">
+    .header_style_company {
+        padding: 15px;
+        color: black;
+        font-size: 20px;
+        vertical-align: bottom;
+    }
 
-        .header_style_company2 {
-            padding: 15px;
-            color: black;
-            font-size: 15px;
-            vertical-align: top;
-        }
+    .header_style_company2 {
+        padding: 15px;
+        color: black;
+        font-size: 15px;
+        vertical-align: top;
+    }
 
-        .header_style_alamat {
-            padding: 10px;
-            color: black;
-            font-size: 10px;
-        }
+    .header_style_alamat {
+        padding: 10px;
+        color: black;
+        font-size: 10px;
+    }
 
-        table.default {
-            font-family: arial, sans-serif;
-            font-size: 9px;
-            padding: 0px;
-        }
+    table.default {
+        font-family: arial, sans-serif;
+        font-size: 9px;
+        padding: 0px;
+    }
 
-        p {
-            font-family: arial, sans-serif;
-            font-size: 14px;
-        }
+    p {
+        font-family: arial, sans-serif;
+        font-size: 14px;
+    }
 
-        .font {
-            font-family: arial, sans-serif;
-            font-size: 14px;
-        }
+    .font {
+        font-family: arial, sans-serif;
+        font-size: 14px;
+    }
 
-        table.gridtable {
-            font-family: arial, sans-serif;
-            font-size: 11px;
-            color: #333333;
-            border: 1px solid #808080;
-            border-collapse: collapse;
-        }
+    table.gridtable {
+        font-family: arial, sans-serif;
+        font-size: 11px;
+        color: #333333;
+        border: 1px solid #808080;
+        border-collapse: collapse;
+    }
 
-        table.gridtable th {
-            padding: 6px;
-            background-color: #f7f7f7;
-            color: black;
-            border-color: #808080;
-            border-style: solid;
-            border-width: 1px;
-        }
+    table.gridtable th {
+        padding: 6px;
+        background-color: #f7f7f7;
+        color: black;
+        border-color: #808080;
+        border-style: solid;
+        border-width: 1px;
+    }
 
-        table.gridtable th.head {
-            padding: 6px;
-            background-color: #f7f7f7;
-            color: black;
-            border-color: #808080;
-            border-style: solid;
-            border-width: 1px;
-        }
+    table.gridtable th.head {
+        padding: 6px;
+        background-color: #f7f7f7;
+        color: black;
+        border-color: #808080;
+        border-style: solid;
+        border-width: 1px;
+    }
 
-        table.gridtable td {
-            border-width: 1px;
-            padding: 6px;
-            border-style: solid;
-            border-color: #808080;
-        }
+    table.gridtable td {
+        border-width: 1px;
+        padding: 6px;
+        border-style: solid;
+        border-color: #808080;
+    }
 
-        table.gridtable td.cols {
-            border-width: 1px;
-            padding: 6px;
-            border-style: solid;
-            border-color: #808080;
-        }
+    table.gridtable td.cols {
+        border-width: 1px;
+        padding: 6px;
+        border-style: solid;
+        border-color: #808080;
+    }
 
 
-        table.gridtable2 {
-            font-family: arial, sans-serif;
-            font-size: 12px;
-            color: #333333;
-            border-width: 1px;
-            border-color: #666666;
-            border-collapse: collapse;
-        }
+    table.gridtable2 {
+        font-family: arial, sans-serif;
+        font-size: 12px;
+        color: #333333;
+        border-width: 1px;
+        border-color: #666666;
+        border-collapse: collapse;
+    }
 
-        table.gridtable2 td {
-            border-width: 1px;
-            padding: 1px;
-            border-style: none;
-            border-color: #666666;
-            background-color: #ffffff;
-        }
+    table.gridtable2 td {
+        border-width: 1px;
+        padding: 1px;
+        border-style: none;
+        border-color: #666666;
+        background-color: #ffffff;
+    }
 
-        table.gridtable2 td.cols {
-            border-width: 1px;
-            padding: 1px;
-            border-style: none;
-            border-color: #666666;
-            background-color: #ffffff;
-        }
+    table.gridtable2 td.cols {
+        border-width: 1px;
+        padding: 1px;
+        border-style: none;
+        border-color: #666666;
+        background-color: #ffffff;
+    }
 
-        table.gridtableX {
-            font-family: arial, sans-serif;
-            font-size: 12px;
-            color: #333333;
-            border: none;
-            border-collapse: collapse;
-        }
+    table.gridtableX {
+        font-family: arial, sans-serif;
+        font-size: 12px;
+        color: #333333;
+        border: none;
+        border-collapse: collapse;
+    }
 
-        table.gridtableX td {
-            border-width: 1px;
-            padding: 6px;
-        }
+    table.gridtableX td {
+        border-width: 1px;
+        padding: 6px;
+    }
 
-        table.gridtableX td.cols {
-            border-width: 1px;
-            padding: 6px;
-        }
+    table.gridtableX td.cols {
+        border-width: 1px;
+        padding: 6px;
+    }
 
-        table.gridtableX2 {
-            font-family: arial, sans-serif;
-            font-size: 12px;
-            color: #333333;
-            border: none;
-            border-collapse: collapse;
-        }
+    table.gridtableX2 {
+        font-family: arial, sans-serif;
+        font-size: 12px;
+        color: #333333;
+        border: none;
+        border-collapse: collapse;
+    }
 
-        table.gridtableX2 td {
-            border-width: 1px;
-            padding: 2px;
-        }
+    table.gridtableX2 td {
+        border-width: 1px;
+        padding: 2px;
+    }
 
-        table.gridtableX2 td.cols {
-            border-width: 1px;
-            padding: 2px;
-        }
+    table.gridtableX2 td.cols {
+        border-width: 1px;
+        padding: 2px;
+    }
 
-        #testtable {
-            width: 100%;
-        }
-    </style>
-</head>
+    th td {
+        font-size: 8px !important;
+    }
 
-<body>
+    #testtable {
+        width: 100%;
+    }
+</style>
+<!-- </head>  -->
+
+<page backtop="5mm" backbottom="5mm" backleft="5mm" backright="5mm">
+    <page_header>
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+                <td style="width: 70%;"></td>
+                <td style="width: 30%; text-align: right; font-size: 10px; font-family: arial; padding-right: 0mm; padding-top: 0mm;">
+                    Page No. [[page_cu]] / [[page_nb]]
+                </td>
+            </tr>
+        </table>
+    </page_header>
+
     <?php
     foreach ($header as $header) {
     }
@@ -257,14 +272,15 @@
             ?>
 
                 <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
-                    <td align="center" width="100" style="font-size: 11px;">Material</td>
+                    <td align="center" width="15">No.</td>
+                    <td align="center" width="50" style="font-size: 11px;">Material</td>
                     <td align="center" width="30" style="font-size: 11px;">Width</td>
                     <td align="center" width="30" style="font-size: 11px;">Length</td>
-                    <td align="center" width="50" style="font-size: 11px;">Total Sheet</td>
+                    <td align="center" width="30" style="font-size: 11px;">Total Sheet</td>
                     <td align="center" width="50" style="font-size: 11px;">Unit Price <br> Sheet</td>
                     <td align="center" width="50" style="font-size: 11px;">Total Kgs</td>
                     <td align="center" width="50" style="font-size: 11px;">Unit Price <br> Kgs</td>
-                    <td align="center" width="80" style="font-size: 11px;">Amount</td>
+                    <td align="center" width="50" style="font-size: 11px;">Amount</td>
                     <td align="center" width="50" style="font-size: 11px;">Remarks</td>
                 </tr>
 
@@ -272,6 +288,7 @@
             } else {
             ?>
                 <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
+                    <td align="center" width="15">No.</td>
                     <td align="center" width='150'>Material</td>
                     <td align="center" width='30'>Width</td>
                     <td align="center" width='30'>Length</td>
@@ -291,6 +308,7 @@
             $ttl_sheet = 0;
             $ttl_kgs = 0;
             $ttl_amount = 0;
+            $no = 0;
             foreach ($detail as $detail) {
 
                 $HS = number_format($detail->hargasatuan, 3);
@@ -299,7 +317,9 @@
                     $HS = number_format($detail->hargasatuan, 2);
                     $JH = number_format($detail->jumlahharga, 2);
                 }
+
                 if ($check_sheet > 0) {
+                    $no++;
                     $TOT_PPH += (($detail->totalwidth) * $detail->hargasatuan) * $detail->pajak / 100;
                     $total_weight_kgs = ($detail->totalwidth);
                     $harga_satuan_kgs = ($detail->hargasatuan * $detail->total_weight);
@@ -316,17 +336,25 @@
 
                     $harga_sheet = ($detail->hargasatuan * $get_material->total_weight);
 
+                    $nama = $detail->nama;
+                    $exp_nama = explode('-', $nama);
+                    $nama_end = (!empty($exp_nama[6])) ? $exp_nama[6] : '';
+
+                    $nama_fix = str_replace('-HOT ROLLED', '', $nama);
+                    $nama_fix2 = str_replace('-COLD ROLLED', '', $nama_fix);
+
 
                     echo "	
                     <tr >
-                        <td width='100'>" . wordwrap($detail->nama, 15, '<br>', true) . "</td>
+                        <td width='5'>" . $no . "</td>
+                        <td width='100'>" . wordwrap($nama_fix2, 15, "<br />\n", true) . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
-                        <td width='50' align='right'>" . number_format($weight_sheet, 2) . "</td>
+                        <td width='20' align='right'>" . number_format($weight_sheet, 2) . "</td>
                         <td width='50' align='right'>" . number_format($harga_sheet, 2) . "</td>
                         <td width='50' align='right'>" . number_format($total_weight_kgs, 2) . "</td>
                         <td width='50' align='right'>" . $HS . "</td>
-                        <td width='80' align='right'>" . number_format(($total_weight_kgs) * $detail->hargasatuan, 2) . "</td>
+                        <td width='50' align='right'>" . number_format(($total_weight_kgs) * $detail->hargasatuan, 2) . "</td>
                         <td width='50'>" . $detail->description . "</td>
                     </tr>";
 
@@ -334,10 +362,12 @@
                     $ttl_kgs += $total_weight_kgs;
                     $ttl_amount += ((($detail->totalwidth) * $detail->hargasatuan) + ((($detail->totalwidth) * $detail->hargasatuan) * $detail->pajak / 100));
                 } else {
+                    $no++;
                     $TOT_PPH += $detail->jumlahharga * $detail->pajak / 100;
                     echo "	
                     <tr >
-                        <td width='150'>" . $detail->nama . "</td>
+                        <td width='5'>" . $no . "</td>
+                        <td width='150'>" . wordwrap($detail->nama, 25, '<br />', true) . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
                         <td width='40' align='right'>" . number_format($detail->totalwidth, 2) . "</td>
@@ -360,6 +390,7 @@
                         <td align="center" colspan='7'>PPN </td>
                         <td align="right"><?= number_format($TOT_PPH, 2) ?></td>
                         <td align="center"></td>
+                        <td align="center"></td>
                     </tr>
 
                 <?php
@@ -370,6 +401,7 @@
                         <td align="center" colspan='3'>PPN </td>
                         <td align="right" colspan='2'></td>
                         <td align="right"><?= number_format($TOT_PPH, 2) ?></td>
+                        <td align="center"></td>
                         <td align="center"></td>
                     </tr>
 
@@ -388,7 +420,7 @@
             }
             ?>
             <tr>
-                <td align="center" colspan='3'>Total </td>
+                <td align="center" colspan='4'>Total </td>
                 <?php
                 if ($check_sheet > 0) {
                 ?>
@@ -413,29 +445,76 @@
 
             </tr>
             <tr style='vertical-align:middle;'>
-                <td colspan='3' align="center">Issued Date</td>
-                <td colspan='3' align="center">
-                    <?php
-                    if ($header->cif == "Destination") {
-                        echo "Delivery To :";
-                    } else {
-                        echo "Delivery To";
-                    };
-                    ?>
-                </td>
-                <td colspan=3' align="center" width='40'>Eta Date</td>
+                <?php
+                if ($check_sheet > 0) {
+                ?>
+
+                    <td colspan='4' align="center">Issued Date</td>
+                    <td colspan='4' align="center">
+                        <?php
+                        if ($header->cif == "Destination") {
+                            echo "Delivery To :";
+                        } else {
+                            echo "Delivery To";
+                        };
+                        ?>
+                    </td>
+                    <td colspan='4' align="center" width='40'>Eta Date</td>
+
+                <?php
+                } else {
+                ?>
+
+                    <td colspan='3' align="center">Issued Date</td>
+                    <td colspan='3' align="center">
+                        <?php
+                        if ($header->cif == "Destination") {
+                            echo "Delivery To :";
+                        } else {
+                            echo "Delivery To";
+                        };
+                        ?>
+                    </td>
+                    <td colspan='3' align="center" width='40'>Eta Date</td>
+
+                <?php
+                }
+                ?>
             </tr>
 
-            <tr style='vertical-align:middle;'>
-                <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->tanggal)) ?></td>
-                <td colspan='3' align="center">PT Metalsindo Pacific<br>Cikarang, Indonesia</td>
-                <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->expect_tanggal)) ?></td>
-            </tr>
-            <tr style="vertical-align: middle;">
-                <td colspan="3" align="center">Payment Term</td>
-                <td colspan="3" align="center"><?= $header->term ?></td>
-                <td colspan="3" align="center"></td>
-            </tr>
+            <?php
+            if ($check_sheet > 0) {
+            ?>
+
+                <tr style='vertical-align:middle;'>
+                    <td colspan='4' align="center"><?= date('d-M-Y', strtotime($header->tanggal)) ?></td>
+                    <td colspan='4' align="center">PT Metalsindo Pacific<br>Cikarang, Indonesia</td>
+                    <td colspan='4' align="center"><?= date('d-M-Y', strtotime($header->expect_tanggal)) ?></td>
+                </tr>
+                <tr style="vertical-align: middle;">
+                    <td colspan="4" align="center">Payment Term</td>
+                    <td colspan="4" align="center"><?= $header->term ?></td>
+                    <td colspan="4" align="center"></td>
+                </tr>
+
+            <?php
+            } else {
+            ?>
+
+                <tr style='vertical-align:middle;'>
+                    <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->tanggal)) ?></td>
+                    <td colspan='3' align="center">PT Metalsindo Pacific<br>Cikarang, Indonesia</td>
+                    <td colspan='3' align="center"><?= date('d-M-Y', strtotime($header->expect_tanggal)) ?></td>
+                </tr>
+                <tr style="vertical-align: middle;">
+                    <td colspan="3" align="center">Payment Term</td>
+                    <td colspan="3" align="center"><?= $header->term ?></td>
+                    <td colspan="3" align="center"></td>
+                </tr>
+
+            <?php
+            }
+            ?>
 
 
         </tbody>
@@ -477,6 +556,6 @@
     </table>
 
 
-</body>
+</page>
 
-</html>
+<!-- </html> -->

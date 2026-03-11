@@ -1463,51 +1463,71 @@ class Purchase_order extends Admin_Controller
 
 	public function PrintH2()
 	{
-		ob_clean();
-		ob_start();
+		// 1. Cek Permission & ID
 		$this->auth->restrict($this->managePermission);
 		$id = $this->uri->segment(3);
-		$data['header'] = $this->db->query("SELECT a.*, b.name_suplier as name_suplier, b.address_office as address_office,b.id_negara as negara, b.telephone as telephone,b.fax as fax FROM tr_purchase_order as a INNER JOIN master_supplier as b on a.id_suplier = b.id_suplier WHERE a.no_po = '" . $id . "' ")->result();
-		$data['detail']  = $this->db->query("SELECT a.*, b.nama, b.total_weight FROM dt_trans_po a 
-		JOIN ms_inventory_category3 b ON b.id_category3 = a.idmaterial 
-		WHERE a.no_po = '" . $id . "' ")->result();
-		$data['detailsum'] = $this->db->query("SELECT AVG(width) as totalwidth, AVG(qty) as totalqty FROM dt_trans_po WHERE no_po = '" . $id . "' ")->result();
 
+		// 2. Tarik Data Header & Supplier
+		$data['header'] = $this->db->query("SELECT a.*, b.name_suplier, b.address_office, b.id_negara as negara, b.telephone, b.fax 
+                                        FROM tr_purchase_order as a 
+                                        INNER JOIN master_supplier as b on a.id_suplier = b.id_suplier 
+                                        WHERE a.no_po = '$id'")->result();
+
+		// 3. Tarik Data Detail Material
+		$data['detail'] = $this->db->query("SELECT a.*, b.nama, b.total_weight 
+                                        FROM dt_trans_po a 
+                                        JOIN ms_inventory_category3 b ON b.id_category3 = a.idmaterial 
+                                        WHERE a.no_po = '$id'")->result();
+
+		// 4. Hitung Summary & Data Pendukung (Pindahin logic dari view ke sini biar bersih)
+		$h = $data['header'][0];
+		$data['detailsum'] = $this->db->query("SELECT SUM(width) as sumwidth, SUM(qty) as sumqty, SUM(totalwidth) as sumtotalwidth, 
+                                           SUM(jumlahharga) as sumjumlahharga, SUM(hargasatuan) as sumhargasatuan 
+                                           FROM dt_trans_po WHERE no_po = '" . $h->no_po . "'")->result();
+
+		// 5. Cari No PR
 		$no_pr = [];
-
-		$this->db->select('c.no_surat, c.tanggal');
-		$this->db->from('dt_trans_po a');
-		$this->db->join('dt_trans_pr b', 'b.id_dt_pr = a.idpr', 'left');
-		$this->db->join('tr_purchase_request c', 'c.no_pr = b.no_pr', 'left');
-		$this->db->where('a.no_po', $id);
-		$this->db->group_by('c.no_surat');
-		$get_no_pr = $this->db->get()->result();
+		$get_no_pr = $this->db->select('c.no_surat, c.tanggal')
+			->from('dt_trans_po a')
+			->join('dt_trans_pr b', 'b.id_dt_pr = a.idpr', 'left')
+			->join('tr_purchase_request c', 'c.no_pr = b.no_pr', 'left')
+			->where('a.no_po', $id)
+			->group_by('c.no_surat')
+			->get()->result();
 
 		foreach ($get_no_pr as $item) {
 			$no_pr[] = $item->no_surat;
 		}
-
 		$data['no_pr'] = $no_pr;
-		$data['date_required'] = $get_no_pr[0]->tanggal;
+		$data['date_required'] = (!empty($get_no_pr)) ? $get_no_pr[0]->tanggal : '-';
 
-		$this->db->select('a.id');
-		$this->db->from('dt_trans_po a');
-		$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.idmaterial');
-		$this->db->where('a.no_po', $id);
-		$this->db->where('b.id_bentuk', 'B2000002');
-		$check_sheet = $this->db->get()->num_rows();
+		// 6. Cek Jenis Bentuk (Sheet atau bukan)
+		$data['check_sheet'] = $this->db->from('dt_trans_po a')
+			->join('ms_inventory_category3 b', 'b.id_category3 = a.idmaterial')
+			->where('a.no_po', $id)
+			->where('b.id_bentuk', 'B2000002')
+			->get()->num_rows();
 
-		$data['check_sheet'] = $check_sheet;
+		// 7. Proses Generate PDF
+		// ob_clean() dipanggil sebelum ob_start() untuk memastikan buffer benar-benar kosong
+		if (ob_get_contents()) ob_clean();
+		ob_start();
 
 		$this->load->view('print2', $data);
 		$html = ob_get_contents();
+		ob_end_clean();
 
 		require_once('./assets/html2pdf/html2pdf/html2pdf.class.php');
-		$html2pdf = new HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(10, 5, 10, 5));
-		$html2pdf->pdf->SetDisplayMode('fullpage');
-		$html2pdf->WriteHTML($html);
-		ob_end_clean();
-		$html2pdf->Output('Penawaran.pdf', 'I');
+		try {
+			// Gunakan margin yang konsisten
+			$html2pdf = new HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(5, 5, 5, 5));
+			$html2pdf->pdf->SetDisplayMode('fullpage');
+			$html2pdf->WriteHTML($html);
+			$html2pdf->Output('Purchase_Order_' . $id . '.pdf', 'I');
+		} catch (HTML2PDF_exception $e) {
+			echo $e;
+			exit;
+		}
 	}
 
 	public function PrintH3($id)

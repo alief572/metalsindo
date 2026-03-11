@@ -1239,6 +1239,10 @@ class Incoming extends Admin_Controller
 			);
 		} else {
 			$this->db->trans_commit();
+
+			$this->Pr_model->akumulasi_stock($no_surat);
+			$this->Pr_model->kartu_stok($no_surat);
+
 			$Arr_Data	= array(
 				'pesan'		=> 'Save berhasil disimpan. Thanks ...',
 				'status'	=> 1
