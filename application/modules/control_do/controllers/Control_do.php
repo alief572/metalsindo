@@ -505,10 +505,10 @@ class Control_do extends Admin_Controller
         $this->db->select('a.id_delivery_order');
         $this->db->from('tr_delivery_order a');
         $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
-        $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
+        // $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
-        $this->db->where('d.no_invoice', null);
+        // $this->db->where('d.no_invoice', null);
 
         if (!empty($tahun)) {
             $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
@@ -532,10 +532,10 @@ class Control_do extends Admin_Controller
         $this->db->select('a.id_delivery_order');
         $this->db->from('tr_delivery_order a');
         $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
-        $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
+        // $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
-        $this->db->where('d.no_invoice', null);
+        // $this->db->where('d.no_invoice', null);
 
         if (!empty($tahun)) {
             $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
@@ -568,10 +568,10 @@ class Control_do extends Admin_Controller
         $this->db->select('a.*, b.name_customer');
         $this->db->from('tr_delivery_order a');
         $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
-        $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
+        // $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
-        $this->db->where('d.no_invoice', null);
+        // $this->db->where('d.no_invoice', null);
 
         if (!empty($tahun)) {
             $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
@@ -676,10 +676,10 @@ class Control_do extends Admin_Controller
         $this->db->from('tr_delivery_order a');
         $this->db->join('dt_delivery_order_child_scrap b', 'b.id_delivery_order = a.id_delivery_order');
         $this->db->join('master_customers c', 'c.id_customer = a.id_customer', 'left');
-        $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
+        // $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
-        $this->db->where('d.no_invoice', null);
+        // $this->db->where('d.no_invoice', null);
         if (!empty($tahun)) {
             $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
         }
@@ -702,10 +702,10 @@ class Control_do extends Admin_Controller
         $this->db->from('tr_delivery_order a');
         $this->db->join('dt_delivery_order_child_scrap b', 'b.id_delivery_order = a.id_delivery_order');
         $this->db->join('master_customers c', 'c.id_customer = a.id_customer', 'left');
-        $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
+        // $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
-        $this->db->where('d.no_invoice', null);
+        // $this->db->where('d.no_invoice', null);
 
         if (!empty($tahun)) {
             $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
@@ -739,10 +739,10 @@ class Control_do extends Admin_Controller
         $this->db->from('tr_delivery_order a');
         $this->db->join('dt_delivery_order_child_scrap b', 'b.id_delivery_order = a.id_delivery_order');
         $this->db->join('master_customers c', 'c.id_customer = a.id_customer', 'left');
-        $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
+        // $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
         $this->db->where('a.deleted', null);
         $this->db->where('a.close_do', null);
-        $this->db->where('d.no_invoice', null);
+        // $this->db->where('d.no_invoice', null);
 
         if (!empty($tahun)) {
             $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
