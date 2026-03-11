@@ -197,11 +197,7 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 					<br>
 					<button type="button" class="btn btn-sm btn-primary" onclick="filterDataScrap()"><i class="fa fa-search"></i> Search</button>
 					<button type="button" class="btn btn-sm btn-danger" onclick="clearFilterScrap()"><i class="fa fa-times"></i> Clear</button>
-<<<<<<< HEAD
-					<button type="button" class="	btn btn-sm btn-success" onclick="downloadExcelScrap()"><i class="fa fa-download"></i> Download Excel</button>
-=======
 					<button type="button" class="btn btn-sm btn-success" onclick="downloadExcelScrap()"><i class="fa fa-download"></i> Download Excel</button>
->>>>>>> 7411680fa6384d858a64750f9f6789eed3b5366f
 				</div>
 			</div>
 			<table id="example3" class="table table-bordered table-striped">
