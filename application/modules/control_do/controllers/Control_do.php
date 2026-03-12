@@ -174,7 +174,7 @@ class Control_do extends Admin_Controller
                     $get_material = $this->db->get()->row();
                     $total_weight = $get_material->total_weight;
 
-                    $qty_sheet = ($qty_in / $total_weight);
+                    $qty_sheet = round($qty_in / $total_weight);
 
                     $this->db->update('stock_material', ['qty_sheet' => $qty_sheet], ['id_stock' => $item_do_detail->id_stock]);
                 }
@@ -254,7 +254,7 @@ class Control_do extends Admin_Controller
         $get_material = $this->db->get_where('ms_inventory_category3', ['id_category3' => $data['id_category3']])->row();
 
         if (!empty($get_material->id_bentuk) && $get_material->id_bentuk == 'B2000002') {
-            $qty_sheet = ($qty / $get_material->total_weight);
+            $qty_sheet = round($qty / $get_material->total_weight);
         }
 
         $data['qty']        = 1;
@@ -307,7 +307,7 @@ class Control_do extends Admin_Controller
                     $get_material = $this->db->get()->row();
                     $total_weight = $get_material->total_weight;
 
-                    $qty_sheet = ($qty_in / $total_weight);
+                    $qty_sheet = round($qty_in / $total_weight);
 
                     $this->db->update('stock_material', ['qty_sheet' => $qty_sheet], ['id_stock' => $item_do_detail->id_stock]);
                 }
