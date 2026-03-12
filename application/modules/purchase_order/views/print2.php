@@ -358,7 +358,7 @@
                         <td width='50'>" . $detail->description . "</td>
                     </tr>";
 
-                    $ttl_sheet += ($total_weight_kgs / $weight_per_sheet);
+                    $ttl_sheet += $weight_sheet;
                     $ttl_kgs += $total_weight_kgs;
                     $ttl_amount += ((($detail->totalwidth) * $detail->hargasatuan) + ((($detail->totalwidth) * $detail->hargasatuan) * $detail->pajak / 100));
                 } else {
