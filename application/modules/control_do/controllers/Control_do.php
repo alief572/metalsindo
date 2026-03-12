@@ -167,7 +167,7 @@ class Control_do extends Admin_Controller
                     throw new Exception("Data stock tidak ditemukan untuk ID: " . $item_do_detail->id_stock);
                 }
 
-                if ($get_stock['qty_sheet'] > 0) {
+                if ($get_stock['qty_sheet'] > 0 && ($qty_ng > 0 || $qty_fg > 0)) {
                     $this->db->select('a.total_weight');
                     $this->db->from('ms_inventory_category3 a');
                     $this->db->where('a.id_category3', $get_stock['id_category3']);
@@ -300,7 +300,7 @@ class Control_do extends Admin_Controller
                     throw new Exception("Data stock tidak ditemukan untuk ID: " . $item_do_detail->id_stock);
                 }
 
-                if ($get_stock['qty_sheet'] > 0) {
+                if ($get_stock['qty_sheet'] > 0 && ($qty_ng > 0 || $qty_fg > 0)) {
                     $this->db->select('a.total_weight');
                     $this->db->from('ms_inventory_category3 a');
                     $this->db->where('a.id_category3', $get_stock['id_category3']);
