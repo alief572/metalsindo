@@ -575,11 +575,25 @@ class Wt_invoicing_model extends BF_Model
     $start = $this->input->post('start');
     $search = $this->input->post('search');
 
+    $tgl_awal = $this->input->post('tgl_awal');
+    $tgl_akhir = $this->input->post('tgl_akhir');
+
     $this->db->select('a.*, b.name_customer as name_customer');
     $this->db->from('tr_invoice a');
     $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
     $this->db->where("a.no_invoice <>", '');
     $this->db->where('a.status_close', '0');
+
+
+    if(!empty($tgl_awal)){
+      $this->db->where('a.tgl_invoice >=', $tgl_awal);
+    }
+    if(!empty($tgl_akhir)) {
+      $this->db->where('a.tgl_invoice <=', $tgl_akhir);
+    }
+
+    $count_all = $this->db->count_all_results('', false);
+
     if (!empty($search['value'])) {
       $this->db->group_start();
       $this->db->like('a.no_surat', $search['value'], 'both');
@@ -587,8 +601,125 @@ class Wt_invoicing_model extends BF_Model
       $this->db->or_like('a.nama_sales', $search['value'], 'both');
       $this->db->group_end();
     }
+
+    $count_filter = $this->db->count_all_results('', false);
+
     $this->db->order_by('a.no_invoice', 'desc');
-    $query = $this->db->get();
+    $this->db->limit($length, $start);
+    $query = $this->db->get()->result_array();
+
+    $no = (0 + $start);
+    $hasil = [];
+
+    foreach ($query as $item) {
+      $no++;
+
+      $this->db->select('a.*');
+      $this->db->from('tr_invoice_detail a');
+      $this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3');
+      $this->db->where('a.no_invoice', $item['no_invoice']);
+      $this->db->where('b.id_bentuk', 'B2000002');
+      $get_detail_sheet = $this->db->get()->result();
+
+      $tipe_sheet = (count($get_detail_sheet) > 0) ? '1' : '0';
+
+      if ($tipe_sheet == '1') {
+        $nilai_invoice = 0;
+
+        foreach ($get_detail_sheet as $item_sheet) {
+          $this->db->select('a.qty_sheet');
+          $this->db->from('stock_material a');
+          $this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
+          $this->db->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order');
+          $this->db->where('c.no_surat', $item['no_do']);
+          $this->db->where('b.id_material', $item_sheet->id_category3);
+          $this->db->where('a.no_kirim', $item['id_do']);
+          // $this->db->group_by('a.id_stock');
+          $get_qty_sheet = $this->db->get()->result();
+
+          $qty_sheet = 0;
+          foreach ($get_qty_sheet as $item_qty_sheet) {
+            $qty_sheet += $item_qty_sheet->qty_sheet;
+          }
+
+          $nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet) + (($item_sheet->harga_satuan * $qty_sheet) * 11 / 100);
+        }
+      } else {
+        $this->db->select('SUM(a.qty_invoice * a.harga_satuan) as ttl_harga');
+        $this->db->from('tr_invoice_detail a');
+        $this->db->where('a.no_invoice', $item['no_invoice']);
+        $get_total_invoice = $this->db->get()->row();
+
+        $ttl_harga = $get_total_invoice->ttl_harga;
+
+        $dpp_nilai_lain = ceil(11 / 12 * $ttl_harga);
+        $ppn = ($dpp_nilai_lain * 12 / 100);
+        $grand_total = ($ttl_harga + $ppn);
+
+        $nilai_invoice = $grand_total;
+      }
+
+      $tgl_terima = (!empty($item['tgl_terima'])) ? date('d-F-Y', strtotime($item['tgl_terima'])) : '-';
+      $tgl_janji = (!empty($item['tgl_janji_bayar'])) ? date('d-F-Y', strtotime($item['tgl_janji_bayar'])) : date('d-F-Y', strtotime($item['jatuh_tempo']));
+
+      $tgl1 = strtotime($tgl_terima);
+      $tgl2 = strtotime(date('Y-m-d'));
+
+      $jarak = $tgl2 - $tgl1;
+      if ($tgl1 != '') {
+        $umur = $jarak / 60 / 60 / 24;
+      } else {
+        $umur = 0;
+      }
+
+      $render_action = $this->_render_action_monitoring_invoice($item);
+
+      $hasil[] = [
+        'no' => $no,
+        'no_invoice' => $item['no_surat'],
+        'nama_customer' => strtoupper($item['name_customer']),
+        'marketing' => $item['nama_sales'],
+        'top' => $item['nama_top'],
+        'payment' => $item['payment'],
+        'nilai_invoice' => number_format($nilai_invoice),
+        'total_bayar' => number_format($item['total_bayar']),
+        'tanggal_invoice' => date('d F Y', strtotime($item['tgl_invoice'])),
+        'janji_bayar' => $tgl_janji,
+        'umur_piutang' => $umur,
+        'action' => $render_action
+      ];
+    }
+
+    $response = [
+      'draw' => intval($draw),
+      'recordsTotal' => $count_all,
+      'recordsFiltered' => $count_filter,
+      'data' => $hasil
+    ];
+
+    echo json_encode($response);
+  }
+
+  public function _render_action_monitoring_invoice($item)
+  {
+    $ENABLE_ADD     = has_permission('Invoicing.Add');
+    $ENABLE_MANAGE  = has_permission('Invoicing.Manage');
+    $ENABLE_VIEW    = has_permission('Invoicing.View');
+    $ENABLE_DELETE  = has_permission('Invoicing.Delete');
+
+    $action = '';
+
+    if ($ENABLE_VIEW) {
+      $action .= ' <a class="btn btn-primary btn-sm history" href="#" title="Riwayat Follow UP" data-no_invoice="' . $item['no_invoice'] . '"><i class="fa fa-history"></i></a>';
+    }
+
+    if ($ENABLE_MANAGE) {
+      $action .= ' <a class="btn btn-success btn-sm" href="' . base_url('/wt_invoicing/FollowUp/' . $item['no_invoice']) . '" title="Follow UP" data-no_inquiry="' . $item['no_inquiry'] . '"><i class="fa fa-check"></i></a>';
+
+      $action .= ' <a class="btn btn-warning btn-sm tutup" href="#" title="Close Invoice" data-no_invoice="' . $item['no_invoice'] . '"><i class="fa fa-close"></i></a>';
+    }
+
+    return $action;
   }
 
   public function get_data_spk_marketing()
@@ -653,5 +784,24 @@ class Wt_invoicing_model extends BF_Model
       'recordsFiltered' => $count_filtered,
       'data'            => $hasil
     ]);
+  }
+
+  public function get_data_monitoring($tgl_awal = null, $tgl_akhir = null) {
+    $this->db->select('a.*, b.name_customer as name_customer');
+    $this->db->from('tr_invoice a');
+    $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+    $this->db->where("a.no_invoice <>", '');
+    $this->db->where('a.status_close', '0');
+
+    if(!empty($tgl_awal)) {
+      $this->db->where('a.tgl_invoice >=', $tgl_awal);
+    }
+    if(!empty($tgl_akhir)) {
+      $this->db->where('a.tgl_invoice <=', $tgl_akhir);
+    }
+
+    $get_data = $this->db->get()->result_array();
+
+    return $get_data;
   }
 }
