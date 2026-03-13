@@ -17,7 +17,16 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 	<!-- /.box-header -->
 	<!-- /.box-header -->
 	<div class="box-body">
-		<table id="example1" class="table table-bordered table-striped">
+		<div class="form-inline">
+			<input type="date" name="tgl_awal" id="tgl_awal" class="form-control form-control-sm">
+			<span>S/D</span>
+			<input type="date" name="tgl_akhir" id="tgl_akhir" class="form-control form-control-sm">
+			<button class="btn btn-primary btn-sm" onclick="filterData()"><i class="fa fa-search"></i> Search</button>
+			<button type="button" class="btn btn-danger btn-sm" onclick="resetFilter()"><i class="fa fa-refresh"></i> Reset</button>
+			<button type="button" class="btn btn-success btn-sm" onclick="exportData()"><i class="fa fa-file-excel-o"></i> Export</button>
+		</div>
+		<br>
+		<table id="table_monitoring_invoice" class="table table-bordered table-striped">
 			<thead>
 				<tr>
 					<th>#</th>
@@ -34,61 +43,8 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 					<th width="10%">Action</th>
 				</tr>
 			</thead>
-
 			<tbody>
-				<?php if (empty($results)) {
-				} else {
-
-
-					$numb = 0;
-					foreach ($results as $record) {
-						$numb++;
-
-						$tgl_terima = (!empty($record->tgl_terima)) ? date('d-F-Y', strtotime($record->tgl_terima)) : '-';
-						$tgl_janji = (!empty($record->tgl_janji_bayar)) ? date('d-F-Y', strtotime($record->tgl_janji_bayar)) : date('d-F-Y', strtotime($record->jatuh_tempo));
-
-						$tgl1 = strtotime($tgl_terima);
-						$tgl2 = strtotime(date('Y-m-d'));
-
-						$jarak = $tgl2 - $tgl1;
-						if ($tgl1 != '') {
-							$umur = $jarak / 60 / 60 / 24;
-						} else {
-							$umur = 0;
-						}
-
-				?>
-						<tr>
-							<td><?= $numb; ?></td>
-							<td><?= $record->no_surat ?></td>
-							<td><?= strtoupper($record->name_customer) ?></td>
-							<td><?= $record->nama_sales ?></td>
-							<td><?= $record->nama_top ?></td>
-							<td><?= $record->payment ?></td>
-							<td><?= number_format($record->nilai_invoice) ?></td>
-							<td><?= number_format($record->total_bayar) ?></td>
-							<td><?= date('d-F-Y', strtotime($record->tgl_invoice)) ?></td>
-							<td><?= $tgl_janji ?></td>
-							<td><?= $umur ?></td>
-
-							<td>
-								<?php if ($ENABLE_VIEW) : ?>
-									<a class="btn btn-primary btn-sm history" href="#" title="Riwayat Follow UP" data-no_invoice="<?= $record->no_invoice ?>"><i class="fa fa-history"></i>
-									</a>
-								<?php endif; ?>
-								<?php if ($ENABLE_MANAGE) : ?>
-									<a class="btn btn-success btn-sm" href="<?= base_url('/wt_invoicing/FollowUp/' . $record->no_invoice) ?>" title="Follow UP" data-no_inquiry="<?= $record->no_inquiry ?>"><i class="fa fa-check"></i>
-									</a>
-								<?php endif; ?>
-								<?php if ($ENABLE_MANAGE) : ?>
-									<a class="btn btn-warning btn-sm tutup" href="#" title="Close Invoice" data-no_invoice="<?= $record->no_invoice ?>"><i class="fa fa-close"></i>
-									</a>
-								<?php endif; ?>
-							</td>
-
-						</tr>
-				<?php }
-				}  ?>
+				
 			</tbody>
 		</table>
 	</div>
@@ -160,6 +116,9 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 
 <!-- page script -->
 <script type="text/javascript">
+	$(document).ready(function() {
+		DataTables();
+	});
 	$(document).on('click', '.history', function(e) {
 		var id = $(this).data('no_invoice');
 		$("#head_title").html("<i class='fa fa-list-alt'></i><b>History Follow UP</b>");
@@ -235,12 +194,29 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 	});
 
 	$(function() {
-
 		$("#form-area").hide();
 	});
 
+	function filterData() {
+		DataTables();
+	}
+
+	function resetFilter() {
+		$('#tgl_awal').val('');
+		$('#tgl_akhir').val('');
+
+		DataTables();
+	}
+
+	function exportData() {
+		var tgl_awal = $('#tgl_awal').val();
+		var tgl_akhir = $('#tgl_akhir').val();
+
+		window.open(siteurl + active_controller + 'export_data_mon_inv/' + tgl_awal + '/' + tgl_akhir, '_blank');
+	}
+
 	function DataTables() {
-		var DataTables = $('#example1').dataTable({
+		var DataTables = $('#table_monitoring_invoice').dataTable({
 			serverSide: true,
 			processing: true,
 			paging: true,
@@ -248,9 +224,14 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 			ajax: {
 				type: 'post',
 				url: siteurl + active_controller + 'get_monitoring_invoice',
+				data: function(d) {
+					d.tgl_awal = $('#tgl_awal').val();
+					d.tgl_akhir = $('#tgl_akhir').val();
+				},
 				dataType: 'json'
 			},
-			column: [{
+			columns: [
+				{
 					data: 'no'
 				},
 				{

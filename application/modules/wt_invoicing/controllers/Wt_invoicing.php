@@ -2594,4 +2594,15 @@ class Wt_invoicing extends Admin_Controller
 	{
 		$this->Wt_invoicing_model->get_data_spk_marketing();
 	}
+
+	public function export_data_mon_inv($tgl_awal = null, $tgl_akhir = null) {
+		$get_data = $this->Wt_invoicing_model->get_data_monitoring($tgl_awal, $tgl_akhir);
+
+		$data = [
+			'tgl_awal' => $tgl_awal,
+			'tgl_akhir' => $tgl_akhir,
+			'data_monitoring' => $get_data
+		];
+		$this->load->view('export_excel_monitoring', $data);
+	}
 }
