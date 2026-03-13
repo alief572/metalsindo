@@ -239,7 +239,7 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 				<div class="modal-footer">
 					<button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">
 						<span class="glyphicon glyphicon-remove"></span> Cancel</button>
-					<button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-check"></i> Confirm</button>
+					<button type="submit" class="btn btn-sm btn-primary btn_confirm"><i class="fa fa-check"></i> Confirm</button>
 				</div>
 			</form>
 		</div>
@@ -260,7 +260,7 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 				<div class="modal-footer">
 					<button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">
 						<span class="glyphicon glyphicon-remove"></span> Cancel</button>
-					<button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-check"></i> Confirm</button>
+					<button type="submit" class="btn btn-sm btn-primary btn_confirm_scrap"><i class="fa fa-check"></i> Confirm</button>
 				</div>
 			</form>
 		</div>
@@ -444,6 +444,8 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 			}
 		}
 
+		$('.btn_confirm').attr('disabled', true);
+
 		Swal.fire({
 			icon: 'warning',
 			title: 'Are you sure ?',
@@ -488,6 +490,8 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 								timer: 3000
 							});
 						}
+
+						$('.btn_confirm').attr('disabled', false);
 					},
 					error: function(result) {
 						Swal.fire({
@@ -499,8 +503,12 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 							allowOutsideClick: false,
 							timer: 3000
 						})
+
+						$('.btn_confirm').attr('disabled', false);
 					}
 				});
+			} else {
+				$('.btn_confirm').attr('disabled', false);
 			}
 		});
 	})
@@ -578,6 +586,8 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 			}
 		}
 
+		$('.btn_confirm_scrap').attr('disabled', true);
+
 		Swal.fire({
 			icon: 'warning',
 			title: 'Are you sure ?',
@@ -622,6 +632,8 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 								timer: 3000
 							});
 						}
+
+						$('.btn_confirm_scrap').attr('disabled', false);
 					},
 					error: function(result) {
 						Swal.fire({
@@ -633,8 +645,12 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 							allowOutsideClick: false,
 							timer: 3000
 						})
+
+						$('.btn_confirm_scrap').attr('disabled', false);
 					}
 				});
+			} else {
+				$('.btn_confirm_scrap').attr('disabled', false);
 			}
 		});
 	})
