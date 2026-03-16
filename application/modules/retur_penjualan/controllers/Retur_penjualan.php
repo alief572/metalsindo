@@ -168,28 +168,29 @@ class Retur_penjualan extends Admin_Controller
 				}
 
 				if ($deal == 1) {
-					$detRetur[] =  array(
-						'id_retur'				=> $code,
-						'id_dt_retur'			=> $code . '-' . $numb1,
-						'id_material'		    => $dp[id_category3],
-						'thickness'		        => $dp[thickness],
-						'width'		        	=> $dp[width],
-						'length'		        => $dp[length],
-						'harga_deal'		    => $hargadeal,
-						'qty_produk'			=> 1,
-						'weight'		    	=> $totalretur,
-						'total_weight'		    => $totalretur,
-						'total_harga'		    => $totalharga,
-						'total_ppn'		        => $totalppn,
-						'deal'		    		=> $dp[deal],
-						'created_on'			=> date('Y-m-d H:i:s'),
-						'created_by'			=> $this->auth->user_id(),
-						'id_stok'		    	=> $dp[id_stok],
-						'lotno'	    			=> $dp['lotno']
+					$row = array(
+						'id_retur'              => $code,
+						'id_dt_retur'           => $code . '-' . $numb1,
+						'id_material'           => $dp['id_category3'],
+						'thickness'             => $dp['thickness'],
+						'width'                 => $dp['width'],
+						'length'                => $dp['length'],
+						'harga_deal'            => $hargadeal,
+						'qty_produk'            => 1,
+						'weight'                => $totalretur,
+						'total_weight'          => $totalretur,
+						'total_harga'           => $totalharga,
+						'total_ppn'             => $totalppn,
+						'deal'                  => $dp['deal'],
+						'created_on'            => date('Y-m-d H:i:s'),
+						'created_by'            => $this->auth->user_id(),
+						'id_stok'               => $dp['id_stok'],
+						'lotno'                 => $dp['lotno'],
+						// Tambahkan default value di sini supaya jumlah kolom selalu sama
+						'total_sheet'           => (isset($dp['qty_sheet']) && !empty($dp['qty_sheet'])) ? $dp['qty_sheet'] : 0
 					);
-					if (isset($dp['qty_sheet'])) {
-						$detRetur['total_sheet'] = $dp['qty_sheet'];
-					}
+
+					$detRetur[] = $row;
 
 					$get_last_stock = $this->Retur_penjualan_model->get_last_stock($lotno);
 
@@ -228,6 +229,7 @@ class Retur_penjualan extends Admin_Controller
 			}
 
 			if (!empty($detRetur)) {
+				// throw new Exception(''.print_r($detRetur).'');
 				$insert_detail_retur = $this->db->insert_batch('dt_returpenjualan', $detRetur);
 				if (!$insert_detail_retur) {
 					throw new Exception('Data detail retur gagal di input !');
