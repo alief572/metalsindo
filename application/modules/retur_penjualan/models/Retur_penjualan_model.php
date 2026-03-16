@@ -415,4 +415,15 @@ class Retur_penjualan_model extends BF_Model
 
 		echo json_encode($response);
 	}
+
+	public function get_last_stock($lotno) {
+		$this->db->select('a.*');
+		$this->db->from('stock_material a');
+		$this->db->where('a.lotno', $lotno);
+		$this->db->order_by('a.created_on', 'desc');
+		$this->db->limit(1);
+		$get_data = $this->db->get()->row();
+
+		return $get_data;
+	}
 }
