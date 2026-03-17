@@ -17,6 +17,7 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 	<!-- /.box-header -->
 	<!-- /.box-header -->
 	<div class="box-body">
+		<button type="button" class="btn btn-sm btn-danger" onclick="update_retur();">Update Retur</button>
 		<table id="example1" class="table table-bordered table-striped">
 			<thead>
 				<tr>
@@ -30,7 +31,7 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 			</thead>
 
 			<tbody>
-				
+
 			</tbody>
 		</table>
 	</div>
@@ -181,8 +182,45 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 					}
 				})
 			});
-
 	})
+
+	function update_retur() {
+		// Tambahkan loading state supaya user tidak klik berkali-kali
+		swal({
+			title: "Sedang memproses...",
+			text: "Mohon tunggu sejenak",
+			imageUrl: "assets/images/loading.gif", // sesuaikan path jika ada
+			showConfirmButton: false,
+			allowOutsideClick: false
+		});
+
+		$.ajax({
+			type: 'POST', // Gunakan uppercase untuk standar
+			url: siteurl + active_controller + 'update_retur', // Perbaiki typo 'urL' jadi 'url'
+			cache: false,
+			dataType: 'json',
+			success: function(res) {
+				// Karena dataType sudah 'json', jQuery otomatis melakukan JSON.parse()
+				// Variabel 'result' saya ganti 'res' agar konsisten dengan isi fungsi
+				if (res.status == 1) {
+					swal({
+						title: "Berhasil!",
+						text: res.message,
+						type: "success"
+					}, function() {
+						// Opsional: Reload tabel atau halaman setelah user klik OK
+						if (typeof table !== 'undefined') table.ajax.reload();
+					});
+				} else {
+					swal("Gagal!", res.message, "error");
+				}
+			},
+			error: function(xhr, status, error) {
+				// Berikan informasi lebih detail saat terjadi error server (500, 404, dll)
+				swal("System Error!", "Terjadi kesalahan pada server: " + error, "error");
+			}
+		});
+	}
 
 	function DataTables() {
 		$('#example1').dataTable({
@@ -197,11 +235,10 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 				cache: false,
 				dataType: 'json',
 				data: function(d) {
-					
+
 				}
 			},
-			columns: [
-				{
+			columns: [{
 					data: 'no'
 				},
 				{

@@ -292,8 +292,21 @@ class Retur_penjualan extends Admin_Controller
 			->get()
 			->result();
 
+		$check_type_sheet = $this->db
+			->select('a.*, b.nama AS item')
+			->from('dt_returpenjualan a')
+			->join('ms_inventory_category3 b', 'b.id_category3=a.id_material')
+			->where('a.id_retur', $id)
+			->where('b.id_bentuk', 'B2000002')
+			->get()
+			->num_rows();
+
+		$type_sheet = ($check_type_sheet > 0) ? 1 : 0;
+
+
 		$data['penawaran'] = $this->Retur_penjualan_model->get_data('tr_penawaran');
 		$data['detailsum'] 	= array();
+		$data['type_sheet'] = $type_sheet;
 		$this->load->view('print2', $data);
 		$html = ob_get_contents();
 
@@ -898,5 +911,68 @@ class Retur_penjualan extends Admin_Controller
 		}
 
 		return $buttons;
+	}
+
+	public function update_retur()
+	{
+		try {
+			$this->db->trans_begin();
+
+			$this->db->select('id, total_ppn, total_harga, total_sheet, harga_deal');
+			$this->db->from('dt_returpenjualan');
+			$this->db->where('total_sheet >', 0);
+			$get_data = $this->db->get()->result();
+
+			if (empty($get_data)) {
+				throw new Exception('Data detail retur tidak ditemukan.');
+			}
+
+			$arr_update = [];
+
+			foreach ($get_data as $item) {
+				// Safety check: Hindari pembagian dengan nol
+				$total_harga_lama = (float) $item->total_harga;
+				$persen_ppn = 0;
+
+				if ($total_harga_lama > 0) {
+					$persen_ppn = ($item->total_ppn / $total_harga_lama * 100);
+				}
+
+				$total_harga_baru = ($item->total_sheet * $item->harga_deal);
+				$total_ppn_baru   = ($total_harga_baru * $persen_ppn / 100);
+
+				$arr_update[] = [
+					'id'          => $item->id,
+					'total_harga' => $total_harga_baru,
+					'total_ppn'   => $total_ppn_baru
+				];
+			}
+
+			if (!empty($arr_update)) {
+				$this->db->update_batch('dt_returpenjualan', $arr_update, 'id');
+
+				// Cek status transaksi database
+				if ($this->db->trans_status() === FALSE) {
+					$db_error = $this->db->error();
+					throw new Exception('Database Error: ' . $db_error['message']);
+				}
+
+				$this->db->trans_commit();
+				echo json_encode([
+					'status'  => 1,
+					'message' => 'Berhasil memperbarui ' . count($arr_update) . ' data.'
+				]);
+			} else {
+				throw new Exception('Tidak ada data yang perlu diupdate.');
+			}
+		} catch (Exception $e) {
+			$this->db->trans_rollback();
+
+			// Return pesan error yang jelas
+			echo json_encode([
+				'status'  => 0,
+				'message' => 'Update Gagal: ' . $e->getMessage()
+			]);
+		}
 	}
 }
