@@ -218,7 +218,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 			if($results['type_sheet'] == '1') {
 				echo '
 					<th>
-						<input type="text" class="form-control" value="'.number_format($dt->total_weight, 2).'">
+						<input type="text" class="form-control" value="'.number_format($dt->total_weight, 2).'" readonly>
 					</th>
 				';
 			}
