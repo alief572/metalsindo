@@ -17,7 +17,7 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 	<!-- /.box-header -->
 	<!-- /.box-header -->
 	<div class="box-body">
-		<button type="button" class="btn btn-sm btn-danger" onclick="update_retur();">Update Retur</button>
+		<!-- <button type="button" class="btn btn-sm btn-danger" onclick="update_retur();">Update Retur</button> -->
 		<table id="example1" class="table table-bordered table-striped">
 			<thead>
 				<tr>
