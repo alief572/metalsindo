@@ -159,13 +159,26 @@ foreach ($results['tr_spk'] as $tr_spk) {
 								<table class='table table-bordered table-striped'>
 									<thead>
 										<tr class='bg-blue'>
-											<th width='30%'>Nama Material</th>
-											<th width='5%'>Thickness</th>
-											<th width='5%'>Width</th>
+											<th width='22%'>Nama Material</th>
+											<th width='8%'>Thickness</th>
+											<th width='8%'>Width</th>
 											<th width='10%'>Part Number</th>
 											<th width='10%'>Harga <br> Penawaran</th>
-											<th width='10%'>Harga Deal / Kg</th>
-											<th width='5%'>Qty (KG)</th>
+											<?php 
+												if($results['type_sheet'] == '1') {
+													echo "
+														<th width='10%'>Harga Deal / Sheet</th>
+														<th width='10%'>Qty (Sheet)</th>
+														<th width='10%'>Qty (Kg)</th>
+													";
+												} else {
+													echo "
+														<th width='10%'>Harga Deal / Kg</th>
+														<th width='8%'>Qty (KG)</th>
+													";
+												}
+											?>
+											
 											<th width='10%' hidden>Weight / Coil</th>
 											<th width='10%' hidden>Total<br>Weight</th>
 											<th width='10%'>Total Harga</th>
@@ -177,25 +190,46 @@ foreach ($results['tr_spk'] as $tr_spk) {
 										<?php $loop = 0;
 										foreach ($results['dtspk'] as $dt) {
 											$thg = number_format($dt->total_harga, 2);
+											$qty = $dt->weight;
+											$total_harga = $dt->total_harga;
+											if($results['type_sheet'] == '1') {
+												$thg = number_format(($dt->harga_deal * $dt->total_sheet), 2);
+												$qty = $dt->total_sheet;
+												$total_harga = ($qty * $dt->harga_deal);
+											}
+
+											
+
 											$loop++;
 											echo "
 			<tr id='tabel_penawaran_$loop'>
 			<th hidden><input type='text' class='form-control' 	value='$dt->id_child_penawaran' readonly id='dp_id_child_penawaran_$loop' required name='dp[$loop][id_child_penawaran]'></th>
 			<th hidden><input type='text' class='form-control' 	value='$dt->id_material' readonly id='dp_idmaterial_$loop' required name='dp[$loop][idmaterial]'></th>
 			
-			<th><input type='text' class='form-control' 		value='$dt->nama|$dt->maker' readonly id='dp_noalloy_$loop' required name='dp[$loop][noalloy]'></th>
+			<th><textarea class='form-control' id='dp_noalloy_$loop' name='dp[$loop][noalloy]' rows='4' readonly required>".$dt->nama."|".$dt->maker."</textarea></th>
 			<th><input type='text' class='form-control' 		value='$dt->thickness' readonly id='dp_thickness_$loop' required name='dp[$loop][thickness]'></th>
 			<th><input type='text' class='form-control' 	value='$dt->width' id='dp_width_$loop' required name='dp[$loop][width]'></th>
 			<th><input type='text' class='form-control' 	value='$dt->part_number' id='dp_part_number_$loop' required name='dp[$loop][part_number]'></th>
 			<th><input type='text' class='form-control'	 		value='$dt->harga_penawaran' readonly id='dp_hgpenwaran_$loop' required name='dp[$loop][hgpenaaran]'></th>
 			<th><input type='text' class='form-control' 		value='$dt->harga_deal' onkeyup='return AksiDetail($loop);' id='dp_hgdeal_$loop' required name='dp[$loop][hgdeal]'></th>
-			<th ><input type='text' class='form-control' 		value='$dt->weight' onkeyup='return AksiDetail($loop);' id='dp_qty_$loop' required name='dp[$loop][qty]'></th>
+			<th ><input type='text' class='form-control' 		value='$qty' onkeyup='return AksiDetail($loop);' id='dp_qty_$loop' required name='dp[$loop][qty]'></th>
+			";
+
+			if($results['type_sheet'] == '1') {
+				echo '
+					<th>
+						<input type="text" class="form-control" value="'.number_format($dt->total_weight, 2).'">
+					</th>
+				';
+			}
+
+			echo "
 			<th hidden><input type='text' class='form-control' 	value='$dt->weight' onkeyup='return AksiDetail($loop);'id='dp_weight_$loop' required name='dp[$loop][weight]'></th>
 			<th id='total_weight_$loop' hidden><input type='text' value='$dt->total_weight' class='form-control' value='$jcc'  id='dp_twight_$loop' required name='dp[$loop][twight]'></th>
 			
 			<th id='total_harga_$loop'>
 			<div hidden>
-			<input type='text' class='form-control' value='" . $dt->total_harga . "' readonly id='dp_tharga_$id' required name='dp[$loop][tharga]'>
+			<input type='text' class='form-control' value='" . $total_harga . "' readonly id='dp_tharga_$id' required name='dp[$loop][tharga]'>
             </div>
 			<input type='text' class='form-control' value='" . $thg . "' readonly></th>
 			

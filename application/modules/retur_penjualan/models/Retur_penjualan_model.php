@@ -330,93 +330,76 @@ class Retur_penjualan_model extends BF_Model
 
 	public function get_retur_incoming()
 	{
-		$ENABLE_ADD     = has_permission('Retur_Penjualan.Add');
-		$ENABLE_MANAGE  = has_permission('Retur_Penjualan.Manage');
-		$ENABLE_VIEW    = has_permission('Retur_Penjualan.View');
-		$ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
+		$ENABLE_MANAGE = has_permission('Retur_Penjualan.Manage');
 
-		$post = $this->input->post();
+		$post   = $this->input->post();
+		$draw   = intval($post['draw']);
+		$length = intval($post['length']);
+		$start  = intval($post['start']);
+		$search = $post['search']['value'];
 
-		$draw = $post['draw'];
-		$length = $post['length'];
-		$start = $post['start'];
-		$search = $post['search'];
+		$this->db->from('v_retur_incoming');
 
-		$sql = '
-			SELECT 
-				a.*,
-				b.name_customer as name_customer,
-				c.no_surat as no_do
-			FROM
-				tr_spk_marketing a
-				JOIN master_customers b ON b.id_customer = a.id_customer
-				LEFT JOIN tr_delivery_order c ON c.no_spk_marketing = a.no_surat
-			WHERE
-				1=1 AND c.no_surat IS NOT NULL AND (
-					a.tgl_spk_marketing LIKE "%' . $search['value'] . '%" OR
-					a.no_surat LIKE "%' . $search['value'] . '%" OR
-					b.name_customer LIKE "%' . $search['value'] . '%" OR
-					c.no_surat LIKE "%' . $search['value'] . '%"
-				)
-			GROUP BY a.id_spkmarketing, a.no_surat
-			ORDER BY a.id_spkmarketing DESC
-		';
-		$count_all = $this->db->query($sql)->num_rows();
-		$get_data = $this->db->query($sql . ' LIMIT ' . $length . ' OFFSET ' . $start)->result();
+		// Filter Search
+		if (!empty($search)) {
+			$this->db->group_start();
+			$this->db->like('no_spk', $search, 'both');
+			$this->db->or_like('name_customer', $search, 'both');
+			$this->db->or_like('all_no_do', $search, 'both');
+			$this->db->or_like('tgl_spk_marketing', $search, 'both');
+			$this->db->group_end();
+		}
+
+		// Hitung total setelah filter
+		$count_filter = $this->db->count_all_results('', false);
+
+		// Ordering
+		$this->db->order_by('id_spkmarketing', 'DESC');
+
+		// Limit & Offset
+		$this->db->limit($length, $start);
+		$get_data = $this->db->get()->result();
 
 		$hasil = [];
-		$no = (0 + $start);
+		$no = $start;
 
 		foreach ($get_data as $item) {
 			$no++;
 
-			$id_spkmarketing = $item->id_spkmarketing;
+			// Status Badge logic
+			$status = ($item->status_approve == '1')
+				? '<span class="badge bg-green">Approve</span>'
+				: '<span class="badge bg-red">Belum di Approve</span>';
 
-			$so = $item->no_surat;
-			$invoice = $this->db->query("select no_surat FROM tr_delivery_order WHERE no_spk_marketing='$so'")->result();
-			$separator = ',';
-			$allinv = array();
-			foreach ($invoice as $inv) {
-				$allinv[] = $inv->no_surat;
-			}
-
-			$invc =  implode($separator, $allinv);
-
-			$status = '';
-			if ($item->status_approve == '1') {
-				$status = '<span class="badge bg-green">Approve</span>';
-			} else {
-				$status = '<span class="badge bg-red">Belum di Approve</span>';
-			}
-
+			// Action logic
 			$action = '';
-
 			if ($ENABLE_MANAGE) {
-				$action = '<a class="btn btn-info btn-sm" href="' . base_url('/retur_penjualan/proses_incoming/' . $item->id_spkmarketing) . '" title="Edit"><i class="fa fa-edit">&nbsp;</i></i></a></a>';
+				$action = '<a class="btn btn-info btn-sm" href="' . base_url('/retur_penjualan/proses_incoming/' . $item->id_spkmarketing) . '" title="Edit"><i class="fa fa-edit"></i></a>';
 			}
 
 			$hasil[] = [
-				'no' => $no,
+				'no'                 => $no,
 				'tanggal_spk_terbit' => date('d F Y', strtotime($item->tgl_spk_marketing)),
-				'no_spk' => $item->no_surat,
-				'customer' => $item->name_customer,
-				'no_do' => $invc,
-				'status' => $status,
-				'action' => $action
+				'no_spk'             => $item->no_spk,
+				'customer'           => $item->name_customer,
+				'no_do'              => $item->all_no_do, // Sudah dapet string dari View
+				'status'             => $status,
+				'action'             => $action
 			];
 		}
 
 		$response = [
-			'draw' => intval($draw),
-			'recordsTotal' => $count_all,
-			'recordsFiltered' => $count_all,
-			'data' => $hasil
+			'draw'            => $draw,
+			'recordsTotal'    => $count_filter, // Sesuaikan jika ingin real count_all tanpa filter
+			'recordsFiltered' => $count_filter,
+			'data'            => $hasil
 		];
 
-		echo json_encode($response);
+		$this->output->set_content_type('application/json')->set_output(json_encode($response));
 	}
 
-	public function get_last_stock($lotno) {
+	public function get_last_stock($lotno)
+	{
 		$this->db->select('a.*');
 		$this->db->from('stock_material a');
 		$this->db->where('a.lotno', $lotno);
@@ -425,5 +408,104 @@ class Retur_penjualan_model extends BF_Model
 		$get_data = $this->db->get()->row();
 
 		return $get_data;
+	}
+
+	public function get_data_nota_retur($post)
+	{
+		$this->db->from('v_nota_retur');
+
+		// Search
+		if (!empty($post['search']['value'])) {
+			$search = $post['search']['value'];
+			$this->db->group_start();
+			$this->db->like('no_retur', $search);
+			$this->db->or_like('name_customer', $search);
+			$this->db->or_like('tgl_retur', $search);
+			$this->db->group_end();
+		}
+
+		// Return object dengan data dan jumlah filter sekaligus
+		$temp_db = clone $this->db;
+		$count_filter = $temp_db->count_all_results();
+
+		$this->db->order_by('id_retur', 'desc');
+		$this->db->limit($post['length'], $post['start']);
+		$query = $this->db->get();
+
+		return [
+			'data' => $query->result(),
+			'count_filter' => $count_filter
+		];
+	}
+
+	public function get_datatables_retur($length, $start, $search)
+	{
+		$this->db->select('a.*, b.name_customer');
+		$this->db->select('(SELECT COALESCE(SUM(total_harga), 0) FROM dt_spkmarketing_retur WHERE id_spkmarketing = a.id_spkmarketing) AS nilai_spk');
+		$this->db->from('tr_spk_marketing_retur a');
+		$this->db->join('master_customers b', 'b.id_customer = a.id_customer');
+
+		$this->db->group_start()
+			->where('a.sts <>', '1')
+			->or_where('a.sts IS NULL', null, false)
+			->group_end();
+
+		if (!empty($search)) {
+			$this->db->group_start();
+			$this->db->like('a.no_surat', $search);
+			$this->db->or_like('b.name_customer', $search);
+			$this->db->group_end();
+		}
+
+		$this->db->order_by('a.id_spkmarketing', 'desc');
+		if ($length != -1) $this->db->limit($length, $start);
+
+		return $this->db->get()->result();
+	}
+
+	/* ------------------------- Di dalam M_retur.php ------------------------- */
+
+	/**
+	 * Base Query untuk menghindari pengulangan kode
+	 * (Private function agar konsisten antara get data & count filtered)
+	 */
+	private function _get_main_query()
+	{
+		$this->db->from('tr_spk_marketing_retur a');
+		$this->db->join('master_customers b', 'b.id_customer = a.id_customer');
+
+		// Filter Status: sts tidak sama dengan 1 atau NULL
+		$this->db->group_start()
+			->where('a.sts <>', '1')
+			->or_where('a.sts IS NULL', null, false)
+			->group_end();
+	}
+
+	/**
+	 * Menghitung SEMUA data tanpa filter search
+	 */
+	public function count_all_retur()
+	{
+		$this->_get_main_query();
+		return $this->db->count_all_results();
+	}
+
+	/**
+	 * Menghitung data setelah diterapkan filter SEARCH
+	 */
+	public function count_filtered_retur($search = null)
+	{
+		$this->_get_main_query();
+
+		if (!empty($search)) {
+			$this->db->group_start();
+			$this->db->like('a.no_surat', $search);
+			$this->db->or_like('b.name_customer', $search);
+			// Sesuaikan format tgl jika ingin bisa disearch (opsional)
+			$this->db->or_like('DATE_FORMAT(a.tgl_spk_marketing, "%d %M %Y")', $search);
+			$this->db->group_end();
+		}
+
+		return $this->db->count_all_results();
 	}
 }

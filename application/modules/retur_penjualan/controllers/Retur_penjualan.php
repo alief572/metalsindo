@@ -160,6 +160,9 @@ class Retur_penjualan extends Admin_Controller
 				$hargadeal      = $harga->harga_deal;
 				$totalretur     = $dp[total_kirim];
 				$totalharga     = $hargadeal * $totalretur;
+				if (isset($dp['qty_sheet']) && !empty($dp['qty_sheet'])) {
+					$totalharga = ($hargadeal * $dp['qty_sheet']);
+				}
 
 				if ($ppn->exclude_vat != '' || $ppn->exclude_vat != '0') {
 					$totalppn   = ($totalharga * $ppn->exclude_vat) / 100;
@@ -268,8 +271,8 @@ class Retur_penjualan extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		$data = $this->Retur_penjualan_model->CariRetur();
-		$this->template->set('results', $data);
+		// $data = $this->Retur_penjualan_model->CariRetur();
+		// $this->template->set('results', $data);
 		$this->template->title('Retur Penjualan');
 		$this->template->render('list_retur_penjualan');
 	}
@@ -338,10 +341,16 @@ class Retur_penjualan extends Admin_Controller
 		$deleted = '0';
 		$tr_spk = $this->Retur_penjualan_model->get_data('tr_spk_marketing', 'id_spkmarketing', $id);
 		// $dtspk = $this->Retur_penjualan_model->get_data('dt_spkmarketing',array('id_spkmarketing',$id));
-		$dtspk = $this->db->query("SELECT a.*, b.nama, b.maker FROM dt_returpenjualan a
+		$dtspk = $this->db->query("SELECT a.*, b.nama, b.maker, b.id_bentuk FROM dt_returpenjualan a
 		INNER JOIN ms_inventory_category3 b ON b.id_category3 = a.id_material
 		WHERE a.id_retur ='$id2' AND a.deal='1'")->result();
 
+		$type_sheet = 0;
+		foreach ($dtspk as $item_detail) {
+			if ($type_sheet == '0' && $item_detail->id_bentuk == 'B2000002') {
+				$type_sheet = 1;
+			}
+		}
 
 
 		$penawaran = $this->Retur_penjualan_model->get_data('tr_penawaran');
@@ -363,6 +372,7 @@ class Retur_penjualan extends Admin_Controller
 			'customer' => $customer,
 			'karyawan' => $karyawan,
 			'mata_uang' => $mata_uang,
+			'type_sheet' => $type_sheet
 		];
 		$this->template->set('id', $id);
 		$this->template->set('id2', $id2);
@@ -794,5 +804,99 @@ class Retur_penjualan extends Admin_Controller
 	public function get_retur_incoming()
 	{
 		$this->Retur_penjualan_model->get_retur_incoming();
+	}
+
+	public function get_nota_retur()
+	{
+		$post = $this->input->post();
+
+		// 1. Ambil data mentah dari Model
+		$fetch = $this->Retur_penjualan_model->get_data_nota_retur($post);
+
+		// 2. Ambil total data tanpa filter (untuk recordsTotal)
+		$total_data = $this->db->count_all('v_nota_retur');
+
+		$arr_data = [];
+		$no = intval($post['start']);
+
+		foreach ($fetch['data'] as $item) {
+			$no++;
+
+			// Formatting HTML tetep di Controller/Private Function
+			$arr_data[] = [
+				'no'            => $no,
+				'no_retur'      => $item->no_retur,
+				'tanggal_retur' => $item->tgl_retur,
+				'customer'      => $item->name_customer,
+				'nilai_retur'   => number_format($item->total_nilai_retur), // Hasil dari View
+				'action'        => $this->_render_get_nota_retur_action($item)
+			];
+		}
+
+		$response = [
+			'draw'            => intval($post['draw']),
+			'recordsTotal'    => $total_data,
+			'recordsFiltered' => $fetch['count_filter'],
+			'data'            => $arr_data
+		];
+
+		$this->output->set_content_type('application/json')->set_output(json_encode($response));
+	}
+
+	public function _render_get_nota_retur_action($item)
+	{
+		$return = '';
+
+		if (has_permission($this->viewPermission)) {
+			$return .= ' <a class="btn btn-success btn-sm" href="' . base_url('/retur_penjualan/PrintH2/' . $item->id_retur) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
+		}
+
+		if (has_permission($this->managePermission)) {
+			$return .= ' <a class="btn btn-info btn-sm" href="' . base_url('/retur_penjualan/editHeader/' . $item->id_spkmarketing . '/' . $item->id_retur) . '" title="Create SPK Marketing"><i class="fa fa-edit">&nbsp;</i></i></a></a>';
+		}
+
+		return $return;
+	}
+
+	public function get_dat_delivery_retur()
+	{
+		$draw   = $this->input->post('draw', true);
+		$length = $this->input->post('length', true);
+		$start  = $this->input->post('start', true);
+		$search = $this->input->post('search', true)['value'];
+
+		// Panggil Model
+		$get_data     = $this->Retur_penjualan_model->get_datatables_retur($length, $start, $search);
+		$count_all    = $this->Retur_penjualan_model->count_all_retur(); // Buat fungsi count sederhana di model
+		$count_filter = $this->Retur_penjualan_model->count_filtered_retur($search);
+
+		$arr_data = [];
+		foreach ($get_data as $item) {
+			$arr_data[] = [
+				'no'                 => ++$start,
+				'tanggal_spk_terbit' => date('d F Y', strtotime($item->tgl_spk_marketing)),
+				'no_spk'             => $item->no_surat,
+				'customer'           => $item->name_customer,
+				'nilai_spk'          => (float)$item->nilai_spk,
+				'action'             => $this->_render_actions_delivery_ret($item)
+			];
+		}
+
+		echo json_encode([
+			'draw'            => intval($draw),
+			'recordsTotal'    => $count_all,
+			'recordsFiltered' => $count_filter,
+			'data'            => $arr_data
+		]);
+	}
+
+	public function _render_actions_delivery_ret($item)
+	{
+		$buttons = '';
+		if (has_permission($this->managePermission)) {
+			$buttons .= ' <a class="btn btn-info btn-sm" href="' . base_url('/retur_penjualan/delivery_order/' . $item->id_spkmarketing) . '" title="Edit"><i class="fa fa-edit">&nbsp;</i></i></a></a>';
+		}
+
+		return $buttons;
 	}
 }
