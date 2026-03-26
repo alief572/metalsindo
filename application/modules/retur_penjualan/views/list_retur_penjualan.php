@@ -11,12 +11,13 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 	}
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
-<link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
 
 <div class="box">
 	<!-- /.box-header -->
 	<!-- /.box-header -->
 	<div class="box-body">
+		<!-- <button type="button" class="btn btn-sm btn-danger" onclick="update_retur();">Update Retur</button> -->
 		<table id="example1" class="table table-bordered table-striped">
 			<thead>
 				<tr>
@@ -25,45 +26,12 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 					<th>No. Retur</th>
 					<th>Custommer</th>
 					<th>Nilai Retur</th>
-					<?php if ($ENABLE_MANAGE) : ?>
-						<th width="13%">Action</th>
-					<?php endif; ?>
+					<th>Action</th>
 				</tr>
 			</thead>
 
 			<tbody>
-				<?php if (empty($results)) {
-				} else {
 
-					$numb = 0;
-					foreach ($results as $record) {
-						$numb++;
-						$id_retur = $record->id_retur;
-						$totalharga	= $this->db->query("SELECT SUM(total_harga) as total FROM dt_returpenjualan WHERE id_retur = '$id_retur' ")->result();
-				?>
-						<tr>
-							<td><?= $numb; ?></td>
-							<td><?= $record->tgl_retur ?></td>
-							<td><?= $record->no_retur ?></td>
-							<td><?= $record->name_customer ?></td>
-
-							<td align='right'> Rp <?= number_format($totalharga[0]->total); ?></td>
-							<td style="padding-left:20px">
-								<?php if ($ENABLE_VIEW) : ?>
-									<!--<a class="btn btn-primary btn-sm view" href="javascript:void(0)" title="View" data-id_spkmarketing="<?= $record->id_spkmarketing ?>"><i class="fa fa-eye"></i>
-				 </a> -->
-									<a class="btn btn-success btn-sm" href="<?= base_url('/retur_penjualan/PrintH2/' . $record->id_retur) ?>" target="_blank" title="Print"><i class="fa fa-print"></i></a>
-								<?php endif; ?>
-								<?php if ($ENABLE_MANAGE) : ?>
-									<a class="btn btn-info btn-sm" href="<?= base_url('/retur_penjualan/editHeader/' . $record->id_spkmarketing . '/' . $record->id_retur) ?>" title="Create SPK Marketing"><i class="fa fa-edit">&nbsp;</i></i></a>
-									</a>
-								<?php endif; ?>
-
-							</td>
-
-						</tr>
-				<?php }
-				}  ?>
 			</tbody>
 		</table>
 	</div>
@@ -109,11 +77,13 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 </div>
 
 <!-- DataTables -->
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js') ?>"></script>
+<script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
 
 <!-- page script -->
 <script type="text/javascript">
+	$(document).ready(function() {
+		DataTables();
+	});
 	$(document).on('click', '.edit', function(e) {
 		var id = $(this).data('no_penawaran');
 		$("#head_title").html("<i class='fa fa-list-alt'></i><b>Edit Inventory</b>");
@@ -212,41 +182,83 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 					}
 				})
 			});
-
 	})
 
-	$(function() {
-		// $('#example1 thead tr').clone(true).appendTo( '#example1 thead' );
-		// $('#example1 thead tr:eq(1) th').each( function (i) {
-		// var title = $(this).text();
-		//alert(title);
-		// if (title == "#" || title =="Action" ) {
-		// $(this).html( '' );
-		// }else{
-		// $(this).html( '<input type="text" />' );
-		// }
-
-		// $( 'input', this ).on( 'keyup change', function () {
-		// if ( table.column(i).search() !== this.value ) {
-		// table
-		// .column(i)
-		// .search( this.value )
-		// .draw();
-		// }else{
-		// table
-		// .column(i)
-		// .search( this.value )
-		// .draw();
-		// }
-		// } );
-		// } );
-
-		var table = $('#example1').DataTable({
-			orderCellsTop: true,
-			fixedHeader: true
+	function update_retur() {
+		// Tambahkan loading state supaya user tidak klik berkali-kali
+		swal({
+			title: "Sedang memproses...",
+			text: "Mohon tunggu sejenak",
+			imageUrl: "assets/images/loading.gif", // sesuaikan path jika ada
+			showConfirmButton: false,
+			allowOutsideClick: false
 		});
-		$("#form-area").hide();
-	});
+
+		$.ajax({
+			type: 'POST', // Gunakan uppercase untuk standar
+			url: siteurl + active_controller + 'update_retur', // Perbaiki typo 'urL' jadi 'url'
+			cache: false,
+			dataType: 'json',
+			success: function(res) {
+				// Karena dataType sudah 'json', jQuery otomatis melakukan JSON.parse()
+				// Variabel 'result' saya ganti 'res' agar konsisten dengan isi fungsi
+				if (res.status == 1) {
+					swal({
+						title: "Berhasil!",
+						text: res.message,
+						type: "success"
+					}, function() {
+						// Opsional: Reload tabel atau halaman setelah user klik OK
+						if (typeof table !== 'undefined') table.ajax.reload();
+					});
+				} else {
+					swal("Gagal!", res.message, "error");
+				}
+			},
+			error: function(xhr, status, error) {
+				// Berikan informasi lebih detail saat terjadi error server (500, 404, dll)
+				swal("System Error!", "Terjadi kesalahan pada server: " + error, "error");
+			}
+		});
+	}
+
+	function DataTables() {
+		$('#example1').dataTable({
+			serverSide: true,
+			processing: true,
+			paging: true,
+			destroy: true,
+			stateSave: true,
+			ajax: {
+				type: 'post',
+				url: siteurl + active_controller + 'get_nota_retur',
+				cache: false,
+				dataType: 'json',
+				data: function(d) {
+
+				}
+			},
+			columns: [{
+					data: 'no'
+				},
+				{
+					data: 'tanggal_retur'
+				},
+				{
+					data: 'no_retur'
+				},
+				{
+					data: 'customer'
+				},
+				{
+					data: 'nilai_retur'
+				},
+				{
+					data: 'action'
+				}
+			]
+		});
+	}
 
 
 	//Delete

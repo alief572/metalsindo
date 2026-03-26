@@ -17,48 +17,20 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 	<!-- /.box-header -->
 	<!-- /.box-header -->
 	<div class="box-body">
-		<table id="example1" class="table table-bordered table-striped">
+		<table id="example2" class="table table-bordered table-striped">
 			<thead>
 				<tr>
-					<th width="5">#</th>
+					<th>#</th>
 					<th>Tanggal SPK Terbit</th>
 					<th>No. SPK</th>
 					<th>Custommer</th>
 					<th>Nilai SPK</th>
-					<?php if ($ENABLE_MANAGE) : ?>
-						<th width="13%">Action</th>
-					<?php endif; ?>
+					<th>Action</th>
 				</tr>
 			</thead>
 
 			<tbody>
-				<?php if (empty($results)) {
-				} else {
-
-					$numb = 0;
-					foreach ($results as $record) {
-						$numb++;
-						$id_spkmarketing = $record->id_spkmarketing;
-						$totalharga	= $this->db->query("SELECT SUM(total_harga) as total FROM dt_spkmarketing_retur WHERE id_spkmarketing='$id_spkmarketing' ")->result();
-				?>
-						<tr>
-							<td><?= $numb; ?></td>
-							<td><?= $record->tgl_spk_marketing ?></td>
-							<td><?= $record->no_surat ?></td>
-							<td><?= $record->name_customer ?></td>
-
-							<td align='right'> Rp <?= number_format($totalharga[0]->total); ?></td>
-							<td style="padding-left:20px">
-								<?php if ($ENABLE_MANAGE) : ?>
-									<a class="btn btn-info btn-sm" href="<?= base_url('/retur_penjualan/delivery_order/' . $record->id_spkmarketing) ?>" title="Edit"><i class="fa fa-edit">&nbsp;</i></i></a>
-									</a>
-								<?php endif; ?>
-
-							</td>
-
-						</tr>
-				<?php }
-				}  ?>
+				
 			</tbody>
 		</table>
 	</div>
@@ -109,6 +81,11 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 
 <!-- page script -->
 <script type="text/javascript">
+
+	$(document).ready(function() {
+		initDataTables();
+	})
+
 	$(document).on('click', '.edit', function(e) {
 		var id = $(this).data('no_penawaran');
 		$("#head_title").html("<i class='fa fa-list-alt'></i><b>Edit Inventory</b>");
@@ -243,6 +220,74 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 		$("#form-area").hide();
 	});
 
+	/**
+	 * Inisialisasi DataTable untuk Delivery Retur
+	 * @param {string} selector - Selector elemen (default: .example2)
+	 */
+	function initDataTables(selector = '#example2') {
+		const $el = $(selector);
+
+		// 1. Cek apakah elemen ada sebelum inisialisasi
+		if ($el.length === 0) return;
+
+		// 2. Gunakan konstanta untuk URL agar lebih bersih
+		const ajaxUrl = `${siteurl}${active_controller}get_dat_delivery_retur`;
+
+		// 3. Simpan instance ke variable jika ingin diakses nanti
+		const table = $el.DataTable({
+			serverSide: true,
+			processing: true,
+			destroy: true, // Melepas instance lama jika ada
+			stateSave: true, // Menyimpan status (filter/halaman) di browser
+			deferRender: true, // Optimasi performa render
+			ajax: {
+				url: ajaxUrl,
+				type: 'GET',
+				dataType: 'json',
+				// Gunakan error handling sederhana agar tidak silent fail
+				error: function(xhr, error, thrown) {
+					swal({
+						type: 'error',
+						title: 'Oops...',
+						text: 'Gagal memuat data: ' + thrown
+					});
+				}
+			},
+			columns: [{
+					data: null,
+					orderable: false,
+					searchable: false,
+					render: function(data, type, row, meta) {
+						return meta.row + meta.settings._iDisplayStart + 1;
+					}
+				},
+				{
+					data: 'tanggal_spk_terbit'
+				},
+				{
+					data: 'no_spk'
+				},
+				{
+					data: 'customer'
+				},
+				{
+					data: 'nilai_spk',
+					render: $.fn.dataTable.render.number(',', '.', 0, 'Rp ') // Opsional: format mata uang
+				},
+				{
+					data: 'action',
+					orderable: false,
+					searchable: false
+				}
+			],
+			// 4. Atur tata letak (Dom) agar lebih user-friendly (Opsional)
+			language: {
+				processing: '<i class="fa faHeader fa-spinner fa-spin fa-fw"></i> Memuat Data...'
+			}
+		});
+
+		return table;
+	}
 
 	//Delete
 
