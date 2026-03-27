@@ -532,51 +532,6 @@ class Wt_invoicing_model extends BF_Model
             $qty_sheet += $item_qty_sheet->qty_sheet;
           }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-      $this->db->select('a.*');
-      $this->db->from('tr_invoice_detail a');
-      $this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3');
-      $this->db->where('a.no_invoice', $item['no_invoice']);
-      $this->db->where('b.id_bentuk', 'B2000002');
-      $get_detail_sheet = $this->db->get()->result();
-
-      $tipe_sheet = (count($get_detail_sheet) > 0) ? '1' : '0';
-
-      if ($tipe_sheet == '1') {
-        $nilai_invoice = 0;
-
-        foreach ($get_detail_sheet as $item_sheet) {
-          $this->db->select('a.qty_sheet');
-          $this->db->from('stock_material a');
-          $this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
-          $this->db->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order');
-          $this->db->where('c.no_surat', $item['no_do']);
-          $this->db->where('b.id_material', $item_sheet->id_category3);
-          $this->db->where('a.no_kirim', $item['id_do']);
-          $this->db->group_by('a.id_stock');
-          $get_qty_sheet = $this->db->get()->result();
-
-          $qty_sheet = 0;
-          foreach ($get_qty_sheet as $item_qty_sheet) {
-            $qty_sheet += $item_qty_sheet->qty_sheet;
-          }
-
-          $total_awal = ($item_sheet->harga_satuan * $qty_sheet);
-          $dpp_lain_lain = ceil(11 / 12 * $total_awal);
-          $ppn = ($dpp_lain_lain * 12 / 100);
-
-          // $nilai_invoice += ($qty_sheet);
-          $nilai_invoice += ($total_awal + $ppn);
-          // $nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet);
-        }
-      } else {
-        $this->db->select('SUM(a.qty_invoice * a.harga_satuan) as ttl_harga');
-=======
-
-        $this->db->select('a.*');
->>>>>>> 1dc243b37598ac4ab7f585bf1418d1729f2a6872
-=======
           $total_awal = ($item_sheet->harga_satuan * $qty_sheet);
           $dpp_lain_lain = ceil(11 / 12 * $total_awal);
           $ppn = ($dpp_lain_lain * 12 / 100);
@@ -588,7 +543,6 @@ class Wt_invoicing_model extends BF_Model
         }
       } else {
         $this->db->select('SUM(a.qty_invoice * a.harga_satuan) as ttl_harga');
->>>>>>> dfe07ad2f38127896e9b04427a9db9867383566d
         $this->db->from('tr_invoice_detail a');
         $this->db->where('a.no_invoice', $item['no_invoice']);
         $get_total_invoice = $this->db->get()->row();
