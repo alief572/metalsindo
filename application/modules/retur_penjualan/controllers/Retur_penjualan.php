@@ -160,12 +160,9 @@ class Retur_penjualan extends Admin_Controller
 				$hargadeal      = $harga->harga_deal;
 				$totalretur     = $dp[total_kirim];
 				$totalharga     = $hargadeal * $totalretur;
-<<<<<<< HEAD
-=======
 				if (isset($dp['qty_sheet']) && !empty($dp['qty_sheet'])) {
 					$totalharga = ($hargadeal * $dp['qty_sheet']);
 				}
->>>>>>> development
 
 				if ($ppn->exclude_vat != '' || $ppn->exclude_vat != '0') {
 					$totalppn   = ($totalharga * $ppn->exclude_vat) / 100;
@@ -174,30 +171,6 @@ class Retur_penjualan extends Admin_Controller
 				}
 
 				if ($deal == 1) {
-<<<<<<< HEAD
-					$detRetur[] =  array(
-						'id_retur'				=> $code,
-						'id_dt_retur'			=> $code . '-' . $numb1,
-						'id_material'		    => $dp[id_category3],
-						'thickness'		        => $dp[thickness],
-						'width'		        	=> $dp[width],
-						'length'		        => $dp[length],
-						'harga_deal'		    => $hargadeal,
-						'qty_produk'			=> 1,
-						'weight'		    	=> $totalretur,
-						'total_weight'		    => $totalretur,
-						'total_harga'		    => $totalharga,
-						'total_ppn'		        => $totalppn,
-						'deal'		    		=> $dp[deal],
-						'created_on'			=> date('Y-m-d H:i:s'),
-						'created_by'			=> $this->auth->user_id(),
-						'id_stok'		    	=> $dp[id_stok],
-						'lotno'	    			=> $dp['lotno']
-					);
-					if (isset($dp['qty_sheet'])) {
-						$detRetur['total_sheet'] = $dp['qty_sheet'];
-					}
-=======
 					$row = array(
 						'id_retur'              => $code,
 						'id_dt_retur'           => $code . '-' . $numb1,
@@ -221,7 +194,6 @@ class Retur_penjualan extends Admin_Controller
 					);
 
 					$detRetur[] = $row;
->>>>>>> development
 
 					$get_last_stock = $this->Retur_penjualan_model->get_last_stock($lotno);
 
@@ -260,10 +232,7 @@ class Retur_penjualan extends Admin_Controller
 			}
 
 			if (!empty($detRetur)) {
-<<<<<<< HEAD
-=======
 				// throw new Exception(''.print_r($detRetur).'');
->>>>>>> development
 				$insert_detail_retur = $this->db->insert_batch('dt_returpenjualan', $detRetur);
 				if (!$insert_detail_retur) {
 					throw new Exception('Data detail retur gagal di input !');
