@@ -273,7 +273,7 @@
 
                 <tr style='vertical-align:middle; background-color:#c2c2c2; font-weight:bold;'>
                     <td align="center" width="15">No.</td>
-                    <td align="center" width="50" style="font-size: 11px;">Material</td>
+                    <td align="center" width="40" style="font-size: 11px;">Material</td>
                     <td align="center" width="30" style="font-size: 11px;">Width</td>
                     <td align="center" width="30" style="font-size: 11px;">Length</td>
                     <td align="center" width="30" style="font-size: 11px;">Total Sheet</td>
@@ -347,7 +347,7 @@
                     echo "	
                     <tr >
                         <td width='5'>" . $no . "</td>
-                        <td width='100'>" . wordwrap($nama_fix2, 15, "<br />\n", true) . "</td>
+                        <td width='70'>" . wordwrap($nama_fix2, 13, "<br />\n", true) . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
                         <td width='20' align='right'>" . number_format($weight_sheet, 2) . "</td>

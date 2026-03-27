@@ -522,7 +522,7 @@ class Wt_invoicing_model extends BF_Model
           $this->db->where('c.no_surat', $item['no_do']);
           $this->db->where('b.id_material', $item_sheet->id_category3);
           $this->db->where('a.no_kirim', $item['id_do']);
-          // $this->db->group_by('a.id_stock');
+          $this->db->group_by('a.id_stock');
           $get_qty_sheet = $this->db->get()->result();
 
           $qty_sheet = 0;
@@ -530,7 +530,13 @@ class Wt_invoicing_model extends BF_Model
             $qty_sheet += $item_qty_sheet->qty_sheet;
           }
 
-          $nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet) + (($item_sheet->harga_satuan * $qty_sheet) * 11 / 100);
+          $total_awal = ($item_sheet->harga_satuan * $qty_sheet);
+          $dpp_lain_lain = ceil(11 / 12 * $total_awal);
+          $ppn = ($dpp_lain_lain * 12 / 100);
+
+          // $nilai_invoice += ($qty_sheet);
+          $nilai_invoice += ($total_awal + $ppn);
+          // $nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet);
         }
       } else {
         $this->db->select('SUM(a.qty_invoice * a.harga_satuan) as ttl_harga');
