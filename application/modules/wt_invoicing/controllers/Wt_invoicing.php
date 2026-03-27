@@ -2757,12 +2757,17 @@ class Wt_invoicing extends Admin_Controller
 			// var_dump($items);
 			// exit();
 
+			$npwp_name = strtoupper($item['npwp_name']);
+			if ($npwp_name == '' || $npwp_name == null) {
+				$npwp_name = strtoupper($item['name_customer']);
+			}
+
 			$invoices_data_for_export[] = [
 				'no' => $no,
 				'no_faktur' => '',
 				'no_invoice' => $item['no_surat'],
 				'npwp' => $item['npwp'],
-				'nama_customer' => strtoupper($item['npwp_name']),
+				'nama_customer' => strtoupper($npwp_name),
 				'address' => $item['npwp_address'],
 				'term' => $item['note'],
 				'nomor_do' => $item['no_do'],
@@ -3165,12 +3170,17 @@ class Wt_invoicing extends Admin_Controller
 			// var_dump($items);
 			// exit();
 
+			$npwp_name = strtoupper($item['npwp_name']);
+			if ($npwp_name == '' || $npwp_name == null) {
+				$npwp_name = strtoupper($item['name_customer']);
+			}
+
 			$invoices_data[] = [
 				'no' => $no,
 				'no_faktur' => '',
 				'no_invoice' => $item['no_surat'],
 				'npwp' => $item['npwp'],
-				'nama_customer' => strtoupper($item['npwp_name']),
+				'nama_customer' => strtoupper($npwp_name),
 				'address' => $item['npwp_address'],
 				'term' => $item['note'],
 				'nomor_do' => $item['no_do'],
