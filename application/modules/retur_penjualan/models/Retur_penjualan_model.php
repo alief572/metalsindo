@@ -349,6 +349,7 @@ class Retur_penjualan_model extends BF_Model
 			$this->db->or_like('tgl_spk_marketing', $search, 'both');
 			$this->db->group_end();
 		}
+<<<<<<< HEAD
 
 		// Hitung total setelah filter
 		$count_filter = $this->db->count_all_results('', false);
@@ -362,10 +363,28 @@ class Retur_penjualan_model extends BF_Model
 
 		$hasil = [];
 		$no = $start;
+=======
+
+		// Hitung total setelah filter
+		$count_filter = $this->db->count_all_results('', false);
+>>>>>>> 1dc243b37598ac4ab7f585bf1418d1729f2a6872
+
+		// Ordering
+		$this->db->order_by('id_spkmarketing', 'DESC');
+
+<<<<<<< HEAD
+=======
+		// Limit & Offset
+		$this->db->limit($length, $start);
+		$get_data = $this->db->get()->result();
+
+		$hasil = [];
+		$no = $start;
 
 		foreach ($get_data as $item) {
 			$no++;
 
+>>>>>>> 1dc243b37598ac4ab7f585bf1418d1729f2a6872
 			// Status Badge logic
 			$status = ($item->status_approve == '1')
 				? '<span class="badge bg-green">Approve</span>'
@@ -396,6 +415,120 @@ class Retur_penjualan_model extends BF_Model
 		];
 
 		$this->output->set_content_type('application/json')->set_output(json_encode($response));
+<<<<<<< HEAD
+	}
+
+	public function get_last_stock($lotno)
+	{
+		$this->db->select('a.*');
+		$this->db->from('stock_material a');
+		$this->db->where('a.lotno', $lotno);
+		$this->db->order_by('a.created_on', 'desc');
+		$this->db->limit(1);
+		$get_data = $this->db->get()->row();
+
+		return $get_data;
+	}
+
+	public function get_data_nota_retur($post)
+	{
+		$this->db->from('v_nota_retur');
+
+		// Search
+		if (!empty($post['search']['value'])) {
+			$search = $post['search']['value'];
+			$this->db->group_start();
+			$this->db->like('no_retur', $search);
+			$this->db->or_like('name_customer', $search);
+			$this->db->or_like('tgl_retur', $search);
+			$this->db->group_end();
+		}
+
+		// Return object dengan data dan jumlah filter sekaligus
+		$temp_db = clone $this->db;
+		$count_filter = $temp_db->count_all_results();
+
+		$this->db->order_by('id_retur', 'desc');
+		$this->db->limit($post['length'], $post['start']);
+		$query = $this->db->get();
+
+		return [
+			'data' => $query->result(),
+			'count_filter' => $count_filter
+		];
+	}
+
+	public function get_datatables_retur($length, $start, $search)
+	{
+		$this->db->select('a.*, b.name_customer');
+		$this->db->select('(SELECT COALESCE(SUM(total_harga), 0) FROM dt_spkmarketing_retur WHERE id_spkmarketing = a.id_spkmarketing) AS nilai_spk');
+		$this->db->from('tr_spk_marketing_retur a');
+		$this->db->join('master_customers b', 'b.id_customer = a.id_customer');
+
+		$this->db->group_start()
+			->where('a.sts <>', '1')
+			->or_where('a.sts IS NULL', null, false)
+			->group_end();
+
+		if (!empty($search)) {
+			$this->db->group_start();
+			$this->db->like('a.no_surat', $search);
+			$this->db->or_like('b.name_customer', $search);
+			$this->db->group_end();
+		}
+
+		$this->db->order_by('a.id_spkmarketing', 'desc');
+		if ($length != -1) $this->db->limit($length, $start);
+
+		return $this->db->get()->result();
+	}
+
+	/* ------------------------- Di dalam M_retur.php ------------------------- */
+
+	/**
+	 * Base Query untuk menghindari pengulangan kode
+	 * (Private function agar konsisten antara get data & count filtered)
+	 */
+	private function _get_main_query()
+	{
+		$this->db->from('tr_spk_marketing_retur a');
+		$this->db->join('master_customers b', 'b.id_customer = a.id_customer');
+
+		// Filter Status: sts tidak sama dengan 1 atau NULL
+		$this->db->group_start()
+			->where('a.sts <>', '1')
+			->or_where('a.sts IS NULL', null, false)
+			->group_end();
+	}
+
+	/**
+	 * Menghitung SEMUA data tanpa filter search
+	 */
+	public function count_all_retur()
+	{
+		$this->_get_main_query();
+		return $this->db->count_all_results();
+	}
+
+	/**
+	 * Menghitung data setelah diterapkan filter SEARCH
+	 */
+	public function count_filtered_retur($search = null)
+	{
+		$this->_get_main_query();
+
+		if (!empty($search)) {
+			$this->db->group_start();
+			$this->db->like('a.no_surat', $search);
+			$this->db->or_like('b.name_customer', $search);
+			// Sesuaikan format tgl jika ingin bisa disearch (opsional)
+			$this->db->or_like('DATE_FORMAT(a.tgl_spk_marketing, "%d %M %Y")', $search);
+			$this->db->group_end();
+		}
+
+		return $this->db->count_all_results();
+=======
+>>>>>>> 1dc243b37598ac4ab7f585bf1418d1729f2a6872
 	}
 
 	public function get_last_stock($lotno)
@@ -509,14 +642,14 @@ class Retur_penjualan_model extends BF_Model
 		return $this->db->count_all_results();
 	}
 
-	public function get_last_stock($lotno) {
-		$this->db->select('a.*');
-		$this->db->from('stock_material a');
-		$this->db->where('a.lotno', $lotno);
-		$this->db->order_by('a.created_on', 'desc');
-		$this->db->limit(1);
-		$get_data = $this->db->get()->row();
+	// public function get_last_stock($lotno) {
+	// 	$this->db->select('a.*');
+	// 	$this->db->from('stock_material a');
+	// 	$this->db->where('a.lotno', $lotno);
+	// 	$this->db->order_by('a.created_on', 'desc');
+	// 	$this->db->limit(1);
+	// 	$get_data = $this->db->get()->row();
 
-		return $get_data;
-	}
+	// 	return $get_data;
+	// }
 }
