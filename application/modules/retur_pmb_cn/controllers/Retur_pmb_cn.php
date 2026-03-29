@@ -330,7 +330,7 @@ class Retur_pmb_cn extends Admin_Controller
 		if (has_permission($this->viewPermission)) {
 			$btn_view = '<a href="' . base_url('retur_pmb_cn/view/' . $item->id) . '" class="btn btn-sm btn-info" title="View DN"><i class="fa fa-eye"></i></a>';
 
-			$btn_print = '<a href="' . base_url('retur_pmb_cn/print/' . $item->id) . '" class="btn btn-sm btn-primary" title="Print DN"><i class="fa fa-print"></i></a>';
+			$btn_print = '<a href="' . base_url('retur_pmb_cn/print_dn/' . $item->id) . '" class="btn btn-sm btn-primary" target="_blank" title="Print DN"><i class="fa fa-print"></i></a>';
 		}
 
 		$action = $btn_view . ' ' . $btn_print;
@@ -363,5 +363,23 @@ class Retur_pmb_cn extends Admin_Controller
 		$this->template->set($data);
 		$this->template->title('View DN Retur Pembelian');
 		$this->template->render('view');
+	}
+
+	public function print_dn($id_dn) {
+		$get_dn_header = $this->Retur_pmb_cn_model->get_dn_header($id_dn);
+		$get_dn_detail = $this->Retur_pmb_cn_model->get_dn_detail($get_dn_header->no_surat);
+		$get_supplier = $this->Retur_pmb_cn_model->get_supplier($get_dn_header->id_supplier);
+		$get_retur_header = $this->Retur_pmb_cn_model->get_retur_header($get_dn_header->id_retur);
+		$get_po = $this->Retur_pmb_cn_model->get_po($get_retur_header->no_po);
+
+		$data = [
+			'header' => $get_dn_header,
+			'detail' => $get_dn_detail,
+			'supplier' => $get_supplier,
+			'retur_header' => $get_retur_header,
+			'po' => $get_po
+		];
+
+		$this->load->view('print', $data);
 	}
 }

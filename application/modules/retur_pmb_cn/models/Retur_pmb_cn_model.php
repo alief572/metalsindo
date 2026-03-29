@@ -118,6 +118,37 @@ class Retur_pmb_cn_model extends BF_Model
 		return $get_data;
 	}
 
+	public function get_supplier($id_supplier = null) {
+		$this->db->select('a.*');
+		$this->db->from('master_supplier a');
+		if(!empty($id_supplier)) {
+			$this->db->where('a.id_suplier', $id_supplier);
+			$get_data = $this->db->get()->row();
+		} else {
+			$get_data = $this->db->get()->result();
+		}
+
+		return $get_data;
+	}
+
+	public function get_po($id_po = null) {
+		$this->db->select('a.*');
+		$this->db->from('tr_purchase_order a');
+		if(!empty($id_po)) {
+			if(strpos($id_po, ',') !== false) {
+				$this->db->where_in('a.no_po', explode(',', $id_po));
+				$get_data = $this->db->get()->result();
+			} else {
+				$this->db->where('a.no_po', $id_po);
+				$get_data = $this->db->get()->row();
+			}
+		} else {
+			$get_data = $this->db->get()->result();
+		}
+
+		return $get_data;
+	}
+
 	public function generate_no_dn()
 	{
 		$this->db->select('MAX(RIGHT(no_surat, 4)) as max');
