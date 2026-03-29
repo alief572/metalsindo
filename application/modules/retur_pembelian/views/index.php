@@ -27,6 +27,7 @@ $ENABLE_DELETE  = has_permission('Retur_Pembelian.Delete');
 					<th class="text-center">Tanggal Retur</th>
 					<th class="text-center">No. Ref Invoice</th>
 					<th class="text-center">Tanggal Invoice</th>
+					<th class="text-center">Status</th>
 					<th class="text-center">Action</th>
 				</tr>
 			</thead>
@@ -197,6 +198,10 @@ $ENABLE_DELETE  = has_permission('Retur_Pembelian.Delete');
 				},
 				{
 					data: 'tanggal_invoice',
+					sClass: 'text-center'
+				},
+				{
+					data: 'status',
 					sClass: 'text-center'
 				},
 				{

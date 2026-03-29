@@ -483,6 +483,8 @@ class Retur_pembelian extends Admin_Controller
 
 			$no_surat_po = implode(', ', $no_surat_po);
 
+			$status = $this->_render_dn_status($item);
+
 			$action = $this->_render_action_retur_pembelian($item);
 
 			$arr_data[] = [
@@ -493,6 +495,7 @@ class Retur_pembelian extends Admin_Controller
 				'tanggal_retur' => date('d F Y', strtotime($item->tgl_retur)),
 				'no_ref_invoice' => $item->no_ref_invoice,
 				'tanggal_invoice' => date('d F Y', strtotime($item->tgl_invoice)),
+				'status' => $status,
 				'action' => $action
 			];
 		}
@@ -509,24 +512,37 @@ class Retur_pembelian extends Admin_Controller
 
 	public function _render_action_retur_pembelian($item)
 	{
+		$get_dn = $this->db->get_where('tr_dn_retur_pmb', ['id_retur' => $item->id])->result();
+
 		$btn_view = '';
 		if (has_permission($this->viewPermission)) {
 			$btn_view = '<a href="' . base_url('retur_pembelian/view_retur/' . $item->id) . '" class="btn btn-sm btn-info" title="View Retur"><i class="fa fa-eye"></i></a>';
 		}
 
 		$btn_delete = '';
-		if (has_permission($this->deletePermission) && $item->deleted_by == null) {
+		if (has_permission($this->deletePermission) && $item->deleted_by == null && count($get_dn) < 1) {
 			$btn_delete = '<button type="button" class="btn btn-sm btn-danger del_retur" title="Delete Retur" data-id="' . $item->id . '"><i class="fa fa-trash"></i></button>';
 		}
 
 		$btn_edit = '';
-		if (has_permission($this->deletePermission) && $item->deleted_by == null) {
+		if (has_permission($this->deletePermission) && $item->deleted_by == null && count($get_dn) < 1) {
 			$btn_edit = '<a href="' . base_url('retur_pembelian/edit_retur/' . $item->id) . '" class="btn btn-sm btn-warning" title="Edit Retur"><i class="fa fa-pencil"></i></a>';
 		}
 
 		$action = $btn_view . ' ' . $btn_delete . ' ' . $btn_edit;
 
 		return $action;
+	}
+
+	public function _render_dn_status($item) {
+		$get_dn = $this->db->get_where('tr_dn_retur_pmb', ['id_retur' => $item->id])->result();
+
+		$status = '<span class="badge bg-blue">Waiting DN</span>';
+		if(count($get_dn) > 0) {
+			$status = '<span class="badge bg-green">DN Created</span>';
+		}
+
+		return $status;
 	}
 
 	public function del_retur()
