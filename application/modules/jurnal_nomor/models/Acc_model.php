@@ -140,7 +140,7 @@ class Acc_model extends CI_Model
 		$this->db->where($param,$value);
 		$query = $this->db->get(); 
 		
-		if($query->num_rows() != 0)
+		if($query && $query->num_rows() != 0)
 		{
 			return $query->result();
 		}		else		{
