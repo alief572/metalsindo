@@ -107,6 +107,8 @@ $alamat_cust =  $this->db->query("SELECT * FROM master_customers WHERE id_custom
 										<option value="1102-01-07">PERMATA BANK - IDR 8808-0017-156-1780-7</option>
 										<option value="1102-01-08">MAY BANK - IDR 2001000198</option>
 										<option value="1102-01-09">MAY BANK - USD 2001000093</option>
+										<option value="1101-02-10">BANK MANDIRI GIRO (IDR) 1730020202850</option>
+										<option value="1101-02-11">BANK MANDIRI (TABUNGAN) 1730099911886</option>
 										<option value="2101-07-01">DEPOSIT CUSTOMER</option>
 
 									</select>
