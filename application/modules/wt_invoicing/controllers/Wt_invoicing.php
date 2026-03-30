@@ -4,11 +4,11 @@ if (!defined('BASEPATH')) {
 }
 
 /*
- * @author Syamsudin
- * @Copyright (c) 2022, Syamsudin
- *
- * This is controller for Wt_penawaran
- */
+* @author Syamsudin
+* @Copyright (c) 2022, Syamsudin
+*
+* This is controller for Wt_penawaran
+*/
 
 class Wt_invoicing extends Admin_Controller
 {
@@ -33,6 +33,7 @@ class Wt_invoicing extends Admin_Controller
 
 		date_default_timezone_set('Asia/Bangkok');
 	}
+
 	public function index()
 	{
 		$this->auth->restrict($this->viewPermission);
@@ -114,7 +115,6 @@ class Wt_invoicing extends Admin_Controller
 		ob_end_clean();
 		$html2pdf->Output('Delivery_order_Slitting.pdf', 'I');
 	}
-
 
 	public function index_monitoring()
 	{
@@ -2604,5 +2604,786 @@ class Wt_invoicing extends Admin_Controller
 			'data_monitoring' => $get_data
 		];
 		$this->load->view('export_excel_monitoring', $data);
+	}
+
+	// E-Faktur
+	public function e_faktur()
+	{
+		$this->auth->restrict($this->viewPermission);
+		$session = $this->session->userdata('app_session');
+		$this->template->page_icon('fa fa-users');
+
+		$this->template->title('E-Faktur');
+		$this->template->render('index_efaktur');
+	}
+	public function get_efaktur()
+	{
+		$get = $this->Wt_invoicing_model->get_efaktur();
+		
+		echo json_encode([
+			'draw' => $get['draw'],
+			'recordsTotal' => $get['recordsTotal'],
+			'recordsFiltered' => $get['recordsFiltered'],
+			'totalValid' => isset($get['totalValid']) ? $get['totalValid'] : 0,
+			'data' => $get['data']
+		]);
+	}
+	public function get_all_efaktur_id()
+	{
+		$get = $this->Wt_invoicing_model->get_all_efaktur_id();
+		
+		echo json_encode([
+			'data' => $get
+		]);
+	}
+	public function e_faktur_list()
+	{
+		$this->auth->restrict($this->viewPermission);
+		$session = $this->session->userdata('app_session');
+		$this->template->page_icon('fa fa-users');
+
+		$this->template->title('List E-Faktur');
+		$this->template->render('index_efaktur_list');
+	}
+	public function list_efaktur()
+	{
+		$get = $this->Wt_invoicing_model->list_efaktur();
+		
+		echo json_encode([
+			'draw' => $get['draw'],
+			'recordsTotal' => $get['recordsTotal'],
+			'recordsFiltered' => $get['recordsFiltered'],
+			'data' => $get['data']
+		]);
+	}
+	public function generate_efaktur()
+	{
+		$post = $this->input->post();
+		$id_generate = $post['id_generate'];
+
+		$this->db->select('a.*, b.name_customer as name_customer, b.npwp as npwp, b.npwp_name as npwp_name, b.npwp_address as npwp_address');
+		$this->db->from('tr_invoice a');
+		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+		$this->db->where('a.stat_efaktur =', 0);
+		$this->db->where('b.npwp !=', '');
+		$this->db->where_in('a.no_surat', $id_generate);
+		$this->db->order_by('a.no_surat', 'ASC');
+		// $this->db->limit(5, 0);
+
+		$get_data = $this->db->get();
+
+		$invoices_data_for_export = [];
+		$no = (0 + $start);
+		foreach ($get_data->result_array() as $item) {
+			$no++;
+
+			$this->db->select('a.*, b.id_bentuk, b.nama as nama_barang');
+			$this->db->from('tr_invoice_detail a');
+			$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3', 'left');
+			$this->db->where('a.no_invoice', $item['no_invoice']);
+			// $this->db->where('b.id_bentuk', 'B2000002');
+			$get_detail_sheet = $this->db->get()->result();
+			
+			$items = [];
+			$nilai_invoice = 0;
+			$nilai_ppn = 0;
+			$nilai_dpp = 0;
+			foreach ($get_detail_sheet as $item_sheet) {
+				$qty = 0;
+				$satuan = 'UM.0003';
+				if($item_sheet->id_bentuk == 'B2000002'){
+					$this->db->select('a.qty_sheet, a.price_sheet');
+					$this->db->from('stock_material a');
+					$this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
+					$this->db->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order');
+					$this->db->where('c.no_surat', $item['no_do']);
+					$this->db->where('b.id_material', $item_sheet->id_category3);
+					$this->db->where('a.no_kirim', $item['id_do']);
+					$this->db->group_by('a.id_stock');
+					$get_qty_sheet = $this->db->get()->result();
+
+					$qty_sheet = 0;
+					foreach ($get_qty_sheet as $item_qty_sheet) {
+						$qty_sheet += $item_qty_sheet->qty_sheet;
+						
+						if ($item_qty_sheet->price_sheet > 0) :
+							$satuan = 'UM.0020';
+						else :
+							$satuan = 'UM.0003';
+						endif;
+					}
+					$qty = $qty_sheet;
+
+					$ttl_harga = ($item_sheet->harga_satuan * $qty_sheet);
+					$dpp_lain_lain = ceil(11 / 12 * $ttl_harga);
+					$ppn = ($dpp_lain_lain * 12 / 100);
+
+					// $nilai_invoice += ($qty_sheet);
+					$nilai_invoice += ($ttl_harga + $ppn);
+					$nilai_ppn += ($ppn);
+					$nilai_dpp += $dpp_lain_lain;
+
+				} else {
+					$qty = $item_sheet->qty_invoice;
+					$ttl_harga = $item_sheet->qty_invoice * $item_sheet->harga_satuan;
+
+					$dpp_lain_lain = ceil(11 / 12 * $ttl_harga);
+					$ppn = ($dpp_lain_lain * 12 / 100);
+					$grand_total = ($ttl_harga + $ppn);
+
+					$nilai_invoice = $grand_total;
+					$nilai_ppn = $ppn;
+					$nilai_dpp = $dpp_lain_lain;
+
+				}
+
+				$items[] = [
+					'barang_jasa' => 'A',
+					'nama_barang' => $item_sheet->nama_barang,
+					'satuan' => $satuan,
+					'harga_satuan' => $item_sheet->harga_satuan,
+					'qty' => $qty,
+					'diskon' => 0,
+					'dpp' => $ttl_harga,
+					'dpp_lain' => $dpp_lain_lain,
+					'tarif_ppn' => '12',
+					'ppn' => $ppn,
+					'tarif_ppnbm' => 0,
+					'ppnbm' => 0,
+					'kode_barang' => $item_sheet->id_category3
+				];
+			}
+			// echo '<pre>';
+			// var_dump($items);
+			// exit();
+
+			$invoices_data_for_export[] = [
+				'no' => $no,
+				'no_faktur' => '',
+				'no_invoice' => $item['no_surat'],
+				'npwp' => $item['npwp'],
+				'nama_customer' => strtoupper($item['npwp_name']),
+				'address' => $item['npwp_address'],
+				'term' => $item['note'],
+				'nomor_do' => $item['no_do'],
+				'nilai_dpp' => $nilai_dpp,
+				'nilai_ppn' => $nilai_ppn,
+				'nilai_invoice' => $nilai_invoice,
+				'tanggal_invoice' => $item['tgl_invoice'],
+				'items' => $items
+			];
+		}
+
+		if (empty($invoices_data_for_export)) {
+			echo json_encode([
+				'status' => 'no_data',
+				'message' => 'Tidak ada faktur yang perlu diekspor.'
+			]);
+			exit;
+		}
+
+		$invoices_to_update = array_column($invoices_data_for_export, 'no_invoice');
+
+		// =====================
+		// PREPARE LOG DATA
+		// =====================
+	
+		$logData = [];
+		$export_id = date("ymdHi");
+		$date_export = date("Y-m-d");
+		$time_export = date("H:i:s");
+		foreach ($invoices_to_update as $inv) {
+			$logData[] = [
+				"id_export"   => $export_id,
+				"date_export" => $date_export,
+				"time_export" => $time_export,
+				"invoice_no"  => $inv
+			];
+		}
+	
+		// =====================
+		// INSERT BATCH (1 QUERY)
+		// =====================
+	
+		if(!empty($logData)){
+			$this->db->insert_batch('faktur_e_logs', $logData);
+		}
+	
+		// =====================
+		// UPDATE STATUS
+		// =====================
+	
+		$this->db->set('stat_efaktur', 1);
+		$this->db->where_in('no_surat', $invoices_to_update);
+		$this->db->where('stat_efaktur', 0);
+		$this->db->update('tr_invoice');
+	
+		// sementara tidak dipakai
+		// history($this->sessionName.' Generate Data E-Faktur: ' . count($invoices_to_update) . ' faktur');
+	
+		// =====================
+		// SIMPAN EXPORT DATA
+		// =====================
+	
+		$this->session->set_userdata('export_data_temp', $invoices_data_for_export);
+	
+		echo json_encode(['status' => 'success']);
+		exit;
+	}
+	public function export_coretax_excel()
+	{
+		ob_start();
+
+		ini_set('display_errors', 0);
+		error_reporting(0);
+
+		set_time_limit(0);
+		ini_set('memory_limit','1024M');
+
+		$this->load->library("PHPExcel");
+
+		$invoices_data = $this->session->userdata('export_data_temp');
+		$this->session->unset_userdata('export_data_temp');
+
+		if (empty($invoices_data)) {
+			redirect('wt_invoicing/e_faktur?msg=data_hilang'); 
+			exit;
+		}
+
+		$objPHPExcel = new PHPExcel();
+		
+		$objPHPExcel->setActiveSheetIndex(0);
+		$sheetFaktur = $objPHPExcel->getActiveSheet();
+		$sheetFaktur->setTitle('Faktur');
+
+		$sheetFaktur->getStyle("A3:R3")->applyFromArray(
+			array(
+				'font' => array(
+					'color' => array('rgb' => '000000'),
+					'bold' => true
+				)
+			)
+		);
+
+		$sheetFaktur->mergeCells('A1:B1');
+		$sheetFaktur->setCellValue("A1", 'NPWP Penjual');
+		$sheetFaktur->getStyle('A1')->getFont()->setBold(true);
+
+		$sheetFaktur->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$sheetFaktur->getStyle('A1')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+		$sheetFaktur->setCellValueExplicit('C1', '0210982047414000', PHPExcel_Cell_DataType::TYPE_STRING);
+		$sheetFaktur->setCellValueExplicit('K2', '', PHPExcel_Cell_DataType::TYPE_STRING); //0761851856433000
+
+		$sheetFaktur->getColumnDimension('C')->setAutoSize(true);
+
+		$headerFaktur = [
+			'Baris',
+			'Tanggal Faktur',
+			'Jenis Faktur',
+			'Kode Transaksi',
+			'Keterangan',
+			'Dokumen Pendukung',
+			'Period Dok Pendukung',
+			'Referensi',
+			'Cap Fasilitas',
+			'ID TKU Penjual',
+			'NPWP/NIK Pembeli',
+			'Jenis ID Pembeli',
+			'Negara Pembeli',
+			'Nomor Dokumen Pembeli',
+			'Nama Pembeli',
+			'Alamat Pembeli',
+			'Email Pembeli',
+			'ID TKU Pembeli'
+		];
+
+		// Judul Header
+		$sheetFaktur->fromArray($headerFaktur, NULL, 'A3'); 
+
+		$rowFaktur 		= 4;
+		$itemRowIndex 	= 1; // Index untuk menghubungkan Faktur dan Detail
+
+		//MULAI Setup Sheet Detail Faktur (Sheet 1) ya gais ya
+		$objPHPExcel->createSheet();
+		$sheetDetail = $objPHPExcel->getSheet(1);
+		$sheetDetail->setTitle('DetailFaktur');
+
+		$headerDetail = [
+			'Baris',
+			'Barang/Jasa',
+			'Kode Barang Jasa',
+			'Nama Barang/Jasa',
+			'Nama Satuan Ukur',
+			'Harga Satuan',
+			'Jumlah Barang Jasa',
+			'Total Diskon',
+			'DPP',
+			'DPP Nilai Lain',
+			'Tarif PPN',
+			'PPN',
+			'Tarif PPnBM',
+			'PPnBM'
+		];
+
+		// Judul Header si Detail
+		$sheetDetail->fromArray($headerDetail, NULL, 'A1');
+		$rowDetail = 2; 
+
+		foreach ($invoices_data as $invoice) {
+			
+			$tanggal_faktur_formatted = date('j/n/Y', strtotime($invoice['tanggal_invoice']));
+			$NPWP = preg_replace("/[^0-9]/", "", $invoice['npwp']);
+			if(strlen($NPWP) < 16){
+				$NPWP = str_pad($NPWP, 16, '0', STR_PAD_LEFT);
+			}
+
+			$dataFaktur = [
+				$itemRowIndex,
+				$tanggal_faktur_formatted,
+				"Normal",
+				"",
+				"",
+				"",
+				"",
+				$invoice['no_invoice'],
+				"",
+				"",
+				"",
+				"TIN",
+				"IDN",
+				$invoice['no_invoice'],
+				$invoice['nama_customer'],
+				$invoice['address'],
+				"",
+				""
+			];
+
+			$endFaktur = [
+				"END"
+			];
+
+			$sheetFaktur->fromArray($dataFaktur, NULL, 'A' . $rowFaktur);
+
+			$sheetFaktur->setCellValueExplicit('D' . $rowFaktur, "04", PHPExcel_Cell_DataType::TYPE_STRING); 
+			$sheetFaktur->setCellValueExplicit('J' . $rowFaktur, "0210982047414000000000", PHPExcel_Cell_DataType::TYPE_STRING); 
+			$sheetFaktur->setCellValueExplicit('K' . $rowFaktur, $NPWP, PHPExcel_Cell_DataType::TYPE_STRING); 
+			$sheetFaktur->setCellValueExplicit('R' . $rowFaktur, $NPWP."000000", PHPExcel_Cell_DataType::TYPE_STRING);
+			
+			$sheetFaktur->getStyle('J' . $rowFaktur)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
+			$sheetFaktur->getStyle('K' . $rowFaktur)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
+			$sheetFaktur->getStyle('R' . $rowFaktur)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
+
+			$rowFaktur++;
+
+			// Data untuk Sheet Detail Faktur
+			foreach ($invoice['items'] as $item) {
+
+				$dataDetail = [
+					$itemRowIndex, // Kunci penghubung
+					$item['barang_jasa'],
+					'',
+					$item['nama_barang'],
+					$item['satuan'],
+					$item['harga_satuan'],
+					$item['qty'],
+					$item['diskon'],
+					$item['dpp'],
+					$item['dpp_lain'],
+					$item['tarif_ppn'],
+					$item['ppn'],
+					$item['tarif_ppnbm'],
+					$item['ppnbm']
+				];
+
+				$sheetDetail->fromArray($dataDetail, NULL, 'A' . $rowDetail);
+
+				$sheetDetail->setCellValueExplicit('C' . $rowDetail, $item['kode_barang'], PHPExcel_Cell_DataType::TYPE_STRING);
+				$sheetDetail->getStyle('C' . $rowDetail)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
+
+				$rowDetail++;
+			}
+
+			$itemRowIndex++;
+		}
+
+		$lastRowHeader = $rowFaktur - 1;
+		$lastRowDetail = $rowDetail - 1;
+		$EndRowFaktur  = $rowFaktur;
+
+		$sheetFaktur->setCellValue('A' . $EndRowFaktur, 'END');
+		$sheetFaktur->getStyle('A' . $EndRowFaktur)->applyFromArray(
+			array(
+				'font' => array(
+					'color' => array('rgb' => '000000'),
+					'bold' => true
+				)
+			)
+		);
+
+		$sheetFaktur->getStyle('B4:B' . $lastRowHeader)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_XLSX14);
+		// $sheetFaktur->getStyle('J4:J' . $lastRowHeader)->getNumberFormat()->setFormatCode('0000000000000000000000');
+		// $sheetFaktur->getStyle('K4:K' . $lastRowHeader)->getNumberFormat()->setFormatCode('0000000000000000');
+		// $sheetFaktur->getStyle('R4:R' . $lastRowHeader)->getNumberFormat()->setFormatCode('0000000000000000000000');
+
+		//Setingan Nilai Comma
+		$sheetDetail->getStyle('H2:H' . $lastRowDetail)
+			->getNumberFormat()
+			->setFormatCode('0.00');
+		$sheetDetail->getStyle('I2:J' . $lastRowDetail)
+			->getNumberFormat()
+			->setFormatCode('0.00');
+		$sheetDetail->getStyle('L2:L' . $lastRowDetail)
+			->getNumberFormat()
+			->setFormatCode('0.00');
+		$sheetDetail->getStyle('N2:N' . $lastRowDetail)
+			->getNumberFormat()
+			->setFormatCode('0.00');
+
+		$filename = 'Impor_Faktur_Keluaran_Coretax_' . date('Ymd_His') . '.xlsx';
+
+		while (ob_get_level()) {
+			ob_end_clean();
+		}
+
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename="' . $filename . '"');
+		header('Cache-Control: max-age=0');
+
+		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		$objWriter->save('php://output');
+		exit;
+	}
+	public function export_coretax_excel_row()
+	{
+		ob_start();
+
+		ini_set('display_errors', 0);
+		error_reporting(0);
+
+		set_time_limit(0);
+		ini_set('memory_limit','1024M');
+
+		$this->load->library("PHPExcel");
+
+		$getID = $this->input->get('getID');
+		
+		$this->db->select('a.*, b.name_customer as name_customer, b.npwp as npwp, b.npwp_name as npwp_name, b.npwp_address as npwp_address');
+		$this->db->from('tr_invoice a');
+		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+		$this->db->join('faktur_e_logs f', 'f.invoice_no=a.no_surat');
+		$this->db->where('f.id_export =', $getID);
+		$this->db->order_by('a.no_surat', 'ASC');
+
+		$get_data = $this->db->get();
+		// echo '<pre>';
+		// var_dump($get_data->result_array());
+		// exit();
+
+		$invoices_data = [];
+		$no = (0 + $start);
+		foreach ($get_data->result_array() as $item) {
+			$no++;
+
+			$this->db->select('a.*, b.id_bentuk, b.nama as nama_barang');
+			$this->db->from('tr_invoice_detail a');
+			$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3', 'left');
+			$this->db->where('a.no_invoice', $item['no_invoice']);
+			// $this->db->where('b.id_bentuk', 'B2000002');
+			$get_detail_sheet = $this->db->get()->result();
+			
+			$items = [];
+			$nilai_invoice = 0;
+			$nilai_ppn = 0;
+			$nilai_dpp = 0;
+			foreach ($get_detail_sheet as $item_sheet) {
+				$qty = 0;
+				$satuan = 'UM.0003';
+				if($item_sheet->id_bentuk == 'B2000002'){
+					$this->db->select('a.qty_sheet, a.price_sheet');
+					$this->db->from('stock_material a');
+					$this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
+					$this->db->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order');
+					$this->db->where('c.no_surat', $item['no_do']);
+					$this->db->where('b.id_material', $item_sheet->id_category3);
+					$this->db->where('a.no_kirim', $item['id_do']);
+					$this->db->group_by('a.id_stock');
+					$get_qty_sheet = $this->db->get()->result();
+
+					$qty_sheet = 0;
+					foreach ($get_qty_sheet as $item_qty_sheet) {
+						$qty_sheet += $item_qty_sheet->qty_sheet;
+						
+						if ($item_qty_sheet->price_sheet > 0) :
+							$satuan = 'UM.0020';
+						else :
+							$satuan = 'UM.0003';
+						endif;
+					}
+					$qty = $qty_sheet;
+
+					$ttl_harga = ($item_sheet->harga_satuan * $qty_sheet);
+					$dpp_lain_lain = ceil(11 / 12 * $ttl_harga);
+					$ppn = ($dpp_lain_lain * 12 / 100);
+
+					// $nilai_invoice += ($qty_sheet);
+					$nilai_invoice += ($ttl_harga + $ppn);
+					$nilai_ppn += ($ppn);
+					$nilai_dpp += $dpp_lain_lain;
+
+				} else {
+					$qty = $item_sheet->qty_invoice;
+					$ttl_harga = $item_sheet->qty_invoice * $item_sheet->harga_satuan;
+
+					$dpp_lain_lain = ceil(11 / 12 * $ttl_harga);
+					$ppn = ($dpp_lain_lain * 12 / 100);
+					$grand_total = ($ttl_harga + $ppn);
+
+					$nilai_invoice = $grand_total;
+					$nilai_ppn = $ppn;
+					$nilai_dpp = $dpp_lain_lain;
+
+				}
+
+				$items[] = [
+					'barang_jasa' => 'A',
+					'nama_barang' => $item_sheet->nama_barang,
+					'satuan' => $satuan,
+					'harga_satuan' => $item_sheet->harga_satuan,
+					'qty' => $qty,
+					'diskon' => 0,
+					'dpp' => $ttl_harga,
+					'dpp_lain' => $dpp_lain_lain,
+					'tarif_ppn' => '12',
+					'ppn' => $ppn,
+					'tarif_ppnbm' => 0,
+					'ppnbm' => 0,
+					'kode_barang' => $item_sheet->id_category3
+				];
+			}
+			// echo '<pre>';
+			// var_dump($items);
+			// exit();
+
+			$invoices_data[] = [
+				'no' => $no,
+				'no_faktur' => '',
+				'no_invoice' => $item['no_surat'],
+				'npwp' => $item['npwp'],
+				'nama_customer' => strtoupper($item['npwp_name']),
+				'address' => $item['npwp_address'],
+				'term' => $item['note'],
+				'nomor_do' => $item['no_do'],
+				'nilai_dpp' => $nilai_dpp,
+				'nilai_ppn' => $nilai_ppn,
+				'nilai_invoice' => $nilai_invoice,
+				'tanggal_invoice' => $item['tgl_invoice'],
+				'items' => $items
+			];
+		}
+
+		$objPHPExcel = new PHPExcel();
+		
+		$objPHPExcel->setActiveSheetIndex(0);
+		$sheetFaktur = $objPHPExcel->getActiveSheet();
+		$sheetFaktur->setTitle('Faktur');
+
+		$sheetFaktur->getStyle("A3:R3")->applyFromArray(
+			array(
+				'font' => array(
+					'color' => array('rgb' => '000000'),
+					'bold' => true
+				)
+			)
+		);
+
+		$sheetFaktur->mergeCells('A1:B1');
+		$sheetFaktur->setCellValue("A1", 'NPWP Penjual');
+		$sheetFaktur->getStyle('A1')->getFont()->setBold(true);
+
+		$sheetFaktur->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$sheetFaktur->getStyle('A1')->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+
+		$sheetFaktur->setCellValueExplicit('C1', '0210982047414000', PHPExcel_Cell_DataType::TYPE_STRING);
+		$sheetFaktur->setCellValueExplicit('K2', '', PHPExcel_Cell_DataType::TYPE_STRING); //0761851856433000
+
+		$sheetFaktur->getColumnDimension('C')->setAutoSize(true);
+
+		$headerFaktur = [
+			'Baris',
+			'Tanggal Faktur',
+			'Jenis Faktur',
+			'Kode Transaksi',
+			'Keterangan',
+			'Dokumen Pendukung',
+			'Period Dok Pendukung',
+			'Referensi',
+			'Cap Fasilitas',
+			'ID TKU Penjual',
+			'NPWP/NIK Pembeli',
+			'Jenis ID Pembeli',
+			'Negara Pembeli',
+			'Nomor Dokumen Pembeli',
+			'Nama Pembeli',
+			'Alamat Pembeli',
+			'Email Pembeli',
+			'ID TKU Pembeli'
+		];
+
+		// Judul Header
+		$sheetFaktur->fromArray($headerFaktur, NULL, 'A3'); 
+
+		$rowFaktur 		= 4;
+		$itemRowIndex 	= 1; // Index untuk menghubungkan Faktur dan Detail
+
+		//MULAI Setup Sheet Detail Faktur (Sheet 1) ya gais ya
+		$objPHPExcel->createSheet();
+		$sheetDetail = $objPHPExcel->getSheet(1);
+		$sheetDetail->setTitle('DetailFaktur');
+
+		$headerDetail = [
+			'Baris',
+			'Barang/Jasa',
+			'Kode Barang Jasa',
+			'Nama Barang/Jasa',
+			'Nama Satuan Ukur',
+			'Harga Satuan',
+			'Jumlah Barang Jasa',
+			'Total Diskon',
+			'DPP',
+			'DPP Nilai Lain',
+			'Tarif PPN',
+			'PPN',
+			'Tarif PPnBM',
+			'PPnBM'
+		];
+
+		// Judul Header si Detail
+		$sheetDetail->fromArray($headerDetail, NULL, 'A1');
+		$rowDetail = 2; 
+
+		foreach ($invoices_data as $invoice) {
+			
+			$tanggal_faktur_formatted = date('j/n/Y', strtotime($invoice['tanggal_invoice']));
+			$NPWP = preg_replace("/[^0-9]/", "", $invoice['npwp']);
+			if(strlen($NPWP) < 16){
+				$NPWP = str_pad($NPWP, 16, '0', STR_PAD_LEFT);
+			}
+
+			$dataFaktur = [
+				$itemRowIndex,
+				$tanggal_faktur_formatted,
+				"Normal",
+				"",
+				"",
+				"",
+				"",
+				$invoice['no_invoice'],
+				"",
+				"",
+				"",
+				"TIN",
+				"IDN",
+				$invoice['no_invoice'],
+				$invoice['nama_customer'],
+				$invoice['address'],
+				"",
+				""
+			];
+
+			$endFaktur = [
+				"END"
+			];
+
+			$sheetFaktur->fromArray($dataFaktur, NULL, 'A' . $rowFaktur);
+
+			$sheetFaktur->setCellValueExplicit('D' . $rowFaktur, "04", PHPExcel_Cell_DataType::TYPE_STRING); 
+			$sheetFaktur->setCellValueExplicit('J' . $rowFaktur, "0210982047414000000000", PHPExcel_Cell_DataType::TYPE_STRING); 
+			$sheetFaktur->setCellValueExplicit('K' . $rowFaktur, $NPWP, PHPExcel_Cell_DataType::TYPE_STRING); 
+			$sheetFaktur->setCellValueExplicit('R' . $rowFaktur, $NPWP."000000", PHPExcel_Cell_DataType::TYPE_STRING);
+			
+			$sheetFaktur->getStyle('J' . $rowFaktur)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
+			$sheetFaktur->getStyle('K' . $rowFaktur)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
+			$sheetFaktur->getStyle('R' . $rowFaktur)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
+
+			$rowFaktur++;
+
+			// Data untuk Sheet Detail Faktur
+			foreach ($invoice['items'] as $item) {
+
+				$dataDetail = [
+					$itemRowIndex, // Kunci penghubung
+					$item['barang_jasa'],
+					'',
+					$item['nama_barang'],
+					$item['satuan'],
+					$item['harga_satuan'],
+					$item['qty'],
+					$item['diskon'],
+					$item['dpp'],
+					$item['dpp_lain'],
+					$item['tarif_ppn'],
+					$item['ppn'],
+					$item['tarif_ppnbm'],
+					$item['ppnbm']
+				];
+
+				$sheetDetail->fromArray($dataDetail, NULL, 'A' . $rowDetail);
+
+				$sheetDetail->setCellValueExplicit('C' . $rowDetail, $item['kode_barang'], PHPExcel_Cell_DataType::TYPE_STRING);
+				$sheetDetail->getStyle('C' . $rowDetail)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
+
+				$rowDetail++;
+			}
+
+			$itemRowIndex++;
+		}
+
+		$lastRowHeader = $rowFaktur - 1;
+		$lastRowDetail = $rowDetail - 1;
+		$EndRowFaktur  = $rowFaktur;
+
+		$sheetFaktur->setCellValue('A' . $EndRowFaktur, 'END');
+		$sheetFaktur->getStyle('A' . $EndRowFaktur)->applyFromArray(
+			array(
+				'font' => array(
+					'color' => array('rgb' => '000000'),
+					'bold' => true
+				)
+			)
+		);
+
+		$sheetFaktur->getStyle('B4:B' . $lastRowHeader)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_DATE_XLSX14);
+		// $sheetFaktur->getStyle('J4:J' . $lastRowHeader)->getNumberFormat()->setFormatCode('0000000000000000000000');
+		// $sheetFaktur->getStyle('K4:K' . $lastRowHeader)->getNumberFormat()->setFormatCode('0000000000000000');
+		// $sheetFaktur->getStyle('R4:R' . $lastRowHeader)->getNumberFormat()->setFormatCode('0000000000000000000000');
+
+		//Setingan Nilai Comma
+		$sheetDetail->getStyle('H2:H' . $lastRowDetail)
+			->getNumberFormat()
+			->setFormatCode('0.00');
+		$sheetDetail->getStyle('I2:J' . $lastRowDetail)
+			->getNumberFormat()
+			->setFormatCode('0.00');
+		$sheetDetail->getStyle('L2:L' . $lastRowDetail)
+			->getNumberFormat()
+			->setFormatCode('0.00');
+		$sheetDetail->getStyle('N2:N' . $lastRowDetail)
+			->getNumberFormat()
+			->setFormatCode('0.00');
+
+		$filename = 'Impor_Faktur_Keluaran_Coretax_' . date('Ymd_His') . '.xlsx';
+
+		while (ob_get_level()) {
+			ob_end_clean();
+		}
+
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename="' . $filename . '"');
+		header('Cache-Control: max-age=0');
+
+		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		$objWriter->save('php://output');
+		exit;
 	}
 }
