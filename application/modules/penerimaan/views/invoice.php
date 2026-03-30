@@ -1,27 +1,27 @@
  <div class="box box-primary">
- 	<div class="box-body">
- 		<form id="data-form" method="post">
- 			<div class="form-group row">
- 				<table class="table table-bordered" width="100%" id="list_item_stok">
- 					<thead>
- 						<tr>
- 							<th width="30%">Code</th>
- 							<th width="30%">No Invoice</th>
- 							<th width="30%">Nama Customer</th>
- 							<th width="30%">Total Invoice</th>
- 							<th width="30%">Sisa Invoice</th>
- 							<th width="2%" class="text-center">Aksi</th>
- 						</tr>
- 					</thead>
- 					<tbody>
- 						<?php
-
-							$cust = $results['detail'];
-
-							$invoice = $this->db->query("SELECT a.*, b.name_customer as nm_customer FROM tr_invoice a
+    <div class="box-body">
+		<form id="data-form" method="post">
+		<div class="form-group row" >
+			 <table class="table table-bordered" width="100%" id="list_item_stok">
+              <thead>
+                  <tr>
+				      <th width="30%">Code</th>
+                      <th width="30%">No Invoice</th>
+                      <th width="30%">Nama Customer</th>
+                      <th width="30%">Total Invoice</th>
+					   <th width="30%">Sisa Invoice</th>
+                      <th width="2%" class="text-center">Aksi</th>  
+                  </tr>
+              </thead>
+              <tbody>
+                  <?php	
+				 
+				  $cust = $results['detail'];
+				  
+                  $invoice = $this->db->query("SELECT a.*, b.name_customer as nm_customer FROM tr_invoice a
 				                      INNER JOIN master_customers b ON a.id_customer=b.id_customer WHERE a.id_customer ='$cust' AND (a.sisa_invoice_idr >'0')")->result();
-							if ($invoice) {
-								foreach ($invoice as $ks => $vs) {
+				  if($invoice){
+					foreach($invoice as $ks=>$vs){
 
 									$this->db->select('a.*');
 									$this->db->from('tr_invoice_detail a');
@@ -36,32 +36,22 @@
 										$nilai_invoice = 0;
 
 										foreach ($get_detail_sheet as $item_sheet) {
-											$this->db->select('a.qty_sheet as ttl_qty_sheet');
+											$this->db->select('SUM(a.qty_sheet) as ttl_qty_sheet');
 											$this->db->from('stock_material a');
 											$this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
 											$this->db->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order');
 											$this->db->where('c.no_surat', $vs->no_do);
 											$this->db->where('b.id_material', $item_sheet->id_category3);
 											$this->db->where('a.no_kirim', $vs->id_do);
-											$this->db->group_by('a.id_stock');
-											$get_qty_sheet = $this->db->get()->result();
+											// $this->db->group_by('a.id_stock');
+											$get_qty_sheet = $this->db->get()->row();
 
-											$qty_sheet = 0;
-											foreach($get_qty_sheet as $detail_sheet) {
- 												$qty_sheet += $detail_sheet->ttl_qty_sheet;
-											}
-
-											// $qty_sheet = (!empty($get_qty_sheet->ttl_qty_sheet)) ? $get_qty_sheet->ttl_qty_sheet : 0;
+											$qty_sheet = (!empty($get_qty_sheet->ttl_qty_sheet)) ? $get_qty_sheet->ttl_qty_sheet : 0;
 											// foreach ($get_qty_sheet as $item_qty_sheet) {
 											// 	$qty_sheet += $item_qty_sheet->qty_sheet;
 											// }
 
-											$total_awal = ($item_sheet->harga_satuan * $qty_sheet);
-											$dpp_lain_lain = ceil(11 / 12 * $total_awal);
-											$ppn = ($dpp_lain_lain * 12 / 100);
-
-											// $nilai_invoice += ($qty_sheet);
-											$nilai_invoice += ($total_awal + $ppn);
+											$nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet) + (($item_sheet->harga_satuan * $qty_sheet) * 11 / 100);
 										}
 										$sisa_invoice_idr = ($nilai_invoice - $vs->total_bayar);
 									} else {
@@ -130,4 +120,12 @@
 
 
 
+<<<<<<< HEAD
+<<<<<<< HEAD
  </script>
+=======
+ </script>
+>>>>>>> 9447b155 (Perbaikan - Penerimaan & Invoicing)
+=======
+ </script>
+>>>>>>> 7f0a388b (Update 16 Mar 2026)
