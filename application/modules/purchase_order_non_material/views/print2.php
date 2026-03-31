@@ -155,7 +155,17 @@
         <tr>
             <td>PT. METALSINDO PACIFIC</td>
             <td><?= date('d-M-y', strtotime($h->delivery_date)) ?></td>
-            <td><?= $h->term ?></td>
+            <?php 
+                $this->db->select('a.keterangan');
+                $this->db->from('tr_top_po a');
+                $this->db->where('a.no_po', $h->no_po);
+                $this->db->order_by('a.created_on', 'asc');
+                $this->db->limit(1);
+                $get_first_top = $this->db->get()->row();
+
+                $payment_terms = (!empty($get_first_top->keterangan)) ? $get_first_top->keterangan : '';
+            ?>
+            <td><?= $payment_terms ?></td>
             <td><?= (!empty($date_required)) ? date('d-M-y', strtotime($date_required)) : '-'; ?></td>
         </tr>
     </table>
