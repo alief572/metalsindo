@@ -1989,8 +1989,6 @@ class Purchase_order_non_material extends Admin_Controller
 				$get_department = $this->db->get()->row();
 			}
 
-
-
 			$data['nm_department'] = $get_department->nm_department;
 
 			if ($data['header'][0]->tipe == 'pr depart') {
