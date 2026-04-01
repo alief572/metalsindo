@@ -247,23 +247,46 @@ class Control_do extends Admin_Controller
     {
         if ($qty <= 0) return;
 
-        $data = $base_stock;
-        unset($data['id_stock']); // Hapus ID lama agar auto-increment
+        // $data = $base_stock;
+        // unset($data['id_stock']); // Hapus ID lama agar auto-increment
 
         $qty_sheet = 0;
-        $get_material = $this->db->get_where('ms_inventory_category3', ['id_category3' => $data['id_category3']])->row();
+        $get_material = $this->db->get_where('ms_inventory_category3', ['id_category3' => $base_stock['id_category3']])->row();
 
         if (!empty($get_material->id_bentuk) && $get_material->id_bentuk == 'B2000002') {
             $qty_sheet = round($qty / $get_material->total_weight);
         }
 
+        $data['id_category3'] = $base_stock['id_category3'];
+        $data['nama_material'] = $base_stock['nama_material'];
+        $data['width'] = $base_stock['width'];
+        $data['length'] = $base_stock['length'];
+        $data['id_bentuk'] = $base_stock['id_bentuk'];
+        $data['lotno'] = $base_stock['lotno'];
+        $data['weight'] = $qty;
+        $data['no_po'] = $base_stock['no_po'];
+        $data['id_incoming'] = $base_stock['id_incoming'];
+        $data['lot_slitting'] = $base_stock['lot_slitting'];
+        $data['sisa_potongan'] = $base_stock['sisa_potongan'];
+        $data['detail_potongan'] = $base_stock['detail_potongan'];
+        $data['keterangan'] = $base_stock['keterangan'];
+        $data['id_roll'] = $base_stock['id_roll'];
+        $data['panjang'] = $base_stock['panjang'];
+        $data['actual_berat'] = $base_stock['actual_berat'];
+        $data['no_surat'] = $base_stock['no_surat'];
+        $data['customer'] = $base_stock['customer'];
+        $data['costbook'] = $base_stock['costbook'];
+        $data['id_dt_spkmarketing'] = $base_stock['id_dt_spkmarketing'];
+        $data['harga_deal'] = $base_stock['harga_deal'];
+        $data['tipe_material'] = $base_stock['tipe_material'];
+        $data['thickness'] = $base_stock['thickness'];
         $data['qty']        = 1;
         $data['sisa_spk']   = $qty;
-        $data['totalweight'] = $qty;
+        $data['totalweight']= $qty;
         $data['id_gudang']  = $gudang_id;
         $data['status_do']  = 'OPN';
         $data['aktif']      = 'Y';
-        $data['qty_sheet'] = $qty_sheet;
+        $data['qty_sheet']  = $qty_sheet;
         $data['created_by'] = $this->auth->user_id();
         $data['created_on'] = date('Y-m-d H:i:s');
 
