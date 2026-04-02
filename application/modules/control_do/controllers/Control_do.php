@@ -282,7 +282,7 @@ class Control_do extends Admin_Controller
         $data['thickness'] = $base_stock['thickness'];
         $data['qty']        = 1;
         $data['sisa_spk']   = $qty;
-        $data['totalweight']= $qty;
+        $data['totalweight'] = $qty;
         $data['id_gudang']  = $gudang_id;
         $data['status_do']  = 'OPN';
         $data['aktif']      = 'Y';
@@ -656,6 +656,8 @@ class Control_do extends Admin_Controller
             $btn_confirm = '';
             if (has_permission($this->managePermission) && $get_do_detail > 0) {
                 $btn_confirm = '<button type="button" class="btn btn-sm btn-success confirm_do" data-id="' . $item->id_delivery_order . '" title="Confirm DO" ><i class="fa fa-check"></i></button>';
+            } else {
+                $btn_confirm = '<button type="button" class="btn btn-sm btn-info view_control_do" data-id="' . $item->id_delivery_order . '"><i class="fa fa-eye"></i></button>';
             }
 
             $hasil[] = [
@@ -817,9 +819,11 @@ class Control_do extends Admin_Controller
             $total_fg = (!empty($get_total->total_fg)) ? $get_total->total_fg : 0;
             $total_ng = (!empty($get_total->total_ng)) ? $get_total->total_ng : 0;
 
-            $btn_confirm = '';
+
             if (has_permission($this->managePermission) && $get_do_detail > 0) {
                 $btn_confirm = '<button type="button" class="btn btn-sm btn-success confirm_do_scrap" data-id="' . $item->id_delivery_order . '" title="Confirm DO" ><i class="fa fa-check"></i></button>';
+            } else {
+                $btn_confirm = '<button type="button" class="btn btn-sm btn-info view_control_do_scrap" data-id="' . $item->id_delivery_order . '"><i class="fa fa-eye"></i></button>';
             }
 
             $hasil[] = [
@@ -844,5 +848,33 @@ class Control_do extends Admin_Controller
         ];
 
         echo json_encode($response);
+    }
+
+    public function view_control_do()
+    {
+        $id = $this->input->get('id', true);
+
+        $get_do_detail = $this->control_do_model->do_detail($id);
+
+        $data = [
+            'do_detail' => $get_do_detail
+        ];
+
+        $this->template->set($data);
+        $this->template->render('view_confirm_do');
+    }
+
+    public function view_control_do_scrap()
+    {
+        $id = $this->input->get('id', true);
+
+        $get_do_detail = $this->control_do_model->do_detail_scrap($id);
+
+        $data = [
+            'do_detail' => $get_do_detail
+        ];
+
+        $this->template->set($data);
+        $this->template->render('view_confirm_do_scrap');
     }
 }

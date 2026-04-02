@@ -321,6 +321,7 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 			cache: false,
 			success: function(result) {
 				$('#head_title').html('<i class="fa fa-check"></i> Confirm DO');
+				$('.btn_confirm').show();
 				$('#ModalView').html(result);
 
 				$('#dialog-popup').modal('show');
@@ -351,6 +352,7 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 			cache: false,
 			success: function(result) {
 				$('#head_title_scrap').html('<i class="fa fa-check"></i> Confirm DO Scrap');
+				$('.btn_confirm_scrap').show();
 				$('#ModalViewScrap').html(result);
 
 				$('#dialog-popup-scrap').modal('show');
@@ -651,6 +653,58 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 				});
 			} else {
 				$('.btn_confirm_scrap').attr('disabled', false);
+			}
+		});
+	})
+
+	$(document).on('click', '.view_control_do', function() {
+		var id = $(this).data('id');
+
+		$.ajax({
+			type: 'get',
+			url: siteurl + active_controller + 'view_control_do',
+			data: {
+				'id': id
+			},
+			cache: false,
+			success: function(result) {
+				$('#ModalView').html(result);
+				$('#head_title').html('<i class="fa fa-list"></i> View Control DO');
+				$('.btn_confirm').hide();
+				$('#dialog-popup').modal('show');
+			},
+			error: function(xhr, status, error) {
+				Swal.fire({
+					icon: 'error',
+					title: 'Error !',
+					text: 'Oops! There is an error occured !'
+				});
+			}
+		});
+	})
+
+	$(document).on('click', '.view_control_do_scrap', function() {
+		var id = $(this).data('id');
+
+		$.ajax({
+			type: 'get',
+			url: siteurl + active_controller + 'view_control_do_scrap',
+			data: {
+				'id': id
+			},
+			cache: false,
+			success: function(result) {
+				$('#ModalViewScrap').html(result);
+				$('#head_title_scrap').html('<i class="fa fa-list"></i> View Control DO Scrap');
+				$('.btn_confirm_scrap').hide();
+				$('#dialog-popup-scrap').modal('show');
+			},
+			error: function(xhr, status, error) {
+				Swal.fire({
+					icon: 'error',
+					title: 'Error !',
+					text: 'Oops! There is an error occured !'
+				});
 			}
 		});
 	})
