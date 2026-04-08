@@ -20,6 +20,7 @@ class Control_do_model extends BF_Model
         return $get_data;
     }
 
+
     public function do_detail_scrap($id_delivery_order)
     {
         $this->db->select('a.*');
@@ -28,6 +29,27 @@ class Control_do_model extends BF_Model
         $get_data = $this->db->get()->result();
 
         return $get_data;
+    }
+
+    public function stock_sheet($id_stock)
+    {
+        $this->db->select('COALESCE(a.qty_sheet, 0) as qty_sheet');
+        $this->db->from('stock_material a');
+        $this->db->where('a.id_stock', $id_stock);
+        $get_data = $this->db->get()->row();
+
+        return (!empty($get_data->qty_sheet)) ? $get_data->qty_sheet : 0;
+    }
+
+    public function check_sheet_mat($id_delivery_order)
+    {
+        $this->db->select('COUNT(a.id) as jml_mat_sheet');
+        $this->db->from('dt_delivery_order_child a');
+        $this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_material');
+        $this->db->where('a.id_delivery_order', $id_delivery_order);
+        $get_data = $this->db->get()->row();
+
+        return (!empty($get_data->jml_mat_sheet)) ? $get_data->jml_mat_sheet : 0;
     }
 
     public function get_list_customer()
@@ -65,8 +87,16 @@ class Control_do_model extends BF_Model
 
     public function get_total_do($id_delivery_order)
     {
-        $this->db->select('SUM(a.weight_mat) as total_do, SUM(a.qty_in) as total_delivered, SUM(a.qty_fg) as total_fg, SUM(a.qty_ng) as total_ng');
+        $this->db->select('COALESCE(SUM(a.weight_mat), 0) as total_do,
+        COALESCE(SUM(a.qty_in), 0) as total_delivered,
+        COALESCE(SUM(a.qty_in_sheet), 0) as total_delivered_sheet,
+        COALESCE(SUM(a.qty_fg), 0) as total_fg, 
+        COALESCE(SUM(a.qty_fg_sheet), 0) as total_fg_sheet, 
+        COALESCE(SUM(a.qty_ng), 0) as total_ng, 
+        COALESCE(SUM(a.qty_ng_sheet), 0) as total_ng_sheet, 
+        COALESCE(SUM(b.qty_sheet), 0) as total_sheet');
         $this->db->from('dt_delivery_order_child a');
+        $this->db->join('stock_material b', 'b.id_stock = a.id_stock');
         $this->db->where('a.id_delivery_order', $id_delivery_order);
         $get_total = $this->db->get()->row();
 
@@ -75,8 +105,16 @@ class Control_do_model extends BF_Model
 
     public function get_total_do_scrap($id_delivery_order)
     {
-        $this->db->select('SUM(a.weight_mat) as total_do, SUM(a.qty_in) as total_delivered, SUM(a.qty_fg) as total_fg, SUM(a.qty_ng) as total_ng');
+        $this->db->select('COALESCE(SUM(a.weight_mat), 0) as total_do,
+        COALESCE(SUM(a.qty_in), 0) as total_delivered,
+        COALESCE(SUM(a.qty_in_sheet), 0) as total_delivered_sheet,
+        COALESCE(SUM(a.qty_fg), 0) as total_fg, 
+        COALESCE(SUM(a.qty_fg_sheet), 0) as total_fg_sheet, 
+        COALESCE(SUM(a.qty_ng), 0) as total_ng, 
+        COALESCE(SUM(a.qty_ng_sheet), 0) as total_ng_sheet, 
+        COALESCE(SUM(b.qty_sheet), 0) as total_sheet');
         $this->db->from('dt_delivery_order_child_scrap a');
+        $this->db->join('stock_material b', 'b.id_stock = a.id_stock');
         $this->db->where('a.id_delivery_order', $id_delivery_order);
         $get_total = $this->db->get()->row();
 

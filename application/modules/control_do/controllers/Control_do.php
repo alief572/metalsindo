@@ -102,6 +102,7 @@ class Control_do extends Admin_Controller
         $id = $this->input->post('id');
 
         $get_do_header = $this->db->get_where('tr_delivery_order', ['id_delivery_order' => $id])->row();
+        $check_sheet_mat = $this->control_do_model->check_sheet_mat($id);
 
         $this->db->select('a.*');
         $this->db->from('dt_delivery_order_child a');
@@ -110,7 +111,8 @@ class Control_do extends Admin_Controller
 
         $data = [
             'do_header' => $get_do_header,
-            'do_detail' => $get_do_detail
+            'do_detail' => $get_do_detail,
+            'type_sheet' => $check_sheet_mat
         ];
 
         $this->load->view('confirm_do', $data);
@@ -127,9 +129,25 @@ class Control_do extends Admin_Controller
         $this->db->where('a.id_delivery_order', $id);
         $get_do_detail = $this->db->get()->result();
 
+        $this->db->select('COUNT(a.id) as jum_sheet');
+        $this->db->from('dt_delivery_order_child_scrap a');
+        $this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_material');
+        $this->db->where('a.id_delivery_order', $id);
+        $this->db->where('b.id_bentuk', 'B2000002');
+        $get_jum_sheet = $this->db->get()->row();
+
+        $type_sheet = (!empty($get_jum_sheet->jum_sheet)) ? $get_jum_sheet->jum_sheet : 0;
+
+        $arr_qty_sheet = [];
+        foreach ($get_do_detail as $item_do_detail) {
+            $arr_qty_sheet[$item_do_detail->id] = $this->control_do_model->stock_sheet($item_do_detail->id_stock);
+        }
+
         $data = [
             'do_header' => $get_do_header,
-            'do_detail' => $get_do_detail
+            'do_detail' => $get_do_detail,
+            'jum_sheet' => $type_sheet,
+            'qty_sheet' => $arr_qty_sheet
         ];
 
         $this->load->view('confirm_do_scrap', $data);
@@ -157,8 +175,25 @@ class Control_do extends Admin_Controller
 
                 $d = $post['detail'][$no];
                 $qty_in = (float) str_replace(',', '', $d['qty_in']);
+                $qty_in_sheet = 0;
+                if (isset($d['qty_in_sheet'])) {
+                    $qty_in_sheet = (float) str_replace(',', '', $d['qty_in_sheet']);
+                }
                 $qty_fg = (float) str_replace(',', '', $d['qty_fg']);
+                $qty_fg_sheet = 0;
+                if (isset($d['qty_fg    _sheet'])) {
+                    $qty_fg_sheet = (float) str_replace(',', '', $d['qty_fg_sheet']);
+                }
                 $qty_ng = (float) str_replace(',', '', $d['qty_ng']);
+                $qty_ng_sheet = 0;
+                if (isset($d['qty_ng_sheet'])) {
+                    $qty_ng_sheet = (float) str_replace(',', '', $d['qty_ng_sheet']);
+                }
+
+                $qty_do_sheet = 0;
+                if (isset($d['qty_do_sheet'])) {
+                    $qty_do_sheet = (float) str_replace(',', '', $d['qty_do_sheet']);
+                }
 
                 // Ambil data stock sekali saja (sebagai array agar konsisten)
                 $get_stock = $this->db->get_where('stock_material', ['id_stock' => $item_do_detail->id_stock])->row_array();
@@ -174,7 +209,7 @@ class Control_do extends Admin_Controller
                     $get_material = $this->db->get()->row();
                     $total_weight = $get_material->total_weight;
 
-                    $qty_sheet = round($qty_in / $total_weight);
+                    $qty_sheet = $qty_in_sheet;
 
                     $this->db->update('stock_material', ['qty_sheet' => $qty_sheet], ['id_stock' => $item_do_detail->id_stock]);
                 }
@@ -186,6 +221,10 @@ class Control_do extends Admin_Controller
                     'qty_in'       => $qty_in,
                     'qty_fg'       => $qty_fg,
                     'qty_ng'       => $qty_ng,
+                    'qty_do_sheet' => $qty_do_sheet,
+                    'qty_in_sheet' => $qty_in_sheet,
+                    'qty_fg_sheet' => $qty_fg_sheet,
+                    'qty_ng_sheet' => $qty_ng_sheet,
                     'created_by'   => $this->auth->user_id(),
                     'created_at'   => date('Y-m-d H:i:s')
                 ];
@@ -195,13 +234,16 @@ class Control_do extends Admin_Controller
                 $arr_do_in_ng = [
                     'qty_in' => ($item_do_detail->qty_in + $qty_in),
                     'qty_fg' => ($item_do_detail->qty_fg + $qty_fg),
-                    'qty_ng' => ($item_do_detail->qty_ng + $qty_ng)
+                    'qty_ng' => ($item_do_detail->qty_ng + $qty_ng),
+                    'qty_in_sheet' => ($item_do_detail->qty_in_sheet + $qty_in_sheet),
+                    'qty_fg_sheet' => ($item_do_detail->qty_fg_sheet + $qty_fg_sheet),
+                    'qty_ng_sheet' => ($item_do_detail->qty_ng_sheet + $qty_ng_sheet)
                 ];
                 $this->db->update('dt_delivery_order_child', $arr_do_in_ng, ['id' => $item_do_detail->id]);
 
                 // 3. Helper function untuk insert stock baru (FG & NG)
-                $this->_insert_new_stock($get_stock, $qty_fg, '3'); // Gudang FG
-                $this->_insert_new_stock($get_stock, $qty_ng, '6'); // Gudang NG
+                $this->_insert_new_stock($get_stock, $qty_fg, $qty_fg_sheet, '3'); // Gudang FG
+                $this->_insert_new_stock($get_stock, $qty_ng, $qty_ng_sheet, '6'); // Gudang NG
 
                 // 4. Update Stock Lama (Mark as CLS/Deleted)
                 $arr_stock_update = [
@@ -243,19 +285,12 @@ class Control_do extends Admin_Controller
     /**
      * Helper private function untuk mengurangi duplikasi code insert stock
      */
-    private function _insert_new_stock($base_stock, $qty, $gudang_id)
+    private function _insert_new_stock($base_stock, $qty, $qty_sheet = 0, $gudang_id)
     {
         if ($qty <= 0) return;
 
         // $data = $base_stock;
         // unset($data['id_stock']); // Hapus ID lama agar auto-increment
-
-        $qty_sheet = 0;
-        $get_material = $this->db->get_where('ms_inventory_category3', ['id_category3' => $base_stock['id_category3']])->row();
-
-        if (!empty($get_material->id_bentuk) && $get_material->id_bentuk == 'B2000002') {
-            $qty_sheet = round($qty / $get_material->total_weight);
-        }
 
         $data['id_category3'] = $base_stock['id_category3'];
         $data['nama_material'] = $base_stock['nama_material'];
@@ -313,8 +348,20 @@ class Control_do extends Admin_Controller
 
                 $d = $post['detail'][$no];
                 $qty_in = (float) str_replace(',', '', $d['qty_in']);
+                $qty_in_sheet = 0;
+                if (isset($d['qty_in_sheet'])) {
+                    $qty_in_sheet = (float) str_replace(',', '', $d['qty_in_sheet']);
+                }
                 $qty_fg = (float) str_replace(',', '', $d['qty_fg']);
+                $qty_fg_sheet = 0;
+                if (isset($d['qty_fg_sheet'])) {
+                    $qty_fg_sheet = (float) str_replace(',', '', $d['qty_fg_sheet']);
+                }
                 $qty_ng = (float) str_replace(',', '', $d['qty_ng']);
+                $qty_ng_sheet = 0;
+                if (isset($d['qty_ng_sheet'])) {
+                    $qty_ng_sheet = (float) str_replace(',', '', $d['qty_ng_sheet']);
+                }
 
                 // Ambil data stock (sebagai array untuk konsistensi)
                 $get_stock = $this->db->get_where('stock_material', ['id_stock' => $item_do_detail->id_stock])->row_array();
@@ -330,7 +377,7 @@ class Control_do extends Admin_Controller
                     $get_material = $this->db->get()->row();
                     $total_weight = $get_material->total_weight;
 
-                    $qty_sheet = round($qty_in / $total_weight);
+                    $qty_sheet = $qty_in_sheet;
 
                     $this->db->update('stock_material', ['qty_sheet' => $qty_sheet], ['id_stock' => $item_do_detail->id_stock]);
                 }
@@ -340,8 +387,11 @@ class Control_do extends Admin_Controller
                     'id_detail_do' => $item_do_detail->id,
                     'qty_do'       => $item_do_detail->weight_mat,
                     'qty_in'       => $qty_in,
+                    'qty_in_sheet' => $qty_in_sheet,
                     'qty_fg'       => $qty_fg,
+                    'qty_fg_sheet' => $qty_fg_sheet,
                     'qty_ng'       => $qty_ng,
+                    'qty_ng_sheet' => $qty_ng_sheet,
                     'created_by'   => $this->auth->user_id(),
                     'created_at'   => date('Y-m-d H:i:s')
                 ];
@@ -350,14 +400,17 @@ class Control_do extends Admin_Controller
                 // 2. Update dt_delivery_order_child_scrap
                 $arr_do_in_ng = [
                     'qty_in' => ($item_do_detail->qty_in + $qty_in),
+                    'qty_in_sheet' => ($item_do_detail->qty_in_sheet + $qty_in_sheet),
                     'qty_fg' => ($item_do_detail->qty_fg + $qty_fg),
-                    'qty_ng' => ($item_do_detail->qty_ng + $qty_ng)
+                    'qty_fg_sheet' => ($item_do_detail->qty_fg_sheet + $qty_fg_sheet),
+                    'qty_ng' => ($item_do_detail->qty_ng + $qty_ng),
+                    'qty_ng_sheet' => ($item_do_detail->qty_ng_sheet + $qty_ng_sheet)
                 ];
                 $this->db->update('dt_delivery_order_child_scrap', $arr_do_in_ng, ['id' => $item_do_detail->id]);
 
                 // 3. Insert stock baru (Reuse helper function di bawah)
-                $this->_process_stock_scrap($get_stock, $qty_fg, '3'); // Gudang FG
-                $this->_process_stock_scrap($get_stock, $qty_ng, '6'); // Gudang NG
+                $this->_process_stock_scrap($get_stock, $qty_fg, $qty_fg_sheet, '3'); // Gudang FG
+                $this->_process_stock_scrap($get_stock, $qty_ng, $qty_ng_sheet, '6'); // Gudang NG
 
                 // 4. Update Stock Lama (Mark as CLS)
                 $arr_stock_old = [
@@ -396,7 +449,7 @@ class Control_do extends Admin_Controller
     /**
      * Helper untuk insert stock baru agar DRY (Don't Repeat Yourself)
      */
-    private function _process_stock_scrap($base_stock, $qty, $gudang_id)
+    private function _process_stock_scrap($base_stock, $qty, $qty_sheet, $gudang_id)
     {
         if ($qty <= 0) return;
 
@@ -408,6 +461,7 @@ class Control_do extends Admin_Controller
         $new_stock['id_gudang']  = $gudang_id;
         $new_stock['status_do']  = 'OPN';
         $new_stock['aktif']      = 'Y';
+        $new_stock['qty_sheet']  = $qty_sheet;
         $new_stock['created_by'] = $this->auth->user_id();
         $new_stock['created_on'] = date('Y-m-d H:i:s');
 
@@ -510,178 +564,118 @@ class Control_do extends Admin_Controller
         $this->load->view('download_excel_scrap', $data);
     }
 
+    private function _filter_control_do()
+    {
+        $tahun    = $this->input->post('tahun', true);
+        $bulan    = $this->input->post('bulan', true);
+        $no_do    = $this->input->post('no_do', true);
+        $no_spk   = $this->input->post('no_spk', true);
+        $customer = $this->input->post('customer', true);
+        $search   = $this->input->post('search', true);
+        $searchValue = isset($search['value']) ? $search['value'] : null;
+
+        $this->db->from('tr_delivery_order a');
+        $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
+        $this->db->where('a.deleted', null);
+        $this->db->where('a.close_do', null);
+
+        if (!empty($tahun))    $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
+        if (!empty($bulan))    $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
+        if (!empty($no_do))    $this->db->where('a.no_surat', $no_do);
+        if (!empty($no_spk))   $this->db->where('a.no_spk_marketing', $no_spk);
+        if (!empty($customer)) $this->db->where('b.id_customer', $customer);
+
+        if (!empty($searchValue)) {
+            $this->db->group_start();
+            $this->db->like('a.tgl_delivery_order', $searchValue);
+            $this->db->or_like('a.no_surat', $searchValue);
+            $this->db->or_like('a.no_spk_marketing', $searchValue);
+            $this->db->or_like('b.name_customer', $searchValue);
+            $this->db->group_end();
+        }
+    }
+
     public function get_data_control_do()
     {
-        $post = $this->input->post();
-
-        $draw = intval($this->input->post('draw', true));
+        $draw   = intval($this->input->post('draw', true));
         $length = $this->input->post('length', true);
-        $start = $this->input->post('start', true);
-        $search = $this->input->post('search', true)['value'];
+        $start  = $this->input->post('start', true);
 
-        $tahun = $this->input->post('tahun', true);
-        $bulan = $this->input->post('bulan', true);
-        $no_do = $this->input->post('no_do', true);
-        $no_spk = $this->input->post('no_spk', true);
-        $customer = $this->input->post('customer', true);
-
-        $this->db->select('a.id_delivery_order');
-        $this->db->from('tr_delivery_order a');
-        $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
-        // $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
-        $this->db->where('a.deleted', null);
-        $this->db->where('a.close_do', null);
-        // $this->db->where('d.no_invoice', null);
-
-        if (!empty($tahun)) {
-            $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
-        }
-        if (!empty($bulan)) {
-            $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
-        }
-        if (!empty($no_do)) {
-            $this->db->where('a.no_surat', $no_do);
-        }
-        if (!empty($no_spk)) {
-            $this->db->where('a.no_spk_marketing', $no_spk);
-        }
-        if (!empty($customer)) {
-            $this->db->where('b.id_customer', $customer);
-        }
-
+        // 1. Hitung Total Filtered
+        $this->_filter_control_do();
         $this->db->group_by('a.id_delivery_order');
-        $count_all = $this->db->get()->num_rows();
-
-        $this->db->select('a.id_delivery_order');
-        $this->db->from('tr_delivery_order a');
-        $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
-        // $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
-        $this->db->where('a.deleted', null);
-        $this->db->where('a.close_do', null);
-        // $this->db->where('d.no_invoice', null);
-
-        if (!empty($tahun)) {
-            $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
-        }
-        if (!empty($bulan)) {
-            $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
-        }
-        if (!empty($no_do)) {
-            $this->db->where('a.no_surat', $no_do);
-        }
-        if (!empty($no_spk)) {
-            $this->db->where('a.no_spk_marketing', $no_spk);
-        }
-        if (!empty($customer)) {
-            $this->db->where('b.id_customer', $customer);
-        }
-
-        if (!empty($search)) {
-            $this->db->group_start();
-            $this->db->like('a.tgl_delivery_order', $search, 'both');
-            $this->db->or_like('a.no_surat', $search, 'both');
-            $this->db->or_like('a.no_spk_marketing', $search, 'both');
-            $this->db->or_like('b.name_customer', $search, 'both');
-            $this->db->group_end();
-        }
-        $this->db->group_by('a.id_delivery_order');
-
         $count_filter = $this->db->get()->num_rows();
 
+        // 2. Hitung Total All (Tanpa Filter Search)
+        // Opsional: Jika recordsTotal ingin benar-benar data tanpa filter search
+        $this->db->where('deleted', null)->where('close_do', null);
+        $count_all = $this->db->count_all_results('tr_delivery_order');
+
+        // 3. Ambil Data Real
+        $this->_filter_control_do();
         $this->db->select('a.*, b.name_customer');
-        $this->db->from('tr_delivery_order a');
-        $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
-        // $this->db->join('tr_invoice d', 'd.no_do = a.no_surat', 'left');
-        $this->db->where('a.deleted', null);
-        $this->db->where('a.close_do', null);
-        // $this->db->where('d.no_invoice', null);
-
-        if (!empty($tahun)) {
-            $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
-        }
-        if (!empty($bulan)) {
-            $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
-        }
-        if (!empty($no_do)) {
-            $this->db->where('a.no_surat', $no_do);
-        }
-        if (!empty($no_spk)) {
-            $this->db->where('a.no_spk_marketing', $no_spk);
-        }
-        if (!empty($customer)) {
-            $this->db->where('b.id_customer', $customer);
-        }
-
-        if (!empty($search)) {
-            $this->db->group_start();
-            $this->db->like('a.tgl_delivery_order', $search, 'both');
-            $this->db->or_like('a.no_surat', $search, 'both');
-            $this->db->or_like('a.no_spk_marketing', $search, 'both');
-            $this->db->or_like('b.name_customer', $search, 'both');
-            $this->db->group_end();
-        }
-
         $this->db->group_by('a.id_delivery_order');
         $this->db->order_by('a.id_delivery_order', 'desc');
         $this->db->limit($length, $start);
-
         $get_data = $this->db->get()->result();
 
-        $no = (0 + $start);
-        $hasil = [];
+        $hasil = array(); // PHP 5.6 aman pakai array() atau []
+        $no = $start;
 
         foreach ($get_data as $item) {
             $no++;
 
-            $this->db->select('a.id');
-            $this->db->from('dt_delivery_order_child a');
-            $this->db->where('a.id_delivery_order', $item->id_delivery_order);
-            $this->db->where('a.qty_in <=', 0);
-            $this->db->where('a.qty_fg <=', 0);
-            $this->db->where('a.qty_ng <=', 0);
-            $get_do_detail = $this->db->get()->num_rows();
+            // Cek status detail DO
+            $get_do_detail = $this->db->get_where('dt_delivery_order_child', array(
+                'id_delivery_order' => $item->id_delivery_order,
+                'qty_in <=' => 0,
+                'qty_fg <=' => 0,
+                'qty_ng <=' => 0
+            ))->num_rows();
 
-            // $this->db->select('SUM(a.weight_mat) as total_do, SUM(a.qty_in) as total_delivered');
-            // $this->db->from('dt_delivery_order_child a');
-            // $this->db->where('a.id_delivery_order', $item->id_delivery_order);
-            // $get_total = $this->db->get()->row();
+            $total = $this->control_do_model->get_total_do($item->id_delivery_order);
 
-            $get_total = $this->control_do_model->get_total_do($item->id_delivery_order);
+            // Fallback untuk PHP 5.6 (karena belum ada ??)
+            $q_order   = isset($total->total_do) ? $total->total_do : 0;
+            $q_sheet   = isset($total->total_sheet) ? $total->total_sheet : 0;
+            $q_deliv   = isset($total->total_delivered) ? $total->total_delivered : 0;
+            $q_deliv_s = isset($total->total_delivered_sheet) ? $total->total_delivered_sheet : 0;
+            $q_fg      = isset($total->total_fg) ? $total->total_fg : 0;
+            $q_fg_s    = isset($total->total_fg_sheet) ? $total->total_fg_sheet : 0;
+            $q_ng      = isset($total->total_ng) ? $total->total_ng : 0;
+            $q_ng_s    = isset($total->total_ng_sheet) ? $total->total_ng_sheet : 0;
 
-            $total_do = (!empty($get_total->total_do)) ? $get_total->total_do : 0;
-            $total_delivered = (!empty($get_total->total_delivered)) ? $get_total->total_delivered : 0;
-            $total_fg = (!empty($get_total->total_fg)) ? $get_total->total_fg : 0;
-            $total_ng = (!empty($get_total->total_ng)) ? $get_total->total_ng : 0;
-
-            $btn_confirm = '';
+            // Logika Button
+            $btn = '<button type="button" class="btn btn-sm btn-info view_control_do" data-id="' . $item->id_delivery_order . '"><i class="fa fa-eye"></i></button>';
             if (has_permission($this->managePermission) && $get_do_detail > 0) {
-                $btn_confirm = '<button type="button" class="btn btn-sm btn-success confirm_do" data-id="' . $item->id_delivery_order . '" title="Confirm DO" ><i class="fa fa-check"></i></button>';
-            } else {
-                $btn_confirm = '<button type="button" class="btn btn-sm btn-info view_control_do" data-id="' . $item->id_delivery_order . '"><i class="fa fa-eye"></i></button>';
+                $btn = '<button type="button" class="btn btn-sm btn-success confirm_do" data-id="' . $item->id_delivery_order . '" title="Confirm DO"><i class="fa fa-check"></i></button>';
             }
 
-            $hasil[] = [
-                'no' => $no,
-                'tanggal_do' => date('d F Y', strtotime($item->tgl_delivery_order)),
-                'no_do' => $item->no_surat,
-                'spk_marketing' => $item->no_spk_marketing,
-                'customer' => $item->name_customer,
-                'qty_order' => number_format($total_do, 2),
-                'qty_delivery' => number_format($total_delivered, 2),
-                'qty_fg' => number_format($total_fg, 2),
-                'balance' => number_format($total_ng, 2),
-                'option' => $btn_confirm
-            ];
+            $hasil[] = array(
+                'no'                 => $no,
+                'tanggal_do'         => date('d F Y', strtotime($item->tgl_delivery_order)),
+                'no_do'              => $item->no_surat,
+                'spk_marketing'      => $item->no_spk_marketing,
+                'customer'           => $item->name_customer,
+                'qty_order'          => number_format($q_order, 2),
+                'qty_order_sheet'    => number_format($q_sheet, 2),
+                'qty_delivery'       => number_format($q_deliv, 2),
+                'qty_delivery_sheet' => number_format($q_deliv_s, 2),
+                'qty_fg'             => number_format($q_fg, 2),
+                'qty_fg_sheet'       => number_format($q_fg_s, 2),
+                'qty_ng'             => number_format($q_ng, 2),
+                'qty_ng_sheet'       => number_format($q_ng_s, 2),
+                'balance'            => number_format($q_ng, 2),
+                'option'             => $btn
+            );
         }
 
-        $response = [
-            'draw' => $draw,
-            'recordsTotal' => $count_all,
+        echo json_encode(array(
+            'draw'            => $draw,
+            'recordsTotal'    => $count_all,
             'recordsFiltered' => $count_filter,
-            'data' => $hasil
-        ];
-
-        echo json_encode($response);
+            'data'            => $hasil
+        ));
     }
 
     public function get_data_control_do_scrap()
@@ -815,9 +809,13 @@ class Control_do extends Admin_Controller
             $get_total = $this->control_do_model->get_total_do_scrap($item->id_delivery_order);
 
             $total_do = (!empty($get_total->total_do)) ? $get_total->total_do : 0;
+            $total_do_sheet = (!empty($get_total->total_sheet)) ? $get_total->total_sheet : 0;
             $total_delivered = (!empty($get_total->total_delivered)) ? $get_total->total_delivered : 0;
+            $total_delivered_sheet = (!empty($get_total->total_delivered_sheet)) ? $get_total->total_delivered_sheet : 0;
             $total_fg = (!empty($get_total->total_fg)) ? $get_total->total_fg : 0;
+            $total_fg_sheet = (!empty($get_total->total_fg_sheet)) ? $get_total->total_fg_sheet : 0;
             $total_ng = (!empty($get_total->total_ng)) ? $get_total->total_ng : 0;
+            $total_ng_sheet = (!empty($get_total->total_ng_sheet)) ? $get_total->total_ng_sheet : 0;
 
 
             if (has_permission($this->managePermission) && $get_do_detail > 0) {
@@ -833,9 +831,13 @@ class Control_do extends Admin_Controller
                 'spk_marketing' => $item->no_spk_marketing,
                 'customer' => $item->name_customer,
                 'qty_order' => number_format($total_do, 2),
+                'qty_order_sheet' => number_format($total_do_sheet, 2),
                 'qty_delivery' => number_format($total_delivered, 2),
+                'qty_delivery_sheet' => number_format($total_delivered_sheet, 2),
                 'qty_fg' => number_format($total_fg, 2),
-                'balance' => number_format($total_ng, 2),
+                'qty_fg_sheet' => number_format($total_fg_sheet, 2),
+                'qty_ng' => number_format($total_ng, 2),
+                'qty_ng_sheet' => number_format($total_ng_sheet, 2),
                 'option' => $btn_confirm
             ];
         endforeach;

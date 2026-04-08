@@ -8,10 +8,27 @@
             <th class="text-center">Width</th>
             <th class="text-center">Length</th>
             <th class="text-center">Lot No.</th>
-            <th class="text-center">Qty DO</th>
-            <th class="text-center">Qty OK</th>
-            <th class="text-center">Qty FG</th>
-            <th class="text-center">Qty NG</th>
+            <?php
+            if ($type_sheet > 0) {
+                echo '
+                    <th class="text-center">Qty DO (Kg)</th>
+                    <th class="text-center">Qty DO (Sheet)</th>
+                    <th class="text-center">Qty OK (Kg)</th>
+                    <th class="text-center">Qty OK (Sheet)</th>
+                    <th class="text-center">Qty FG (Kg)</th>
+                    <th class="text-center">Qty FG (Sheet)</th>
+                    <th class="text-center">Qty NG (Kg)</th>
+                    <th class="text-center">Qty NG (Sheet)</th>
+                ';
+            } else {
+                echo '
+                        <th class="text-center">Qty DO</th>
+                        <th class="text-center">Qty OK</th>
+                        <th class="text-center">Qty FG</th>
+                        <th class="text-center">Qty NG</th>
+                    ';
+            }
+            ?>
         </tr>
     </thead>
     <tbody>
@@ -22,28 +39,66 @@
 
             echo '<tr>';
 
-            echo '<td class="text-center">';
-            echo '<input type="hidden" name="detail[' . $no . '][id_detail]" value="' . $item->id . '">';
-            echo  $no;
-            echo '</td>';
-            echo '<td class="text-left">' . $item->nm_material . '</td>';
-            echo '<td class="text-right">' . number_format($item->thickness, 2) . '</td>';
-            echo '<td class="text-right">' . number_format($item->width, 2) . '</td>';
-            echo '<td class="text-right">' . number_format($item->length, 2) . '</td>';
-            echo '<td class="text-left">' . $item->lotno . '</td>';
-            echo '<td class="text-right">';
-            echo number_format($item->weight_mat, 2);
-            echo '<input type="hidden" name="detail[' . $no . '][qty_do]" value="' . $item->weight_mat . '">';
-            echo '</td>';
-            echo '<td>';
-            echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_in]" value="' . $item->weight_mat . '">';
-            echo '</td>';
-            echo '<td>';
-            echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_fg]" value="0">';
-            echo '</td>';
-            echo '<td>';
-            echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_ng]" value="0">';
-            echo '</td>';
+            if ($type_sheet > 0) {
+                echo '<td class="text-center">';
+                echo '<input type="hidden" name="detail[' . $no . '][id_detail]" value="' . $item->id . '">';
+                echo  $no;
+                echo '</td>';
+                echo '<td class="text-left">' . $item->nm_material . '</td>';
+                echo '<td class="text-right">' . number_format($item->thickness, 2) . '</td>';
+                echo '<td class="text-right">' . number_format($item->width, 2) . '</td>';
+                echo '<td class="text-right">' . number_format($item->length, 2) . '</td>';
+                echo '<td class="text-left">' . $item->lotno . '</td>';
+                echo '<td class="text-right">';
+                echo number_format($item->weight_mat, 2);
+                echo '<input type="hidden" name="detail[' . $no . '][qty_do]" value="' . $item->weight_mat . '">';
+                echo '</td>';
+                echo '<td class="text-right">';
+                echo number_format($qty_sheet[$item->id], 2);
+                echo '<input type="hidden" name="detail[' . $no . '][qty_do_sheet]" value="' . $qty_sheet[$item->id] . '">';
+                echo '</td>';
+                echo '<td>';
+                echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_in]" value="' . $item->weight_mat . '">';
+                echo '</td>';
+                echo '<td>';
+                echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_in_sheet]" value="' . $qty_sheet[$item->id] . '">';
+                echo '</td>';
+                echo '<td>';
+                echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_fg]" value="0">';
+                echo '</td>';
+                echo '<td>';
+                echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_fg_sheet]" value="0">';
+                echo '</td>';
+                echo '<td>';
+                echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_ng]" value="0">';
+                echo '</td>';
+                echo '<td>';
+                echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_ng_sheet]" value="0">';
+                echo '</td>';
+            } else {
+                echo '<td class="text-center">';
+                echo '<input type="hidden" name="detail[' . $no . '][id_detail]" value="' . $item->id . '">';
+                echo  $no;
+                echo '</td>';
+                echo '<td class="text-left">' . $item->nm_material . '</td>';
+                echo '<td class="text-right">' . number_format($item->thickness, 2) . '</td>';
+                echo '<td class="text-right">' . number_format($item->width, 2) . '</td>';
+                echo '<td class="text-right">' . number_format($item->length, 2) . '</td>';
+                echo '<td class="text-left">' . $item->lotno . '</td>';
+                echo '<td class="text-right">';
+                echo number_format($item->weight_mat, 2);
+                echo '<input type="hidden" name="detail[' . $no . '][qty_do]" value="' . $item->weight_mat . '">';
+                echo '</td>';
+                echo '<td>';
+                echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_in]" value="' . $item->weight_mat . '">';
+                echo '</td>';
+                echo '<td>';
+                echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_fg]" value="0">';
+                echo '</td>';
+                echo '<td>';
+                echo '<input type="text" class="form-control form-control-sm auto_num" name="detail[' . $no . '][qty_ng]" value="0">';
+                echo '</td>';
+            }
 
             echo '</tr>';
         }
