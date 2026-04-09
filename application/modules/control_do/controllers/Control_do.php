@@ -857,9 +857,11 @@ class Control_do extends Admin_Controller
         $id = $this->input->get('id', true);
 
         $get_do_detail = $this->control_do_model->do_detail($id);
+        $type_sheet = $this->control_do_model->check_sheet_mat($id);
 
         $data = [
-            'do_detail' => $get_do_detail
+            'do_detail' => $get_do_detail,
+            'type_sheet' => $type_sheet
         ];
 
         $this->template->set($data);
@@ -870,10 +872,32 @@ class Control_do extends Admin_Controller
     {
         $id = $this->input->get('id', true);
 
-        $get_do_detail = $this->control_do_model->do_detail_scrap($id);
+        $get_do_header = $this->db->get_where('tr_delivery_order', ['id_delivery_order' => $id])->row();
+
+        $this->db->select('a.*');
+        $this->db->from('dt_delivery_order_child_scrap a');
+        $this->db->where('a.id_delivery_order', $id);
+        $get_do_detail = $this->db->get()->result();
+
+        $this->db->select('COUNT(a.id) as jum_sheet');
+        $this->db->from('dt_delivery_order_child_scrap a');
+        $this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_material');
+        $this->db->where('a.id_delivery_order', $id);
+        $this->db->where('b.id_bentuk', 'B2000002');
+        $get_jum_sheet = $this->db->get()->row();
+
+        $type_sheet = (!empty($get_jum_sheet->jum_sheet)) ? $get_jum_sheet->jum_sheet : 0;
+
+        $arr_qty_sheet = [];
+        foreach ($get_do_detail as $item_do_detail) {
+            $arr_qty_sheet[$item_do_detail->id] = $this->control_do_model->stock_sheet($item_do_detail->id_stock);
+        }
 
         $data = [
-            'do_detail' => $get_do_detail
+            'do_header' => $get_do_header,
+            'do_detail' => $get_do_detail,
+            'jum_sheet' => $type_sheet,
+            'qty_sheet' => $arr_qty_sheet
         ];
 
         $this->template->set($data);
