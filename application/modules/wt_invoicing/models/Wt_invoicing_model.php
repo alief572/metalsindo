@@ -599,10 +599,10 @@ class Wt_invoicing_model extends BF_Model
     $this->db->where('a.status_close', '0');
 
 
-    if(!empty($tgl_awal)){
+    if (!empty($tgl_awal)) {
       $this->db->where('a.tgl_invoice >=', $tgl_awal);
     }
-    if(!empty($tgl_akhir)) {
+    if (!empty($tgl_akhir)) {
       $this->db->where('a.tgl_invoice <=', $tgl_akhir);
     }
 
@@ -800,17 +800,18 @@ class Wt_invoicing_model extends BF_Model
     ]);
   }
 
-  public function get_data_monitoring($tgl_awal = null, $tgl_akhir = null) {
+  public function get_data_monitoring($tgl_awal = null, $tgl_akhir = null)
+  {
     $this->db->select('a.*, b.name_customer as name_customer');
     $this->db->from('tr_invoice a');
     $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
     $this->db->where("a.no_invoice <>", '');
     $this->db->where('a.status_close', '0');
 
-    if(!empty($tgl_awal)) {
+    if (!empty($tgl_awal)) {
       $this->db->where('a.tgl_invoice >=', $tgl_awal);
     }
-    if(!empty($tgl_akhir)) {
+    if (!empty($tgl_akhir)) {
       $this->db->where('a.tgl_invoice <=', $tgl_akhir);
     }
 
@@ -819,37 +820,37 @@ class Wt_invoicing_model extends BF_Model
     return $get_data;
   }
 
-    // E-Faktur
+  // E-Faktur
   public function get_all_efaktur_id()
   {
-      $search = $this->input->post('search');
+    $search = $this->input->post('search');
 
-      $this->db->select('a.no_surat');
-      $this->db->from('tr_invoice a');
-      $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-      $this->db->where('a.stat_efaktur =', 0);
-      $this->db->where('b.npwp !=', '');
-      
-      if (!empty($search)) {
-        $this->db->group_start();
-        $this->db->like('a.no_surat', $search, 'both');
-        $this->db->or_like('b.name_customer', $search, 'both');
-        $this->db->or_like('a.note', $search, 'both');
-        $this->db->or_like('a.no_do', $search, 'both');
-        $this->db->or_like('a.nilai_invoice', $search, 'both');
-        $this->db->or_like('a.tgl_invoice', $search, 'both');
-        $this->db->group_end();
-      }
-      
-      $this->db->order_by('a.no_surat', 'ASC');
-      $get_data = $this->db->get();
+    $this->db->select('a.no_surat');
+    $this->db->from('tr_invoice a');
+    $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+    $this->db->where('a.stat_efaktur =', 0);
+    $this->db->where('b.npwp !=', '');
 
-      $hasil = [];
-      foreach ($get_data->result_array() as $item) {
-        $hasil[] = $item['no_surat'];
-      }
+    if (!empty($search)) {
+      $this->db->group_start();
+      $this->db->like('a.no_surat', $search, 'both');
+      $this->db->or_like('b.name_customer', $search, 'both');
+      $this->db->or_like('a.note', $search, 'both');
+      $this->db->or_like('a.no_do', $search, 'both');
+      $this->db->or_like('a.nilai_invoice', $search, 'both');
+      $this->db->or_like('a.tgl_invoice', $search, 'both');
+      $this->db->group_end();
+    }
 
-      return $hasil;
+    $this->db->order_by('a.no_surat', 'ASC');
+    $get_data = $this->db->get();
+
+    $hasil = [];
+    foreach ($get_data->result_array() as $item) {
+      $hasil[] = $item['no_surat'];
+    }
+
+    return $hasil;
   }
 
   public function get_efaktur()
@@ -899,7 +900,7 @@ class Wt_invoicing_model extends BF_Model
       $no++;
       $noSurat = $item['no_surat'];
 
-      $action = "<input class='check_nosurat' type='checkbox' value='".$noSurat."' id='no_surat_$no' data-npwp='".$item['npwp']."'>";
+      $action = "<input class='check_nosurat' type='checkbox' value='" . $noSurat . "' id='no_surat_$no' data-npwp='" . $item['npwp'] . "'>";
 
       $this->db->select('a.*');
       $this->db->from('tr_invoice_detail a');
@@ -1018,7 +1019,7 @@ class Wt_invoicing_model extends BF_Model
     foreach ($get_data->result_array() as $item) {
       $no++;
 
-      $action = '<a href="'.site_url('wt_invoicing/export_coretax_excel_row?getID='.$item['id_export']).'" class="btn btn-sm btn-success" style="border-radius:25%;" target="_blank"><i class="fa fa-file-excel-o fa-sm"></i></a>';
+      $action = '<a href="' . site_url('wt_invoicing/export_coretax_excel_row?getID=' . $item['id_export']) . '" class="btn btn-sm btn-success" style="border-radius:25%;" target="_blank"><i class="fa fa-file-excel-o fa-sm"></i></a>';
 
       $hasil[] = [
         'no' => $no,
