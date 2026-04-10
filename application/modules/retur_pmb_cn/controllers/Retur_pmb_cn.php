@@ -38,7 +38,7 @@ class Retur_pmb_cn extends Admin_Controller
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-list');
 
-		$this->template->title('Credit Note Retur Pembelian');
+		$this->template->title('Debit Note Retur Pembelian');
 		$this->template->render('index');
 	}
 
@@ -365,7 +365,8 @@ class Retur_pmb_cn extends Admin_Controller
 		$this->template->render('view');
 	}
 
-	public function print_dn($id_dn) {
+	public function print_dn($id_dn)
+	{
 		$get_dn_header = $this->Retur_pmb_cn_model->get_dn_header($id_dn);
 		$get_dn_detail = $this->Retur_pmb_cn_model->get_dn_detail($get_dn_header->no_surat);
 		$get_supplier = $this->Retur_pmb_cn_model->get_supplier($get_dn_header->id_supplier);
