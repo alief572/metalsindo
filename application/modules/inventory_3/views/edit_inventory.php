@@ -63,6 +63,14 @@ thead input {
 				</div>
 				<div class="form-group row">
 					<div class="col-md-3">
+					  <label for="">Kode Coretax</label>
+					</div>
+					 <div class="col-md-9">
+					  <input type="text" class="form-control" id="kode_coretax" name="kode_coretax" placeholder="Kode Coretax" value="<?= isset($inven->kode_coretax) ? $inven->kode_coretax : '' ?>" required>
+					</div>
+				</div>
+				<div class="form-group row">
+					<div class="col-md-3">
 					  <label for="">Status</label>
 					</div>
 					<div class="col-md-4">

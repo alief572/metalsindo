@@ -14,8 +14,9 @@
 		<div class="box-body">	
 			<div class="row">
 			  <div class="col-md-12">
-				<legend><h3 style="margin:0px !Important"><label>ID Inventory :<?= $result['id_inventory1']?></label></h3></legend>
-				<legend><h3 style="margin:0px !Important"><label>Nama Iventory :<?= $result['nm_inventory1']?></label></h3></legend>
+				<legend><h3 style="margin:0px !Important"><label>ID Inventory :<?= $result['id_category2']?></label></h3></legend>
+				<legend><h3 style="margin:0px !Important"><label>Nama Inventory :<?= $result['nama']?></label></h3></legend>
+				<legend><h3 style="margin:0px !Important"><label>Kode Coretax :<?= isset($result['kode_coretax']) ? $result['kode_coretax'] : '-'?></label></h3></legend>
 			  <div>
 			</div>
 		</div>
