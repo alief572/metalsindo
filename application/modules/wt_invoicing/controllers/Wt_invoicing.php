@@ -3270,7 +3270,7 @@ class Wt_invoicing extends Admin_Controller
 
 			$dataFaktur = [
 				$itemRowIndex,
-				$tanggal_faktur_formatted,
+				'`' . $tanggal_faktur_formatted,
 				"Normal",
 				"",
 				"",
