@@ -887,7 +887,7 @@ class Wt_invoicing_model extends BF_Model
     $db_clone3->where('b.npwp !=', '');
     $count_valid = $db_clone3->count_all_results();
 
-    $this->db->order_by('a.no_surat', 'ASC');
+    $this->db->order_by('a.tgl_invoice', 'DESC');
     $this->db->limit($length, $start);
 
     $get_data = $this->db->get();
