@@ -599,10 +599,10 @@ class Wt_invoicing_model extends BF_Model
     $this->db->where('a.status_close', '0');
 
 
-    if(!empty($tgl_awal)){
+    if (!empty($tgl_awal)) {
       $this->db->where('a.tgl_invoice >=', $tgl_awal);
     }
-    if(!empty($tgl_akhir)) {
+    if (!empty($tgl_akhir)) {
       $this->db->where('a.tgl_invoice <=', $tgl_akhir);
     }
 
@@ -800,17 +800,18 @@ class Wt_invoicing_model extends BF_Model
     ]);
   }
 
-  public function get_data_monitoring($tgl_awal = null, $tgl_akhir = null) {
+  public function get_data_monitoring($tgl_awal = null, $tgl_akhir = null)
+  {
     $this->db->select('a.*, b.name_customer as name_customer');
     $this->db->from('tr_invoice a');
     $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
     $this->db->where("a.no_invoice <>", '');
     $this->db->where('a.status_close', '0');
 
-    if(!empty($tgl_awal)) {
+    if (!empty($tgl_awal)) {
       $this->db->where('a.tgl_invoice >=', $tgl_awal);
     }
-    if(!empty($tgl_akhir)) {
+    if (!empty($tgl_akhir)) {
       $this->db->where('a.tgl_invoice <=', $tgl_akhir);
     }
 
@@ -819,37 +820,37 @@ class Wt_invoicing_model extends BF_Model
     return $get_data;
   }
 
-    // E-Faktur
+  // E-Faktur
   public function get_all_efaktur_id()
   {
-      $search = $this->input->post('search');
+    $search = $this->input->post('search');
 
-      $this->db->select('a.no_surat');
-      $this->db->from('tr_invoice a');
-      $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-      $this->db->where('a.stat_efaktur =', 0);
-      $this->db->where('b.npwp !=', '');
-      
-      if (!empty($search)) {
-        $this->db->group_start();
-        $this->db->like('a.no_surat', $search, 'both');
-        $this->db->or_like('b.name_customer', $search, 'both');
-        $this->db->or_like('a.note', $search, 'both');
-        $this->db->or_like('a.no_do', $search, 'both');
-        $this->db->or_like('a.nilai_invoice', $search, 'both');
-        $this->db->or_like('a.tgl_invoice', $search, 'both');
-        $this->db->group_end();
-      }
-      
-      $this->db->order_by('a.no_surat', 'ASC');
-      $get_data = $this->db->get();
+    $this->db->select('a.no_surat');
+    $this->db->from('tr_invoice a');
+    $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+    $this->db->where('a.stat_efaktur =', 0);
+    $this->db->where('b.npwp !=', '');
 
-      $hasil = [];
-      foreach ($get_data->result_array() as $item) {
-        $hasil[] = $item['no_surat'];
-      }
+    if (!empty($search)) {
+      $this->db->group_start();
+      $this->db->like('a.no_surat', $search, 'both');
+      $this->db->or_like('b.name_customer', $search, 'both');
+      $this->db->or_like('a.note', $search, 'both');
+      $this->db->or_like('a.no_do', $search, 'both');
+      $this->db->or_like('a.nilai_invoice', $search, 'both');
+      $this->db->or_like('a.tgl_invoice', $search, 'both');
+      $this->db->group_end();
+    }
 
-      return $hasil;
+    $this->db->order_by('a.no_surat', 'ASC');
+    $get_data = $this->db->get();
+
+    $hasil = [];
+    foreach ($get_data->result_array() as $item) {
+      $hasil[] = $item['no_surat'];
+    }
+
+    return $hasil;
   }
 
   public function get_efaktur()
@@ -862,8 +863,8 @@ class Wt_invoicing_model extends BF_Model
     $this->db->select('a.*, b.name_customer as name_customer, b.npwp');
     $this->db->from('tr_invoice a');
     $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		$this->db->where('a.stat_efaktur =', 0);
-		// $this->db->where('b.npwp !=', '');
+    $this->db->where('a.stat_efaktur =', 0);
+    // $this->db->where('b.npwp !=', '');
 
     $db_clone1 = clone $this->db;
     $count_all = $db_clone1->count_all_results();
@@ -886,7 +887,7 @@ class Wt_invoicing_model extends BF_Model
     $db_clone3->where('b.npwp !=', '');
     $count_valid = $db_clone3->count_all_results();
 
-		$this->db->order_by('a.no_surat', 'ASC');
+    $this->db->order_by('a.no_surat', 'ASC');
     $this->db->limit($length, $start);
 
     $get_data = $this->db->get();
@@ -899,7 +900,7 @@ class Wt_invoicing_model extends BF_Model
       $no++;
       $noSurat = $item['no_surat'];
 
-      $action = "<input class='check_nosurat' type='checkbox' value='".$noSurat."' id='no_surat_$no' data-npwp='".$item['npwp']."'>";
+      $action = "<input class='check_nosurat' type='checkbox' value='" . $noSurat . "' id='no_surat_$no' data-npwp='" . $item['npwp'] . "'>";
 
       $this->db->select('a.*');
       $this->db->from('tr_invoice_detail a');
@@ -982,58 +983,92 @@ class Wt_invoicing_model extends BF_Model
       'data' => $hasil
     ];
   }
+
   public function list_efaktur()
   {
-    $draw = $this->input->post('draw');
-    $start = $this->input->post('start');
-    $length = $this->input->post('length');
+    $draw   = $this->input->post('draw');
+    $start  = (int) $this->input->post('start');
+    $length = (int) $this->input->post('length');
     $search = $this->input->post('search');
 
-    $this->db->select('a.*');
-    $this->db->from('faktur_e_logs a');
-		$this->db->where('YEAR(date_export)', date('Y'));
-		$this->db->group_by('a.id_export');
-
-    $db_clone1 = clone $this->db;
-    $count_all = $db_clone1->count_all_results();
+    // Base query builder
+    $this->_efaktur_base_query();
+    $count_all = $this->db->count_all_results('', false);
 
     if (!empty($search['value'])) {
+      $keyword = $search['value'];
       $this->db->group_start();
-      $this->db->like('a.id_export', $search['value'], 'both');
-      $this->db->or_like('a.date_export', $search['value'], 'both');
-      $this->db->or_like('a.time_export', $search['value'], 'both');
+      $this->db->like('a.id_export', $keyword);
+      $this->db->or_like('a.date_export', $keyword);
+      $this->db->or_like('a.time_export', $keyword);
+      // Search by invoice_no via EXISTS subquery
+      $this->db->or_where("EXISTS (
+        SELECT 1 FROM faktur_e_logs sub
+        WHERE sub.id_export = a.id_export
+        AND sub.invoice_no LIKE '%" . $this->db->escape_like_str($keyword) . "%'
+      )", NULL, FALSE);
       $this->db->group_end();
     }
 
-    $db_clone2 = clone $this->db;
-    $count_filtered = $db_clone2->count_all_results();
+    $count_filtered = $this->db->count_all_results('', false);
 
-		$this->db->order_by('a.id_export', 'DESC');
-    $this->db->limit($length, $start);
+    $rows = $this->db
+      ->order_by('a.id_export', 'DESC')
+      ->limit($length, $start)
+      ->get()
+      ->result_array();
 
-    $get_data = $this->db->get();
+    // Fetch all invoice_no in one query to avoid N+1
+    $export_ids = array_column($rows, 'id_export');
+    $invoice_map = [];
+    if (!empty($export_ids)) {
+      $logs = $this->db
+        ->select('id_export, invoice_no')
+        ->where_in('id_export', $export_ids)
+        ->get('faktur_e_logs')
+        ->result();
 
-    $hasil = [];
-    $no = (0 + $start);
-    foreach ($get_data->result_array() as $item) {
-      $no++;
-
-      $action = '<a href="'.site_url('wt_invoicing/export_coretax_excel_row?getID='.$item['id_export']).'" class="btn btn-sm btn-success" style="border-radius:25%;" target="_blank"><i class="fa fa-file-excel-o fa-sm"></i></a>';
-
-      $hasil[] = [
-        'no' => $no,
-        'id_export' => $item['id_export'],
-        'date_export' => $item['date_export'],
-        'time_export' => $item['time_export'],
-        'action' => $action
-      ];
+      foreach ($logs as $log) {
+        $invoice_map[$log->id_export][] = $log->invoice_no;
+      }
     }
 
+    $no   = $start;
+    $data = array_map(function ($item) use (&$no, $invoice_map) {
+      $no++;
+      $invoices = isset($invoice_map[$item['id_export']]) ? $invoice_map[$item['id_export']] : [];
+
+      return [
+        'no'          => $no,
+        'id_export'   => $item['id_export'],
+        'no_invoice'  => implode(', ', $invoices),
+        'date_export' => $item['date_export'],
+        'time_export' => $item['time_export'],
+        'action'      => $this->_efaktur_action_button($item['id_export']),
+      ];
+    }, $rows);
+
     return [
-      'draw' => intval($draw),
-      'recordsTotal' => $count_all,
+      'draw'            => (int) $draw,
+      'recordsTotal'    => $count_all,
       'recordsFiltered' => $count_filtered,
-      'data' => $hasil
+      'data'            => $data,
     ];
+  }
+
+  private function _efaktur_base_query()
+  {
+    $this->db->select('a.*');
+    $this->db->from('faktur_e_logs a');
+    $this->db->where('YEAR(date_export)', date('Y'));
+    $this->db->group_by('a.id_export');
+  }
+
+  private function _efaktur_action_button($id_export)
+  {
+    $url = site_url('wt_invoicing/export_coretax_excel_row?getID=' . $id_export);
+    return '<a href="' . $url . '" class="btn btn-sm btn-success" style="border-radius:25%;" target="_blank">
+              <i class="fa fa-file-excel-o fa-sm"></i>
+            </a>';
   }
 }
