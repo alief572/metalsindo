@@ -374,117 +374,142 @@ class Inventory_4_model extends BF_Model
 
 	public function get_data_penawaran()
 	{
-		$draw = $this->input->post('draw');
-		$length = $this->input->post('length');
-		$start = $this->input->post('start');
+		$draw   = $this->input->post('draw');
+		$start  = (int) $this->input->post('start');
+		$length = (int) $this->input->post('length');
 		$search = $this->input->post('search');
 
-		$this->db->select('a.*, b.name_customer as name_customer, c.id_spkmarketing AS spkmarketing');
-		$this->db->from('tr_penawaran a');
-		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		$this->db->join('tr_spk_marketing c', 'a.no_penawaran=c.no_penawaran', 'left');
-		$this->db->where('a.type', 'reguler');
+		// Cache permission checks — avoid repeated calls inside loop
+		$canView   = has_permission($this->viewPermission);
+		$canManage = has_permission($this->managePermission);
+
+		// Base query
+		$this->_penawaran_base_query();
+		$count_all = $this->db->count_all_results('', false);
+
 		if (!empty($search['value'])) {
-			$this->db->like('a.no_surat', $search['value']);
-			$this->db->or_like('b.name_customer', $search['value']);
-			$this->db->or_like('a.tgl_penawaran', $search['value']);
+			$keyword = $search['value'];
+			$this->db->group_start();
+			$this->db->like('a.no_surat', $keyword);
+			$this->db->or_like('b.name_customer', $keyword);
+			$this->db->or_like('a.tgl_penawaran', $keyword);
+			$this->db->group_end();
 		}
-		$this->db->group_by('a.no_penawaran');
-		$this->db->order_by('a.no_penawaran', 'desc');
 
-		$db_clone = clone $this->db;
-		$count_all = $db_clone->count_all_results();
+		$count_filtered = $this->db->count_all_results('', false);
 
-		$this->db->limit($length, $start);
+		$rows = $this->db
+			->order_by('a.no_penawaran', 'DESC')
+			->limit($length, $start)
+			->get()
+			->result();
 
-		$get_data = $this->db->get();
-
-		$hasil = [];
-		$no = (0 + $start);
-		foreach ($get_data->result() as $item) :
+		$no   = $start;
+		$data = array_map(function ($item) use (&$no, $canView, $canManage) {
 			$no++;
 
-			$get_spk = $this->db->select('no_surat')->get_where('tr_spk_marketing', array('no_penawaran' => $item->no_penawaran))->result_array();
-			$arrImp = [];
-			foreach ($get_spk as $key => $value) {
-				$arrImp[] = $value['no_surat'];
-			}
-
-			$Status = "<span class='badge bg-yellow'>Open</span>";
-			$keterangan = ucfirst(strtolower($item->keterangan));
-			if ($item->spkmarketing != NULL) {
-				$Status = "<span class='badge bg-green'>Closed</span>";
-				$keterangan = implode("<br>", $arrImp);
-			}
-			if ($item->spkmarketing == NULL and $item->status == 'Y') {
-				$Status = "<span class='badge bg-red'>Closed</span>";
-			}
-
-			$revisi = '';
-			if ($item->status_revisi == 0) {
-				$revisi = "<span class='badge bg-purple'>Tidak Ada Revisi</span>";
-			} elseif ($item->status_revisi == 1) {
-				$revisi = "<span class='badge bg-orange'>Menunggu Approval Revisi</span>";
-			} elseif ($item->status_revisi == 2) {
-				$revisi = "<span class='badge bg-green'>Revisi Disetujui</span>";
-			} elseif ($item->status_revisi == 3) {
-				$revisi = "<span class='badge bg-red'>Revisi Ditolak</span>";
-			}
-
-			$option = '';
-
-			if (has_permission($this->viewPermission)) {
-				$option .= ' <a class="btn btn-warning btn-sm view" href="javascript:void(0)" title="View" data-no_penawaran="' . $item->no_penawaran . '"><i class="fa fa-eye"></i></a>';
-			}
-
-			if (has_permission($this->managePermission) && $item->status == 'N') {
-				$option .= ' <a class="btn btn-success btn-sm edit" href="javascript:void(0)" title="Edit" data-no_penawaran="' . $item->no_penawaran . '"><i class="fa fa-edit"></i></a>';
-			}
-
-			if (has_permission($this->viewPermission) && $item->spkmarketing == null && $item->status == 'N') {
-				$option .= ' <a class="btn btn-primary btn-sm" href="' . base_url('/penawaran/detail/' . $item->no_penawaran) . '" title="Detail" data-no_inquiry="' . $item->no_inquiry . '"><i class="fa fa-table"></i></a>';
-			}
-
-			if (has_permission($this->viewPermission)) {
-				$option .= ' <a class="btn btn-info btn-sm" href="' . base_url('/penawaran/PrintHeader/' . $item->no_penawaran) . '" target="_blank" title="Detail" data-no_inquiry="' . $item->no_inquiry . '"><i class="fa fa-print"></i></a>';
-			}
-
-			if (has_permission($this->managePermission) && $item->spkmarketing == null && $item->status == 'N') {
-				$option .= ' <a class="btn bg-purple btn-sm close_penawaran" href="javascript:void(0)" title="Close Penawaran" data-no_penawaran="' . $item->no_penawaran . '"><i class="fa fa-check"></i></a>';
-			}
-
-			if (has_permission($this->managePermission)) {
-				$option .= ' <a class="btn btn-success btn-sm copy" href="javascript:void(0)" title="Copy" data-no_penawaran="' . $item->no_penawaran . '"><i class="fa fa-copy"></i></a>';
-			}
-
-			if (has_permission($this->managePermission) && $item->spkmarketing != null && $item->status_revisi == 0) {
-				$option .= ' <a class="btn btn-primary btn-sm revisi" href="javascript:void(0)" title="Ajukan Revisi" data-no_penawaran="' . $item->no_penawaran . '"><i class="fa fa-history"></i></a>';
-			}
-
-			if (has_permission($this->managePermission) && $item->spkmarketing != null && $item->status_revisi == '2') {
-				$option .= '
-				<a class="btn btn-primary btn-sm" href="' . base_url('/penawaran/detailrevisi/' . $item->no_penawaran) . '" title="Revisi" data-no_inquiry="' . $item->no_inquiry . '"><i class="fa fa-list"></i></a>
-				';
-			}
-
-			$hasil[] = [
-				'no' => $no,
-				'no_surat' => $item->no_surat,
+			return [
+				'no'            => $no,
+				'no_surat'      => $item->no_surat,
 				'name_customer' => $item->name_customer,
 				'tgl_penawaran' => $item->tgl_penawaran,
-				'status' => $Status,
-				'status_revisi' => $revisi,
-				'keterangan' => $keterangan,
-				'aksi' => $option
+				'status'        => $this->_penawaran_status_badge($item),
+				'status_revisi' => $this->_penawaran_revisi_badge($item->status_revisi),
+				'keterangan'    => $this->_penawaran_keterangan($item),
+				'aksi'          => $this->_penawaran_action_buttons($item, $canView, $canManage),
 			];
-		endforeach;
+		}, $rows);
 
-		echo json_encode([
-			'draw' => $draw,
-			'recordsTotal' => $count_all,
-			'recordsFiltered' => $count_all,
-			'data' => $hasil
-		]);
+		return [
+			'draw'            => (int) $draw,
+			'recordsTotal'    => $count_all,
+			'recordsFiltered' => $count_filtered,
+			'data'            => $data,
+		];
+	}
+
+	private function _penawaran_base_query()
+	{
+		$this->db->select("a.*, b.name_customer, MAX(c.id_spkmarketing) AS spkmarketing, GROUP_CONCAT(c.no_surat SEPARATOR '<br>') as spk_surat_list", false);
+		$this->db->from('tr_penawaran a');
+		$this->db->join('master_customers b', 'b.id_customer = a.id_customer');
+		$this->db->join('tr_spk_marketing c', 'a.no_penawaran = c.no_penawaran', 'left');
+		$this->db->where('a.type', 'reguler');
+		$this->db->group_by('a.no_penawaran');
+	}
+
+	private function _penawaran_status_badge($item)
+	{
+		if ($item->spkmarketing !== NULL) {
+			return "<span class='badge bg-green'>Closed</span>";
+		}
+		if ($item->status == 'Y') {
+			return "<span class='badge bg-red'>Closed</span>";
+		}
+		return "<span class='badge bg-yellow'>Open</span>";
+	}
+
+	private function _penawaran_keterangan($item)
+	{
+		if ($item->spkmarketing !== NULL) {
+			return $item->spk_surat_list;
+		}
+		return ucfirst(strtolower($item->keterangan));
+	}
+
+	private function _penawaran_revisi_badge($status_revisi)
+	{
+		$map = [
+			0 => "<span class='badge bg-purple'>Tidak Ada Revisi</span>",
+			1 => "<span class='badge bg-orange'>Menunggu Approval Revisi</span>",
+			2 => "<span class='badge bg-green'>Revisi Disetujui</span>",
+			3 => "<span class='badge bg-red'>Revisi Ditolak</span>",
+		];
+		return isset($map[(int) $status_revisi]) ? $map[(int) $status_revisi] : '';
+	}
+
+	private function _penawaran_action_buttons($item, $canView, $canManage)
+	{
+		$no  = $item->no_penawaran;
+		$inq = $item->no_inquiry;
+		$hasSpk    = $item->spkmarketing !== null;
+		$isOpen    = $item->status == 'N';
+
+		$btn = '';
+
+		if ($canView) {
+			$btn .= " <a class='btn btn-warning btn-sm view' href='javascript:void(0)' title='View' data-no_penawaran='{$no}'><i class='fa fa-eye'></i></a>";
+		}
+
+		if ($canManage && $isOpen) {
+			$btn .= " <a class='btn btn-success btn-sm edit' href='javascript:void(0)' title='Edit' data-no_penawaran='{$no}'><i class='fa fa-edit'></i></a>";
+		}
+
+		if ($canView && !$hasSpk && $isOpen) {
+			$btn .= " <a class='btn btn-primary btn-sm' href='" . base_url('/penawaran/detail/' . $no) . "' title='Detail' data-no_inquiry='{$inq}'><i class='fa fa-table'></i></a>";
+		}
+
+		if ($canView) {
+			$btn .= " <a class='btn btn-info btn-sm' href='" . base_url('/penawaran/PrintHeader/' . $no) . "' target='_blank' title='Print' data-no_inquiry='{$inq}'><i class='fa fa-print'></i></a>";
+		}
+
+		if ($canManage && !$hasSpk && $isOpen) {
+			$btn .= " <a class='btn bg-purple btn-sm close_penawaran' href='javascript:void(0)' title='Close Penawaran' data-no_penawaran='{$no}'><i class='fa fa-check'></i></a>";
+		}
+
+		if ($canManage) {
+			$btn .= " <a class='btn btn-success btn-sm copy' href='javascript:void(0)' title='Copy' data-no_penawaran='{$no}'><i class='fa fa-copy'></i></a>";
+		}
+
+		if ($canManage && $hasSpk && $item->status_revisi == 0) {
+			$btn .= " <a class='btn btn-primary btn-sm revisi' href='javascript:void(0)' title='Ajukan Revisi' data-no_penawaran='{$no}'><i class='fa fa-history'></i></a>";
+		}
+
+		if ($canManage && $hasSpk && $item->status_revisi == 2) {
+			$btn .= " <a class='btn btn-primary btn-sm' href='" . base_url('/penawaran/detailrevisi/' . $no) . "' title='Revisi' data-no_inquiry='{$inq}'><i class='fa fa-list'></i></a>";
+		}
+
+		return $btn;
 	}
 
 	public function get_category3($id_category3)

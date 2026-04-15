@@ -32,6 +32,7 @@ class Penawaran extends Admin_Controller
 
 		date_default_timezone_set('Asia/Bangkok');
 	}
+
 	public function index()
 	{
 		$this->auth->restrict($this->viewPermission);
@@ -2028,7 +2029,7 @@ class Penawaran extends Admin_Controller
 
 	public function get_data_penawaran()
 	{
-		$this->Inventory_4_model->get_data_penawaran();
+		echo json_encode($this->Inventory_4_model->get_data_penawaran());
 	}
 
 	public function get_last_sheet_price()
