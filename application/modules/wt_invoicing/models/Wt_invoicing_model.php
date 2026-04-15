@@ -983,58 +983,92 @@ class Wt_invoicing_model extends BF_Model
       'data' => $hasil
     ];
   }
+
   public function list_efaktur()
   {
-    $draw = $this->input->post('draw');
-    $start = $this->input->post('start');
-    $length = $this->input->post('length');
+    $draw   = $this->input->post('draw');
+    $start  = (int) $this->input->post('start');
+    $length = (int) $this->input->post('length');
     $search = $this->input->post('search');
 
+    // Base query builder
+    $this->_efaktur_base_query();
+    $count_all = $this->db->count_all_results('', false);
+
+    if (!empty($search['value'])) {
+      $keyword = $search['value'];
+      $this->db->group_start();
+      $this->db->like('a.id_export', $keyword);
+      $this->db->or_like('a.date_export', $keyword);
+      $this->db->or_like('a.time_export', $keyword);
+      // Search by invoice_no via EXISTS subquery
+      $this->db->or_where("EXISTS (
+        SELECT 1 FROM faktur_e_logs sub
+        WHERE sub.id_export = a.id_export
+        AND sub.invoice_no LIKE '%" . $this->db->escape_like_str($keyword) . "%'
+      )", NULL, FALSE);
+      $this->db->group_end();
+    }
+
+    $count_filtered = $this->db->count_all_results('', false);
+
+    $rows = $this->db
+      ->order_by('a.id_export', 'DESC')
+      ->limit($length, $start)
+      ->get()
+      ->result_array();
+
+    // Fetch all invoice_no in one query to avoid N+1
+    $export_ids = array_column($rows, 'id_export');
+    $invoice_map = [];
+    if (!empty($export_ids)) {
+      $logs = $this->db
+        ->select('id_export, invoice_no')
+        ->where_in('id_export', $export_ids)
+        ->get('faktur_e_logs')
+        ->result();
+
+      foreach ($logs as $log) {
+        $invoice_map[$log->id_export][] = $log->invoice_no;
+      }
+    }
+
+    $no   = $start;
+    $data = array_map(function ($item) use (&$no, $invoice_map) {
+      $no++;
+      $invoices = isset($invoice_map[$item['id_export']]) ? $invoice_map[$item['id_export']] : [];
+
+      return [
+        'no'          => $no,
+        'id_export'   => $item['id_export'],
+        'no_invoice'  => implode(', ', $invoices),
+        'date_export' => $item['date_export'],
+        'time_export' => $item['time_export'],
+        'action'      => $this->_efaktur_action_button($item['id_export']),
+      ];
+    }, $rows);
+
+    return [
+      'draw'            => (int) $draw,
+      'recordsTotal'    => $count_all,
+      'recordsFiltered' => $count_filtered,
+      'data'            => $data,
+    ];
+  }
+
+  private function _efaktur_base_query()
+  {
     $this->db->select('a.*');
     $this->db->from('faktur_e_logs a');
     $this->db->where('YEAR(date_export)', date('Y'));
     $this->db->group_by('a.id_export');
+  }
 
-    $db_clone1 = clone $this->db;
-    $count_all = $db_clone1->count_all_results();
-
-    if (!empty($search['value'])) {
-      $this->db->group_start();
-      $this->db->like('a.id_export', $search['value'], 'both');
-      $this->db->or_like('a.date_export', $search['value'], 'both');
-      $this->db->or_like('a.time_export', $search['value'], 'both');
-      $this->db->group_end();
-    }
-
-    $db_clone2 = clone $this->db;
-    $count_filtered = $db_clone2->count_all_results();
-
-    $this->db->order_by('a.id_export', 'DESC');
-    $this->db->limit($length, $start);
-
-    $get_data = $this->db->get();
-
-    $hasil = [];
-    $no = (0 + $start);
-    foreach ($get_data->result_array() as $item) {
-      $no++;
-
-      $action = '<a href="' . site_url('wt_invoicing/export_coretax_excel_row?getID=' . $item['id_export']) . '" class="btn btn-sm btn-success" style="border-radius:25%;" target="_blank"><i class="fa fa-file-excel-o fa-sm"></i></a>';
-
-      $hasil[] = [
-        'no' => $no,
-        'id_export' => $item['id_export'],
-        'date_export' => $item['date_export'],
-        'time_export' => $item['time_export'],
-        'action' => $action
-      ];
-    }
-
-    return [
-      'draw' => intval($draw),
-      'recordsTotal' => $count_all,
-      'recordsFiltered' => $count_filtered,
-      'data' => $hasil
-    ];
+  private function _efaktur_action_button($id_export)
+  {
+    $url = site_url('wt_invoicing/export_coretax_excel_row?getID=' . $id_export);
+    return '<a href="' . $url . '" class="btn btn-sm btn-success" style="border-radius:25%;" target="_blank">
+              <i class="fa fa-file-excel-o fa-sm"></i>
+            </a>';
   }
 }

@@ -2595,7 +2595,8 @@ class Wt_invoicing extends Admin_Controller
 		$this->Wt_invoicing_model->get_data_spk_marketing();
 	}
 
-	public function export_data_mon_inv($tgl_awal = null, $tgl_akhir = null) {
+	public function export_data_mon_inv($tgl_awal = null, $tgl_akhir = null)
+	{
 		$get_data = $this->Wt_invoicing_model->get_data_monitoring($tgl_awal, $tgl_akhir);
 
 		$data = [
@@ -2619,7 +2620,7 @@ class Wt_invoicing extends Admin_Controller
 	public function get_efaktur()
 	{
 		$get = $this->Wt_invoicing_model->get_efaktur();
-		
+
 		echo json_encode([
 			'draw' => $get['draw'],
 			'recordsTotal' => $get['recordsTotal'],
@@ -2631,7 +2632,7 @@ class Wt_invoicing extends Admin_Controller
 	public function get_all_efaktur_id()
 	{
 		$get = $this->Wt_invoicing_model->get_all_efaktur_id();
-		
+
 		echo json_encode([
 			'data' => $get
 		]);
@@ -2648,7 +2649,7 @@ class Wt_invoicing extends Admin_Controller
 	public function list_efaktur()
 	{
 		$get = $this->Wt_invoicing_model->list_efaktur();
-		
+
 		echo json_encode([
 			'draw' => $get['draw'],
 			'recordsTotal' => $get['recordsTotal'],
@@ -2673,7 +2674,7 @@ class Wt_invoicing extends Admin_Controller
 		$get_data = $this->db->get();
 
 		$invoices_data_for_export = [];
-		$no = (0 + $start);
+		$no = (0);
 		foreach ($get_data->result_array() as $item) {
 			$no++;
 
@@ -2683,7 +2684,7 @@ class Wt_invoicing extends Admin_Controller
 			$this->db->where('a.no_invoice', $item['no_invoice']);
 			// $this->db->where('b.id_bentuk', 'B2000002');
 			$get_detail_sheet = $this->db->get()->result();
-			
+
 			$items = [];
 			$nilai_invoice = 0;
 			$nilai_ppn = 0;
@@ -2691,7 +2692,7 @@ class Wt_invoicing extends Admin_Controller
 			foreach ($get_detail_sheet as $item_sheet) {
 				$qty = 0;
 				$satuan = 'UM.0003';
-				if($item_sheet->id_bentuk == 'B2000002'){
+				if ($item_sheet->id_bentuk == 'B2000002') {
 					$this->db->select('a.qty_sheet, a.price_sheet');
 					$this->db->from('stock_material a');
 					$this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
@@ -2705,7 +2706,7 @@ class Wt_invoicing extends Admin_Controller
 					$qty_sheet = 0;
 					foreach ($get_qty_sheet as $item_qty_sheet) {
 						$qty_sheet += $item_qty_sheet->qty_sheet;
-						
+
 						if ($item_qty_sheet->price_sheet > 0) :
 							$satuan = 'UM.0020';
 						else :
@@ -2722,7 +2723,6 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_invoice += ($ttl_harga + $ppn);
 					$nilai_ppn += ($ppn);
 					$nilai_dpp += $dpp_lain_lain;
-
 				} else {
 					$qty = $item_sheet->qty_invoice;
 					$ttl_harga = $item_sheet->qty_invoice * $item_sheet->harga_satuan;
@@ -2734,7 +2734,6 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_invoice = $grand_total;
 					$nilai_ppn = $ppn;
 					$nilai_dpp = $dpp_lain_lain;
-
 				}
 
 				$items[] = [
@@ -2792,7 +2791,7 @@ class Wt_invoicing extends Admin_Controller
 		// =====================
 		// PREPARE LOG DATA
 		// =====================
-	
+
 		$logData = [];
 		$export_id = date("ymdHi");
 		$date_export = date("Y-m-d");
@@ -2805,33 +2804,33 @@ class Wt_invoicing extends Admin_Controller
 				"invoice_no"  => $inv
 			];
 		}
-	
+
 		// =====================
 		// INSERT BATCH (1 QUERY)
 		// =====================
-	
-		if(!empty($logData)){
+
+		if (!empty($logData)) {
 			$this->db->insert_batch('faktur_e_logs', $logData);
 		}
-	
+
 		// =====================
 		// UPDATE STATUS
 		// =====================
-	
+
 		$this->db->set('stat_efaktur', 1);
 		$this->db->where_in('no_surat', $invoices_to_update);
 		$this->db->where('stat_efaktur', 0);
 		$this->db->update('tr_invoice');
-	
+
 		// sementara tidak dipakai
 		// history($this->sessionName.' Generate Data E-Faktur: ' . count($invoices_to_update) . ' faktur');
-	
+
 		// =====================
 		// SIMPAN EXPORT DATA
 		// =====================
-	
+
 		$this->session->set_userdata('export_data_temp', $invoices_data_for_export);
-	
+
 		echo json_encode(['status' => 'success']);
 		exit;
 	}
@@ -2843,7 +2842,7 @@ class Wt_invoicing extends Admin_Controller
 		error_reporting(0);
 
 		set_time_limit(0);
-		ini_set('memory_limit','1024M');
+		ini_set('memory_limit', '1024M');
 
 		$this->load->library("PHPExcel");
 
@@ -2851,12 +2850,12 @@ class Wt_invoicing extends Admin_Controller
 		$this->session->unset_userdata('export_data_temp');
 
 		if (empty($invoices_data)) {
-			redirect('wt_invoicing/e_faktur?msg=data_hilang'); 
+			redirect('wt_invoicing/e_faktur?msg=data_hilang');
 			exit;
 		}
 
 		$objPHPExcel = new PHPExcel();
-		
+
 		$objPHPExcel->setActiveSheetIndex(0);
 		$sheetFaktur = $objPHPExcel->getActiveSheet();
 		$sheetFaktur->setTitle('Faktur');
@@ -2904,7 +2903,7 @@ class Wt_invoicing extends Admin_Controller
 		];
 
 		// Judul Header
-		$sheetFaktur->fromArray($headerFaktur, NULL, 'A3'); 
+		$sheetFaktur->fromArray($headerFaktur, NULL, 'A3');
 
 		$rowFaktur 		= 4;
 		$itemRowIndex 	= 1; // Index untuk menghubungkan Faktur dan Detail
@@ -2933,13 +2932,13 @@ class Wt_invoicing extends Admin_Controller
 
 		// Judul Header si Detail
 		$sheetDetail->fromArray($headerDetail, NULL, 'A1');
-		$rowDetail = 2; 
+		$rowDetail = 2;
 
 		foreach ($invoices_data as $invoice) {
-			
+
 			$tanggal_faktur_formatted = date('j/n/Y', strtotime($invoice['tanggal_invoice']));
 			$NPWP = preg_replace("/[^0-9]/", "", $invoice['npwp']);
-			if(strlen($NPWP) < 16){
+			if (strlen($NPWP) < 16) {
 				$NPWP = str_pad($NPWP, 16, '0', STR_PAD_LEFT);
 			}
 
@@ -2970,11 +2969,11 @@ class Wt_invoicing extends Admin_Controller
 
 			$sheetFaktur->fromArray($dataFaktur, NULL, 'A' . $rowFaktur);
 
-			$sheetFaktur->setCellValueExplicit('D' . $rowFaktur, "04", PHPExcel_Cell_DataType::TYPE_STRING); 
-			$sheetFaktur->setCellValueExplicit('J' . $rowFaktur, "0210982047414000000000", PHPExcel_Cell_DataType::TYPE_STRING); 
-			$sheetFaktur->setCellValueExplicit('K' . $rowFaktur, $NPWP, PHPExcel_Cell_DataType::TYPE_STRING); 
-			$sheetFaktur->setCellValueExplicit('R' . $rowFaktur, $NPWP."000000", PHPExcel_Cell_DataType::TYPE_STRING);
-			
+			$sheetFaktur->setCellValueExplicit('D' . $rowFaktur, "04", PHPExcel_Cell_DataType::TYPE_STRING);
+			$sheetFaktur->setCellValueExplicit('J' . $rowFaktur, "0210982047414000000000", PHPExcel_Cell_DataType::TYPE_STRING);
+			$sheetFaktur->setCellValueExplicit('K' . $rowFaktur, $NPWP, PHPExcel_Cell_DataType::TYPE_STRING);
+			$sheetFaktur->setCellValueExplicit('R' . $rowFaktur, $NPWP . "000000", PHPExcel_Cell_DataType::TYPE_STRING);
+
 			$sheetFaktur->getStyle('J' . $rowFaktur)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
 			$sheetFaktur->getStyle('K' . $rowFaktur)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
 			$sheetFaktur->getStyle('R' . $rowFaktur)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
@@ -3067,12 +3066,12 @@ class Wt_invoicing extends Admin_Controller
 		error_reporting(0);
 
 		set_time_limit(0);
-		ini_set('memory_limit','1024M');
+		ini_set('memory_limit', '1024M');
 
 		$this->load->library("PHPExcel");
 
 		$getID = $this->input->get('getID');
-		
+
 		$this->db->select('a.*, b.name_customer as name_customer, b.npwp as npwp, b.npwp_name as npwp_name, b.npwp_address as npwp_address');
 		$this->db->from('tr_invoice a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
@@ -3096,7 +3095,7 @@ class Wt_invoicing extends Admin_Controller
 			$this->db->where('a.no_invoice', $item['no_invoice']);
 			// $this->db->where('b.id_bentuk', 'B2000002');
 			$get_detail_sheet = $this->db->get()->result();
-			
+
 			$items = [];
 			$nilai_invoice = 0;
 			$nilai_ppn = 0;
@@ -3104,7 +3103,7 @@ class Wt_invoicing extends Admin_Controller
 			foreach ($get_detail_sheet as $item_sheet) {
 				$qty = 0;
 				$satuan = 'UM.0003';
-				if($item_sheet->id_bentuk == 'B2000002'){
+				if ($item_sheet->id_bentuk == 'B2000002') {
 					$this->db->select('a.qty_sheet, a.price_sheet');
 					$this->db->from('stock_material a');
 					$this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
@@ -3118,7 +3117,7 @@ class Wt_invoicing extends Admin_Controller
 					$qty_sheet = 0;
 					foreach ($get_qty_sheet as $item_qty_sheet) {
 						$qty_sheet += $item_qty_sheet->qty_sheet;
-						
+
 						if ($item_qty_sheet->price_sheet > 0) :
 							$satuan = 'UM.0020';
 						else :
@@ -3135,7 +3134,6 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_invoice += ($ttl_harga + $ppn);
 					$nilai_ppn += ($ppn);
 					$nilai_dpp += $dpp_lain_lain;
-
 				} else {
 					$qty = $item_sheet->qty_invoice;
 					$ttl_harga = $item_sheet->qty_invoice * $item_sheet->harga_satuan;
@@ -3147,7 +3145,6 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_invoice = $grand_total;
 					$nilai_ppn = $ppn;
 					$nilai_dpp = $dpp_lain_lain;
-
 				}
 
 				$items[] = [
@@ -3193,7 +3190,7 @@ class Wt_invoicing extends Admin_Controller
 		}
 
 		$objPHPExcel = new PHPExcel();
-		
+
 		$objPHPExcel->setActiveSheetIndex(0);
 		$sheetFaktur = $objPHPExcel->getActiveSheet();
 		$sheetFaktur->setTitle('Faktur');
@@ -3241,7 +3238,7 @@ class Wt_invoicing extends Admin_Controller
 		];
 
 		// Judul Header
-		$sheetFaktur->fromArray($headerFaktur, NULL, 'A3'); 
+		$sheetFaktur->fromArray($headerFaktur, NULL, 'A3');
 
 		$rowFaktur 		= 4;
 		$itemRowIndex 	= 1; // Index untuk menghubungkan Faktur dan Detail
@@ -3270,13 +3267,13 @@ class Wt_invoicing extends Admin_Controller
 
 		// Judul Header si Detail
 		$sheetDetail->fromArray($headerDetail, NULL, 'A1');
-		$rowDetail = 2; 
+		$rowDetail = 2;
 
 		foreach ($invoices_data as $invoice) {
-			
+
 			$tanggal_faktur_formatted = date('j/n/Y', strtotime($invoice['tanggal_invoice']));
 			$NPWP = preg_replace("/[^0-9]/", "", $invoice['npwp']);
-			if(strlen($NPWP) < 16){
+			if (strlen($NPWP) < 16) {
 				$NPWP = str_pad($NPWP, 16, '0', STR_PAD_LEFT);
 			}
 
@@ -3307,11 +3304,11 @@ class Wt_invoicing extends Admin_Controller
 
 			$sheetFaktur->fromArray($dataFaktur, NULL, 'A' . $rowFaktur);
 
-			$sheetFaktur->setCellValueExplicit('D' . $rowFaktur, "04", PHPExcel_Cell_DataType::TYPE_STRING); 
-			$sheetFaktur->setCellValueExplicit('J' . $rowFaktur, "0210982047414000000000", PHPExcel_Cell_DataType::TYPE_STRING); 
-			$sheetFaktur->setCellValueExplicit('K' . $rowFaktur, $NPWP, PHPExcel_Cell_DataType::TYPE_STRING); 
-			$sheetFaktur->setCellValueExplicit('R' . $rowFaktur, $NPWP."000000", PHPExcel_Cell_DataType::TYPE_STRING);
-			
+			$sheetFaktur->setCellValueExplicit('D' . $rowFaktur, "04", PHPExcel_Cell_DataType::TYPE_STRING);
+			$sheetFaktur->setCellValueExplicit('J' . $rowFaktur, "0210982047414000000000", PHPExcel_Cell_DataType::TYPE_STRING);
+			$sheetFaktur->setCellValueExplicit('K' . $rowFaktur, $NPWP, PHPExcel_Cell_DataType::TYPE_STRING);
+			$sheetFaktur->setCellValueExplicit('R' . $rowFaktur, $NPWP . "000000", PHPExcel_Cell_DataType::TYPE_STRING);
+
 			$sheetFaktur->getStyle('J' . $rowFaktur)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
 			$sheetFaktur->getStyle('K' . $rowFaktur)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
 			$sheetFaktur->getStyle('R' . $rowFaktur)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);

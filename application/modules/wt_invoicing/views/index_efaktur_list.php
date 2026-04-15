@@ -17,6 +17,7 @@
 			<thead>
 				<tr>
 					<th>ID Export</th>
+					<th>No. Invoice</th>
 					<th>Date Export</th>
 					<th>Time Export</th>
 					<th>Action</th>
@@ -105,9 +106,11 @@
 				url: siteurl + active_controller + 'list_efaktur',
 				dataType: 'json'
 			},
-			columns: [
-				{
+			columns: [{
 					data: 'id_export'
+				},
+				{
+					data: 'no_invoice'
 				},
 				{
 					data: 'date_export'
@@ -128,57 +131,57 @@
 	});
 	$(document).on('click', '.generate', function(e) {
 		swal({
-			title: "Generate Data E-Faktur Sekarang?",
-			text: "",
-			type: "warning",
-			showCancelButton: true,
-			confirmButtonClass: "btn-danger",
-			confirmButtonText: "Ya, Proses Data",
-			cancelButtonText: "Tidak",
-			closeOnConfirm: false,
-			closeOnCancel: false,
-			showLoaderOnConfirm: true
-		},
-		function(isConfirm) {
-			if (isConfirm) {
-				$.ajax({
-					url: siteurl + active_controller + "generate_efaktur",
-					dataType: "json",
-					type: 'POST',
-					data: {
-						id_generate: []
-					},
-					success: function(result) {
-						window.location.href = siteurl + active_controller + "export_coretax_excel";
+				title: "Generate Data E-Faktur Sekarang?",
+				text: "",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonClass: "btn-danger",
+				confirmButtonText: "Ya, Proses Data",
+				cancelButtonText: "Tidak",
+				closeOnConfirm: false,
+				closeOnCancel: false,
+				showLoaderOnConfirm: true
+			},
+			function(isConfirm) {
+				if (isConfirm) {
+					$.ajax({
+						url: siteurl + active_controller + "generate_efaktur",
+						dataType: "json",
+						type: 'POST',
+						data: {
+							id_generate: []
+						},
+						success: function(result) {
+							window.location.href = siteurl + active_controller + "export_coretax_excel";
 
-						swal({
-							title: "Generate Success!",
-							text: result.msg,
-							type: "success",
-							timer: 1500,
-							showCancelButton: false,
-							showConfirmButton: false,
-							allowOutsideClick: false
-						});
-						DataTables('set');
-					},
-					error: function(request, error) {
-						console.log(arguments);
-						swal({
-							title: "Error Message !",
-							text: 'An Error Occured During Process. Please try again..',
-							type: "warning",
-							timer: 5000,
-							showCancelButton: false,
-							showConfirmButton: false,
-							allowOutsideClick: false
-						});
-					}
-				});
-			} else {
-				swal("Batal Proses", "Data bisa diproses nanti", "error");
-				return false;
-			}
-		});
+							swal({
+								title: "Generate Success!",
+								text: result.msg,
+								type: "success",
+								timer: 1500,
+								showCancelButton: false,
+								showConfirmButton: false,
+								allowOutsideClick: false
+							});
+							DataTables('set');
+						},
+						error: function(request, error) {
+							console.log(arguments);
+							swal({
+								title: "Error Message !",
+								text: 'An Error Occured During Process. Please try again..',
+								type: "warning",
+								timer: 5000,
+								showCancelButton: false,
+								showConfirmButton: false,
+								allowOutsideClick: false
+							});
+						}
+					});
+				} else {
+					swal("Batal Proses", "Data bisa diproses nanti", "error");
+					return false;
+				}
+			});
 	});
 </script>
