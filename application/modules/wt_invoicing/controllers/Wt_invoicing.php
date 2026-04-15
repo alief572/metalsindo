@@ -2691,7 +2691,7 @@ class Wt_invoicing extends Admin_Controller
 			$nilai_dpp = 0;
 			foreach ($get_detail_sheet as $item_sheet) {
 				$qty = 0;
-				$satuan = 'KGS';
+				$satuan = 'UM.0003';
 				if ($item_sheet->id_bentuk == 'B2000002') {
 					$this->db->select('a.qty_sheet, a.price_sheet');
 					$this->db->from('stock_material a');
@@ -2708,9 +2708,9 @@ class Wt_invoicing extends Admin_Controller
 						$qty_sheet += $item_qty_sheet->qty_sheet;
 
 						if ($item_qty_sheet->price_sheet > 0) :
-							$satuan = 'SHEETS';
+							$satuan = 'UM.0020';
 						else :
-							$satuan = 'KGS';
+							$satuan = 'UM.0003';
 						endif;
 					}
 					$qty = $qty_sheet;
@@ -3103,7 +3103,7 @@ class Wt_invoicing extends Admin_Controller
 			$nilai_dpp = 0;
 			foreach ($get_detail_sheet as $item_sheet) {
 				$qty = 0;
-				$satuan = 'KGS';
+				$satuan = 'UM.0003';
 				if ($item_sheet->id_bentuk == 'B2000002') {
 					$this->db->select('a.qty_sheet, a.price_sheet');
 					$this->db->from('stock_material a');
@@ -3120,9 +3120,9 @@ class Wt_invoicing extends Admin_Controller
 						$qty_sheet += $item_qty_sheet->qty_sheet;
 
 						if ($item_qty_sheet->price_sheet > 0) :
-							$satuan = 'SHEETS';
+							$satuan = 'UM.0020';
 						else :
-							$satuan = 'KGS';
+							$satuan = 'UM.0003';
 						endif;
 					}
 					$qty = $qty_sheet;
