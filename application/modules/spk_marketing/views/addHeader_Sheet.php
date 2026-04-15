@@ -90,7 +90,7 @@ $tanggal = date('Y-m-d');
                             <div class="col-sm-6">
                                 <div class="form-group row">
                                     <div class="col-md-4">
-                                        <label for="no_penawaran">No PO</label>
+                                        <label for="no_po">No PO <span style="color:red">*</span></label>
                                     </div>
                                     <div class="col-md-8">
                                         <input type="text" class="form-control" id="no_po" required name="no_po">
@@ -113,7 +113,7 @@ $tanggal = date('Y-m-d');
                             <div class="col-sm-6">
                                 <div class="form-group row">
                                     <div class="col-md-4">
-                                        <label for="no_penawaran">Tgl PO</label>
+                                        <label for="tgl_po">Tgl PO <span style="color:red">*</span></label>
                                     </div>
                                     <div class="col-md-8">
                                         <input type="text" class="form-control datepicker" id="tgl_po" required name="tgl_po" readonly>
