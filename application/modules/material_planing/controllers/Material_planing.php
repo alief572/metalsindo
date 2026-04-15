@@ -1693,6 +1693,6 @@ class Material_planing extends Admin_Controller
 
 	public function get_data_material_planning()
 	{
-		$this->Inventory_4_model->get_data_material_planning();
+		echo json_encode($this->Inventory_4_model->get_data_material_planning());
 	}
 }

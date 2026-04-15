@@ -315,123 +315,95 @@ class Inventory_4_model extends BF_Model
 
 	public function get_data_material_planning()
 	{
-		$draw = $this->input->post('draw');
-		$start = $this->input->post('start');
-		$length = $this->input->post('length');
+		$draw   = $this->input->post('draw');
+		$start  = (int) $this->input->post('start');
+		$length = (int) $this->input->post('length');
 		$search = $this->input->post('search');
 
-		$this->db->select('a.*, a.length, c.name_customer as name_customer, b.no_surat as no_surat, c.id_customer, d.total_weight');
-		$this->db->from('dt_spkmarketing a');
-		$this->db->join('tr_spk_marketing b', 'b.id_spkmarketing=a.id_spkmarketing');
-		$this->db->join('master_customers c', 'c.id_customer=b.id_customer');
-		$this->db->join('ms_inventory_category3 d', 'd.id_category3=a.id_material', 'left');
-		// $this->db->order_by('a.delivery', 'asc');
-		$this->db->where('a.deal', '1');
-		$this->db->where('a.status_close_planning', 'OPN');
-		$this->db->where('a.approved', '1');
-		if (!empty($search)) {
+		$can_access = has_permission($this->viewPermission);
+
+		// Apply search filter
+		$this->db->from('view_material_planning');
+		// Total tanpa filter
+		$count_all = $this->db->count_all_results('', false);
+
+		if (!empty($search['value'])) {
+			$keyword = $search['value'];
 			$this->db->group_start();
-			$this->db->like('b.no_surat', $search['value'], 'both');
-			$this->db->or_like('c.name_customer', $search['value'], 'both');
-			$this->db->or_like('a.id_material', $search['value'], 'both');
-			$this->db->or_like('a.no_alloy', $search['value'], 'both');
+			$this->db->like('no_spk', $keyword);
+			$this->db->or_like('customer', $keyword);
+			$this->db->or_like('id_material', $keyword);
+			$this->db->or_like('no_alloy', $keyword);
 			$this->db->group_end();
 		}
 
-		$db_clone = clone $this->db;
-		$count_all = $db_clone->count_all_results(); // ✅ will preserve original query state
+		$count_filtered = $this->db->count_all_results('', false);
 
-		$this->db->order_by('a.id_dt_spkmarketing', 'asc');
-		$this->db->limit($length, $start);
+		$rows = $this->db
+			->order_by('id_dt_spkmarketing', 'ASC')
+			->limit($length, $start)
+			->get()
+			->result();
 
-		$query = $this->db->get();
-
-		$hasil = [];
-
-		$no = (0 + $start);
-		foreach ($query->result() as $item) {
+		$no   = $start;
+		$data = array_map(function ($item) use (&$no, $can_access) {
 			$no++;
-
-			$booking	= $this->db->query("SELECT 
-				SUM(a.berat) as total,
-				b.id_category3
-			FROM 
-				stock_material_customer a 
-				LEFT JOIN stock_material b ON a.id_stock=b.id_stock
-			WHERE 
-				a.id_customer = '$item->id_customer' 
-				AND b.id_category3 = '$item->id_material'
-				AND b.width = '$item->width'
-				AND a.id_dt_spkmarketing = '$item->id_dt_spkmarketing'
-			")->row();
-
-			$nilai_booking = (!empty($booking)) ? $booking->total : 0;
-
-			$btn_edit = '<a class="btn btn-warning btn-sm edit" href="javascript:void(0)" title="Lihat Stock" data-id_dt_spkmarketing="' . $item->id_dt_spkmarketing . '" data-id_material="' . $item->id_material . '" data-width="' . $item->width . '" data-view="edit"><i class="fa fa-bars"></i></a>';
-
-			$btn_create_pr = '<a class="btn btn-primary btn-sm" href="' . base_url("/purchase_request/add_pr/" . $item->id_dt_spkmarketing) . '" title="Create PR" data-no_inquiry="' . $item->no_inquiry . '"><i class="fa fa-table"></i></a>';
-
-			$btn_approve = '<a class="btn btn-success btn-sm delete" href="javascript:void(0)" title="Approve" data-id_dt_spkmarketing="' . $item->id_dt_spkmarketing . '" data-id_material="' . $item->id_material . '"><i class="fa fa-check"></i></a>';
-
-			$btn_tutup = '';
-
-			// if($item->status_lanjutan == '1') {
-
-			// }
-			if ($item->status_lanjutan == '2') {
-				$btn_tutup = '<a class="btn btn-warning btn-sm tutup" href="javascript:void(0)" title="Close" data-id_dt_spkmarketing="' . $item->id_dt_spkmarketing . '" data-id_material="' . $item->id_material . '"><i class="fa fa-times"></i></a>';
-			}
-
-			if (!has_permission($this->viewPermission)) {
-				$btn_edit = '';
-				$btn_create_pr = '';
-				$btn_approve = '';
-				$btn_tutup = '';
-			}
-
-			$get_material = $this->db->get_where('ms_inventory_category3', ['id_category3' => $item->id_material])->row();
-
-			$total_sheet = 0;
-			if ($get_material->id_bentuk == 'B2000002') {
-				$total_sheet = round($item->qty_produk / $get_material->total_weight);
-			}
-
-			$this->db->select('a.nilai_dimensi');
-			$this->db->from('child_inven_dimensi a');
-			$this->db->where('a.id_category3', $item->id_material);
-			$this->db->where('a.id_dimensi', '33');
-			$get_length = $this->db->get()->row();
-
-			if ($get_material->id_bentuk == 'B2000002') {
-				$lengths = (!empty($item->length)) ? $item->length : $get_length->nilai_dimensi;
-			} else {
-				$lengths = $item->length;
-			}
-
-
-			$hasil[] = [
-				'no' => $no,
-				'no_spk' => $item->no_surat,
-				'customer' => $item->name_customer,
+			return [
+				'no'            => $no,
+				'no_spk'        => $item->no_spk,
+				'customer'      => $item->customer,
 				'kode_material' => $item->id_material,
-				'no_aloy' => $item->no_alloy,
-				'thickness' => $item->thickness,
-				'width' => $item->width,
-				'length' => number_format($lengths, 2),
-				'delivery_date' => date('d-M-Y', strtotime($item->delivery)),
-				'total_weight' => number_format($item->qty_produk),
-				'total_sheet' => number_format($total_sheet),
-				'total_spk' => '-',
-				'fg' => number_format($nilai_booking, 2),
-				'action' => $btn_edit . ' ' . $btn_create_pr . ' ' . $btn_approve . ' ' . $btn_tutup
+				'no_aloy'       => $item->no_alloy,
+				'thickness'     => $item->thickness,
+				'width'         => $item->width,
+				'length'        => number_format($item->length_val, 2),
+				'delivery_date' => date('d-M-Y', strtotime($item->delivery_date)),
+				'total_weight'  => number_format($item->total_weight),
+				'total_sheet'   => number_format($item->total_sheet),
+				'total_spk'     => '-',
+				'fg'            => number_format($item->fg_booking, 2),
+				'action'        => $this->_material_planning_action_buttons($item, $can_access),
 			];
+		}, $rows);
+
+		return [
+			'draw'            => (int) $draw,
+			'recordsTotal'    => $count_all,
+			'recordsFiltered' => $count_filtered,
+			'data'            => $data,
+		];
+	}
+
+	private function _material_planning_action_buttons($item, $can_access)
+	{
+		if (!$can_access) {
+			return '';
 		}
 
-		echo json_encode([
-			'draw' => intval($draw),
-			'recordsTotal' => $count_all,
-			'recordsFiltered' => $count_all,
-			'data' => $hasil
-		]);
+		$id  = $item->id_dt_spkmarketing;
+		$mat = $item->id_material;
+
+		$buttons = array(
+			'<a class="btn btn-warning btn-sm edit" href="javascript:void(0)" title="Lihat Stock"'
+				. ' data-id_dt_spkmarketing="' . $id . '"'
+				. ' data-id_material="' . $mat . '"'
+				. ' data-width="' . $item->width . '"'
+				. ' data-view="edit"><i class="fa fa-bars"></i></a>',
+
+			'<a class="btn btn-primary btn-sm" href="' . base_url('/purchase_request/add_pr/' . $id) . '" title="Create PR">'
+				. '<i class="fa fa-table"></i></a>',
+
+			'<a class="btn btn-success btn-sm delete" href="javascript:void(0)" title="Approve"'
+				. ' data-id_dt_spkmarketing="' . $id . '"'
+				. ' data-id_material="' . $mat . '"><i class="fa fa-check"></i></a>',
+		);
+
+		if ($item->status_lanjutan == '2') {
+			$buttons[] = '<a class="btn btn-warning btn-sm tutup" href="javascript:void(0)" title="Close"'
+				. ' data-id_dt_spkmarketing="' . $id . '"'
+				. ' data-id_material="' . $mat . '"><i class="fa fa-times"></i></a>';
+		}
+
+		return implode(' ', $buttons);
 	}
 }
