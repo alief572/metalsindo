@@ -2691,7 +2691,7 @@ class Wt_invoicing extends Admin_Controller
 			$nilai_dpp = 0;
 			foreach ($get_detail_sheet as $item_sheet) {
 				$qty = 0;
-				$satuan = 'UM.0003';
+				$satuan = 'KGS';
 				if ($item_sheet->id_bentuk == 'B2000002') {
 					$this->db->select('a.qty_sheet, a.price_sheet');
 					$this->db->from('stock_material a');
@@ -2708,9 +2708,9 @@ class Wt_invoicing extends Admin_Controller
 						$qty_sheet += $item_qty_sheet->qty_sheet;
 
 						if ($item_qty_sheet->price_sheet > 0) :
-							$satuan = 'UM.0020';
+							$satuan = 'SHEETS';
 						else :
-							$satuan = 'UM.0003';
+							$satuan = 'KGS';
 						endif;
 					}
 					$qty = $qty_sheet;
@@ -3084,9 +3084,10 @@ class Wt_invoicing extends Admin_Controller
 		foreach ($get_data->result_array() as $item) {
 			$no++;
 
-			$this->db->select('a.*, b.id_bentuk, b.nama as nama_barang');
+			$this->db->select('a.*, b.id_bentuk, b.nama as nama_barang, c.kode_coretax');
 			$this->db->from('tr_invoice_detail a');
 			$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3', 'left');
+			$this->db->join('ms_inventory_category2 c', 'c.id_category2 = b.id_category2', 'left');
 			$this->db->where('a.no_invoice', $item['no_invoice']);
 			// $this->db->where('b.id_bentuk', 'B2000002');
 			$get_detail_sheet = $this->db->get()->result();
@@ -3097,7 +3098,7 @@ class Wt_invoicing extends Admin_Controller
 			$nilai_dpp = 0;
 			foreach ($get_detail_sheet as $item_sheet) {
 				$qty = 0;
-				$satuan = 'UM.0003';
+				$satuan = 'KGS';
 				if ($item_sheet->id_bentuk == 'B2000002') {
 					$this->db->select('a.qty_sheet, a.price_sheet');
 					$this->db->from('stock_material a');
@@ -3114,9 +3115,9 @@ class Wt_invoicing extends Admin_Controller
 						$qty_sheet += $item_qty_sheet->qty_sheet;
 
 						if ($item_qty_sheet->price_sheet > 0) :
-							$satuan = 'UM.0020';
+							$satuan = 'SHEETS';
 						else :
-							$satuan = 'UM.0003';
+							$satuan = 'KGS';
 						endif;
 					}
 					$qty = $qty_sheet;
@@ -3155,7 +3156,7 @@ class Wt_invoicing extends Admin_Controller
 					'ppn' => $ppn,
 					'tarif_ppnbm' => 0,
 					'ppnbm' => 0,
-					'kode_barang' => $item_sheet->id_category3
+					'kode_barang' => $item_sheet->kode_coretax
 				];
 			}
 			// echo '<pre>';
