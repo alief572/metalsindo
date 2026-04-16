@@ -2833,7 +2833,7 @@ class Wt_invoicing extends Admin_Controller
 	public function export_coretax_excel()
 	{
 		ob_start();
-
+		// 
 		ini_set('display_errors', 0);
 		error_reporting(0);
 
