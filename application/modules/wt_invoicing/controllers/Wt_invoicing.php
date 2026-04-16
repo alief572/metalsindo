@@ -2738,7 +2738,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$items[] = [
 					'barang_jasa' => 'A',
-					'nama_barang' => $item_sheet->nama_barang,
+					'nama_barang' => $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
@@ -2987,7 +2987,7 @@ class Wt_invoicing extends Admin_Controller
 					$itemRowIndex, // Kunci penghubung
 					$item['barang_jasa'],
 					'',
-					$item['nama_barang'],
+					$item['nama_barang'] . ', ' . $item['tobe_size'],
 					$item['satuan'],
 					$item['harga_satuan'],
 					$item['qty'],
@@ -3150,7 +3150,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$items[] = [
 					'barang_jasa' => 'A',
-					'nama_barang' => $item_sheet->nama_barang,
+					'nama_barang' => $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
@@ -3323,7 +3323,7 @@ class Wt_invoicing extends Admin_Controller
 					$itemRowIndex, // Kunci penghubung
 					$item['barang_jasa'],
 					'',
-					$item['nama_barang'],
+					$item['nama_barang'] . ', ' . $item['tobe_size'],
 					$item['satuan'],
 					$item['harga_satuan'],
 					$item['qty'],
