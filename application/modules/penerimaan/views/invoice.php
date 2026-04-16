@@ -1,27 +1,27 @@
  <div class="box box-primary">
-    <div class="box-body">
-		<form id="data-form" method="post">
-		<div class="form-group row" >
-			 <table class="table table-bordered" width="100%" id="list_item_stok">
-              <thead>
-                  <tr>
-				      <th width="30%">Code</th>
-                      <th width="30%">No Invoice</th>
-                      <th width="30%">Nama Customer</th>
-                      <th width="30%">Total Invoice</th>
-					   <th width="30%">Sisa Invoice</th>
-                      <th width="2%" class="text-center">Aksi</th>  
-                  </tr>
-              </thead>
-              <tbody>
-                  <?php	
-				 
-				  $cust = $results['detail'];
-				  
-                  $invoice = $this->db->query("SELECT a.*, b.name_customer as nm_customer FROM tr_invoice a
+ 	<div class="box-body">
+ 		<form id="data-form" method="post">
+ 			<div class="form-group row">
+ 				<table class="table table-bordered" width="100%" id="list_item_stok">
+ 					<thead>
+ 						<tr>
+ 							<th width="30%">Code</th>
+ 							<th width="30%">No Invoice</th>
+ 							<th width="30%">Nama Customer</th>
+ 							<th width="30%">Total Invoice</th>
+ 							<th width="30%">Sisa Invoice</th>
+ 							<th width="2%" class="text-center">Aksi</th>
+ 						</tr>
+ 					</thead>
+ 					<tbody>
+ 						<?php
+
+							$cust = $results['detail'];
+
+							$invoice = $this->db->query("SELECT a.*, b.name_customer as nm_customer FROM tr_invoice a
 				                      INNER JOIN master_customers b ON a.id_customer=b.id_customer WHERE a.id_customer ='$cust' AND (a.sisa_invoice_idr >'0')")->result();
-				  if($invoice){
-					foreach($invoice as $ks=>$vs){
+							if ($invoice) {
+								foreach ($invoice as $ks => $vs) {
 
 									$this->db->select('a.*');
 									$this->db->from('tr_invoice_detail a');
@@ -43,10 +43,15 @@
 											$this->db->where('c.no_surat', $vs->no_do);
 											$this->db->where('b.id_material', $item_sheet->id_category3);
 											$this->db->where('a.no_kirim', $vs->id_do);
-											// $this->db->group_by('a.id_stock');
-											$get_qty_sheet = $this->db->get()->row();
+											$this->db->group_by('a.id_stock');
+											$get_qty_sheet = $this->db->get()->result();
 
-											$qty_sheet = (!empty($get_qty_sheet->ttl_qty_sheet)) ? $get_qty_sheet->ttl_qty_sheet : 0;
+											$qty_sheet = 0;
+											foreach ($get_qty_sheet as $detail_sheet) {
+												$qty_sheet += $detail_sheet->ttl_qty_sheet;
+											}
+
+											// $qty_sheet = (!empty($get_qty_sheet->ttl_qty_sheet)) ? $get_qty_sheet->ttl_qty_sheet : 0;
 											// foreach ($get_qty_sheet as $item_qty_sheet) {
 											// 	$qty_sheet += $item_qty_sheet->qty_sheet;
 											// }
@@ -67,7 +72,7 @@
 										$grand_total = ($ttl_harga + $ppn);
 
 										$nilai_invoice = $grand_total;
-										$sisa_invoice_idr = $vs->sisa_invoice_idr;
+										$sisa_invoice_idr = ($nilai_invoice - $vs->total_bayar_idr);
 									}
 									if ($sisa_invoice_idr > 0) {
 							?>
@@ -113,19 +118,3 @@
  </form>
  </div>
  </div>
-
-
-
-
-
-
-
-<<<<<<< HEAD
-<<<<<<< HEAD
- </script>
-=======
- </script>
->>>>>>> 9447b155 (Perbaikan - Penerimaan & Invoicing)
-=======
- </script>
->>>>>>> 7f0a388b (Update 16 Mar 2026)
