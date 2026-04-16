@@ -3148,7 +3148,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$items[] = [
 					'barang_jasa' => 'A',
-					'nama_barang' => $item_sheet->nama_barang,
+					'nama_barang' => $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
@@ -3166,12 +3166,17 @@ class Wt_invoicing extends Admin_Controller
 			// var_dump($items);
 			// exit();
 
+			$npwp_name = strtoupper($item['npwp_name']);
+			if ($npwp_name == '' || $npwp_name == null) {
+				$npwp_name = strtoupper($item['name_customer']);
+			}
+
 			$invoices_data[] = [
 				'no' => $no,
 				'no_faktur' => '',
 				'no_invoice' => $item['no_surat'],
 				'npwp' => $item['npwp'],
-				'nama_customer' => strtoupper($item['npwp_name']),
+				'nama_customer' => strtoupper($npwp_name),
 				'address' => $item['npwp_address'],
 				'term' => $item['note'],
 				'nomor_do' => $item['no_do'],
@@ -3265,7 +3270,7 @@ class Wt_invoicing extends Admin_Controller
 
 		foreach ($invoices_data as $invoice) {
 
-			$tanggal_faktur_formatted = PHPExcel_Shared_Date::PHPToExcel(strtotime(date('Y-m-d', strtotime($invoice['tanggal_invoice']))));
+			$tanggal_faktur_formatted = date('d/m/Y', strtotime($invoice['tanggal_invoice']));
 			$NPWP = preg_replace("/[^0-9]/", "", $invoice['npwp']);
 			if (strlen($NPWP) < 16) {
 				$NPWP = str_pad($NPWP, 16, '0', STR_PAD_LEFT);
@@ -3317,7 +3322,7 @@ class Wt_invoicing extends Admin_Controller
 					$itemRowIndex, // Kunci penghubung
 					$item['barang_jasa'],
 					'',
-					$item['nama_barang'],
+					$item['nama_barang'] . ', ' . $item['tobe_size'],
 					$item['satuan'],
 					$item['harga_satuan'],
 					$item['qty'],
