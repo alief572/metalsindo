@@ -184,7 +184,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 								<table class='table table-bordered table-striped'>
 									<thead>
 										<tr class='bg-blue'>
-											<th>Id Material</th>
+											<th>ID Material</th>
 											<th>No. DO</th>
 											<th>Nama Material</th>
 											<th>Lot Number</th>
@@ -224,7 +224,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 												$qty_sheet = (isset($results['data_weight_per_sheet'][$dt->id_category3])) ? $results['data_weight_per_sheet'][$dt->id_category3] : '';
 												$val_sheet = 0;
 												if ($dt->total_kirim > 0 && $qty_sheet > 0) {
-													$val_sheet = round($dt->total_kirim / $qty_sheet, 2);
+													$val_sheet = ceil($dt->total_kirim / $qty_sheet);
 												}
 												echo "<th><input type='text' class='form-control'   value='" . $val_sheet . "' id='dp_qty_sheet_$loop' data-role='qtip' required name='dp[$loop][qty_sheet]'></th>";
 											}
