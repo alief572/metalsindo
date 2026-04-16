@@ -2829,6 +2829,7 @@ class Wt_invoicing extends Admin_Controller
 		echo json_encode(['status' => 'success']);
 		exit;
 	}
+
 	public function export_coretax_excel()
 	{
 		ob_start();
@@ -3053,6 +3054,7 @@ class Wt_invoicing extends Admin_Controller
 		$objWriter->save('php://output');
 		exit;
 	}
+
 	public function export_coretax_excel_row()
 	{
 		ob_start();
