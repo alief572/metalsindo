@@ -2657,6 +2657,7 @@ class Wt_invoicing extends Admin_Controller
 			'data' => $get['data']
 		]);
 	}
+
 	public function generate_efaktur()
 	{
 		$post = $this->input->post();
