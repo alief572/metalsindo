@@ -3022,7 +3022,7 @@ class Wt_invoicing extends Admin_Controller
 			)
 		);
 
-		$sheetFaktur->getStyle('B4:B' . $lastRowHeader)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_GENERAL);
+		$sheetFaktur->getStyle('B4:B' . $lastRowHeader)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
 		// $sheetFaktur->getStyle('J4:J' . $lastRowHeader)->getNumberFormat()->setFormatCode('0000000000000000000000');
 		// $sheetFaktur->getStyle('K4:K' . $lastRowHeader)->getNumberFormat()->setFormatCode('0000000000000000');
 		// $sheetFaktur->getStyle('R4:R' . $lastRowHeader)->getNumberFormat()->setFormatCode('0000000000000000000000');
@@ -3273,7 +3273,7 @@ class Wt_invoicing extends Admin_Controller
 
 			$dataFaktur = [
 				$itemRowIndex,
-				$tanggal_faktur_formatted,
+				"", // Date handled explicitly
 				"Normal",
 				"",
 				"",
@@ -3355,7 +3355,7 @@ class Wt_invoicing extends Admin_Controller
 			)
 		);
 
-		$sheetFaktur->getStyle('B4:B' . $lastRowHeader)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_GENERAL);
+		$sheetFaktur->getStyle('B4:B' . $lastRowHeader)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
 		// $sheetFaktur->getStyle('J4:J' . $lastRowHeader)->getNumberFormat()->setFormatCode('0000000000000000000000');
 		// $sheetFaktur->getStyle('K4:K' . $lastRowHeader)->getNumberFormat()->setFormatCode('0000000000000000');
 		// $sheetFaktur->getStyle('R4:R' . $lastRowHeader)->getNumberFormat()->setFormatCode('0000000000000000000000');
