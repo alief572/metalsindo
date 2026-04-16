@@ -2937,7 +2937,7 @@ class Wt_invoicing extends Admin_Controller
 
 		foreach ($invoices_data as $invoice) {
 
-			$tanggal_faktur_formatted = PHPExcel_Shared_Date::PHPToExcel(strtotime($invoice['tanggal_invoice']));
+			$tanggal_faktur_formatted = PHPExcel_Shared_Date::PHPToExcel(strtotime(date('Y-m-d', strtotime($invoice['tanggal_invoice']))));
 			$NPWP = preg_replace("/[^0-9]/", "", $invoice['npwp']);
 			if (strlen($NPWP) < 16) {
 				$NPWP = str_pad($NPWP, 16, '0', STR_PAD_LEFT);
@@ -3274,7 +3274,7 @@ class Wt_invoicing extends Admin_Controller
 
 		foreach ($invoices_data as $invoice) {
 
-			$tanggal_faktur_formatted = PHPExcel_Shared_Date::PHPToExcel(strtotime($invoice['tanggal_invoice']));
+			$tanggal_faktur_formatted = PHPExcel_Shared_Date::PHPToExcel(strtotime(date('Y-m-d', strtotime($invoice['tanggal_invoice']))));
 			$NPWP = preg_replace("/[^0-9]/", "", $invoice['npwp']);
 			if (strlen($NPWP) < 16) {
 				$NPWP = str_pad($NPWP, 16, '0', STR_PAD_LEFT);
