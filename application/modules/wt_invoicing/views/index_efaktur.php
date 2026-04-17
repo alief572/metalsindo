@@ -100,8 +100,13 @@
 		$("#form-area").hide();
 	});
 
+	var current_search = '';
+	var total_valid_npwp = 0;
+	var id_generate = [];
+	var dtTable = null;
+
 	function DataTables() {
-		var DataTables = $('#example5').dataTable({
+		dtTable = $('#example5').DataTable({
 			serverSide: true,
 			processing: true,
 			paging: true,
@@ -112,7 +117,8 @@
 				dataType: 'json'
 			},
 			columns: [{
-					data: 'action'
+					data: 'action',
+					orderable: false
 				},
 				{
 					data: 'npwp'
@@ -120,9 +126,6 @@
 				{
 					data: 'nama_customer'
 				},
-				// {
-				// 	data: 'no_faktur'
-				// },
 				{
 					data: 'no_invoice'
 				},
@@ -144,30 +147,28 @@
 					total_valid_npwp = settings.json.totalValid;
 				}
 
-				var apiSearch = $('#example5').DataTable().search();
+				// Reset pilihan hanya jika keyword search berubah
+				// Ambil search value langsung dari settings request, bukan dari instance
+				var apiSearch = (settings.oInit && settings.ajax) ? '' : '';
+				try {
+					apiSearch = settings.oPreviousSearch ? settings.oPreviousSearch.sSearch : '';
+				} catch (e) {}
+
 				if (apiSearch !== current_search) {
 					current_search = apiSearch;
 					id_generate = [];
 					$('#no_surat_all').prop('checked', false);
 				}
 
+				// Restore state checkbox sesuai id_generate
 				$('.check_nosurat').each(function() {
-					var val = $(this).val();
-					if (id_generate.indexOf(val) !== -1) {
-						$(this).prop('checked', true);
-					} else {
-						$(this).prop('checked', false);
-					}
+					$(this).prop('checked', id_generate.indexOf($(this).val()) !== -1);
 				});
+
 				updateCheckAllState();
 			}
 		});
 	}
-
-	var current_search = '';
-	var total_valid_npwp = 0;
-	// E-Faktur
-	var id_generate = [];
 
 	function updateCheckAllState() {
 		var allChecked = false;
@@ -190,7 +191,7 @@
 				url: siteurl + active_controller + 'get_all_efaktur_id',
 				type: 'post',
 				data: {
-					search: $('#example5').DataTable().search()
+					search: dtTable ? dtTable.search() : ''
 				},
 				dataType: 'json',
 				success: function(result) {
@@ -217,11 +218,11 @@
 	$(document).on('change', '.check_nosurat', function() {
 		var isChecked = $(this).is(':checked');
 		var val = $(this).val();
-		var npwp = $(this).data('npwp');
+		var npwp = String($(this).data('npwp') || '').trim();
 		var index = id_generate.indexOf(val);
 
 		if (isChecked) {
-			if (!npwp || npwp.trim() === '') {
+			if (npwp === '') {
 				$(this).prop('checked', false);
 				swal({
 					title: "Peringatan",
@@ -246,9 +247,10 @@
 	$(document).on('click', '.list_efaktur', function(e) {
 		window.location.href = siteurl + active_controller + "e_faktur_list";
 	});
+
 	$(document).on('click', '.generate', function(e) {
-		// console.log('generate', id_generate);
-		// return true;
+		console.log('id_generate saat klik:', id_generate);
+		console.log('jumlah:', id_generate.length);
 
 		if (id_generate.length === 0) {
 			swal({
@@ -281,18 +283,26 @@
 							id_generate: id_generate
 						},
 						success: function(result) {
-							window.location.href = siteurl + active_controller + "export_coretax_excel";
+							if (result.status === 'success') {
+								window.location.href = siteurl + active_controller + "export_coretax_excel";
 
-							swal({
-								title: "Generate Success!",
-								text: result.msg,
-								type: "success",
-								timer: 1500,
-								showCancelButton: false,
-								showConfirmButton: false,
-								allowOutsideClick: false
-							});
-							DataTables('set');
+								swal({
+									title: "Generate Success!",
+									text: result.msg,
+									type: "success",
+									timer: 1500,
+									showCancelButton: false,
+									showConfirmButton: false,
+									allowOutsideClick: false
+								});
+								DataTables('set');
+							} else {
+								swal({
+									title: "Peringatan",
+									text: result.message || 'Tidak ada data yang diproses',
+									type: "warning"
+								});
+							}
 						},
 						error: function(request, error) {
 							console.log(arguments);
