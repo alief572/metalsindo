@@ -3021,7 +3021,9 @@ class Wt_invoicing extends Admin_Controller
 					$item['ppnbm']
 				];
 
-				$sheetDetail->fromArray($dataDetail, NULL, 'A' . $rowDetail);
+				$barang_jasa = (!empty($tipe_invoice)) ? 'B' : 'A';
+
+				$sheetDetail->fromArray($dataDetail, NULL, $barang_jasa . $rowDetail);
 
 				$sheetDetail->setCellValueExplicit('C' . $rowDetail, (empty($tipe_invoice)) ? $item['kode_coretax'] : '290000', PHPExcel_Cell_DataType::TYPE_STRING);
 				$sheetDetail->getStyle('C' . $rowDetail)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
@@ -3178,8 +3180,10 @@ class Wt_invoicing extends Admin_Controller
 
 				$nama_barang = (!empty($tipe_invoice)) ? $tipe_invoice . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
 
+				$barang_jasa = (!empty($tipe_jasa)) ? 'B' : 'A';
+
 				$items[] = [
-					'barang_jasa' => 'A',
+					'barang_jasa' => $barang_jasa,
 					'nama_barang' =>  $nama_barang . ', ' . $item_sheet->tobe_size,
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
