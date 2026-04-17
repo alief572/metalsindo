@@ -2678,9 +2678,10 @@ class Wt_invoicing extends Admin_Controller
 		foreach ($get_data->result_array() as $item) {
 			$no++;
 
-			$this->db->select('a.*, b.id_bentuk, b.nama as nama_barang');
+			$this->db->select('a.*, b.id_bentuk, b.nama as nama_barang, c.type as tipe_invoice');
 			$this->db->from('tr_invoice_detail a');
 			$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3', 'left');
+			$this->db->join('tr_invoice c', 'c.no_surat = a.no_invoice', 'left');
 			$this->db->where('a.no_invoice', $item['no_invoice']);
 			// $this->db->where('b.id_bentuk', 'B2000002');
 			$get_detail_sheet = $this->db->get()->result();
@@ -2690,6 +2691,9 @@ class Wt_invoicing extends Admin_Controller
 			$nilai_ppn = 0;
 			$nilai_dpp = 0;
 			foreach ($get_detail_sheet as $item_sheet) {
+
+				$tipe_invoice = ($item_sheet->tipe_invoice == 'slitting') ? 'Jasa Slitting' : '';
+
 				$qty = 0;
 				$satuan = 'UM.0003';
 				if ($item_sheet->id_bentuk == 'B2000002') {
@@ -2736,9 +2740,13 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
+				if ($tipe_invoice == 'Jasa Slitting') {
+					$satuan = 'UM.0033';
+				}
+
 				$items[] = [
 					'barang_jasa' => 'A',
-					'nama_barang' => $item_sheet->nama_barang,
+					'nama_barang' => $tipe_invoice . ' ' . $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
@@ -2825,6 +2833,8 @@ class Wt_invoicing extends Admin_Controller
 		// =====================
 
 		$this->session->set_userdata('export_data_temp', $invoices_data_for_export);
+
+		session_write_close();
 
 		echo json_encode(['status' => 'success']);
 		exit;

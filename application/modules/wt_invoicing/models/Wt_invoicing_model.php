@@ -856,17 +856,15 @@ class Wt_invoicing_model extends BF_Model
   public function get_efaktur()
   {
     $draw   = $this->input->post('draw');
-    $start  = $this->input->post('start');
-    $length = $this->input->post('length');
+    $start  = (int) $this->input->post('start');
+    $length = (int) $this->input->post('length');
     $search = $this->input->post('search');
 
-    // Gunakan View yang sudah di-optimize
     $this->db->from('view_efaktur_invoice');
     $this->db->where('stat_efaktur', 0);
 
-    // Hitung Total Records (Tanpa Filter)
-    $db_clone1 = clone $this->db;
-    $count_all = $db_clone1->count_all_results();
+    // Total tanpa filter
+    $count_all = $this->db->count_all_results('', false);
 
     // Filter Search
     if (!empty($search['value'])) {
@@ -876,59 +874,58 @@ class Wt_invoicing_model extends BF_Model
       $this->db->or_like('nama_customer', $val);
       $this->db->or_like('term', $val);
       $this->db->or_like('nomor_do', $val);
+      $this->db->or_like('tgl_invoice', $val);
       $this->db->group_end();
     }
 
-    // Hitung Filtered Records
-    $db_clone2      = clone $this->db;
-    $count_filtered = $db_clone2->count_all_results();
+    // Total setelah filter
+    $count_filtered = $this->db->count_all_results('', false);
 
-    // Hitung Valid Records (NPWP tidak kosong)
-    $db_clone3   = clone $this->db;
-    $db_clone3->where('npwp !=', '');
-    $db_clone3->where('npwp IS NOT NULL', null, false);
-    $count_valid = $db_clone3->count_all_results();
+    // Hitung Valid Records (NPWP tidak kosong, untuk keperluan check-all state)
+    $this->db->where('npwp !=', '');
+    $this->db->where('npwp IS NOT NULL', null, false);
+    $count_valid = $this->db->count_all_results('', false);
 
-    // Order dan Limit
-    $this->db->order_by('tgl_invoice', 'DESC');
-    $this->db->limit($length, $start);
+    // Ambil data
+    $rows = $this->db
+      ->order_by('tgl_invoice', 'DESC')
+      ->limit($length, $start)
+      ->get()
+      ->result_array();
 
-    $get_data = $this->db->get()->result_array();
-
-    $hasil = [];
-    $no    = $start;
-
-    foreach ($get_data as $item) {
+    $no   = $start;
+    $data = array_map(function ($item) use (&$no) {
       $no++;
 
-      // Action checkbox
-      $action = "<input class='check_nosurat' type='checkbox' 
-                    value='{$item['no_invoice']}' 
-                    id='no_surat_$no' 
-                    data-npwp='{$item['npwp']}'>";
+      $npwp_bersih = preg_replace('/[^0-9]/', '', $item['npwp']);
 
-      $hasil[] = [
+      $action = "<input class='check_nosurat' type='checkbox'
+                    value='{$item['no_invoice']}'
+                    id='no_surat_{$no}'
+                    data-npwp='{$npwp_bersih}'>";
+
+      return [
         'no'              => $no,
         'no_faktur'       => '',
         'no_invoice'      => $item['no_invoice'],
-        'npwp'            => (empty($item['npwp'])) ? '<span class="text-danger"><b>KOSONG</b></span>' : $item['npwp'],
-        'nama_customer'   => $item['nama_customer'], // Sudah UPPER di View
+        'npwp'            => empty($npwp_bersih) ? '<span class="text-danger"><b>KOSONG</b></span>' : $item['npwp'],
+        'nama_customer'   => $item['nama_customer'],
         'term'            => $item['term'],
         'nomor_do'        => $item['nomor_do'],
         'nilai_dpp'       => number_format($item['nilai_dpp']),
         'nilai_ppn'       => number_format($item['nilai_ppn']),
         'nilai_invoice'   => number_format($item['nilai_invoice']),
         'tanggal_invoice' => date('d-F-Y', strtotime($item['tgl_invoice'])),
-        'action'          => $action
+        'action'          => $action,
       ];
-    }
+    }, $rows);
 
     return [
       'draw'            => intval($draw),
       'recordsTotal'    => $count_all,
       'recordsFiltered' => $count_filtered,
       'totalValid'      => $count_valid,
-      'data'            => $hasil
+      'data'            => $data,
     ];
   }
 
