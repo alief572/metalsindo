@@ -7,16 +7,11 @@
  * This is model class for table "Customer"
  */
 
-class Delivery_order_model extends BF_Model
+class Sj_retur_pmb_model extends BF_Model
 {
 	/**
 	 * @var string  User Table Name
 	 */
-	protected $viewPermission 	= 'Delivery_Order.View';
-	protected $addPermission  	= 'Delivery_Order.Add';
-	protected $managePermission = 'Delivery_Order.Manage';
-	protected $deletePermission = 'Delivery_Order.Delete';
-
 	protected $table_name = 'ms_inventory_category3';
 	protected $key        = 'id';
 
@@ -70,35 +65,16 @@ class Delivery_order_model extends BF_Model
 
 	function generate_code($kode = '')
 	{
-		$query = $this->db->query("SELECT MAX(id_delivery_order) as max_id FROM tr_delivery_order");
+		$query = $this->db->query("SELECT MAX(id_retur) as max_id FROM tr_retur_penjualan");
 		$row = $query->row_array();
 		$thn = date('y');
 		$max_id = $row['max_id'];
-		$max_id1 = (int) substr($max_id, 4, 5);
+		$max_id1 = (int) substr($max_id, 3, 5);
 		$counter = $max_id1 + 1;
-		$idcust = "DO" . $thn . str_pad($counter, 5, "0", STR_PAD_LEFT);
+		$idcust = "R" . $thn . str_pad($counter, 5, "0", STR_PAD_LEFT);
 		return $idcust;
 	}
 
-	function BuatNomorOld($kode = '')
-	{
-		$bulan = date('m');
-		$tahun = date('Y');
-		$romawi = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'][$bulan - 1];
-
-		$this->db->select('MAX(no_surat) as max_id');
-		$this->db->from('tr_delivery_order');
-		$this->db->where('MONTH(tgl_delivery_order)', $bulan);
-		$this->db->where('YEAR(tgl_delivery_order)', $tahun);
-		$query = $this->db->get();
-		$row = $query->row_array();
-		$max_id = (!empty($row['max_id'])) ? $row['max_id'] : '0';
-
-		$max_id1 = (int) substr($max_id, 0, 3);
-		$counter = $max_id1 + 1;
-		$idcust = sprintf("%03s", $counter) . "/DO-MP/" . $romawi . "/" . $tahun;
-		return $idcust;
-	}
 
 	function BuatNomor($kode = '')
 	{
@@ -130,35 +106,14 @@ class Delivery_order_model extends BF_Model
 		} elseif ($bulan == '12') {
 			$romawi = 'XII';
 		}
-
-		$romawiToString = [
-			'I' => 1,
-			'II' => 2,
-			'III' => 3,
-			'IV' => 4,
-			'V' => 5,
-			'VI' => 6,
-			'VII' => 7,
-			'VIII' => 8,
-			'IX' => 9,
-			'X' => 10,
-			'XI' => 11,
-			'XII' => 12
-		];
-
-		$bulan_kode = substr($kode, 11, 3);
-		$bulan_kode2 = str_replace('/', '', $bulan_kode);
-		$bulan_kode3 = $romawiToString[$bulan_kode2];
-
 		$blnthn = date('Y-m');
-		$query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id FROM tr_delivery_order WHERE no_surat LIKE '%/" . date('y', strtotime($thn)) . "%'");
+		$query = $this->db->query("SELECT MAX(no_retur) as max_id FROM tr_retur_penjualan WHERE Year(tahun)='$thn' AND month(tahun)='$bulan'");
 		$row = $query->row_array();
-		//$thn = date('T');
+		// $thn = date('T');
 		$max_id = $row['max_id'];
-		$max_id1 = (int) $max_id;
+		$max_id1 = (int) substr($max_id, -4);
 		$counter = $max_id1 + 1;
-		$idcust = "DO-MP/" . $tahun . "/" . $romawi . "/" . sprintf("%04s", $counter);
-
+		$idcust = "RTR-SPK/" . $tahun . "/" . $romawi . "/" . sprintf("%04s", $counter);
 		return $idcust;
 	}
 
@@ -168,35 +123,29 @@ class Delivery_order_model extends BF_Model
 		$this->db->from('dt_inquery_transaksi a');
 		$this->db->join('ms_inventory_category3 b', 'b.id_category3=a.id_category3');
 		$this->db->join('ms_inventory_category2 c', 'c.id_category2=b.id_category2');
-		$this->db->order_by('a.id_dt_inquery', 'DESC');
+		$this->db->order_by('a.id_dt_inquery', DESC);
 		$this->db->where('a.no_inquery', $id_crcl);
 		$query = $this->db->get();
 		return $query->result();
 	}
 
-	public function CariDO()
+	public function CariSPK()
 	{
 		$this->db->select('a.*, b.name_customer as name_customer');
-		$this->db->from('tr_delivery_order a');
+		$this->db->from('tr_spk_marketing a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		$this->db->order_by('a.id_delivery_order', 'DESC');
+		$this->db->order_by('a.id_spkmarketing', DESC);
 		$query = $this->db->get();
 		return $query->result();
 	}
-	public function CariDOopen()
+	public function CariRetur()
 	{
 		$this->db->select('a.*, b.name_customer as name_customer');
-		$this->db->from('tr_delivery_order a');
+		$this->db->from('tr_retur_penjualan a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		$this->db->join('dt_delivery_order_child c', 'c.id_delivery_order = a.id_delivery_order', 'left');
-		$this->db->order_by('a.id_delivery_order', 'DESC');
-		$this->db->where('a.status_approve', '1');
-		$this->db->where('a.status_invoice', 'OPN');
-		$this->db->group_start();
-		$this->db->where('c.qty_in >', 0);
-		$this->db->or_where('c.qty_ng >', 0);
-		$this->db->group_end();
-		$this->db->group_by('a.id_delivery_order');
+		$this->db->where('a.sts <>', '1');
+		$this->db->or_where('a.sts', null);
+		$this->db->order_by('a.id_retur', DESC);
 		$query = $this->db->get();
 		return $query->result();
 	}
@@ -205,9 +154,9 @@ class Delivery_order_model extends BF_Model
 	public function getHeaderPenawaran($id)
 	{
 		$this->db->select('a.*, b.name_customer as name_customer, b.address_office as address_office, b.telephone as telephone,b.fax as fax');
-		$this->db->from('tr_delivery_order a');
+		$this->db->from('tr_penawaran a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		$this->db->where('a.id_delivery_order', $id);
+		$this->db->where('a.no_penawaran', $id);
 		$query = $this->db->get();
 		return $query->result();
 	}
@@ -222,23 +171,12 @@ class Delivery_order_model extends BF_Model
 	}
 	public function PrintDetail($id)
 	{
-		$this->db->select('a.*');
-		$this->db->from('dt_delivery_order_child a');
-		// $this->db->join('ms_inventory_category3 b','b.id_category3=a.id_material');
-		// $this->db->join('ms_inventory_category2 c','c.id_category2=b.id_category2');
-		// $this->db->join('child_inven_dimensi d','d.id_category3=a.id_category3');
-		$this->db->where('a.id_delivery_order', $id);
-		$query = $this->db->get();
-		return $query->result();
-	}
-	public function PrintDetail2($id)
-	{
-		$this->db->select('a.*');
-		$this->db->from('dt_delivery_order_child_scrap a');
-		// $this->db->join('ms_inventory_category3 b','b.id_category3=a.id_material');
-		// $this->db->join('ms_inventory_category2 c','c.id_category2=b.id_category2');
-		// $this->db->join('child_inven_dimensi d','d.id_category3=a.id_category3');
-		$this->db->where('a.id_delivery_order', $id);
+		$this->db->select('a.*, b.nama as nama3,b.hardness as hardness, c.nama as nama2 , d.nilai_dimensi as nilai');
+		$this->db->from('child_penawaran a');
+		$this->db->join('ms_inventory_category3 b', 'b.id_category3=a.id_category3');
+		$this->db->join('ms_inventory_category2 c', 'c.id_category2=b.id_category2');
+		$this->db->join('child_inven_dimensi d', 'd.id_category3=a.id_category3');
+		$this->db->where('a.no_penawaran', $id);
 		$query = $this->db->get();
 		return $query->result();
 	}
@@ -296,14 +234,6 @@ class Delivery_order_model extends BF_Model
 		}
 
 		return $query->result();
-	}
-
-	function get_produksi()
-	{
-		$this->db->order_by('no_surat', 'DESC');
-		return $this->db->from('dt_tr_spk_produksi')
-			->get()
-			->result();
 	}
 
 	function getById($id)
@@ -387,126 +317,206 @@ class Delivery_order_model extends BF_Model
 		return $query->result();
 	}
 
-	public function get_delivery_order()
+	public function CariSPKRetur()
 	{
-		$draw = $this->input->post('draw');
-		$length = $this->input->post('length');
-		$start = $this->input->post('start');
-		$search = $this->input->post('search');
-
 		$this->db->select('a.*, b.name_customer as name_customer');
-		$this->db->from('tr_delivery_order a');
+		$this->db->from('tr_spk_marketing_retur a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+		$this->db->order_by('a.id_spkmarketing', DESC);
+		$query = $this->db->get();
+		return $query->result();
+	}
+
+
+	public function get_retur_incoming()
+	{
+		$ENABLE_MANAGE = has_permission('Retur_Penjualan.Manage');
+
+		$post   = $this->input->post();
+		$draw   = intval($post['draw']);
+		$length = intval($post['length']);
+		$start  = intval($post['start']);
+		$search = $post['search']['value'];
+
+		$this->db->from('v_retur_incoming');
+
+		// Filter Search
 		if (!empty($search)) {
 			$this->db->group_start();
-			$this->db->like('DATE_FORMAT(a.tgl_delivery_order, "%d-%M-%Y")', $search['value'], 'both');
-			$this->db->or_like('a.no_surat', $search['value'], 'both');
-			$this->db->or_like('a.no_spk_marketing', $search['value'], 'both');
-			$this->db->or_like('b.name_customer', $search['value'], 'both');
-			$this->db->or_like('a.type', $search['value'], 'both');
+			$this->db->like('no_spk', $search, 'both');
+			$this->db->or_like('name_customer', $search, 'both');
+			$this->db->or_like('all_no_do', $search, 'both');
+			$this->db->or_like('tgl_spk_marketing', $search, 'both');
 			$this->db->group_end();
 		}
-		$this->db->group_by('a.id_delivery_order');
-		$this->db->order_by('a.id_delivery_order', 'desc');
 
-		$db_clone = clone $this->db;
-		$count_all = $db_clone->count_all_results();
+		// Hitung total setelah filter
+		$count_filter = $this->db->count_all_results('', false);
 
+		// Ordering
+		$this->db->order_by('id_spkmarketing', 'DESC');
+
+		// Limit & Offset
 		$this->db->limit($length, $start);
-		$query = $this->db->get();
+		$get_data = $this->db->get()->result();
 
 		$hasil = [];
+		$no = $start;
 
-		$no = (0 + $start);
-		foreach ($query->result() as $item) {
+		foreach ($get_data as $item) {
 			$no++;
 
-			$button = '';
+			// Status Badge logic
+			$status = ($item->status_approve == '1')
+				? '<span class="badge bg-green">Approve</span>'
+				: '<span class="badge bg-red">Belum di Approve</span>';
 
-			if ($item->status_approve == 1) {
-				if (has_permission($this->viewPermission)) {
-					$button = '
-						<a class="btn btn-primary btn-sm" href="' . base_url('/delivery_order/PrintHeader/' . $item->id_delivery_order) . '" target="_blank" title="Print"><i class="fa fa-print"></i>
-						</a>
-						<a class="btn btn-success btn-sm" href="' . base_url('/delivery_order/PrintHeaderWord/' . $item->id_delivery_order) . '" target="_blank" title="Print Word"><i class="fa fa-file-word-o"></i>
-						</a>
-						<a class="btn btn-success btn-sm" href="' . base_url('/delivery_order/PrintHeaderHtml/' . $item->id_delivery_order) . '" target="_blank" title="Ke Printer"><i class="fa fa-print"></i>
-						</a>
-						<a class="btn btn-warning btn-sm" href="' . base_url('/delivery_order/PrintHeaderSlitting/' . $item->id_delivery_order) . '" target="_blank" title="Print"><i class="fa fa-print"></i>
-						</a>
-						<a class="btn btn-primary btn-sm" href="' . base_url('/delivery_order/PrintHeaderWordSlitting/' . $item->id_delivery_order) . '" target="_blank" title="Print Word Slitting"><i class="fa fa-file-word-o"></i>
-						</a>
-					';
-				}
-			} else {
-				if (has_permission($this->viewPermission)) {
-					$button .= '
-						<a class="btn btn-primary btn-sm" href="' . base_url('/delivery_order/PrintHeaderHtml/' . $item->id_delivery_order) . '" target="_blank" title="Print"><i class="fa fa-print"></i>
-						</a>
-						<a class="btn btn-success btn-sm" href="' . base_url('/delivery_order/PrintHeaderWord/' . $item->id_delivery_order) . '" target="_blank" title="Print Word"><i class="fa fa-file-word-o"></i>
-						</a>
-						<a class="btn btn-warning btn-sm" href="' . base_url('/delivery_order/PrintHeaderSlitting/' . $item->id_delivery_order) . '" target="_blank" title="Print"><i class="fa fa-print"></i>
-						</a>
-						<a class="btn btn-primary btn-sm" href="' . base_url('/delivery_order/PrintHeaderWordSlitting/' . $item->id_delivery_order) . '" target="_blank" title="Print Word Slitting"><i class="fa fa-file-word-o"></i>
-						</a>
-					';
-				}
-				if (has_permission($this->managePermission)) {
-					$button .= '
-						<a class="btn btn-info btn-sm" href="' . base_url('/delivery_order/editHeader/' . $item->id_delivery_order) . '" title="Edit"><i class="fa fa-edit"></i></i></a>
-					';
-				}
-				if (has_permission($this->managePermission)) {
-					$button .= '
-						<button type="text" class="btn btn-success btn-sm release" title="Release" data-id="' . $item->id_delivery_order . '"><i class="fa fa-check"></i></button>
-					';
-				}
+			// Action logic
+			$action = '';
+			if ($ENABLE_MANAGE) {
+				$action = '<a class="btn btn-info btn-sm" href="' . base_url('/retur_penjualan/proses_incoming/' . $item->id_spkmarketing) . '" title="Edit"><i class="fa fa-edit"></i></a>';
 			}
 
-			$this->db->select('SUM(a.weight_mat) as total_fg');
-			$this->db->from('dt_delivery_order_child a');
-			$this->db->where('a.id_delivery_order', $item->id_delivery_order);
-			$get_total_fg = $this->db->get()->row();
-
-			$this->db->select('SUM(a.weight) as total_scrap');
-			$this->db->from('dt_delivery_order_child_scrap a');
-			$this->db->where('a.id_delivery_order', $item->id_delivery_order);
-			$get_total_scrap = $this->db->get()->row();
-
-
-			$this->db->select('a.width, a.weight_mat, b.id_bentuk, b.total_weight');
-			$this->db->from('dt_delivery_order_child a');
-			$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_material', 'left');
-			$this->db->where('a.id_delivery_order', $item->id_delivery_order);
-			$get_do_item = $this->db->get()->result();
-
-			$total_sheet = 0;
-			foreach ($get_do_item as $item_do) :
-				if ($item_do->id_bentuk == 'B2000002') {
-					$total_sheet += ($item_do->width / $item_do->total_weight);
-				}
-			endforeach;
-
 			$hasil[] = [
-				'no' => $no,
-				'tanggal_do' => date('d-M-Y', strtotime($item->tgl_delivery_order)),
-				'no_do' => $item->no_surat,
-				'no_spk_marketing' => $item->no_spk_marketing,
-				'nm_customer' => strtoupper($item->name_customer),
-				'total_fg' => number_format($get_total_fg->total_fg, 2),
-				'total_scrap' => number_format($get_total_scrap->total_scrap, 2),
-				'total_berat' => number_format($get_total_fg->total_fg + $get_total_scrap->total_scrap, 2),
-				'total_sheet' => number_format($total_sheet, 2),
-				'tipe' => strtoupper($item->type),
-				'action' => $button
+				'no'                 => $no,
+				'tanggal_spk_terbit' => date('d F Y', strtotime($item->tgl_spk_marketing)),
+				'no_spk'             => $item->no_spk,
+				'customer'           => $item->name_customer,
+				'no_do'              => $item->all_no_do, // Sudah dapet string dari View
+				'status'             => $status,
+				'action'             => $action
 			];
 		}
 
-		echo json_encode([
-			"draw" => $draw,
-			"recordsTotal" => $count_all,
-			"recordsFiltered" => $count_all,
-			"data" => $hasil
-		]);
+		$response = [
+			'draw'            => $draw,
+			'recordsTotal'    => $count_filter, // Sesuaikan jika ingin real count_all tanpa filter
+			'recordsFiltered' => $count_filter,
+			'data'            => $hasil
+		];
+
+		$this->output->set_content_type('application/json')->set_output(json_encode($response));
 	}
+
+	public function get_last_stock($lotno)
+	{
+		$this->db->select('a.*');
+		$this->db->from('stock_material a');
+		$this->db->where('a.lotno', $lotno);
+		$this->db->order_by('a.created_on', 'desc');
+		$this->db->limit(1);
+		$get_data = $this->db->get()->row();
+
+		return $get_data;
+	}
+
+	public function get_data_nota_retur($post)
+	{
+		$this->db->from('v_nota_retur');
+
+		// Search
+		if (!empty($post['search']['value'])) {
+			$search = $post['search']['value'];
+			$this->db->group_start();
+			$this->db->like('no_retur', $search);
+			$this->db->or_like('name_customer', $search);
+			$this->db->or_like('tgl_retur', $search);
+			$this->db->group_end();
+		}
+
+		// Return object dengan data dan jumlah filter sekaligus
+		$temp_db = clone $this->db;
+		$count_filter = $temp_db->count_all_results();
+
+		$this->db->order_by('id_retur', 'desc');
+		$this->db->limit($post['length'], $post['start']);
+		$query = $this->db->get();
+
+		return [
+			'data' => $query->result(),
+			'count_filter' => $count_filter
+		];
+	}
+
+	public function get_datatables_retur($length, $start, $search)
+	{
+		$this->db->select('a.*, b.name_customer');
+		$this->db->select('(SELECT COALESCE(SUM(total_harga), 0) FROM dt_spkmarketing_retur WHERE id_spkmarketing = a.id_spkmarketing) AS nilai_spk');
+		$this->db->from('tr_spk_marketing_retur a');
+		$this->db->join('master_customers b', 'b.id_customer = a.id_customer');
+
+		$this->db->group_start()
+			->where('a.sts <>', '1')
+			->or_where('a.sts IS NULL', null, false)
+			->group_end();
+
+		if (!empty($search)) {
+			$this->db->group_start();
+			$this->db->like('a.no_surat', $search);
+			$this->db->or_like('b.name_customer', $search);
+			$this->db->group_end();
+		}
+
+		$this->db->order_by('a.id_spkmarketing', 'desc');
+		if ($length != -1) $this->db->limit($length, $start);
+
+		return $this->db->get()->result();
+	}
+
+	/* ------------------------- Di dalam M_retur.php ------------------------- */
+
+	/**
+	 * Base Query untuk menghindari pengulangan kode
+	 * (Private function agar konsisten antara get data & count filtered)
+	 */
+	private function _get_main_query()
+	{
+		$this->db->from('tr_spk_marketing_retur a');
+		$this->db->join('master_customers b', 'b.id_customer = a.id_customer');
+
+		// Filter Status: sts tidak sama dengan 1 atau NULL
+		$this->db->group_start()
+			->where('a.sts <>', '1')
+			->or_where('a.sts IS NULL', null, false)
+			->group_end();
+	}
+
+	/**
+	 * Menghitung SEMUA data tanpa filter search
+	 */
+	public function count_all_retur()
+	{
+		$this->_get_main_query();
+		return $this->db->count_all_results();
+	}
+
+	/**
+	 * Menghitung data setelah diterapkan filter SEARCH
+	 */
+	public function count_filtered_retur($search = null)
+	{
+		$this->_get_main_query();
+
+		if (!empty($search)) {
+			$this->db->group_start();
+			$this->db->like('a.no_surat', $search);
+			$this->db->or_like('b.name_customer', $search);
+			// Sesuaikan format tgl jika ingin bisa disearch (opsional)
+			$this->db->or_like('DATE_FORMAT(a.tgl_spk_marketing, "%d %M %Y")', $search);
+			$this->db->group_end();
+		}
+
+		return $this->db->count_all_results();
+	}
+
+	// public function get_last_stock($lotno) {
+	// 	$this->db->select('a.*');
+	// 	$this->db->from('stock_material a');
+	// 	$this->db->where('a.lotno', $lotno);
+	// 	$this->db->order_by('a.created_on', 'desc');
+	// 	$this->db->limit(1);
+	// 	$get_data = $this->db->get()->row();
+
+	// 	return $get_data;
+	// }
 }
