@@ -74,7 +74,7 @@ class Wt_invoicing extends Admin_Controller
 		$data = $this->Delivery_order_model->CariDOopen();
 		$this->template->set('results', $data);
 		$this->template->title('Invoicing');
-		$this->template->render('index_delivery_order');
+$this->template->render('index_delivery_order');
 	}
 
 	public function PrintHeader()
@@ -2691,6 +2691,9 @@ class Wt_invoicing extends Admin_Controller
 			$nilai_ppn = 0;
 			$nilai_dpp = 0;
 			foreach ($get_detail_sheet as $item_sheet) {
+
+				$tipe_invoice = ($item_sheet->tipe_invoice == 'slitting') ? 'Jasa Slitting' : '';
+
 				$qty = 0;
 				$satuan = 'UM.0003';
 				if ($item_sheet->id_bentuk == 'B2000002') {
@@ -2737,14 +2740,13 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
-				if ($item_sheet->tipe_invoice == 'slitting') {
+				if ($tipe_invoice == 'Jasa Slitting') {
 					$satuan = 'UM.0033';
 				}
 
-
 				$items[] = [
 					'barang_jasa' => 'A',
-					'nama_barang' =>  $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
+					'nama_barang' => $tipe_invoice . ' ' . $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
@@ -2772,7 +2774,7 @@ class Wt_invoicing extends Admin_Controller
 				'no_faktur' => '',
 				'no_invoice' => $item['no_surat'],
 				'npwp' => $item['npwp'],
-				'nama_customer' => strtoupper($npwp_name),
+				'nama_customer' => strtoupper($item['npwp_name']),
 				'address' => $item['npwp_address'],
 				'term' => $item['note'],
 				'nomor_do' => $item['no_do'],
