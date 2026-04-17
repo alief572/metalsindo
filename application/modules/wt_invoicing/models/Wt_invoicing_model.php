@@ -855,132 +855,80 @@ class Wt_invoicing_model extends BF_Model
 
   public function get_efaktur()
   {
-    $draw = $this->input->post('draw');
-    $start = $this->input->post('start');
+    $draw   = $this->input->post('draw');
+    $start  = $this->input->post('start');
     $length = $this->input->post('length');
     $search = $this->input->post('search');
 
-    $this->db->select('a.*, b.name_customer as name_customer, b.npwp');
-    $this->db->from('tr_invoice a');
-    $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-    $this->db->where('a.stat_efaktur =', 0);
-    // $this->db->where('b.npwp !=', '');
+    // Gunakan View yang sudah di-optimize
+    $this->db->from('view_efaktur_invoice');
+    $this->db->where('stat_efaktur', 0);
 
+    // Hitung Total Records (Tanpa Filter)
     $db_clone1 = clone $this->db;
     $count_all = $db_clone1->count_all_results();
 
+    // Filter Search
     if (!empty($search['value'])) {
+      $val = $search['value'];
       $this->db->group_start();
-      $this->db->like('a.no_surat', $search['value'], 'both');
-      $this->db->or_like('b.name_customer', $search['value'], 'both');
-      $this->db->or_like('a.note', $search['value'], 'both');
-      $this->db->or_like('a.no_do', $search['value'], 'both');
-      $this->db->or_like('a.nilai_invoice', $search['value'], 'both');
-      $this->db->or_like('a.tgl_invoice', $search['value'], 'both');
+      $this->db->like('no_invoice', $val);
+      $this->db->or_like('nama_customer', $val);
+      $this->db->or_like('term', $val);
+      $this->db->or_like('nomor_do', $val);
       $this->db->group_end();
     }
 
-    $db_clone2 = clone $this->db;
+    // Hitung Filtered Records
+    $db_clone2      = clone $this->db;
     $count_filtered = $db_clone2->count_all_results();
 
-    $db_clone3 = clone $this->db;
-    $db_clone3->where('b.npwp !=', '');
+    // Hitung Valid Records (NPWP tidak kosong)
+    $db_clone3   = clone $this->db;
+    $db_clone3->where('npwp !=', '');
+    $db_clone3->where('npwp IS NOT NULL', null, false);
     $count_valid = $db_clone3->count_all_results();
 
-    $this->db->order_by('a.tgl_invoice', 'DESC');
+    // Order dan Limit
+    $this->db->order_by('tgl_invoice', 'DESC');
     $this->db->limit($length, $start);
 
-    $get_data = $this->db->get();
+    $get_data = $this->db->get()->result_array();
 
     $hasil = [];
+    $no    = $start;
 
-    $no = (0 + $start);
-
-    foreach ($get_data->result_array() as $item) {
+    foreach ($get_data as $item) {
       $no++;
-      $noSurat = $item['no_surat'];
 
-      $action = "<input class='check_nosurat' type='checkbox' value='" . $noSurat . "' id='no_surat_$no' data-npwp='" . $item['npwp'] . "'>";
-
-      $this->db->select('a.*');
-      $this->db->from('tr_invoice_detail a');
-      $this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3');
-      $this->db->where('a.no_invoice', $item['no_invoice']);
-      $this->db->where('b.id_bentuk', 'B2000002');
-      $get_detail_sheet = $this->db->get()->result();
-
-      $tipe_sheet = (count($get_detail_sheet) > 0) ? '1' : '0';
-
-      if ($tipe_sheet == '1') {
-        $nilai_invoice = 0;
-        $nilai_ppn = 0;
-        $nilai_dpp = 0;
-
-        foreach ($get_detail_sheet as $item_sheet) {
-          $this->db->select('a.qty_sheet');
-          $this->db->from('stock_material a');
-          $this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
-          $this->db->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order');
-          $this->db->where('c.no_surat', $item['no_do']);
-          $this->db->where('b.id_material', $item_sheet->id_category3);
-          $this->db->where('a.no_kirim', $item['id_do']);
-          $this->db->group_by('a.id_stock');
-          $get_qty_sheet = $this->db->get()->result();
-
-          $qty_sheet = 0;
-          foreach ($get_qty_sheet as $item_qty_sheet) {
-            $qty_sheet += $item_qty_sheet->qty_sheet;
-          }
-
-          $total_awal = ($item_sheet->harga_satuan * $qty_sheet);
-          $dpp_lain_lain = ceil(11 / 12 * $total_awal);
-          $ppn = ($dpp_lain_lain * 12 / 100);
-
-          // $nilai_invoice += ($qty_sheet);
-          $nilai_invoice += ($total_awal + $ppn);
-          $nilai_ppn += ($ppn);
-          // $nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet);
-        }
-      } else {
-        $this->db->select('SUM(a.qty_invoice * a.harga_satuan) as ttl_harga');
-        $this->db->from('tr_invoice_detail a');
-        $this->db->where('a.no_invoice', $item['no_invoice']);
-        $get_total_invoice = $this->db->get()->row();
-
-        $ttl_harga = $get_total_invoice->ttl_harga;
-
-        $dpp_nilai_lain = ceil(11 / 12 * $ttl_harga);
-        $ppn = ($dpp_nilai_lain * 12 / 100);
-        $grand_total = ($ttl_harga + $ppn);
-
-        $nilai_invoice = $grand_total;
-        $nilai_ppn = $ppn;
-        $nilai_dpp = $dpp_nilai_lain;
-      }
-
+      // Action checkbox
+      $action = "<input class='check_nosurat' type='checkbox' 
+                    value='{$item['no_invoice']}' 
+                    id='no_surat_$no' 
+                    data-npwp='{$item['npwp']}'>";
 
       $hasil[] = [
-        'no' => $no,
-        'no_faktur' => '',
-        'no_invoice' => $item['no_surat'],
-        'npwp' => ($item['npwp'] == '' || $item['npwp'] == null) ? '<span class="text-danger"><b>KOSONG</b></span>' : $item['npwp'],
-        'nama_customer' => strtoupper($item['name_customer']),
-        'term' => $item['note'],
-        'nomor_do' => $item['no_do'],
-        'nilai_dpp' => number_format($nilai_dpp),
-        'nilai_ppn' => number_format($nilai_ppn),
-        'nilai_invoice' => number_format($nilai_invoice),
+        'no'              => $no,
+        'no_faktur'       => '',
+        'no_invoice'      => $item['no_invoice'],
+        'npwp'            => (empty($item['npwp'])) ? '<span class="text-danger"><b>KOSONG</b></span>' : $item['npwp'],
+        'nama_customer'   => $item['nama_customer'], // Sudah UPPER di View
+        'term'            => $item['term'],
+        'nomor_do'        => $item['nomor_do'],
+        'nilai_dpp'       => number_format($item['nilai_dpp']),
+        'nilai_ppn'       => number_format($item['nilai_ppn']),
+        'nilai_invoice'   => number_format($item['nilai_invoice']),
         'tanggal_invoice' => date('d-F-Y', strtotime($item['tgl_invoice'])),
-        'action' => $action
+        'action'          => $action
       ];
     }
 
     return [
-      'draw' => intval($draw),
-      'recordsTotal' => $count_all,
+      'draw'            => intval($draw),
+      'recordsTotal'    => $count_all,
       'recordsFiltered' => $count_filtered,
-      'totalValid' => $count_valid,
-      'data' => $hasil
+      'totalValid'      => $count_valid,
+      'data'            => $hasil
     ];
   }
 
