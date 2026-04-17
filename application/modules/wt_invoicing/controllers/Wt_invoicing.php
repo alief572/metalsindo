@@ -3141,14 +3141,10 @@ class Wt_invoicing extends Admin_Controller
 					foreach ($get_qty_sheet as $item_qty_sheet) {
 						$qty_sheet += $item_qty_sheet->qty_sheet;
 
-						if (!empty($tipe_invoice)) :
-							$satuan = 'UM.0033';
+						if ($item_qty_sheet->price_sheet > 0) :
+							$satuan = 'UM.0020';
 						else :
-							if ($item_qty_sheet->price_sheet > 0) :
-								$satuan = 'UM.0020';
-							else :
-								$satuan = 'UM.0003';
-							endif;
+							$satuan = 'UM.0003';
 						endif;
 					}
 					$qty = $qty_sheet;
@@ -3173,6 +3169,10 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_ppn = $ppn;
 					$nilai_dpp = $dpp_lain_lain;
 				}
+
+				if (!empty($tipe_invoice)) :
+					$satuan = 'UM.0033';
+				endif;
 
 				$items[] = [
 					'barang_jasa' => 'A',
