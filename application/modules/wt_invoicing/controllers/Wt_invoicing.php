@@ -3174,9 +3174,11 @@ class Wt_invoicing extends Admin_Controller
 					$satuan = 'UM.0033';
 				endif;
 
+				$nama_barang = (!empty($tipe_invoice)) ? $tipe_invoice . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
+
 				$items[] = [
 					'barang_jasa' => 'A',
-					'nama_barang' =>  $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
+					'nama_barang' =>  $nama_barang . ', ' . $item_sheet->tobe_size,
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
