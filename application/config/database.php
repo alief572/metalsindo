@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -77,9 +77,9 @@ $query_builder = true;
 $db['default'] = array(
     'dsn' => '',
     'hostname' => 'localhost',
-    'username' => 'metalsindo',
-    'password' => '93892ifkqKHD^&(hjh',
-    'database' => 'metalsindo_dev',
+    'username' => 'alief',
+    'password' => 'sdk*^HkfJKjkefJFJLEJLE',
+    'database' => 'metalsindo_live',
     'ports' => '3306',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
@@ -101,8 +101,8 @@ $db['default'] = array(
 $db['accounting'] = array(
     'dsn'    => '',
     'hostname' => 'localhost',
-    'username' => 'metalsindo',
-    'password' => '93892ifkqKHD^&(hjh',
+    'username' => 'alief',
+    'password' => 'sdk*^HkfJKjkefJFJLEJLE',
     'database' => 'gl_metalsindo_live',
     'ports' => '3306',
     'dbdriver' => 'mysqli',
