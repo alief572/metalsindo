@@ -2749,7 +2749,7 @@ class Wt_invoicing extends Admin_Controller
 					'ppn' => $ppn,
 					'tarif_ppnbm' => 0,
 					'ppnbm' => 0,
-					'kode_barang' => $item_sheet->id_category3
+					'kode_barang' => $item_sheet->kode_coretax
 				];
 			}
 			// echo '<pre>';
@@ -2937,6 +2937,8 @@ class Wt_invoicing extends Admin_Controller
 
 		foreach ($invoices_data as $invoice) {
 
+			$tipe_invoice = ($invoice['type'] == 'slitting') ? 'Jasa Slitting' : '';
+
 			$tanggal_faktur_formatted = date('d/m/Y', strtotime($invoice['tanggal_invoice']));
 			$NPWP = preg_replace("/[^0-9]/", "", $invoice['npwp']);
 			if (strlen($NPWP) < 16) {
@@ -2989,7 +2991,7 @@ class Wt_invoicing extends Admin_Controller
 					$itemRowIndex, // Kunci penghubung
 					$item['barang_jasa'],
 					'',
-					$item['nama_barang'] . ', ' . $item['tobe_size'],
+					$tipe_invoice . ' ' . $item['nama_barang'] . ', ' . $item['tobe_size'],
 					$item['satuan'],
 					$item['harga_satuan'],
 					$item['qty'],
@@ -3004,7 +3006,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$sheetDetail->fromArray($dataDetail, NULL, 'A' . $rowDetail);
 
-				$sheetDetail->setCellValueExplicit('C' . $rowDetail, $item['kode_barang'], PHPExcel_Cell_DataType::TYPE_STRING);
+				$sheetDetail->setCellValueExplicit('C' . $rowDetail, (empty($tipe_invoice)) ? $item['kode_barang'] : '290000', PHPExcel_Cell_DataType::TYPE_STRING);
 				$sheetDetail->getStyle('C' . $rowDetail)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
 
 				$rowDetail++;
@@ -3092,6 +3094,8 @@ class Wt_invoicing extends Admin_Controller
 		foreach ($get_data->result_array() as $item) {
 			$no++;
 
+			$tipe_invoice = ($item['type'] == 'slitting') ? 'Jasa Slitting' : '';
+
 			$this->db->select('a.*, b.id_bentuk, b.nama as nama_barang, c.kode_coretax');
 			$this->db->from('tr_invoice_detail a');
 			$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3', 'left');
@@ -3122,10 +3126,14 @@ class Wt_invoicing extends Admin_Controller
 					foreach ($get_qty_sheet as $item_qty_sheet) {
 						$qty_sheet += $item_qty_sheet->qty_sheet;
 
-						if ($item_qty_sheet->price_sheet > 0) :
-							$satuan = 'UM.0020';
+						if (!empty($tipe_invoice)) :
+							$satuan = 'UM.0033';
 						else :
-							$satuan = 'UM.0003';
+							if ($item_qty_sheet->price_sheet > 0) :
+								$satuan = 'UM.0020';
+							else :
+								$satuan = 'UM.0003';
+							endif;
 						endif;
 					}
 					$qty = $qty_sheet;
@@ -3153,7 +3161,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$items[] = [
 					'barang_jasa' => 'A',
-					'nama_barang' => $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
+					'nama_barang' => $tipe_invoice . ' ' . $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
@@ -3327,7 +3335,7 @@ class Wt_invoicing extends Admin_Controller
 					$itemRowIndex, // Kunci penghubung
 					$item['barang_jasa'],
 					'',
-					$item['nama_barang'] . ', ' . $item['tobe_size'],
+					$tipe_invoice . ' ' . $item['nama_barang'] . ', ' . $item['tobe_size'],
 					$item['satuan'],
 					$item['harga_satuan'],
 					$item['qty'],
@@ -3342,7 +3350,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$sheetDetail->fromArray($dataDetail, NULL, 'A' . $rowDetail);
 
-				$sheetDetail->setCellValueExplicit('C' . $rowDetail, $item['kode_barang'], PHPExcel_Cell_DataType::TYPE_STRING);
+				$sheetDetail->setCellValueExplicit('C' . $rowDetail, (empty($tipe_invoice)) ? $item['kode_barang'] : '290000', PHPExcel_Cell_DataType::TYPE_STRING);
 				$sheetDetail->getStyle('C' . $rowDetail)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
 
 				$rowDetail++;
