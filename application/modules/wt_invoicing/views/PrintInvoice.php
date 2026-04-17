@@ -420,8 +420,6 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 		foreach ($detail as $detail) {
 			$no++;
 
-
-
 			$get_inventory = $this->db->get_where('ms_inventory_category3', array('id_category3' => $detail->id_category3))->row_array();
 			if ($get_inventory['id_bentuk'] == 'B2000002') :
 				$this->db->select('a.price_sheet, a.qty_sheet');

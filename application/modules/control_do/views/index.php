@@ -14,6 +14,10 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 		font-size: 15px;
 		/* Sesuaikan dengan ukuran yang lebih besar */
 	}
+
+	.modal-lg {
+		width: 85% !important;
+	}
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
 <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
@@ -113,10 +117,14 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 						<th class="text-center">No. DO</th>
 						<th class="text-center">SPK Marketing</th>
 						<th class="text-center">Customer</th>
-						<th class="text-center">Qty Order</th>
-						<th class="text-center">Qty OK</th>
-						<th class="text-center">Qty FG</th>
-						<th class="text-centre">Qty NG</th>
+						<th class="text-center">Qty Order (Kg)</th>
+						<th class="text-center">Qty Order (Sheet)</th>
+						<th class="text-center">Qty OK (Kg)</th>
+						<th class="text-center">Qty OK (Sheet)</th>
+						<th class="text-center">Qty FG (Kg)</th>
+						<th class="text-center">Qty FG (Sheet)</th>
+						<th class="text-centre">Qty NG (Kg)</th>
+						<th class="text-centre">Qty NG (Sheet)</th>
 						<th class="text-center">Option</th>
 					</tr>
 				</thead>
@@ -208,10 +216,14 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 						<th class="text-center">No. DO</th>
 						<th class="text-center">SPK Marketing</th>
 						<th class="text-center">Customer</th>
-						<th class="text-center">Qty Order</th>
-						<th class="text-center">Qty OK</th>
-						<th class="text-center">Qty FG</th>
-						<th class="text-centre">Qty NG</th>
+						<th class="text-center">Qty Order (Kg)</th>
+						<th class="text-center">Qty Order (Sheet)</th>
+						<th class="text-center">Qty OK (Kg)</th>
+						<th class="text-center">Qty OK (Sheet)</th>
+						<th class="text-center">Qty FG (Kg)</th>
+						<th class="text-center">Qty FG (Sheet)</th>
+						<th class="text-center">Qty NG (Kg)</th>
+						<th class="text-center">Qty NG (Sheet)</th>
 						<th class="text-center">Option</th>
 					</tr>
 				</thead>
@@ -820,13 +832,25 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 					data: 'qty_order'
 				},
 				{
+					data: 'qty_order_sheet'
+				},
+				{
 					data: 'qty_delivery'
+				},
+				{
+					data: 'qty_delivery_sheet'
 				},
 				{
 					data: 'qty_fg'
 				},
 				{
-					data: 'balance'
+					data: 'qty_fg_sheet'
+				},
+				{
+					data: 'qty_ng'
+				},
+				{
+					data: 'qty_ng_sheet'
 				},
 				{
 					data: 'option'
@@ -878,15 +902,26 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 				},
 				{
 					data: 'qty_order'
+				}, {
+					data: 'qty_order_sheet'
 				},
 				{
 					data: 'qty_delivery'
 				},
 				{
+					data: 'qty_delivery_sheet'
+				},
+				{
 					data: 'qty_fg'
 				},
 				{
-					data: 'balance'
+					data: 'qty_fg_sheet'
+				},
+				{
+					data: 'qty_ng'
+				},
+				{
+					data: 'qty_ng_sheet'
 				},
 				{
 					data: 'option'

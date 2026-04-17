@@ -1,10 +1,3 @@
-<?php
-$ENABLE_ADD     = has_permission('Retur_Pembelian.Add');
-$ENABLE_MANAGE  = has_permission('Retur_Pembelian.Manage');
-$ENABLE_VIEW    = has_permission('Retur_Pembelian.View');
-$ENABLE_DELETE  = has_permission('Retur_Pembelian.Delete');
-
-?>
 <style type="text/css">
 	thead input {
 		width: 100%;
@@ -15,8 +8,6 @@ $ENABLE_DELETE  = has_permission('Retur_Pembelian.Delete');
 
 <div class="box">
 	<div class="box-body">
-		<a href="<?= base_url('retur_pembelian/add') ?>" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> Add Retur</a>
-		<br><br>
 		<table id="table_retur_pembelian" class="table table-bordered table-striped">
 			<thead>
 				<tr>
@@ -27,7 +18,6 @@ $ENABLE_DELETE  = has_permission('Retur_Pembelian.Delete');
 					<th class="text-center">Tanggal Retur</th>
 					<th class="text-center">No. Ref Invoice</th>
 					<th class="text-center">Tanggal Invoice</th>
-					<th class="text-center">Status</th>
 					<th class="text-center">Action</th>
 				</tr>
 			</thead>
@@ -88,70 +78,6 @@ $ENABLE_DELETE  = has_permission('Retur_Pembelian.Delete');
 		DataTables();
 	});
 
-	$(document).on('click', '.del_retur', function() {
-		var id = $(this).data('id');
-
-		Swal.fire({
-			icon: 'warning',
-			title: 'Anda yakin ?',
-			text: 'Data ini akan dihapus !',
-			showConfirmButton: true,
-			showCancelButton: true,
-			allowEscapeKey: false,
-			allowClickOutside: false
-		}).then((next) => {
-			if (next.isConfirmed) {
-				$.ajax({
-					type: 'post',
-					url: siteurl + active_controller + 'del_retur',
-					data: {
-						'id': id
-					},
-					cache: false,
-					dataType: 'json',
-					success: function(result) {
-						Swal.fire({
-							icon: 'success',
-							title: 'Success !',
-							text: result.msg,
-							showConfirmButton: false,
-							showCancelButton: false,
-							allowEscapeKey: false,
-							allowOutsideClick: false,
-							timer: 3000
-						}).then(() => {
-							Swal.close();
-							DataTables();
-						});
-					},
-					error: function(xhr, status, error) {
-						// 1. Ambil response teks dari server
-						var response = xhr.responseText;
-						var message = 'Terjadi kesalahan sistem.'; // Pesan default
-
-						try {
-							// 2. Coba parse JSON-nya
-							var data = JSON.parse(response);
-							if (data.msg) {
-								message = data.msg; // Ambil isi 'msg' dari PHP
-							}
-						} catch (e) {
-							// Jika response bukan JSON (misal error PHP fatal yang tampil sebagai HTML)
-							console.error("Gagal parse JSON error:", e);
-						}
-
-						// 3. Tampilkan ke SweetAlert
-						Swal.fire({
-							icon: 'error',
-							title: 'Gagal !',
-							text: message // Sekarang isinya "Gagal menghapus data retur." atau sesuai Exception
-						});
-					}
-				})
-			}
-		});
-	});
-
 	function DataTables() {
 		// 1. Simpan ke variabel supaya bisa dipanggil (misal: table.draw())
 		var table = $('#table_retur_pembelian').DataTable({
@@ -198,10 +124,6 @@ $ENABLE_DELETE  = has_permission('Retur_Pembelian.Delete');
 				},
 				{
 					data: 'tanggal_invoice',
-					sClass: 'text-center'
-				},
-				{
-					data: 'status',
 					sClass: 'text-center'
 				},
 				{

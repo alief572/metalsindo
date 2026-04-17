@@ -74,7 +74,7 @@ class Wt_invoicing extends Admin_Controller
 		$data = $this->Delivery_order_model->CariDOopen();
 		$this->template->set('results', $data);
 		$this->template->title('Invoicing');
-		$this->template->render('index_delivery_order');
+$this->template->render('index_delivery_order');
 	}
 
 	public function PrintHeader()
@@ -2757,12 +2757,17 @@ class Wt_invoicing extends Admin_Controller
 					'ppn' => $ppn,
 					'tarif_ppnbm' => 0,
 					'ppnbm' => 0,
-					'kode_barang' => $item_sheet->id_category3
+					'kode_barang' => $item_sheet->kode_coretax
 				];
 			}
 			// echo '<pre>';
 			// var_dump($items);
 			// exit();
+
+			$npwp_name = strtoupper($item['npwp_name']);
+			if ($npwp_name == '' || $npwp_name == null) {
+				$npwp_name = strtoupper($item['name_customer']);
+			}
 
 			$invoices_data_for_export[] = [
 				'no' => $no,
@@ -2942,6 +2947,13 @@ class Wt_invoicing extends Admin_Controller
 
 		foreach ($invoices_data as $invoice) {
 
+			$this->db->select('a.*');
+			$this->db->from('tr_invoice a');
+			$this->db->where('a.no_surat', $invoice['no_invoice']);
+			$get_header = $this->db->get()->row_array();
+
+			$tipe_invoice = ($get_header['type'] == 'slitting') ? 'Jasa Slitting' : '';
+
 			$tanggal_faktur_formatted = date('d/m/Y', strtotime($invoice['tanggal_invoice']));
 			$NPWP = preg_replace("/[^0-9]/", "", $invoice['npwp']);
 			if (strlen($NPWP) < 16) {
@@ -2990,12 +3002,16 @@ class Wt_invoicing extends Admin_Controller
 			// Data untuk Sheet Detail Faktur
 			foreach ($invoice['items'] as $item) {
 
+				$nama_barang = (!empty($tipe_invoice)) ? $tipe_invoice . ' ' . $item['nama_barang'] : $item['nama_barang'];
+
+				$satuan = (!empty($tipe_invoice)) ? 'UM.0033' : $item['satuan'];
+
 				$dataDetail = [
 					$itemRowIndex, // Kunci penghubung
 					$item['barang_jasa'],
 					'',
-					$item['nama_barang'] . ', ' . $item['tobe_size'],
-					$item['satuan'],
+					$nama_barang . ', ' . $item['tobe_size'],
+					$satuan,
 					$item['harga_satuan'],
 					$item['qty'],
 					$item['diskon'],
@@ -3009,7 +3025,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$sheetDetail->fromArray($dataDetail, NULL, 'A' . $rowDetail);
 
-				$sheetDetail->setCellValueExplicit('C' . $rowDetail, $item['kode_barang'], PHPExcel_Cell_DataType::TYPE_STRING);
+				$sheetDetail->setCellValueExplicit('C' . $rowDetail, (empty($tipe_invoice)) ? $item['kode_coretax'] : '290000', PHPExcel_Cell_DataType::TYPE_STRING);
 				$sheetDetail->getStyle('C' . $rowDetail)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
 
 				$rowDetail++;
@@ -3097,6 +3113,8 @@ class Wt_invoicing extends Admin_Controller
 		foreach ($get_data->result_array() as $item) {
 			$no++;
 
+			$tipe_invoice = ($item['type'] == 'slitting') ? 'Jasa Slitting' : '';
+
 			$this->db->select('a.*, b.id_bentuk, b.nama as nama_barang, c.kode_coretax');
 			$this->db->from('tr_invoice_detail a');
 			$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3', 'left');
@@ -3156,9 +3174,15 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
+				if (!empty($tipe_invoice)) :
+					$satuan = 'UM.0033';
+				endif;
+
+				$nama_barang = (!empty($tipe_invoice)) ? $tipe_invoice . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
+
 				$items[] = [
 					'barang_jasa' => 'A',
-					'nama_barang' => $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
+					'nama_barang' =>  $nama_barang . ', ' . $item_sheet->tobe_size,
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
@@ -3347,7 +3371,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$sheetDetail->fromArray($dataDetail, NULL, 'A' . $rowDetail);
 
-				$sheetDetail->setCellValueExplicit('C' . $rowDetail, $item['kode_barang'], PHPExcel_Cell_DataType::TYPE_STRING);
+				$sheetDetail->setCellValueExplicit('C' . $rowDetail, (empty($tipe_invoice)) ? $item['kode_barang'] : '290000', PHPExcel_Cell_DataType::TYPE_STRING);
 				$sheetDetail->getStyle('C' . $rowDetail)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
 
 				$rowDetail++;

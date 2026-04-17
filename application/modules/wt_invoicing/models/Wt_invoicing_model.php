@@ -2,11 +2,11 @@
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 /*
- * @Author Syamsudin
- * @Copyright (c) 2022, Syamsudin
- *
- * This is model class for table "Wt_penawaran"
- */
+* @Author Syamsudin
+* @Copyright (c) 2022, Syamsudin
+*
+* This is model class for table "Wt_penawaran"
+*/
 
 class Wt_invoicing_model extends BF_Model
 {
@@ -156,8 +156,8 @@ class Wt_invoicing_model extends BF_Model
     // 2. Query cari nomor terakhir di TAHUN ini saja
     // Kita cari yang formatnya .../24/... (sesuai tahun jalan)
     $query = $this->db->query("SELECT MAX(RIGHT(no_surat, 4)) as max_id 
-                               FROM tr_invoice 
-                               WHERE no_surat LIKE '%/" . $tahun_short . "/%'");
+                              FROM tr_invoice 
+                              WHERE no_surat LIKE '%/" . $tahun_short . "/%'");
 
     $row = $query->row_array();
 
@@ -863,6 +863,10 @@ class Wt_invoicing_model extends BF_Model
     $this->db->from('view_efaktur_invoice');
     $this->db->where('stat_efaktur', 0);
 
+    // Hitung Valid Records (NPWP tidak kosong, untuk keperluan check-all state)
+    $this->db->where('npwp !=', '');
+    $this->db->where('npwp IS NOT NULL', null, false);
+
     // Total tanpa filter
     $count_all = $this->db->count_all_results('', false);
 
@@ -881,9 +885,7 @@ class Wt_invoicing_model extends BF_Model
     // Total setelah filter
     $count_filtered = $this->db->count_all_results('', false);
 
-    // Hitung Valid Records (NPWP tidak kosong, untuk keperluan check-all state)
-    $this->db->where('npwp !=', '');
-    $this->db->where('npwp IS NOT NULL', null, false);
+
     $count_valid = $this->db->count_all_results('', false);
 
     // Ambil data
