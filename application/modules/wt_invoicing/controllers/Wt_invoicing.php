@@ -3009,7 +3009,7 @@ class Wt_invoicing extends Admin_Controller
 					$item['barang_jasa'],
 					'',
 					$nama_barang . ', ' . $item['tobe_size'],
-					$item['satuan'],
+					$satuan,
 					$item['harga_satuan'],
 					$item['qty'],
 					$item['diskon'],
