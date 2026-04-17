@@ -3021,7 +3021,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$sheetDetail->fromArray($dataDetail, NULL, 'A' . $rowDetail);
 
-				$sheetDetail->setCellValueExplicit('C' . $rowDetail, (empty($tipe_invoice)) ? $item['kode_barang'] : '290000', PHPExcel_Cell_DataType::TYPE_STRING);
+				$sheetDetail->setCellValueExplicit('C' . $rowDetail, (empty($tipe_invoice)) ? $item['kode_coretax'] : '290000', PHPExcel_Cell_DataType::TYPE_STRING);
 				$sheetDetail->getStyle('C' . $rowDetail)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
 
 				$rowDetail++;
