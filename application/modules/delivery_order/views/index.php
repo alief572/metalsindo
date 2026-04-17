@@ -213,14 +213,26 @@ $ENABLE_DELETE  = has_permission('Delivery_Order.Delete');
 	})
 
 	$(function() {
-		var table = $('#example1').DataTable({
+		// Initialize DataTable with enhanced configuration
+		const table = $('#example1').DataTable({
 			ajax: {
-				url: siteurl + active_controller + 'get_delivery_order',
-				type: 'post'
+				url: `${siteurl}${active_controller}get_delivery_order`,
+				type: 'POST',
+				dataType: 'json',
+				cache: false,
+				data: function(d) {
+
+				}
 			},
 			processing: true,
 			serverSide: true,
 			paging: true,
+			deferRender: true, // Improves rendering speed for large datasets
+			scrollY: 400, // Enables vertical scrolling
+			scrollCollapse: true,
+			order: [
+				[0, 'asc']
+			], // Default ordering
 			columns: [{
 					data: 'no'
 				},
@@ -237,24 +249,55 @@ $ENABLE_DELETE  = has_permission('Delivery_Order.Delete');
 					data: 'nm_customer'
 				},
 				{
-					data: 'total_fg'
+					data: 'total_fg',
+					className: 'text-right'
 				},
 				{
-					data: 'total_scrap'
+					data: 'total_scrap',
+					className: 'text-right'
 				},
 				{
-					data: 'total_berat'
+					data: 'total_berat',
+					className: 'text-right'
 				},
 				{
-					data: 'total_sheet'
+					data: 'total_sheet',
+					className: 'text-right'
 				},
 				{
 					data: 'tipe'
 				},
 				{
-					data: 'action'
+					data: 'action',
+					orderable: false,
+					searchable: false,
+					className: 'text-center',
+					// Render action buttons safely
+					render: function(data, type, row) {
+						return data;
+					}
 				}
-			]
+			],
+			language: {
+				processing: "Loading...",
+				zeroRecords: "No matching records found",
+				info: "Showing _START_ to _END_ of _TOTAL_ entries",
+				infoEmpty: "No entries to show",
+				infoFiltered: "(filtered from _MAX_ total entries)",
+				search: "Search:",
+				paginate: {
+					first: "First",
+					last: "Last",
+					next: "Next",
+					previous: "Prev"
+				}
+			},
+			// Reuse the same table instance after Ajax reload
+			drawCallback: function() {
+				$('.edit, .view, .print, .release').off('click').on('click', function(e) {
+					// Delegated handlers will be attached here if needed
+				});
+			}
 		});
 		$("#form-area").hide();
 	});

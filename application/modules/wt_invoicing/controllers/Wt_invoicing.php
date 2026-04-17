@@ -2691,9 +2691,6 @@ class Wt_invoicing extends Admin_Controller
 			$nilai_ppn = 0;
 			$nilai_dpp = 0;
 			foreach ($get_detail_sheet as $item_sheet) {
-
-				$tipe_invoice = ($item_sheet->tipe_invoice == 'slitting') ? 'Jasa Slitting' : '';
-
 				$qty = 0;
 				$satuan = 'UM.0003';
 				if ($item_sheet->id_bentuk == 'B2000002') {
@@ -2740,13 +2737,14 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
-				if ($tipe_invoice == 'Jasa Slitting') {
+				if ($item_sheet->tipe_invoice == 'slitting') {
 					$satuan = 'UM.0033';
 				}
 
+
 				$items[] = [
 					'barang_jasa' => 'A',
-					'nama_barang' => $tipe_invoice . ' ' . $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
+					'nama_barang' =>  $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
@@ -2990,11 +2988,20 @@ class Wt_invoicing extends Admin_Controller
 			// Data untuk Sheet Detail Faktur
 			foreach ($invoice['items'] as $item) {
 
+				$this->db->select('a.*');
+				$this->db->from('tr_invoice a');
+				$this->db->where('a.no_surat', $item['no_invoice']);
+				$get_header = $this->db->get()->row_array();
+
+				$tipe_invoice = ($get_header['type'] == 'slitting') ? 'Jasa Slitting' : '';
+
+				$nama_barang = (!empty($tipe_invoice)) ? $tipe_invoice . ' ' . $item['nama_barang'] : $item['nama_barang'];
+
 				$dataDetail = [
 					$itemRowIndex, // Kunci penghubung
 					$item['barang_jasa'],
 					'',
-					$item['nama_barang'] . ', ' . $item['tobe_size'],
+					$nama_barang . ', ' . $item['tobe_size'],
 					$item['satuan'],
 					$item['harga_satuan'],
 					$item['qty'],
@@ -3158,7 +3165,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$items[] = [
 					'barang_jasa' => 'A',
-					'nama_barang' => $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
+					'nama_barang' =>  $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
