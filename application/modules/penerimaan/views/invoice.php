@@ -36,7 +36,7 @@
 										$nilai_invoice = 0;
 
 										foreach ($get_detail_sheet as $item_sheet) {
-											$this->db->select('a.qty_sheet as ttl_qty_sheet');
+											$this->db->select('SUM(a.qty_sheet) as ttl_qty_sheet');
 											$this->db->from('stock_material a');
 											$this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
 											$this->db->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order');
@@ -56,12 +56,7 @@
 											// 	$qty_sheet += $item_qty_sheet->qty_sheet;
 											// }
 
-											$total_awal = ($item_sheet->harga_satuan * $qty_sheet);
-											$dpp_lain_lain = ceil(11 / 12 * $total_awal);
-											$ppn = ($dpp_lain_lain * 12 / 100);
-
-											// $nilai_invoice += ($qty_sheet);
-											$nilai_invoice += ($total_awal + $ppn);
+											$nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet) + (($item_sheet->harga_satuan * $qty_sheet) * 11 / 100);
 										}
 										$sisa_invoice_idr = ($nilai_invoice - $vs->total_bayar);
 									} else {
