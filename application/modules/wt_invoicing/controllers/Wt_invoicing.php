@@ -2718,7 +2718,7 @@ class Wt_invoicing extends Admin_Controller
 				$qty = 0;
 				$satuan = 'UM.0003';
 				if ($item_sheet->id_bentuk == 'B2000002') {
-					$get_qty_sheet = $this->db->select('a.qty_sheet, a.price_sheet')
+					$get_qty_sheet = $this->db->select('a.qty_sheet')
 						->from('stock_material a')
 						->join('dt_delivery_order_child b', 'b.lotno = a.lotno')
 						->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order')
