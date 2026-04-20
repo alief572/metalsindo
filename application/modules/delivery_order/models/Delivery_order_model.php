@@ -79,40 +79,21 @@ class Delivery_order_model extends BF_Model
 		$idcust = "DO" . $thn . str_pad($counter, 5, "0", STR_PAD_LEFT);
 		return $idcust;
 	}
+
 	function BuatNomorOld($kode = '')
 	{
 		$bulan = date('m');
 		$tahun = date('Y');
-		if ($bulan == '01') {
-			$romawi = 'I';
-		} elseif ($bulan == '02') {
-			$romawi = 'II';
-		} elseif ($bulan == '03') {
-			$romawi = 'III';
-		} elseif ($bulan == '04') {
-			$romawi = 'IV';
-		} elseif ($bulan == '05') {
-			$romawi = 'V';
-		} elseif ($bulan == '06') {
-			$romawi = 'VI';
-		} elseif ($bulan == '07') {
-			$romawi = 'VII';
-		} elseif ($bulan == '08') {
-			$romawi = 'VIII';
-		} elseif ($bulan == '09') {
-			$romawi = 'IX';
-		} elseif ($bulan == '10') {
-			$romawi = 'X';
-		} elseif ($bulan == '11') {
-			$romawi = 'XI';
-		} elseif ($bulan == '12') {
-			$romawi = 'XII';
-		}
-		$blnthn = date('Y-m');
-		$query = $this->db->query("SELECT MAX(no_surat) as max_id FROM tr_delivery_order WHERE month(tgl_delivery_order)='$bulan' and Year(tgl_delivery_order)='$tahun'");
+		$romawi = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'][$bulan - 1];
+
+		$this->db->select('MAX(no_surat) as max_id');
+		$this->db->from('tr_delivery_order');
+		$this->db->where('MONTH(tgl_delivery_order)', $bulan);
+		$this->db->where('YEAR(tgl_delivery_order)', $tahun);
+		$query = $this->db->get();
 		$row = $query->row_array();
-		$thn = date('T');
-		$max_id = $row['max_id'];
+		$max_id = (!empty($row['max_id'])) ? $row['max_id'] : '0';
+
 		$max_id1 = (int) substr($max_id, 0, 3);
 		$counter = $max_id1 + 1;
 		$idcust = sprintf("%03s", $counter) . "/DO-MP/" . $romawi . "/" . $tahun;

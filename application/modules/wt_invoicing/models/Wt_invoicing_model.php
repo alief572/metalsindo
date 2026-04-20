@@ -864,8 +864,13 @@ class Wt_invoicing_model extends BF_Model
     $this->db->where('stat_efaktur', 0);
 
     // Hitung Valid Records (NPWP tidak kosong, untuk keperluan check-all state)
+<<<<<<< HEAD
     // $this->db->where('npwp !=', '');
     // $this->db->where('npwp IS NOT NULL', null, false);
+=======
+    $this->db->where('npwp !=', '');
+    $this->db->where('npwp IS NOT NULL', null, false);
+>>>>>>> c837eb43ea03970b37afd0cd74c8c244905ab74e
 
     // Total tanpa filter
     $count_all = $this->db->count_all_results('', false);

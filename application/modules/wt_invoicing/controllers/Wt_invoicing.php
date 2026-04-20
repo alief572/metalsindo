@@ -2691,9 +2691,6 @@ $this->template->render('index_delivery_order');
 			$nilai_ppn = 0;
 			$nilai_dpp = 0;
 			foreach ($get_detail_sheet as $item_sheet) {
-
-				$tipe_invoice = ($item_sheet->tipe_invoice == 'slitting') ? 'Jasa Slitting' : '';
-
 				$qty = 0;
 				$satuan = 'UM.0003';
 				if ($item_sheet->id_bentuk == 'B2000002') {
@@ -2740,13 +2737,17 @@ $this->template->render('index_delivery_order');
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
-				if ($tipe_invoice == 'Jasa Slitting') {
+				$barang_jasa = 'A';
+				if ($item_sheet->tipe_invoice == 'slitting') {
 					$satuan = 'UM.0033';
+					$barang_jasa = 'B';
 				}
 
+
+
 				$items[] = [
-					'barang_jasa' => 'A',
-					'nama_barang' => $tipe_invoice . ' ' . $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
+					'barang_jasa' => $barang_jasa,
+					'nama_barang' =>  $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
@@ -2950,9 +2951,15 @@ $this->template->render('index_delivery_order');
 			$this->db->select('a.*');
 			$this->db->from('tr_invoice a');
 			$this->db->where('a.no_surat', $invoice['no_invoice']);
+<<<<<<< HEAD
 			$get_header = $this->db->get()->row_array();
 
 			$tipe_invoice = ($get_header['type'] == 'slitting') ? 'Jasa Slitting' : '';
+=======
+			$get_invoice = $this->db->get()->row_array();
+
+			$tipe_invoice = ($get_invoice['type'] == 'slitting') ? 'Jasa Slitting' : '';
+>>>>>>> c837eb43ea03970b37afd0cd74c8c244905ab74e
 
 			$tanggal_faktur_formatted = date('d/m/Y', strtotime($invoice['tanggal_invoice']));
 			$NPWP = preg_replace("/[^0-9]/", "", $invoice['npwp']);
@@ -2985,7 +2992,9 @@ $this->template->render('index_delivery_order');
 				"END"
 			];
 
-			$sheetFaktur->fromArray($dataFaktur, NULL, 'A' . $rowFaktur);
+			$jasa_barang = (!empty($tipe_invoice)) ? 'B' : 'A';
+
+			$sheetFaktur->fromArray($dataFaktur, NULL, $jasa_barang . $rowFaktur);
 			$sheetFaktur->setCellValueExplicit('B' . $rowFaktur, $tanggal_faktur_formatted, PHPExcel_Cell_DataType::TYPE_STRING);
 
 			$sheetFaktur->setCellValueExplicit('D' . $rowFaktur, "04", PHPExcel_Cell_DataType::TYPE_STRING);
@@ -3002,16 +3011,31 @@ $this->template->render('index_delivery_order');
 			// Data untuk Sheet Detail Faktur
 			foreach ($invoice['items'] as $item) {
 
+<<<<<<< HEAD
 				$nama_barang = (!empty($tipe_invoice)) ? $tipe_invoice . ' ' . $item['nama_barang'] : $item['nama_barang'];
 
 				$satuan = (!empty($tipe_invoice)) ? 'UM.0033' : $item['satuan'];
+=======
+				$this->db->select('a.*');
+				$this->db->from('tr_invoice a');
+				$this->db->where('a.no_surat', $item['no_invoice']);
+				$get_header = $this->db->get()->row_array();
+
+				$tipe_invoice = ($get_header['type'] == 'slitting') ? 'Jasa Slitting' : '';
+
+				$nama_barang = (!empty($tipe_invoice)) ? $tipe_invoice . ' ' . $item['nama_barang'] : $item['nama_barang'];
+>>>>>>> c837eb43ea03970b37afd0cd74c8c244905ab74e
 
 				$dataDetail = [
 					$itemRowIndex, // Kunci penghubung
 					$item['barang_jasa'],
 					'',
 					$nama_barang . ', ' . $item['tobe_size'],
+<<<<<<< HEAD
 					$satuan,
+=======
+					$item['satuan'],
+>>>>>>> c837eb43ea03970b37afd0cd74c8c244905ab74e
 					$item['harga_satuan'],
 					$item['qty'],
 					$item['diskon'],
@@ -3130,6 +3154,14 @@ $this->template->render('index_delivery_order');
 			$nilai_ppn = 0;
 			$nilai_dpp = 0;
 			foreach ($get_detail_sheet as $item_sheet) {
+
+				$this->db->select('a.*');
+				$this->db->from('tr_invoice a');
+				$this->db->where('a.no_invoice', $item_sheet->no_invoice);
+				$get_invoice = $this->db->get()->row_array();
+
+				$tipe_invoice = ($get_invoice['type'] == 'slitting') ? 'Jasa Slitting' : '';
+
 				$qty = 0;
 				$satuan = 'UM.0003';
 				if ($item_sheet->id_bentuk == 'B2000002') {
@@ -3176,6 +3208,7 @@ $this->template->render('index_delivery_order');
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
+<<<<<<< HEAD
 				if (!empty($tipe_invoice)) :
 					$satuan = 'UM.0033';
 				endif;
@@ -3183,6 +3216,14 @@ $this->template->render('index_delivery_order');
 				$nama_barang = (!empty($tipe_invoice)) ? $tipe_invoice . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
 
 				$barang_jasa = (!empty($tipe_jasa)) ? 'B' : 'A';
+=======
+				$nama_barang = (!empty($tipe_invoice)) ? $nama_barang . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
+				$barang_jasa = 'A';
+				if (!empty($tipe_invoice)) {
+					$satuan = 'UM.0033';
+					$barang_jasa = 'B';
+				}
+>>>>>>> c837eb43ea03970b37afd0cd74c8c244905ab74e
 
 				$items[] = [
 					'barang_jasa' => $barang_jasa,
