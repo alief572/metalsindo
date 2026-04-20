@@ -2699,7 +2699,7 @@ class Wt_invoicing extends Admin_Controller
 
 		$invoices_data_for_export = [];
 		$no = (0);
-		foreach ($get_data->result_array() as $item) {
+		foreach ($get_data as $item) {
 			$no++;
 
 			$get_detail_sheet = $this->db->select('a.*, b.id_bentuk, b.nama as nama_barang, c.type as tipe_invoice')
