@@ -2677,14 +2677,16 @@ class Wt_invoicing extends Admin_Controller
 		}
 		$id_generate = array_values(array_filter(array_map('trim', $id_generate)));
 
-		$this->db->select('a.*, b.name_customer as name_customer, b.npwp as npwp, b.npwp_name as npwp_name, b.npwp_address as npwp_address');
-		$this->db->from('tr_invoice a');
-		$this->db->join('master_customers b', 'b.id_customer = a.id_customer', 'left');
-		$this->db->where_in('a.no_invoice', $id_generate);
+		$get_data = $this->db->select('a.*, b.name_customer as name_customer, b.npwp as npwp, b.npwp_name as npwp_name, b.npwp_address as npwp_address')
+			->from('tr_invoice a')
+			->join('master_customers b', 'b.id_customer = a.id_customer', 'left')
+			->where_in('a.no_surat', $id_generate)
+			->get()
+			->result_array();
 
-		// die($this->db->get_compiled_select());
+		// $get_data = $this->db->get()->result_array();
 
-		$get_data = $this->db->get()->result_array();
+		// die($this->db->last_query());
 
 		if (empty($get_data)) {
 			echo json_encode([
