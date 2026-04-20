@@ -2657,32 +2657,74 @@ class Wt_invoicing extends Admin_Controller
 			'data' => $get['data']
 		]);
 	}
+
 	public function generate_efaktur()
 	{
-		$post = $this->input->post();
+		$post        = $this->input->post();
 		$id_generate = $post['id_generate'];
 
+		if (empty($id_generate)) {
+			echo json_encode([
+				'status'  => 'no_data',
+				'message' => 'Input id_generate kosong.'
+			]);
+			exit;
+		}
+
+		// Pastikan array
+		if (!is_array($id_generate)) {
+			$id_generate = array($id_generate);
+		}
+
+		$this->db->reset_query();
 		$this->db->select('a.*, b.name_customer as name_customer, b.npwp as npwp, b.npwp_name as npwp_name, b.npwp_address as npwp_address');
 		$this->db->from('tr_invoice a');
-		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		$this->db->where('a.stat_efaktur =', 0);
-		$this->db->where('b.npwp !=', '');
+		$this->db->join('master_customers b', 'b.id_customer = a.id_customer', 'left');
 		$this->db->where_in('a.no_surat', $id_generate);
-		$this->db->order_by('a.no_surat', 'ASC');
-		// $this->db->limit(5, 0);
 
-		$get_data = $this->db->get();
+		$get_data = $this->db->get()->result_array();
+		if (!$get_data) {
+			$like_val = trim($id_generate[0]);
+
+			// Cari di semua kolom yang mungkin
+			$diag = $this->db->query(
+				"SELECT no_surat, no_invoice, id_invoice,
+				        LENGTH(no_surat) as len_surat,
+				        LENGTH(no_invoice) as len_invoice
+				 FROM tr_invoice 
+				 WHERE no_invoice LIKE '%" . $this->db->escape_like_str($like_val) . "%' 
+				    OR no_surat LIKE '%" . $this->db->escape_like_str($like_val) . "%'
+				 LIMIT 3"
+			)->result_array();
+
+			// Cari dari view langsung
+			$diag_view = $this->db->query(
+				"SELECT no_invoice, stat_efaktur
+				 FROM view_efaktur_invoice
+				 WHERE no_invoice LIKE '%" . $this->db->escape_like_str($like_val) . "%'
+				 LIMIT 3"
+			)->result_array();
+
+			echo json_encode([
+				'status'      => 'no_data',
+				'message'     => 'HILISH !',
+				'debug_input' => $id_generate,
+				'diag_table'  => $diag,
+				'diag_view'   => $diag_view
+			]);
+			exit;
+		}
 
 		$invoices_data_for_export = [];
 		$no = (0);
-		foreach ($get_data->result_array() as $item) {
+		foreach ($get_data as $item) {
 			$no++;
 
 			$this->db->select('a.*, b.id_bentuk, b.nama as nama_barang, c.type as tipe_invoice');
 			$this->db->from('tr_invoice_detail a');
 			$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3', 'left');
 			$this->db->join('tr_invoice c', 'c.no_surat = a.no_invoice', 'left');
-			$this->db->where('a.no_invoice', $item['no_invoice']);
+			$this->db->where('a.no_invoice', $item['no_surat']);
 			// $this->db->where('b.id_bentuk', 'B2000002');
 			$get_detail_sheet = $this->db->get()->result();
 
@@ -2737,13 +2779,16 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
+				$barang_jasa = 'A';
 				if ($item_sheet->tipe_invoice == 'slitting') {
 					$satuan = 'UM.0033';
+					$barang_jasa = 'B';
 				}
 
 
+
 				$items[] = [
-					'barang_jasa' => 'A',
+					'barang_jasa' => $barang_jasa,
 					'nama_barang' =>  $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
@@ -2779,9 +2824,10 @@ class Wt_invoicing extends Admin_Controller
 			];
 		}
 
+
 		if (empty($invoices_data_for_export)) {
 			echo json_encode([
-				'status' => 'no_data',
+				'status'  => 'no_data',
 				'message' => 'Tidak ada faktur yang perlu diekspor.'
 			]);
 			exit;
@@ -2940,6 +2986,16 @@ class Wt_invoicing extends Admin_Controller
 
 		foreach ($invoices_data as $invoice) {
 
+<<<<<<< HEAD
+=======
+			$this->db->select('a.*');
+			$this->db->from('tr_invoice a');
+			$this->db->where('a.no_surat', $invoice['no_invoice']);
+			$get_invoice = $this->db->get()->row_array();
+
+			$tipe_invoice = ($get_invoice['type'] == 'slitting') ? 'Jasa Slitting' : '';
+
+>>>>>>> d5162dcc996e29035f8812f9d329dd76a4c6bbb2
 			$tanggal_faktur_formatted = date('d/m/Y', strtotime($invoice['tanggal_invoice']));
 			$NPWP = preg_replace("/[^0-9]/", "", $invoice['npwp']);
 			if (strlen($NPWP) < 16) {
@@ -2971,7 +3027,9 @@ class Wt_invoicing extends Admin_Controller
 				"END"
 			];
 
-			$sheetFaktur->fromArray($dataFaktur, NULL, 'A' . $rowFaktur);
+			$jasa_barang = (!empty($tipe_invoice)) ? 'B' : 'A';
+
+			$sheetFaktur->fromArray($dataFaktur, NULL, $jasa_barang . $rowFaktur);
 			$sheetFaktur->setCellValueExplicit('B' . $rowFaktur, $tanggal_faktur_formatted, PHPExcel_Cell_DataType::TYPE_STRING);
 
 			$sheetFaktur->setCellValueExplicit('D' . $rowFaktur, "04", PHPExcel_Cell_DataType::TYPE_STRING);
@@ -3117,6 +3175,14 @@ class Wt_invoicing extends Admin_Controller
 			$nilai_ppn = 0;
 			$nilai_dpp = 0;
 			foreach ($get_detail_sheet as $item_sheet) {
+
+				$this->db->select('a.*');
+				$this->db->from('tr_invoice a');
+				$this->db->where('a.no_invoice', $item_sheet->no_invoice);
+				$get_invoice = $this->db->get()->row_array();
+
+				$tipe_invoice = ($get_invoice['type'] == 'slitting') ? 'Jasa Slitting' : '';
+
 				$qty = 0;
 				$satuan = 'UM.0003';
 				if ($item_sheet->id_bentuk == 'B2000002') {
@@ -3163,9 +3229,22 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
+<<<<<<< HEAD
 				$items[] = [
 					'barang_jasa' => 'A',
 					'nama_barang' =>  $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
+=======
+				$nama_barang = (!empty($tipe_invoice)) ? $nama_barang . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
+				$barang_jasa = 'A';
+				if (!empty($tipe_invoice)) {
+					$satuan = 'UM.0033';
+					$barang_jasa = 'B';
+				}
+
+				$items[] = [
+					'barang_jasa' => $barang_jasa,
+					'nama_barang' =>  $nama_barang . ', ' . $item_sheet->tobe_size,
+>>>>>>> d5162dcc996e29035f8812f9d329dd76a4c6bbb2
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
