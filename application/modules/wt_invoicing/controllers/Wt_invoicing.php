@@ -2986,8 +2986,6 @@ class Wt_invoicing extends Admin_Controller
 
 		foreach ($invoices_data as $invoice) {
 
-<<<<<<< HEAD
-=======
 			$this->db->select('a.*');
 			$this->db->from('tr_invoice a');
 			$this->db->where('a.no_surat', $invoice['no_invoice']);
@@ -2995,7 +2993,6 @@ class Wt_invoicing extends Admin_Controller
 
 			$tipe_invoice = ($get_invoice['type'] == 'slitting') ? 'Jasa Slitting' : '';
 
->>>>>>> d5162dcc996e29035f8812f9d329dd76a4c6bbb2
 			$tanggal_faktur_formatted = date('d/m/Y', strtotime($invoice['tanggal_invoice']));
 			$NPWP = preg_replace("/[^0-9]/", "", $invoice['npwp']);
 			if (strlen($NPWP) < 16) {
@@ -3229,11 +3226,6 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
-<<<<<<< HEAD
-				$items[] = [
-					'barang_jasa' => 'A',
-					'nama_barang' =>  $item_sheet->nama_barang . ', ' . $item_sheet->tobe_size,
-=======
 				$nama_barang = (!empty($tipe_invoice)) ? $nama_barang . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
 				$barang_jasa = 'A';
 				if (!empty($tipe_invoice)) {
@@ -3244,7 +3236,6 @@ class Wt_invoicing extends Admin_Controller
 				$items[] = [
 					'barang_jasa' => $barang_jasa,
 					'nama_barang' =>  $nama_barang . ', ' . $item_sheet->tobe_size,
->>>>>>> d5162dcc996e29035f8812f9d329dd76a4c6bbb2
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
