@@ -2703,13 +2703,14 @@ class Wt_invoicing extends Admin_Controller
 		foreach ($get_data as $item) {
 			$no++;
 
-			$this->db->select('a.*, b.id_bentuk, b.nama as nama_barang, c.type as tipe_invoice');
-			$this->db->from('tr_invoice_detail a');
-			$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3', 'left');
-			$this->db->join('tr_invoice c', 'c.no_surat = a.no_invoice', 'left');
-			$this->db->where('a.no_invoice', $item['no_invoice']);
-			// $this->db->where('b.id_bentuk', 'B2000002');
-			$get_detail_sheet = $this->db->get()->result();
+			$get_detail_sheet = $this->db->select('a.*, b.id_bentuk, b.nama as nama_barang, c.type as tipe_invoice')
+				->from('tr_invoice_detail a')
+				->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3', 'left')
+				->join('tr_invoice c', 'c.no_surat = a.no_invoice', 'left')
+				->where('a.no_invoice', $item['no_invoice'])
+				->where('b.id_bentuk', 'B2000002')
+				->get()
+				->result();
 
 			$items = [];
 			$nilai_invoice = 0;
@@ -2719,15 +2720,16 @@ class Wt_invoicing extends Admin_Controller
 				$qty = 0;
 				$satuan = 'UM.0003';
 				if ($item_sheet->id_bentuk == 'B2000002') {
-					$this->db->select('a.qty_sheet, a.price_sheet');
-					$this->db->from('stock_material a');
-					$this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
-					$this->db->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order');
-					$this->db->where('c.no_surat', $item['no_do']);
-					$this->db->where('b.id_material', $item_sheet->id_category3);
-					$this->db->where('a.no_kirim', $item['id_do']);
-					$this->db->group_by('a.id_stock');
-					$get_qty_sheet = $this->db->get()->result();
+					$get_qty_sheet = $this->db->select('a.qty_sheet, a.price_sheet')
+						->from('stock_material a')
+						->join('dt_delivery_order_child b', 'b.lotno = a.lotno')
+						->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order')
+						->where('c.no_surat', $item['no_do'])
+						->where('b.id_material', $item_sheet->id_category3)
+						->where('a.no_kirim', $item['id_do'])
+						->group_by('a.id_stock')
+						->get()
+						->result();
 
 					$qty_sheet = 0;
 					foreach ($get_qty_sheet as $item_qty_sheet) {
