@@ -2737,10 +2737,10 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
-				$barang_jasa = 'B';
+				$barang_jasa = 'A';
 				if ($item_sheet->tipe_invoice == 'slitting') {
 					$satuan = 'UM.0033';
-					$barang_jasa = 'A';
+					$barang_jasa = 'B';
 				}
 
 
@@ -3184,10 +3184,10 @@ class Wt_invoicing extends Admin_Controller
 				}
 
 				$nama_barang = (!empty($tipe_invoice)) ? $nama_barang . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
-				$barang_jasa = 'B';
+				$barang_jasa = 'A';
 				if (!empty($tipe_invoice)) {
 					$satuan = 'UM.0033';
-					$barang_jasa = 'A';
+					$barang_jasa = 'B';
 				}
 
 				$items[] = [
