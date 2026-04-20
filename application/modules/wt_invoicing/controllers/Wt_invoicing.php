@@ -2671,52 +2671,33 @@ class Wt_invoicing extends Admin_Controller
 			exit;
 		}
 
-		// Pastikan array
+		// Pastikan array of string yang bersih
 		if (!is_array($id_generate)) {
 			$id_generate = array($id_generate);
 		}
+		$id_generate = array_values(array_filter(array_map('trim', $id_generate)));
 
-		$this->db->reset_query();
 		$this->db->select('a.*, b.name_customer as name_customer, b.npwp as npwp, b.npwp_name as npwp_name, b.npwp_address as npwp_address');
 		$this->db->from('tr_invoice a');
 		$this->db->join('master_customers b', 'b.id_customer = a.id_customer', 'left');
-		$this->db->where_in('a.no_surat', $id_generate);
+		$this->db->where_in('a.no_invoice', $id_generate);
+
+		// die($this->db->get_compiled_select());
 
 		$get_data = $this->db->get()->result_array();
-		if (!$get_data) {
-			$like_val = trim($id_generate[0]);
 
-			// Cari di semua kolom yang mungkin
-			$diag = $this->db->query(
-				"SELECT no_surat, no_invoice, id_invoice,
-				        LENGTH(no_surat) as len_surat,
-				        LENGTH(no_invoice) as len_invoice
-				 FROM tr_invoice 
-				 WHERE no_invoice LIKE '%" . $this->db->escape_like_str($like_val) . "%' 
-				    OR no_surat LIKE '%" . $this->db->escape_like_str($like_val) . "%'
-				 LIMIT 3"
-			)->result_array();
-
-			// Cari dari view langsung
-			$diag_view = $this->db->query(
-				"SELECT no_invoice, stat_efaktur
-				 FROM view_efaktur_invoice
-				 WHERE no_invoice LIKE '%" . $this->db->escape_like_str($like_val) . "%'
-				 LIMIT 3"
-			)->result_array();
-
+		if (empty($get_data)) {
 			echo json_encode([
 				'status'      => 'no_data',
-				'message'     => 'HILISH !',
-				'debug_input' => $id_generate,
-				'diag_table'  => $diag,
-				'diag_view'   => $diag_view
+				'message'     => 'Tidak ada faktur yang perlu diekspor.',
+				'debug_query' => $this->db->last_query(),
+				'debug_input' => $id_generate
 			]);
 			exit;
 		}
 
 		$invoices_data_for_export = [];
-		$no = (0);
+		$no = 0;
 		foreach ($get_data as $item) {
 			$no++;
 
@@ -2724,7 +2705,7 @@ class Wt_invoicing extends Admin_Controller
 			$this->db->from('tr_invoice_detail a');
 			$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3', 'left');
 			$this->db->join('tr_invoice c', 'c.no_surat = a.no_invoice', 'left');
-			$this->db->where('a.no_invoice', $item['no_surat']);
+			$this->db->where('a.no_invoice', $item['no_invoice']);
 			// $this->db->where('b.id_bentuk', 'B2000002');
 			$get_detail_sheet = $this->db->get()->result();
 
@@ -2822,15 +2803,6 @@ class Wt_invoicing extends Admin_Controller
 				'tanggal_invoice' => $item['tgl_invoice'],
 				'items' => $items
 			];
-		}
-
-
-		if (empty($invoices_data_for_export)) {
-			echo json_encode([
-				'status'  => 'no_data',
-				'message' => 'Tidak ada faktur yang perlu diekspor.'
-			]);
-			exit;
 		}
 
 		$invoices_to_update = array_column($invoices_data_for_export, 'no_invoice');

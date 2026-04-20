@@ -249,8 +249,8 @@
 	});
 
 	$(document).on('click', '.generate', function(e) {
-		console.log('id_generate saat klik:', id_generate);
-		console.log('jumlah:', id_generate.length);
+		// console.log('id_generate saat klik:', id_generate);
+		// console.log('jumlah:', id_generate.length);
 
 		if (id_generate.length === 0) {
 			swal({
@@ -276,12 +276,13 @@
 			function(isConfirm) {
 				if (isConfirm) {
 					$.ajax({
-						url: siteurl + active_controller + "generate_efaktur",
-						dataType: "json",
 						type: 'POST',
+						url: siteurl + active_controller + "generate_efaktur",
 						data: {
 							id_generate: id_generate
 						},
+						cache: false,
+						dataType: "JSON",
 						success: function(result) {
 							if (result.status === 'success') {
 								window.location.href = siteurl + active_controller + "export_coretax_excel";
