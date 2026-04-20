@@ -2662,16 +2662,40 @@ class Wt_invoicing extends Admin_Controller
 		$post = $this->input->post();
 		$id_generate = $post['id_generate'];
 
-		$this->db->select('a.*, b.name_customer as name_customer, b.npwp as npwp, b.npwp_name as npwp_name, b.npwp_address as npwp_address');
-		$this->db->from('tr_invoice a');
-		$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-		$this->db->where('a.stat_efaktur =', 0);
-		$this->db->where('b.npwp !=', '');
-		$this->db->where_in('a.no_surat', $id_generate);
-		$this->db->order_by('a.no_surat', 'ASC');
-		// $this->db->limit(5, 0);
+		if (empty($id_generate)) {
+			echo json_encode([
+				'status'  => 'no_data',
+				'message' => 'Input id_generate kosong.'
+			]);
+			exit;
+		}
 
-		$get_data = $this->db->get();
+		// Pastikan array of string yang bersih
+		if (!is_array($id_generate)) {
+			$id_generate = array($id_generate);
+		}
+		$id_generate = array_values(array_filter(array_map('trim', $id_generate)));
+
+		$get_data = $this->db->select('a.*, b.name_customer as name_customer, b.npwp as npwp, b.npwp_name as npwp_name, b.npwp_address as npwp_address')
+			->from('tr_invoice a')
+			->join('master_customers b', 'b.id_customer = a.id_customer', 'left')
+			->where_in('a.no_surat', $id_generate)
+			->get()
+			->result_array();
+
+		// $get_data = $this->db->get()->result_array();
+
+		// die($this->db->last_query());
+
+		if (empty($get_data)) {
+			echo json_encode([
+				'status'      => 'no_data',
+				'message'     => 'Tidak ada faktur yang perlu diekspor.',
+				'debug_query' => $this->db->last_query(),
+				'debug_input' => $id_generate
+			]);
+			exit;
+		}
 
 		$invoices_data_for_export = [];
 		$no = (0);
