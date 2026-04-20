@@ -2733,7 +2733,7 @@ class Wt_invoicing extends Admin_Controller
 					foreach ($get_qty_sheet as $item_qty_sheet) {
 						$qty_sheet += $item_qty_sheet->qty_sheet;
 
-						if ($item_qty_sheet->price_sheet > 0) :
+						if ($item_qty_sheet->qty_sheet > 0) :
 							$satuan = 'UM.0020';
 						else :
 							$satuan = 'UM.0003';
@@ -3183,7 +3183,7 @@ class Wt_invoicing extends Admin_Controller
 					foreach ($get_qty_sheet as $item_qty_sheet) {
 						$qty_sheet += $item_qty_sheet->qty_sheet;
 
-						if ($item_qty_sheet->price_sheet > 0) :
+						if ($item_qty_sheet->qty_sheet > 0) :
 							$satuan = 'UM.0020';
 						else :
 							$satuan = 'UM.0003';
