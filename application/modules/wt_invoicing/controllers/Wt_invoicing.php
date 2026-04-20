@@ -3193,7 +3193,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$nama_barang = (!empty($tipe_invoice)) ? $tipe_invoice . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
 
-				$barang_jasa = (!empty($tipe_jasa)) ? 'B' : 'A';
+				$barang_jasa = (!empty($tipe_invoice)) ? 'B' : 'A';
 
 				$items[] = [
 					'barang_jasa' => $barang_jasa,
