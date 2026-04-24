@@ -1,6 +1,11 @@
 <?php
 if (!defined('BASEPATH')) {
 	exit('No direct script access allowed');
+    public function get_jurnal_invoicing()
+    {
+        $this->Wt_invoicing_model->get_jurnal_invoicing();
+    }
+
 }
 
 /*
@@ -3456,4 +3461,9 @@ class Wt_invoicing extends Admin_Controller
 		$objWriter->save('php://output');
 		exit;
 	}
+    public function get_jurnal_invoicing()
+    {
+        $this->Wt_invoicing_model->get_jurnal_invoicing();
+    }
+
 }
