@@ -254,7 +254,7 @@ $ENABLE_DELETE  = has_permission('Penawaran.Delete');
 				loadingRecords: 'Loading - Please wait ...'
 			},
 			ajax: {
-				url: siteurl + active_controller + 'get_data_penawaran',
+				url: siteurl + active_controller + '/get_data_penawaran',
 				type: 'POST',
 				dataType: 'json'
 			},
