@@ -170,7 +170,7 @@
 	<table border="0" width='100%'>
 		<tr>
 			<td align="left">
-				<img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'>
+				<img src='assets/images/logo_metalsindo.jpeg' alt="" height='30' width='60'>
 			</td>
 			<td align="left">
 				<h5 style="text-align: left;">PT METALSINDO PACIFIC</h5>
@@ -183,7 +183,7 @@
 			<td align="right" width="3000px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 			<td align="right" width="3000px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
 			<td align="right">
-				<img src='<?= $_SERVER['DOCUMENT_ROOT']; ?>/metalsindo/assets/img/logo_iso.jpg' alt="" height='30' width='60'>
+				<img src='assets/img/logo_iso.jpg' alt="" height='30' width='60'>
 			</td>
 		</tr>
 	</table>
@@ -260,8 +260,8 @@
 	<br>
 	<?php
 	if ($header->mata_uang == 'USD') {
-		$kurs	= $this->db->query("SELECT * FROM mata_uang WHERE kode = 'IDR' ")->result();
-		$nominal = $kurs[0]->kurs;
+		$get_kurs	= $this->db->query("SELECT kurs FROM mata_uang WHERE kode = 'IDR'")->row();
+		$nominal = $get_kurs->kurs;
 	?>
 		<table class='gridtable' cellpadding='0' cellspacing='0' width='90%' style='width:90% !important; vertical-align:top;'>
 			<tbody>
@@ -298,29 +298,29 @@
 				?>
 					<tr>
 						<td width='40' align="center"><?= $detail->bentuk_material ?></td>
-						<td width='80'><?= $detail->lotno ?></td>
+						<td width='60'><?= $detail->lotno ?></td>
 						<td width='40'><?= $detail->nama2 ?></td>
 						<td width='50' align='center'><?= $detail->spek ?></td>
-						<td width='22' align='center'><?= ucfirst(strtolower($detail->nm_surface)) ?></td>
-						<td width='22' align='center'><?= $detail->hardness ?></td>
-						<td width='22' align='center'><?= number_format($detail->thickness, 2); ?></td>
-						<td width='22' align='center'><?= $detail->width; ?></td>
-						<td width='22' align='center'><?php if ($detail->length <= 0) {
+						<td width='18' align='center'><?= ucfirst(strtolower($detail->nm_surface)) ?></td>
+						<td width='18' align='center'><?= $detail->hardness ?></td>
+						<td width='18' align='center'><?= number_format($detail->thickness, 2); ?></td>
+						<td width='18' align='center'><?= $detail->width; ?></td>
+						<td width='18' align='center'><?php if ($detail->length <= 0) {
 															echo "C";
 														} else {
 															echo number_format($detail->length, 2);
 														}; ?></td>
 
-						<td width='22' align='right'>$ <?= number_format($detail->harga_dolar, 2) ?></td>
+						<td width='40' align='right'>$ <?= number_format($detail->harga_penawaran_cust, 2) ?></td>
 						<?php
 						if ($tipe_sheet == '1') {
 						?>
-							<td width='22' align='right'>Rp <?= number_format($detail->price_sheet) ?></td>
+							<td width='40' align='right'>Rp <?= number_format($detail->price_sheet * $nominal) ?></td>
 						<?php
 						} else {
 						?>
 
-							<td width='22' align='right'>Rp <?= number_format($detail->harga_penawaran_cust) ?></td>
+							<td width='40' align='right'>Rp <?= number_format($detail->harga_penawaran_cust * $nominal) ?></td>
 
 						<?php
 						}
