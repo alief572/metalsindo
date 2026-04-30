@@ -2391,7 +2391,7 @@ class Spk_aktual extends Admin_Controller
 					foreach ($used[qtyaktual] as $key => $value) {
 						$ArrInsertStock[$key . $numb1]['qty'] = $value;
 					}
-					foreach ($used[weight] as $key => $value) {
+					foreach ($used[width] as $key => $value) {
 						$ArrInsertStock[$key . $numb1]['width'] = $value;
 					}
 					foreach ($used[totalaktual] as $key => $value) {
