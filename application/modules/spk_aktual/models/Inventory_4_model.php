@@ -350,7 +350,7 @@ class Inventory_4_model extends BF_Model
 			$this->db->like('a.no_surat', $search['value'], 'both');
 			$this->db->or_like('a.no_surat', $search['value'], 'both');
 			$this->db->or_like('d.name_customer', $search['value'], 'both');
-			$this->db->or_like('a.nama', $search['value'], 'both');
+			$this->db->or_like('a.nama_material', $search['value'], 'both');
 			$this->db->group_end();
 		}
 		$this->db->group_by('a.id_spkproduksi');
@@ -371,7 +371,7 @@ class Inventory_4_model extends BF_Model
 			$this->db->like('a.no_surat', $search['value'], 'both');
 			$this->db->or_like('a.no_surat', $search['value'], 'both');
 			$this->db->or_like('d.name_customer', $search['value'], 'both');
-			$this->db->or_like('a.nama', $search['value'], 'both');
+			$this->db->or_like('a.nama_material', $search['value'], 'both');
 			$this->db->group_end();
 		}
 		$this->db->group_by('a.id_spkproduksi');
