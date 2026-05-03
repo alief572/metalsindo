@@ -40,6 +40,20 @@
                 <div class="col-md-4">
                     <input type="text" class="form-control" name="no_ref_invoice" placeholder="No. Reference Invoice" value="<?= $header->no_ref_invoice ?>">
                 </div>
+                <?php if (!empty($id_rec_inv_ap)) : ?>
+                <?php
+                // Requirement 6.1: show disabled Receive Invoice AP info
+                $rec_inv_ap_header = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $id_rec_inv_ap])->row();
+                $no_invoice_edit = (!empty($rec_inv_ap_header)) ? $rec_inv_ap_header->no_invoice : $id_rec_inv_ap;
+                ?>
+                <div class="col-md-2">
+                    <span class="text-bold">No. Receive Invoice AP</span>
+                </div>
+                <div class="col-md-4">
+                    <input type="hidden" name="id_rec_inv_ap" value="<?= $id_rec_inv_ap ?>">
+                    <input type="text" class="form-control" value="<?= $no_invoice_edit ?>" disabled>
+                </div>
+                <?php else : ?>
                 <div class="col-md-2">
                     <span class="text-bold">No. PO</span>
                 </div>
@@ -57,6 +71,7 @@
                         ?>
                     </select>
                 </div>
+                <?php endif; ?>
                 <div class="col-md-2">
                     <span class="text-bold">Tanggal Invoice</span>
                 </div>
@@ -96,7 +111,64 @@
             </div>
 
             <div class="col-12-md list_detail_po">
+                <?php if (!empty($id_rec_inv_ap)) : ?>
                 <?php
+                // Requirement 6.2: render detail from dt_retur_pembelian (already stored) — editable fields
+                echo '<table class="table table-striped table-bordered">';
+                echo '<thead>';
+                echo '<tr>';
+                echo '<th class="text-center">Tanggal Incoming</th>';
+                echo '<th class="text-center">Nama Material</th>';
+                echo '<th class="text-center">Width</th>';
+                echo '<th class="text-center">Qty Order</th>';
+                echo '<th class="text-center">Qty Receive</th>';
+                echo '<th class="text-center">Jumlah Retur</th>';
+                echo '<th class="text-center">Harga Satuan</th>';
+                echo '<th class="text-center">Total</th>';
+                echo '</tr>';
+                echo '</thead>';
+                echo '<tbody>';
+
+                $no_detail = 0;
+                foreach ($detail as $item_detail) {
+                    $no_detail++;
+
+                    echo '<tr>';
+                    echo '<td class="text-center">';
+                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][id]" value="' . $item_detail->id_detail_po . '">';
+                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][no_po]" value="' . $item_detail->no_po . '">';
+                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][id_pr]" value="' . $item_detail->id_pr . '">';
+                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][idmaterial]" value="' . $item_detail->id_material . '">';
+                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][namamaterial]" value="' . $item_detail->nama_material . '">';
+                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][width]" value="' . $item_detail->width . '">';
+                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][qty_order]" value="' . $item_detail->qty_order . '">';
+                    // tanggal_incoming is not stored in dt_retur_pembelian; use tgl_retur as fallback
+                    echo date('d F Y', strtotime($header->tgl_retur));
+                    echo '</td>';
+                    echo '<td>' . $item_detail->nama_material . '</td>';
+                    echo '<td class="text-right">' . $item_detail->width . '</td>';
+                    echo '<td class="text-right">' . $item_detail->qty_order . '</td>';
+                    echo '<td>';
+                    echo '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][qty_receive]" value="' . $item_detail->qty_receive . '">';
+                    echo '</td>';
+                    echo '<td>';
+                    echo '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][retur]" data-no_po="' . $item_detail->no_po . '" data-no="' . $no_detail . '" value="' . $item_detail->jumlah_retur . '">';
+                    echo '</td>';
+                    echo '<td>';
+                    echo '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][harga]" value="' . $item_detail->harga_satuan . '" data-no_po="' . $item_detail->no_po . '" data-no="' . $no_detail . '">';
+                    echo '</td>';
+                    echo '<td>';
+                    echo '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][total_harga]" value="' . $item_detail->grand_total . '" readonly>';
+                    echo '</td>';
+                    echo '</tr>';
+                }
+
+                echo '</tbody>';
+                echo '</table>';
+                ?>
+                <?php else : ?>
+                <?php
+                // Requirement 6.2 (backward compat): render from tr_purchase_order (old logic)
                 foreach (explode(',', $header->no_po) as $item_po) {
                     $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $item_po])->row();
 
@@ -164,6 +236,7 @@
                     echo '</table>';
                 }
                 ?>
+                <?php endif; ?>
             </div>
 
             <a href="<?= base_url('retur_pembelian') ?>" class="btn btn-sm btn-danger"><i class="fa fa-arrow-left"></i> Back</a>

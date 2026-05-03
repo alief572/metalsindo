@@ -190,4 +190,48 @@ class Retur_pembelian_model extends BF_Model
 
 		return $get_data;
 	}
+
+	/**
+	 * Mengambil daftar Receive Invoice AP berdasarkan supplier.
+	 * @param string $id_supplier
+	 * @return array of objects {id_rec_inv_ap, no_invoice, tgl_bayar, total_nilai}
+	 */
+	public function get_receive_invoice_ap_by_supplier($id_supplier)
+	{
+		$this->db->select('h.id_rec_inv_ap, h.no_invoice, h.tgl_bayar, COALESCE(SUM(d.total_nilai), 0) AS total_nilai', FALSE);
+		$this->db->from('tr_receive_invoice_ap_header h');
+		$this->db->join('tr_receive_invoice_ap_detail d', 'd.id_rec_inv_ap = h.id_rec_inv_ap', 'left');
+		$this->db->where('h.id_suplier', $id_supplier);
+		$this->db->group_by('h.id_rec_inv_ap');
+		$this->db->order_by('h.tgl_bayar', 'desc');
+		return $this->db->get()->result();
+	}
+
+	/**
+	 * Mengambil detail item material dari Receive Invoice AP melalui join chain.
+	 * @param string $id_rec_inv_ap
+	 * @return array of objects
+	 */
+	public function get_detail_by_receive_invoice_ap($id_rec_inv_ap)
+	{
+		$this->db->select('
+			dtp.id_dt_po,
+			dtp.no_po,
+			dtp.idmaterial,
+			dtp.namamaterial,
+			dtp.width,
+			dtp.totalwidth,
+			dtp.hargasatuan,
+			dtp.idpr,
+			di.width_recive,
+			ti.tanggal AS tanggal_incoming,
+			riad.id_rec_inv_ap
+		', FALSE);
+		$this->db->from('tr_receive_invoice_ap_detail riad');
+		$this->db->join('tr_incoming ti', 'ti.id_incoming = riad.id_incoming');
+		$this->db->join('dt_incoming di', 'di.id_incoming = ti.id_incoming');
+		$this->db->join('dt_trans_po dtp', 'dtp.id_dt_po = di.id_dt_po');
+		$this->db->where('riad.id_rec_inv_ap', $id_rec_inv_ap);
+		return $this->db->get()->result();
+	}
 }

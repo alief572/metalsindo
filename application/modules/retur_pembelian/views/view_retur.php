@@ -36,6 +36,15 @@
             <div class="col-md-4">
                 <input type="text" class="form-control" name="no_ref_invoice" placeholder="No. Reference Invoice" value="<?= $header->no_ref_invoice ?>" readonly>
             </div>
+
+            <?php if (!empty($id_rec_inv_ap)) : ?>
+            <div class="col-md-2">
+                <span class="text-bold">No. Receive Invoice AP</span>
+            </div>
+            <div class="col-md-4">
+                <input type="text" class="form-control" value="<?= isset($no_invoice_rec_inv_ap) ? $no_invoice_rec_inv_ap : '' ?>" readonly>
+            </div>
+            <?php else : ?>
             <div class="col-md-2">
                 <span class="text-bold">No. PO</span>
             </div>
@@ -54,6 +63,8 @@
                     <!-- <option value="">- No. PO -</option> -->
                 </select>
             </div>
+            <?php endif; ?>
+
             <div class="col-md-2">
                 <span class="text-bold">Tanggal Invoice</span>
             </div>
@@ -98,7 +109,46 @@
         </div>
 
         <div class="col-12-md list_detail_po">
+            <?php if (!empty($id_rec_inv_ap)) : ?>
             <?php
+            // Requirement 5.2: render detail from dt_retur_pembelian (already stored), read-only
+            echo '<table class="table table-striped table-bordered">';
+            echo '<thead>';
+            echo '<tr>';
+            echo '<th class="text-center">Tanggal Incoming</th>';
+            echo '<th class="text-center">Nama Material</th>';
+            echo '<th class="text-center">Width</th>';
+            echo '<th class="text-center">Qty Order</th>';
+            echo '<th class="text-center">Qty Receive</th>';
+            echo '<th class="text-center">Jumlah Retur</th>';
+            echo '<th class="text-center">Harga Satuan</th>';
+            echo '<th class="text-center">Total</th>';
+            echo '</tr>';
+            echo '</thead>';
+            echo '<tbody>';
+
+            foreach ($detail as $item_detail) {
+                echo '<tr>';
+                echo '<td class="text-center">';
+                // tanggal_incoming is not stored in dt_retur_pembelian; use tgl_retur as fallback
+                echo date('d F Y', strtotime($header->tgl_retur));
+                echo '</td>';
+                echo '<td>' . $item_detail->nama_material . '</td>';
+                echo '<td class="text-right">' . $item_detail->width . '</td>';
+                echo '<td class="text-right">' . $item_detail->qty_order . '</td>';
+                echo '<td class="text-right">' . number_format($item_detail->qty_receive, 2) . '</td>';
+                echo '<td class="text-right">' . number_format($item_detail->jumlah_retur, 2) . '</td>';
+                echo '<td class="text-right">' . number_format($item_detail->harga_satuan, 2) . '</td>';
+                echo '<td class="text-right">' . number_format($item_detail->grand_total, 2) . '</td>';
+                echo '</tr>';
+            }
+
+            echo '</tbody>';
+            echo '</table>';
+            ?>
+            <?php else : ?>
+            <?php
+            // Requirement 5.3: backward compatibility — render from tr_purchase_order (old logic)
             foreach (explode(',', $header->no_po) as $item_po) {
                 $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $item_po])->row();
 
@@ -127,8 +177,6 @@
                 $no_detail = 0;
                 foreach ($po_detail as $item_po_detail) {
                     $no_detail++;
-
-
 
                     echo '<tr>';
                     echo '<td class="text-center">';
@@ -163,6 +211,7 @@
                 echo '</table>';
             }
             ?>
+            <?php endif; ?>
         </div>
 
         <a href="<?= base_url('retur_pembelian') ?>" class="btn btn-sm btn-danger"><i class="fa fa-arrow-left"></i> Back</a>

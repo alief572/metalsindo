@@ -36,12 +36,13 @@
                     <input type="text" class="form-control" name="no_ref_invoice" placeholder="No. Reference Invoice">
                 </div>
                 <div class="col-md-2">
-                    <span class="text-bold">No. PO</span>
+                    <span class="text-bold">No. Receive Invoice AP</span>
                 </div>
                 <div class="col-md-4">
-                    <select class="form-control no_po select2" name="no_po[]" multiple="multiple">
-                        <!-- <option value="">- No. PO -</option> -->
+                    <select name="rec_inv_ap" class="form-control rec_inv_ap select2">
+                        <option value="">-- Pilih Receive Invoice AP --</option>
                     </select>
+                    <input type="hidden" name="id_rec_inv_ap" id="id_rec_inv_ap_val">
                 </div>
                 <div class="col-md-2">
                     <span class="text-bold">Tanggal Invoice</span>
@@ -106,35 +107,37 @@
 
     $(document).on('change', '.supplier', function() {
         var supplier = $(this).val();
-        var $elNoPo = $('.no_po'); // Simpan selector ke variabel agar lebih ringan
+        var $elRecInvAp = $('.rec_inv_ap'); // Simpan selector ke variabel agar lebih ringan
 
-        // Reset dropdown PO setiap kali supplier berubah
-        $elNoPo.html('<option value="">-- Pilih PO --</option>').trigger('change');
+        // Reset dropdown Receive Invoice AP setiap kali supplier berubah
+        $elRecInvAp.html('<option value="">-- Pilih Receive Invoice AP --</option>').trigger('change');
+        $('#id_rec_inv_ap_val').val('');
+        $('.list_detail_po').html('');
 
         if (!supplier) return; // Jangan tembak AJAX kalau supplier kosong
 
         $.ajax({
             type: 'get',
-            url: siteurl + active_controller + 'getPO',
+            url: siteurl + active_controller + 'getReceiveInvoiceAP',
             data: {
                 'supplier': supplier
             },
-            dataType: 'json', // Pastikan jQuery tahu kita ekspek JSON
+            dataType: 'json',
             cache: false,
             success: function(response) {
-                let html = '<option value="">-- Pilih PO --</option>';
+                let html = '<option value="">-- Pilih Receive Invoice AP --</option>';
 
                 // Pastikan response adalah array dan tidak kosong
                 if (Array.isArray(response) && response.length > 0) {
                     response.forEach(item => {
-                        html += `<option value="${item.no_po}">${item.no_surat}</option>`;
+                        html += `<option value="${item.id_rec_inv_ap}">${item.no_invoice} - ${item.tgl_bayar} (Total: ${item.total_nilai})</option>`;
                     });
                 } else {
-                    html = '<option value="">-- Tidak ada PO --</option>';
+                    html = '<option value="">-- Tidak ada Receive Invoice AP --</option>';
                 }
 
-                $elNoPo.html(html);
-                $elNoPo.trigger('change');
+                $elRecInvAp.html(html);
+                $elRecInvAp.trigger('change');
             },
             error: function(xhr, status, error) {
                 // Ambil pesan error dari server jika ada
@@ -143,22 +146,25 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error !',
-                    text: 'Gagal mengambil data PO: ' + errorMsg,
+                    text: 'Gagal mengambil data Receive Invoice AP: ' + errorMsg,
                     showCancelButton: false,
                 });
             }
         });
     });
 
-    $(document).on('change', '.no_po', function() {
-        var no_po = $(this).val();
+    $(document).on('change', '.rec_inv_ap', function() {
+        var id_rec_inv_ap = $(this).val();
 
-        if (no_po !== '' && no_po !== null) {
+        // Set hidden input value
+        $('#id_rec_inv_ap_val').val(id_rec_inv_ap);
+
+        if (id_rec_inv_ap !== '' && id_rec_inv_ap !== null) {
             $.ajax({
                 type: 'get',
-                url: siteurl + active_controller + 'getDetailPO',
+                url: siteurl + active_controller + 'getDetailReceiveInvoiceAP',
                 data: {
-                    'no_po': no_po
+                    'id_rec_inv_ap': id_rec_inv_ap
                 },
                 cache: false,
                 dataType: 'json',
@@ -177,6 +183,8 @@
                     });
                 }
             });
+        } else {
+            $('.list_detail_po').html('');
         }
     });
 
