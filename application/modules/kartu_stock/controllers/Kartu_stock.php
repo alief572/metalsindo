@@ -4,10 +4,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Kartu_stock extends Admin_Controller
 {
   //Permission
-  protected $viewPermission   = 'Kartu_stock_material.View';
-  protected $addPermission    = 'Kartu_stock_material.Add';
-  protected $managePermission = 'Kartu_stock_material.Manage';
-  protected $deletePermission = 'Kartu_stock_material.Delete';
+	protected $viewPermission   = 'Kartu_Stock.View';
+  protected $addPermission    = 'Kartu_Stock.Add';
+  protected $managePermission = 'Kartu_Stock.Manage';
+  protected $deletePermission = 'Kartu_Stock.Delete';
 
   public function __construct()
   {

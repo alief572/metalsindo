@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -79,7 +79,7 @@ $db['default'] = array(
     'hostname' => 'localhost',
     'username' => 'metalsindo',
     'password' => '93892ifkqKHD^&(hjh',
-    'database' => 'metalsindo_dev',
+    'database' => 'metalsindo_live',
     'ports' => '3306',
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
