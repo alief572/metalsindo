@@ -158,7 +158,8 @@ $get_stocklot = $this->db->get_where('stock_material', array('id_stock' => $tr_s
 									<th><input type='text' class='form-control'   		value='$dt_spk->weight' 		readonly id='used_weight_$i$loop' required name='dt[$i$loop][weight][]'></th>
 									
 									<th>
-									<input type='text' class='form-control'   		value='$dt_spk->width' 			readonly id='used_width_$i$loop' onkeyup='HitungTotalCoil($i$loop)' required name='dt[$i$loop][width][]'>
+									<input type='text' class='form-control'   		value='$dt_spk->width' 			readonly id='used_width_$i$loop' onkeyup='HitungTotalCoil($i$loop)' required>
+									<input type='hidden' value='$dt_spk->weight' name='dt[$i$loop][width][]'>
 									<input type='hidden' class='form-control'   		value='$dt_spk->totalwidth' 		readonly id='used_totalwidth_$i$loop' required name='dt[$i$loop][totalwidth][]'></th>
 									<th>
 									<input type='text' class='form-control'   		value='$tr_spk->lotno -$i' 		readonly id='used_lot_slitting_$i$loop' required name='dt[$i$loop][lot_slitting][]'></th>

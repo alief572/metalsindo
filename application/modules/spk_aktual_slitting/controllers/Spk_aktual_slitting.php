@@ -955,7 +955,7 @@ function CariW1material()
 		$id_marketing=$_GET['id_marketing'];
 		$dbstocking	= $this->db->query("SELECT * FROM dt_spkmarketing WHERE id_dt_spkmarketing = '$id_marketing' ")->result();
 		$id_customerr = $dbstocking[0]->width;
-		echo "<input type='text' class='form-control'  value='$id_customerr'  readonly	id='used_weight_$loop' required name='dt[$loop][weight]'>";
+		echo "<input type='text' class='form-control'  value='$id_customerr'  readonly	id='used_width_$loop' required name='dt[$loop][width]'>";
 	}
 function CariW2material()
     {
@@ -963,7 +963,7 @@ function CariW2material()
 		$id_marketing=$_GET['id_marketing'];
 		$dbstocking	= $this->db->query("SELECT * FROM dt_spkmarketing WHERE id_dt_spkmarketing = '$id_marketing' ")->result();
 		$id_customerr = $dbstocking[0]->weight;
-		echo "<input type='text' class='form-control'  value='$id_customerr'  readonly	id='used_width_$loop' required name='dt[$loop][width]'>";
+		echo "<input type='text' class='form-control'  value='$id_customerr'  readonly	id='used_weight_$loop' required name='dt[$loop][weight]'>";
 	}
 function CariTW2material()
     {

@@ -1,12 +1,8 @@
 <?php
 if (!defined('BASEPATH')) {
 	exit('No direct script access allowed');
-    public function get_jurnal_invoicing()
-    {
-        $this->Wt_invoicing_model->get_jurnal_invoicing();
-    }
-
 }
+
 
 /*
 * @author Syamsudin
@@ -37,6 +33,11 @@ class Wt_invoicing extends Admin_Controller
 		$this->template->page_icon('fa fa-building-o');
 
 		date_default_timezone_set('Asia/Bangkok');
+	}
+
+	public function get_jurnal_invoicing()
+	{
+		$this->Wt_invoicing_model->get_jurnal_invoicing();
 	}
 
 	public function index()
@@ -3465,9 +3466,4 @@ class Wt_invoicing extends Admin_Controller
 		$objWriter->save('php://output');
 		exit;
 	}
-    public function get_jurnal_invoicing()
-    {
-        $this->Wt_invoicing_model->get_jurnal_invoicing();
-    }
-
 }
