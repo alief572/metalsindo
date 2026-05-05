@@ -825,29 +825,29 @@ class Wt_invoicing_model extends BF_Model
   {
     $search = $this->input->post('search');
 
-    $this->db->select('a.no_surat');
+    $this->db->select('a.no_invoice');
     $this->db->from('tr_invoice a');
     $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
-    $this->db->where('a.stat_efaktur =', 0);
+    $this->db->where('a.stat_efaktur', 0);
     $this->db->where('b.npwp !=', '');
+    $this->db->where('a.no_invoice !=', '');
 
     if (!empty($search)) {
       $this->db->group_start();
-      $this->db->like('a.no_surat', $search, 'both');
+      $this->db->like('a.no_invoice', $search, 'both');
       $this->db->or_like('b.name_customer', $search, 'both');
       $this->db->or_like('a.note', $search, 'both');
       $this->db->or_like('a.no_do', $search, 'both');
-      $this->db->or_like('a.nilai_invoice', $search, 'both');
       $this->db->or_like('a.tgl_invoice', $search, 'both');
       $this->db->group_end();
     }
 
-    $this->db->order_by('a.no_surat', 'ASC');
+    $this->db->order_by('a.no_invoice', 'ASC');
     $get_data = $this->db->get();
 
     $hasil = [];
     foreach ($get_data->result_array() as $item) {
-      $hasil[] = $item['no_surat'];
+      $hasil[] = $item['no_invoice'];
     }
 
     return $hasil;

@@ -545,7 +545,7 @@ class Delivery_order extends Admin_Controller
 		foreach ($dt as $dt) {
 			$loop++;
 			$id_category3	= $dt->id_material;
-			$lot			= $this->db->query("SELECT * FROM stock_material WHERE id_gudang = '3' AND id_category3='$id_category3' AND width = $dt->width  AND no_surat like '%$nomor->no_surat%' AND status_do='OPN' ")->result();
+			$lot			= $this->db->query("SELECT * FROM stock_material WHERE id_gudang = '3' AND id_category3='$id_category3' AND width >= $dt->width  AND no_surat like '%$nomor->no_surat%' AND status_do='OPN' ")->result();
 			// if(empty($lot)) {
 			// 	$lot			= $this->db->query("SELECT * FROM stock_material WHERE id_gudang = '3' AND id_category3='$id_category3' AND width = $dt->width AND no_surat like '%$nomor->no_surat%' AND status_do='OPN' ")->result();
 			// }

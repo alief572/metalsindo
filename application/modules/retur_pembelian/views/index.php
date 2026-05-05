@@ -22,7 +22,7 @@ $ENABLE_DELETE  = has_permission('Retur_Pembelian.Delete');
 				<tr>
 					<th class="text-center">#</th>
 					<th class="text-center">No. Retur</th>
-					<th class="text-center">No. PO</th>
+					<th class="text-center">No. Invoice / No. PO</th>
 					<th class="text-center">Nama Supplier</th>
 					<th class="text-center">Tanggal Retur</th>
 					<th class="text-center">No. Ref Invoice</th>

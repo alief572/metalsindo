@@ -88,6 +88,109 @@ class Retur_pembelian extends Admin_Controller
 		}
 	}
 
+	public function getReceiveInvoiceAP()
+	{
+		// 1. Ambil dan validasi input
+		$supplier = $this->input->get('supplier', TRUE); // TRUE untuk XSS filtering
+
+		if (empty($supplier)) {
+			return $this->output
+				->set_content_type('application/json')
+				->set_status_header(400)
+				->set_output(json_encode(['message' => 'Supplier ID is required']));
+		}
+
+		try {
+			$result = $this->Retur_pembelian_model->get_receive_invoice_ap_by_supplier($supplier);
+
+			// 2. Kembalikan data dalam bentuk JSON (array kosong jika tidak ada data)
+			return $this->output
+				->set_content_type('application/json')
+				->set_status_header(200)
+				->set_output(json_encode($result));
+		} catch (Exception $e) {
+			// 3. Error handling
+			return $this->output
+				->set_content_type('application/json')
+				->set_status_header(500)
+				->set_output(json_encode(['message' => $e->getMessage()]));
+		}
+	}
+
+	public function getDetailReceiveInvoiceAP()
+	{
+		$id_rec_inv_ap = $this->input->get('id_rec_inv_ap', true);
+
+		try {
+			$list_detail = $this->Retur_pembelian_model->get_detail_by_receive_invoice_ap($id_rec_inv_ap);
+
+			if (empty($list_detail)) {
+				http_response_code(404);
+				echo json_encode(['msg' => 'Data Receive Invoice AP Tidak Ditemukan !']);
+				return;
+			}
+
+			$return = '';
+
+			$return .= '<table class="table table-striped table-bordered">';
+			$return .= '<thead>';
+			$return .= '<tr>';
+			$return .= '<th class="text-center">Tanggal Incoming</th>';
+			$return .= '<th class="text-center">Nama Material</th>';
+			$return .= '<th class="text-center">Width</th>';
+			$return .= '<th class="text-center">Qty Order</th>';
+			$return .= '<th class="text-center">Qty Receive</th>';
+			$return .= '<th class="text-center">Jumlah Retur</th>';
+			$return .= '<th class="text-center">Harga Satuan</th>';
+			$return .= '<th class="text-center">Total</th>';
+			$return .= '</tr>';
+			$return .= '</thead>';
+			$return .= '<tbody>';
+
+			$no_detail = 0;
+			foreach ($list_detail as $item) {
+				$no_detail++;
+
+				$return .= '<tr>';
+				$return .= '<td class="text-center">';
+				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][id]" value="' . $item->id_dt_po . '">';
+				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][no_po]" value="' . $item->no_po . '">';
+				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][id_pr]" value="' . $item->idpr . '">';
+				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][idmaterial]" value="' . $item->idmaterial . '">';
+				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][namamaterial]" value="' . $item->namamaterial . '">';
+				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][width]" value="' . $item->width . '">';
+				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][qty_order]" value="' . $item->totalwidth . '">';
+				$return .= date('d F Y', strtotime($item->tanggal_incoming));
+				$return .= '</td>';
+				$return .= '<td>' . $item->namamaterial . '</td>';
+				$return .= '<td class="text-center">' . $item->width . '</td>';
+				$return .= '<td class="text-center">' . $item->totalwidth . '</td>';
+				$return .= '<td>';
+				$return .= '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item->no_po . '[' . $no_detail . '][qty_receive]" value="' . $item->width_recive . '">';
+				$return .= '</td>';
+				$return .= '<td>';
+				$return .= '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item->no_po . '[' . $no_detail . '][retur]" data-no_po="' . $item->no_po . '" data-no="' . $no_detail . '">';
+				$return .= '</td>';
+				$return .= '<td>';
+				$return .= '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item->no_po . '[' . $no_detail . '][harga]" value="' . $item->hargasatuan . '" data-no_po="' . $item->no_po . '" data-no="' . $no_detail . '">';
+				$return .= '</td>';
+				$return .= '<td>';
+				$return .= '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item->no_po . '[' . $no_detail . '][total_harga]" value="" readonly>';
+				$return .= '</td>';
+				$return .= '</tr>';
+			}
+
+			$return .= '</tbody>';
+			$return .= '</table>';
+
+			http_response_code(200);
+			echo json_encode(['hasil' => $return]);
+		} catch (Exception $e) {
+			http_response_code(500);
+			echo json_encode(['msg' => $e->getMessage()]);
+		}
+	}
+
 	public function getDetailPO()
 	{
 		$no_po = $this->input->get('no_po', true);
@@ -183,6 +286,11 @@ class Retur_pembelian extends Admin_Controller
 		$this->db->trans_begin();
 
 		try {
+			// Validasi: id_rec_inv_ap wajib dipilih
+			if (empty($this->input->post('id_rec_inv_ap', true))) {
+				throw new Exception('Receive Invoice AP harus dipilih');
+			}
+
 			$fileName = $_FILES['file_ba']['name'];
 			$this->load->library(array('PHPExcel'));
 			$config['upload_path'] = './assets/file_ba/';
@@ -205,11 +313,70 @@ class Retur_pembelian extends Admin_Controller
 
 			$nm_supplier = (!empty($get_supplier)) ? $get_supplier->name_suplier : '';
 
+			// Kumpulkan no_po unik dari $_POST keys yang dimulai dengan 'dt_'
+			$arr_no_po_unique = [];
+			foreach (array_keys($_POST) as $post_key) {
+				if (strpos($post_key, 'dt_') === 0) {
+					$no_po_from_key = substr($post_key, 3); // hapus prefix 'dt_'
+					$arr_no_po_unique[$no_po_from_key] = true;
+				}
+			}
+
+			$arr_insert_detail = [];
+
+			foreach (array_keys($arr_no_po_unique) as $detail_po) {
+				if (isset($_POST['dt_' . $detail_po])) {
+					foreach ($_POST['dt_' . $detail_po] as $item_detail) {
+						$jumlah_retur = (float) str_replace(',', '', $item_detail['retur']);
+						$qty_receive  = (float) str_replace(',', '', $item_detail['qty_receive']);
+						$nama_material = isset($item_detail['namamaterial']) ? $item_detail['namamaterial'] : '';
+
+						// Validasi: jumlah_retur harus lebih dari 0
+						if ($jumlah_retur <= 0) {
+							throw new Exception('Jumlah retur harus lebih dari 0');
+						}
+
+						// Validasi: jumlah_retur tidak boleh melebihi qty_receive
+						if ($jumlah_retur > $qty_receive) {
+							throw new Exception('Jumlah retur ' . $nama_material . ' melebihi qty receive');
+						}
+
+						$arr_insert_detail[] = [
+							'id_header' => $no_surat,
+							'id_detail_po' => $item_detail['id'],
+							'no_po' => $item_detail['no_po'],
+							'id_pr' => $item_detail['id_pr'],
+							'id_material' => $item_detail['idmaterial'],
+							'nama_material' => $nama_material,
+							'width' => $item_detail['width'],
+							'qty_order' => $item_detail['qty_order'],
+							'qty_receive' => $qty_receive,
+							'jumlah_retur' => $jumlah_retur,
+							'harga_satuan' => str_replace(',', '', $item_detail['harga']),
+							'grand_total' => str_replace(',', '', $item_detail['total_harga']),
+							'input_by' => $this->auth->user_id(),
+							'input_date' => date('Y-m-d H:i:s')
+						];
+					}
+				}
+			}
+
+			if (empty($arr_insert_detail)) {
+				throw new Exception('Maaf, data barang yang di akan di retur tidak sesuai !');
+			}
+
+			// Kumpulkan no_po unik dari detail items untuk disimpan di header
+			$arr_no_po_header = [];
+			foreach ($arr_insert_detail as $detail_item) {
+				$arr_no_po_header[$detail_item['no_po']] = true;
+			}
+
 			$arr_insert_header = [
 				'no_surat' => $no_surat,
 				'id_supplier' => $this->input->post('supplier', true),
 				'nm_supplier' => $nm_supplier,
-				'no_po' => implode(',', $this->input->post('no_po', true)),
+				'no_po' => implode(',', array_keys($arr_no_po_header)),
+				'id_rec_inv_ap' => $this->input->post('id_rec_inv_ap', true),
 				'tgl_retur' => $this->input->post('tanggal_retur', true),
 				'no_ng_report' => $this->input->post('no_ng_report', true),
 				'alasan_retur' => $this->input->post('alasan_retur', true),
@@ -220,59 +387,14 @@ class Retur_pembelian extends Admin_Controller
 				'input_date' => date('Y-m-d H:i:s')
 			];
 
-			$arr_insert_detail = [];
-
-			$arr_update_po = [];
-
-			if (!empty($this->input->post('no_po', true))) {
-				foreach ($this->input->post('no_po', true) as $detail_po) {
-					if (isset($_POST['dt_' . $detail_po])) {
-						foreach ($_POST['dt_' . $detail_po] as $item_detail) {
-							$arr_insert_detail[] = [
-								'id_header' => $no_surat,
-								'id_detail_po' => $item_detail['id'],
-								'no_po' => $item_detail['no_po'],
-								'id_pr' => $item_detail['id_pr'],
-								'id_material' => $item_detail['idmaterial'],
-								'nama_material' => $item_detail['namamaterial'],
-								'width' => $item_detail['width'],
-								'qty_order' => $item_detail['qty_order'],
-								'qty_receive' => str_replace(',', '', $item_detail['qty_receive']),
-								'jumlah_retur' => str_replace(',', '', $item_detail['retur']),
-								'harga_satuan' => str_replace(',', '', $item_detail['harga']),
-								'grand_total' => str_replace(',', '', $item_detail['total_harga']),
-								'input_by' => $this->auth->user_id(),
-								'input_date' => date('Y-m-d H:i:s')
-							];
-
-							$arr_update_po[] = [
-								'no_po' => $item_detail['no_po'],
-								'sts_retur' => 'Y'
-							];
-						}
-					}
-				}
-			} else {
-				throw new Exception('Maaf, data barang yang di akan di retur tidak sesuai !');
-			}
-
 			$insert_header = $this->db->insert('tr_retur_pembelian', $arr_insert_header);
 			if (!$insert_header) {
 				throw new Exception('Maaf, data gagal tidak berhasil disimpan !');
 			}
 
-			if (!empty($arr_insert_detail)) {
-				$insert_detail = $this->db->insert_batch('dt_retur_pembelian', $arr_insert_detail);
-				if (!$insert_detail) {
-					throw new Exception('Maaf, data gagal tidak berhasil disimpan !');
-				}
-			}
-
-			if (!empty($arr_update_po)) {
-				$update_po = $this->db->update_batch('tr_purchase_order', $arr_update_po, 'no_po');
-				if (!$update_po) {
-					throw new Exception('Maaf, data gagal tidak berhasil disimpan !');
-				}
+			$insert_detail = $this->db->insert_batch('dt_retur_pembelian', $arr_insert_detail);
+			if (!$insert_detail) {
+				throw new Exception('Maaf, data gagal tidak berhasil disimpan !');
 			}
 
 			$this->db->trans_commit();
@@ -433,8 +555,9 @@ class Retur_pembelian extends Admin_Controller
 		$start = $this->input->get('start', true);
 		$search = $this->input->get('search', true);
 
-		$this->db->select('a.*');
+		$this->db->select('a.*, ria.no_invoice');
 		$this->db->from('tr_retur_pembelian a');
+		$this->db->join('tr_receive_invoice_ap_header ria', 'ria.id_rec_inv_ap = a.id_rec_inv_ap', 'left');
 		$this->db->where('a.deleted_by IS NULL');
 
 		$count_all = $this->db->count_all_results('', false);
@@ -462,26 +585,36 @@ class Retur_pembelian extends Admin_Controller
 		foreach ($get_data as $item) {
 			$no++;
 
-			$no_surat_po = [];
-			if (strpos($item->no_po, ',') !== false) {
-				$this->db->select('a.no_surat');
-				$this->db->from('tr_purchase_order a');
-				$this->db->where_in('a.no_po', explode(',', $item->no_po));
-				$get_no_po = $this->db->get()->result();
-
-				foreach ($get_no_po as $item_no_po) {
-					$no_surat_po[] = $item_no_po->no_surat;
-				}
+			// Requirement 4.2: if id_rec_inv_ap is set, use no_invoice from Receive Invoice AP header
+			// Requirement 4.3: if id_rec_inv_ap is null, fallback to no_surat from tr_purchase_order
+			if (!empty($item->id_rec_inv_ap)) {
+				$no_surat_po = $item->no_invoice;
 			} else {
-				$this->db->select('a.no_surat');
-				$this->db->from('tr_purchase_order a');
-				$this->db->where('a.no_po', $item->no_po);
-				$get_no_po = $this->db->get()->row();
+				$no_surat_po = [];
+				if (strpos($item->no_po, ',') !== false) {
+					$this->db->select('a.no_surat');
+					$this->db->from('tr_purchase_order a');
+					$this->db->where_in('a.no_po', explode(',', $item->no_po));
+					$get_no_po = $this->db->get()->result();
 
-				$no_surat_po[] = $get_no_po->no_surat;
+					foreach ($get_no_po as $item_no_po) {
+						$no_surat_po[] = $item_no_po->no_surat;
+					}
+				} else {
+					$this->db->select('a.no_surat');
+					$this->db->from('tr_purchase_order a');
+					$this->db->where('a.no_po', $item->no_po);
+					$get_no_po = $this->db->get()->row();
+
+					if ($get_no_po) {
+						$no_surat_po[] = $get_no_po->no_surat;
+					}
+				}
+
+				$no_surat_po = implode(', ', $no_surat_po);
 			}
 
-			$no_surat_po = implode(', ', $no_surat_po);
+			$status = $this->_render_dn_status($item);
 
 			$status = $this->_render_dn_status($item);
 
@@ -613,8 +746,15 @@ class Retur_pembelian extends Admin_Controller
 			'header' => $retur_header,
 			'detail' => $retur_detail,
 			'list_supplier' => $get_supplier,
-			'arr_detail' => $arr_detail
+			'arr_detail' => $arr_detail,
+			'id_rec_inv_ap' => $retur_header->id_rec_inv_ap
 		];
+
+		// Requirement 5.1: if id_rec_inv_ap is set, fetch no_invoice from tr_receive_invoice_ap_header
+		if (!empty($retur_header->id_rec_inv_ap)) {
+			$rec_inv_ap = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $retur_header->id_rec_inv_ap])->row();
+			$data['no_invoice_rec_inv_ap'] = (!empty($rec_inv_ap)) ? $rec_inv_ap->no_invoice : '';
+		}
 
 		$this->template->title('View Retur');
 		$this->template->set($data);
@@ -635,7 +775,8 @@ class Retur_pembelian extends Admin_Controller
 			'header' => $retur_header,
 			'detail' => $retur_detail,
 			'list_supplier' => $get_supplier,
-			'arr_detail' => $arr_detail
+			'arr_detail' => $arr_detail,
+			'id_rec_inv_ap' => $retur_header->id_rec_inv_ap
 		];
 
 		$this->template->title('Edit Retur');

@@ -1,6 +1,11 @@
 <?php
 if (!defined('BASEPATH')) {
 	exit('No direct script access allowed');
+    public function get_jurnal_invoicing()
+    {
+        $this->Wt_invoicing_model->get_jurnal_invoicing();
+    }
+
 }
 
 /*
@@ -2657,9 +2662,10 @@ class Wt_invoicing extends Admin_Controller
 			'data' => $get['data']
 		]);
 	}
+
 	public function generate_efaktur()
 	{
-		$post = $this->input->post();
+		$post        = $this->input->post();
 		$id_generate = $post['id_generate'];
 
 		if (empty($id_generate)) {
@@ -2707,6 +2713,7 @@ class Wt_invoicing extends Admin_Controller
 				->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3', 'left')
 				->join('tr_invoice c', 'c.no_surat = a.no_invoice', 'left')
 				->where('a.no_invoice', $item['no_invoice'])
+				->where('b.id_bentuk', 'B2000002')
 				->get()
 				->result();
 
@@ -2718,7 +2725,7 @@ class Wt_invoicing extends Admin_Controller
 				$qty = 0;
 				$satuan = 'UM.0003';
 				if ($item_sheet->id_bentuk == 'B2000002') {
-					$get_qty_sheet = $this->db->select('a.qty_sheet')
+					$get_qty_sheet = $this->db->select('a.qty_sheet, a.price_sheet')
 						->from('stock_material a')
 						->join('dt_delivery_order_child b', 'b.lotno = a.lotno')
 						->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order')
@@ -2810,14 +2817,6 @@ class Wt_invoicing extends Admin_Controller
 				'tanggal_invoice' => $item['tgl_invoice'],
 				'items' => $items
 			];
-		}
-
-		if (empty($invoices_data_for_export)) {
-			echo json_encode([
-				'status' => 'no_data',
-				'message' => 'Tidak ada faktur yang perlu diekspor.'
-			]);
-			exit;
 		}
 
 		$invoices_to_update = array_column($invoices_data_for_export, 'no_invoice');
@@ -3212,13 +3211,12 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
-				if (!empty($tipe_invoice)) :
+				$nama_barang = (!empty($tipe_invoice)) ? $nama_barang . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
+				$barang_jasa = 'A';
+				if (!empty($tipe_invoice)) {
 					$satuan = 'UM.0033';
-				endif;
-
-				$nama_barang = (!empty($tipe_invoice)) ? $tipe_invoice . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
-
-				$barang_jasa = (!empty($tipe_invoice)) ? 'B' : 'A';
+					$barang_jasa = 'B';
+				}
 
 				$items[] = [
 					'barang_jasa' => $barang_jasa,
@@ -3467,4 +3465,9 @@ class Wt_invoicing extends Admin_Controller
 		$objWriter->save('php://output');
 		exit;
 	}
+    public function get_jurnal_invoicing()
+    {
+        $this->Wt_invoicing_model->get_jurnal_invoicing();
+    }
+
 }
