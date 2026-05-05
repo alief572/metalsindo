@@ -648,9 +648,7 @@ class Control_do extends Admin_Controller
             // Logika Button
             $btn = '<button type="button" class="btn btn-sm btn-info view_control_do" data-id="' . $item->id_delivery_order . '"><i class="fa fa-eye"></i></button>';
             if (has_permission($this->managePermission) && $get_do_detail > 0) {
-                $btn_confirm = '<button type="button" class="btn btn-sm btn-success confirm_do" data-id="' . $item->id_delivery_order . '" title="Confirm DO" ><i class="fa fa-check"></i></button>';
-            } else {
-                $btn_confirm = '<button type="button" class="btn btn-sm btn-info view_control_do" data-id="' . $item->id_delivery_order . '"><i class="fa fa-eye"></i></button>';
+                $btn = '<button type="button" class="btn btn-sm btn-success confirm_do" data-id="' . $item->id_delivery_order . '" title="Confirm DO"><i class="fa fa-check"></i></button>';
             }
 
             $hasil[] = array(
@@ -859,9 +857,11 @@ class Control_do extends Admin_Controller
         $id = $this->input->get('id', true);
 
         $get_do_detail = $this->control_do_model->do_detail($id);
+        $type_sheet = $this->control_do_model->check_sheet_mat($id);
 
         $data = [
-            'do_detail' => $get_do_detail
+            'do_detail' => $get_do_detail,
+            'type_sheet' => $type_sheet
         ];
 
         $this->template->set($data);

@@ -616,6 +616,8 @@ class Retur_pembelian extends Admin_Controller
 
 			$status = $this->_render_dn_status($item);
 
+			$status = $this->_render_dn_status($item);
+
 			$action = $this->_render_action_retur_pembelian($item);
 
 			$arr_data[] = [
