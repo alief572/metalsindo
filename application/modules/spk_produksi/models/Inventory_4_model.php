@@ -516,7 +516,8 @@ class Inventory_4_model extends BF_Model
 		]);
 	}
 
-	public function get_data_spk_produksi_booking() {
+	public function get_data_spk_produksi_booking()
+	{
 		$draw = $this->input->post('draw');
 		$length = $this->input->post('length');
 		$start = $this->input->post('start');
