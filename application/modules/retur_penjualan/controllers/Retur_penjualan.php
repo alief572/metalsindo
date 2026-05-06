@@ -42,6 +42,7 @@ class Retur_penjualan extends Admin_Controller
 		$this->template->title('Retur Penjualan');
 		$this->template->render('list_spkmarketing');
 	}
+
 	public function proses_incoming()
 	{
 
@@ -231,20 +232,20 @@ class Retur_penjualan extends Admin_Controller
 				}
 			}
 
-			if (!empty($detRetur)) {
-				// throw new Exception(''.print_r($detRetur).'');
-				$insert_detail_retur = $this->db->insert_batch('dt_returpenjualan', $detRetur);
-				if (!$insert_detail_retur) {
-					throw new Exception('Data detail retur gagal di input !');
-				}
+			// if (!empty($detRetur)) {
+			// throw new Exception(''.print_r($detRetur).'');
+			$insert_detail_retur = $this->db->insert_batch('dt_returpenjualan', $detRetur);
+			if (!$insert_detail_retur) {
+				throw new Exception('Data detail retur gagal di input !');
 			}
+			// }
 
-			if (!empty($arr_stock_retur)) {
-				$insert_stock_retur = $this->db->insert_batch('stock_material', $arr_stock_retur);
-				if (!$insert_stock_retur) {
-					throw new Exception('Data stock retur gagal di kembalikan !');
-				}
+			// if (!empty($arr_stock_retur)) {
+			$insert_stock_retur = $this->db->insert_batch('stock_material', $arr_stock_retur);
+			if (!$insert_stock_retur) {
+				throw new Exception('Data stock retur gagal di kembalikan !');
 			}
+			// }
 
 			$this->db->trans_commit();
 			$status	= array(
