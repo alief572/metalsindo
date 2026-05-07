@@ -11,7 +11,7 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 	}
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
-<link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.3.8/css/dataTables.dataTables.min.css">
 
 <div class="box">
 	<div class="box-body">
@@ -97,8 +97,7 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 </div>
 
 <!-- DataTables -->
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
-<script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js') ?>"></script>
+<script src="https://cdn.datatables.net/2.3.8/js/dataTables.min.js"></script>
 
 <!-- page script -->
 <script type="text/javascript">
