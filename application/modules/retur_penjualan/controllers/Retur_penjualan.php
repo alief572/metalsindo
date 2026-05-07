@@ -45,34 +45,8 @@ class Retur_penjualan extends Admin_Controller
 
 	public function proses_incoming()
 	{
-
-		$id = $this->uri->segment(3);
 		$this->auth->restrict($this->viewPermission);
-		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-pencil');
-		$aktif = 'active';
-		$deleted = '0';
-
-		$nospk  = $this->db->query("SELECT a.no_surat FROM tr_spk_marketing a WHERE a.id_spkmarketing='$id'")->row();
-		$spkmkt = $nospk->no_surat;
-		$tr_spk = $this->Retur_penjualan_model->get_data('tr_spk_marketing', 'id_spkmarketing', $id);
-		// $dtspk = $this->Retur_penjualan_model->get_data('dt_spkmarketing',array('id_spkmarketing',$id));
-		$dtspk = $this->db->query("SELECT a.*, b.nama, b.maker, b.id_bentuk, b.total_weight, c.no_surat as no_do FROM stock_material a
-		JOIN ms_inventory_category3 b ON b.id_category3 = a.id_category3
-		JOIN tr_delivery_order c ON c.id_delivery_order = a.no_kirim
-		WHERE a.no_surat ='$spkmkt' ORDER BY c.no_surat ASC")->result();
-
-		$check_sheet = 0;
-
-		$data_weight_per_sheet = [];
-
-		foreach ($dtspk as $item) {
-			if ($check_sheet == 0 && $item->id_bentuk == 'B2000002') {
-				$check_sheet = 1;
-
-				$data_weight_per_sheet[$item->id_category3] = $item->total_weight;
-			}
-		}
 
 		$penawaran = $this->Retur_penjualan_model->get_data('tr_penawaran');
 		$customer = $this->db
@@ -84,24 +58,169 @@ class Retur_penjualan extends Admin_Controller
 			->order_by('b.name_customer', 'asc')
 			->get()
 			->result();
-		$karyawan = $this->Retur_penjualan_model->get_data('ms_karyawan', 'deleted', $deleted);
-		$mata_uang = $this->Retur_penjualan_model->get_data('mata_uang', 'deleted', $deleted);
+
 		$data = [
-			'tr_spk' => $tr_spk,
-			'dtspk' => $dtspk,
 			'penawaran' => $penawaran,
 			'customer' => $customer,
-			'karyawan' => $karyawan,
-			'mata_uang' => $mata_uang,
-			'check_sheet' => $check_sheet,
-			'data_weight_per_sheet' => $data_weight_per_sheet
 		];
 
-		$gudang	= $this->db->query("select * FROM ms_gudang ")->result();
+		$gudang = $this->db->query("select * FROM ms_gudang")->result();
 		$this->template->set('gudang', $gudang);
 		$this->template->set('results', $data);
 		$this->template->title('Terima Retur Penjualan');
 		$this->template->render('terima_barang');
+	}
+
+	public function FormSpk()
+	{
+		$id = $_GET['id'];
+		$id_customer = isset($_GET['id_customer']) ? $_GET['id_customer'] : '';
+
+		// Filter SPK berdasarkan customer yang dipilih
+		if ($id_customer != '') {
+			$this->db->select('a.*, b.name_customer as name_customer');
+			$this->db->from('tr_spk_marketing a');
+			$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+			$this->db->where('a.id_customer', $id_customer);
+			$this->db->order_by('a.id_spkmarketing', 'DESC');
+			$listspk = $this->db->get()->result();
+		} else {
+			$listspk = $this->Retur_penjualan_model->CariSPK();
+		}
+
+		echo "
+		<div id='spk_" . $id . "' class='col-sm-12' style='margin-bottom:15px; border:1px solid #ddd; padding:10px; border-radius:5px;'>
+			<div class='row'>
+				<div class='col-md-3'>
+					<label>No. SPK Marketing</label>
+				</div>
+				<div class='col-md-5'>
+					<select id='dt_spk_" . $id . "' name='dt[" . $id . "][id_spkmarketing]' class='form-control select' onchange='TambahMaterial(" . $id . ")' required>
+						<option value=''>--Pilih--</option>";
+		foreach ($listspk as $spk) {
+			echo "<option value='" . $spk->id_spkmarketing . "'>" . $spk->no_surat . " - " . $spk->name_customer . "</option>";
+		}
+		echo "			</select>
+				</div>
+				<div class='col-md-4'>
+					<button type='button' class='btn btn-sm btn-danger' onClick='HapusSpk(" . $id . ")'><i class='fa fa-close'></i> Hapus</button>
+				</div>
+			</div>
+			<br>
+			<div class='form-group row'>
+				<table class='table table-bordered table-striped'>
+					<thead>
+						<tr class='bg-blue'>
+							<th>ID Material</th>
+							<th>No. DO</th>
+							<th>Nama Material</th>
+							<th>Lot Number</th>
+							<th>Gudang</th>
+							<th>Customer Titipan</th>
+							<th>Total Kirim (Kg)</th>
+							<th>Qty Sheet</th>
+							<th>Retur<br><input type='checkbox' class='chk_retur_all' data-spk='" . $id . "' onclick='checkAllRetur(" . $id . ")'></th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody id='data_material_" . $id . "'>
+					</tbody>
+				</table>
+			</div>
+		</div>";
+	}
+
+	public function TambahMaterialRetur()
+	{
+		$id_spkmarketing = $_GET['id_spkmarketing'];
+		$id = $_GET['id'];
+
+		// 1. Ambil no_surat dari tr_spk_marketing
+		$spk = $this->db->get_where('tr_spk_marketing', ['id_spkmarketing' => $id_spkmarketing])->row();
+
+		if (!$spk) {
+			echo "<tr><td colspan='10'>Data tidak ditemukan</td></tr>";
+			return;
+		}
+
+		$no_surat = $spk->no_surat;
+
+		// 2. Query material dari stock_material
+		$materials = $this->db->query("SELECT a.*, b.nama, b.id_bentuk, c.no_surat as no_do 
+			FROM stock_material a
+			JOIN ms_inventory_category3 b ON b.id_category3 = a.id_category3
+			JOIN tr_delivery_order c ON c.id_delivery_order = a.no_kirim
+			WHERE a.no_surat = '$no_surat' 
+			ORDER BY c.no_surat ASC")->result();
+
+		// 3. Ambil daftar gudang
+		$gudang = $this->db->get('ms_gudang')->result();
+
+		// 4. Ambil daftar customer (untuk gudang titipan)
+		$customers = $this->db->get('master_customers')->result();
+
+		// 5. Echo HTML rows per material
+		$no = 0;
+		foreach ($materials as $material) {
+			$no++;
+			$is_sheet = ($material->id_bentuk == 'B2000002');
+
+			echo "<tr id='tr_material_" . $id . "_" . $no . "'>";
+
+			// ID Material (readonly) + hidden inputs
+			echo "<td>
+				<input type='text' class='form-control input-sm' value='" . $material->id_category3 . "' name='dp[" . $id . "_" . $no . "][id_category3]' readonly>
+				<input type='hidden' value='" . $material->id_stock . "' name='dp[" . $id . "_" . $no . "][id_stok]'>
+				<input type='hidden' value='" . $id_spkmarketing . "' name='dp[" . $id . "_" . $no . "][id_spkmarketing]'>
+				<input type='hidden' value='" . $material->thickness . "' name='dp[" . $id . "_" . $no . "][thickness]'>
+				<input type='hidden' value='" . $material->width . "' name='dp[" . $id . "_" . $no . "][width]'>
+				<input type='hidden' value='" . $material->length . "' name='dp[" . $id . "_" . $no . "][length]'>
+			</td>";
+
+			// No. DO (readonly)
+			echo "<td>" . $material->no_do . "</td>";
+
+			// Nama Material (readonly)
+			echo "<td><input type='text' class='form-control input-sm' value='" . $material->nama . "' name='dp[" . $id . "_" . $no . "][nama]' readonly></td>";
+
+			// Lot Number (input text)
+			echo "<td><input type='text' class='form-control input-sm' value='" . $material->lotno . "' name='dp[" . $id . "_" . $no . "][lotno]' id='dp_lotno_" . $id . "_" . $no . "'></td>";
+
+			// Gudang (dropdown)
+			echo "<td><select class='form-control input-sm select2_gudang' name='dp[" . $id . "_" . $no . "][gudang]' id='dp_gudang_" . $id . "_" . $no . "' onchange='gudangChange(" . $id . "," . $no . ")'>";
+			echo "<option value=''>Pilih Gudang</option>";
+			foreach ($gudang as $g) {
+				$sel = ($g->id_gudang == 3) ? 'selected' : '';
+				echo "<option value='" . $g->id_gudang . "' " . $sel . ">" . $g->nama_gudang . "</option>";
+			}
+			echo "</select></td>";
+
+			// Customer Titipan (dropdown, default disabled)
+			echo "<td><select class='form-control input-sm select2_customer' name='dp[" . $id . "_" . $no . "][customer_titipan]' id='dp_customer_" . $id . "_" . $no . "' disabled>";
+			echo "<option value=''>Pilih Customer</option>";
+			foreach ($customers as $cust) {
+				echo "<option value='" . $cust->name_customer . "'>" . $cust->name_customer . "</option>";
+			}
+			echo "</select></td>";
+
+			// Total Kirim (input number) - default value dari totalweight material
+			echo "<td><input type='number' step='0.01' class='form-control input-sm total_kirim' value='" . $material->totalweight . "' name='dp[" . $id . "_" . $no . "][total_kirim]' id='dp_total_kirim_" . $id . "_" . $no . "'></td>";
+
+			// Qty Sheet (only for sheet type)
+			if ($is_sheet) {
+				echo "<td><input type='number' class='form-control input-sm qty_sheet' value='' name='dp[" . $id . "_" . $no . "][qty_sheet]' id='dp_qty_sheet_" . $id . "_" . $no . "'></td>";
+			} else {
+				echo "<td></td>";
+			}
+
+			// Checkbox Retur
+			echo "<td><input type='checkbox' value='1' class='chk_retur' name='dp[" . $id . "_" . $no . "][deal]' id='dp_deal_" . $id . "_" . $no . "'></td>";
+
+			// Tombol hapus row
+			echo "<td><button type='button' class='btn btn-xs btn-danger' onClick='HapusRow(" . $id . "," . $no . ")'><i class='fa fa-trash'></i></button></td>";
+
+			echo "</tr>";
+		}
 	}
 
 	public function SaveRetur()
@@ -115,25 +234,40 @@ class Retur_penjualan extends Admin_Controller
 			$code = $this->Retur_penjualan_model->generate_code();
 			$no_surat = $this->Retur_penjualan_model->BuatNomor();
 			$this->db->trans_begin();
+
+			// Ambil id_spkmarketing dari row material pertama yang di-deal
+			$first_spkmarketing = '';
+			$first_no_surat = '';
+			if (isset($_POST['dp'])) {
+				foreach ($_POST['dp'] as $dp_check) {
+					if (isset($dp_check['deal']) && $dp_check['deal'] == 1 && isset($dp_check['id_spkmarketing'])) {
+						$first_spkmarketing = $dp_check['id_spkmarketing'];
+						$spk_row = $this->db->get_where('tr_spk_marketing', ['id_spkmarketing' => $first_spkmarketing])->row();
+						$first_no_surat = $spk_row ? $spk_row->no_surat : '';
+						break;
+					}
+				}
+			}
+
 			$data = [
 				'id_retur'		        => $code,
 				'no_retur'				=> $no_surat,
-				'id_spkmarketing'		=> $post['id_spkmarketing'],
-				'no_surat'				=> $post['no_surat'],
+				'id_spkmarketing'		=> $first_spkmarketing,
+				'no_surat'				=> $first_no_surat,
 				'tgl_retur'		        => $post['tgl_penawaran'],
 				'id_customer'			=> $post['id_customer'],
 				'nama_customer'			=> $post['nama_customer'],
-				'no_penawaran'			=> $post['no_penawaran'],
-				'no_po'					=> $post['no_po'],
-				'sample'				=> $post['sample'],
-				'tgl_po'				=> date('Y-m-d', strtotime($post['tgl_po'])),
-				'plan_cust'				=> date('Y-m-d', strtotime($post['plan_cust'])),
-				'note'					=> $post['note'],
+				'no_penawaran'			=> isset($post['no_penawaran']) ? $post['no_penawaran'] : '',
+				'no_po'					=> isset($post['no_po']) ? $post['no_po'] : '',
+				'sample'				=> isset($post['sample']) ? $post['sample'] : '',
+				'tgl_po'				=> isset($post['tgl_po']) && $post['tgl_po'] != '' ? date('Y-m-d', strtotime($post['tgl_po'])) : date('Y-m-d'),
+				'plan_cust'				=> isset($post['plan_cust']) && $post['plan_cust'] != '' ? date('Y-m-d', strtotime($post['plan_cust'])) : date('Y-m-d'),
+				'note'					=> isset($post['note']) ? $post['note'] : '',
 				'created_on'			=> date('Y-m-d H:i:s'),
 				'created_by'			=> $this->auth->user_id(),
 				'tahun'					=> date('Y-m-d'),
-				'kompensasi'			=> $post['kompensasi'],
-				'ganti_material'	    => $post['ganti']
+				'kompensasi'			=> isset($post['kompensasi']) ? $post['kompensasi'] : '',
+				'ganti_material'	    => isset($post['ganti']) ? $post['ganti'] : ''
 
 			];
 			//Add Data
@@ -150,7 +284,7 @@ class Retur_penjualan extends Admin_Controller
 
 				$deal        = $dp[deal];
 				$id_material = $dp[id_category3];
-				$idspkmarketing = $post['id_spkmarketing'];
+				$idspkmarketing = isset($dp['id_spkmarketing']) ? $dp['id_spkmarketing'] : $first_spkmarketing;
 				$idpenawaran  = $post['no_penawaran'];
 				$lotno = $dp['lotno'];
 				$gudang = $dp['gudang'];

@@ -15,18 +15,23 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 
 <div class="box">
 	<!-- /.box-header -->
-	<!-- /.box-header -->
+	<div class="box-header">
+		<?php if ($ENABLE_MANAGE) { ?>
+			<a class="btn btn-success btn-sm" href="<?= base_url('/retur_penjualan/proses_incoming') ?>"><i class="fa fa-plus"></i> Input Retur Baru</a>
+		<?php } ?>
+	</div>
+	<!-- /.box-body -->
 	<div class="box-body">
 		<table id="table_retur_incoming" class="table table-bordered table-striped">
 			<thead>
 				<tr>
 					<th width="5">#</th>
-					<th>Tanggal SPK Terbit</th>
-					<th>No. SPK</th>
+					<th>No. Retur</th>
+					<th>Tanggal Retur</th>
 					<th>Customer</th>
-					<th width="80">No DO</th>
-					<th>Status</th>
-					<th width="13%">Action</th>
+					<th>No. SPK</th>
+					<th>Kompensasi</th>
+					<th width="10%">Action</th>
 				</tr>
 			</thead>
 
@@ -248,19 +253,19 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 					data: 'no'
 				},
 				{
-					data: 'tanggal_spk_terbit'
+					data: 'no_retur'
 				},
 				{
-					data: 'no_spk'
+					data: 'tgl_retur'
 				},
 				{
 					data: 'customer'
 				},
 				{
-					data: 'no_do'
+					data: 'no_spk'
 				},
 				{
-					data: 'status'
+					data: 'kompensasi'
 				},
 				{
 					data: 'action'

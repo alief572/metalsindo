@@ -338,15 +338,17 @@ class Retur_penjualan_model extends BF_Model
 		$start  = intval($post['start']);
 		$search = $post['search']['value'];
 
-		$this->db->from('v_retur_incoming');
+		$this->db->select('a.*, b.name_customer');
+		$this->db->from('tr_retur_penjualan a');
+		$this->db->join('master_customers b', 'b.id_customer=a.id_customer', 'left');
 
 		// Filter Search
 		if (!empty($search)) {
 			$this->db->group_start();
-			$this->db->like('no_spk', $search, 'both');
-			$this->db->or_like('name_customer', $search, 'both');
-			$this->db->or_like('all_no_do', $search, 'both');
-			$this->db->or_like('tgl_spk_marketing', $search, 'both');
+			$this->db->like('a.no_retur', $search, 'both');
+			$this->db->or_like('b.name_customer', $search, 'both');
+			$this->db->or_like('a.no_surat', $search, 'both');
+			$this->db->or_like('a.tgl_retur', $search, 'both');
 			$this->db->group_end();
 		}
 
@@ -354,7 +356,7 @@ class Retur_penjualan_model extends BF_Model
 		$count_filter = $this->db->count_all_results('', false);
 
 		// Ordering
-		$this->db->order_by('id_spkmarketing', 'DESC');
+		$this->db->order_by('a.id_retur', 'DESC');
 
 		// Limit & Offset
 		$this->db->limit($length, $start);
@@ -366,31 +368,25 @@ class Retur_penjualan_model extends BF_Model
 		foreach ($get_data as $item) {
 			$no++;
 
-			// Status Badge logic
-			$status = ($item->status_approve == '1')
-				? '<span class="badge bg-green">Approve</span>'
-				: '<span class="badge bg-red">Belum di Approve</span>';
-
-			// Action logic
 			$action = '';
 			if ($ENABLE_MANAGE) {
-				$action = '<a class="btn btn-info btn-sm" href="' . base_url('/retur_penjualan/proses_incoming/' . $item->id_spkmarketing) . '" title="Edit"><i class="fa fa-edit"></i></a>';
+				$action = '<a class="btn btn-success btn-sm" href="' . base_url('/retur_penjualan/PrintH2/' . $item->id_retur) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
 			}
 
 			$hasil[] = [
-				'no'                 => $no,
-				'tanggal_spk_terbit' => date('d F Y', strtotime($item->tgl_spk_marketing)),
-				'no_spk'             => $item->no_spk,
-				'customer'           => $item->name_customer,
-				'no_do'              => $item->all_no_do, // Sudah dapet string dari View
-				'status'             => $status,
-				'action'             => $action
+				'no'         => $no,
+				'no_retur'   => $item->no_retur,
+				'tgl_retur'  => date('d F Y', strtotime($item->tgl_retur)),
+				'customer'   => $item->name_customer,
+				'no_spk'     => $item->no_surat,
+				'kompensasi' => ($item->kompensasi == 'brg') ? 'Ganti Barang' : 'Potong Hutang',
+				'action'     => $action
 			];
 		}
 
 		$response = [
 			'draw'            => $draw,
-			'recordsTotal'    => $count_filter, // Sesuaikan jika ingin real count_all tanpa filter
+			'recordsTotal'    => $count_filter,
 			'recordsFiltered' => $count_filter,
 			'data'            => $hasil
 		];
