@@ -459,6 +459,7 @@ class Delivery_order extends Admin_Controller
 		$nama = $nm[0]->nama;
 		echo "<input type='text' class='form-control' value='$nama' readonly id='material' required name='material'>";
 	}
+
 	function GetCustomer()
 	{
 		$no_penawaran	= $_GET['no_penawaran'];

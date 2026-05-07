@@ -1616,62 +1616,109 @@ class Material_planing extends Admin_Controller
 		// print_r($detail);
 		// exit;
 
-		$ArrDet = [];
-		$ArrUpdate = [];
-		foreach ($detail as $key => $value) {
-			if (!empty($value['id'])) {
-				$get_booking = $this->db->select('booking', 'delivery_book')->get_where('stock_material', array('id_stock' => $value['id']))->result();
-				$ArrDet[$key]['id_stock'] = $value['id'];
-				$ArrDet[$key]['id_customer'] = $id_customer;
-				$ArrDet[$key]['berat'] = $value['berat'];
-				$ArrDet[$key]['width'] = $value['width'];
-				$ArrDet[$key]['qty'] 	= $value['qty'];
-				$ArrDet[$key]['weight'] = $value['weight'];
-				$ArrDet[$key]['id_dt_spkmarketing'] = $post['id_dt_spkmarketing'];
-				$ArrDet[$key]['keterangan'] = $value['keterangan'];
-				$ArrDet[$key]['created_by'] = $this->auth->user_id();
-				$ArrDet[$key]['created_date'] = date('Y-m-d H:i:s');
-				if ($value['width'] > $width) {
-					$ArrDet[$key]['sts_over'] = '1';
-				} else {
-					$ArrDet[$key]['sts_over'] = '1';
+		// Fetch all required stock_material data in a single query to prevent N+1 queries
+		$stock_ids = [];
+		if (!empty($detail)) {
+			foreach ($detail as $value) {
+				if (!empty($value['id'])) {
+					$stock_ids[] = $value['id'];
 				}
-
-				$ArrUpdate[$key]['id_stock'] = $value['id'];
-				$ArrUpdate[$key]['booking'] = $get_booking[0]->booking + $value['berat'];
-			} elseif (!empty($value['id2'])) {
-				$get_booking = $this->db->select('booking', 'delivery_book')->get_where('stock_material', array('id_stock' => $value['id']))->result();
-				$ArrDet[$key]['id_stock'] = $value['id2'];
-				$ArrDet[$key]['id_customer'] = $id_customer;
-				$ArrDet[$key]['berat'] = $value['berat'];
-				$ArrDet[$key]['width'] = $value['width'];
-				$ArrDet[$key]['qty'] 	= $value['qty'];
-				$ArrDet[$key]['weight'] = $value['weight'];
-				$ArrDet[$key]['id_dt_spkmarketing'] = $post['id_dt_spkmarketing'];
-				$ArrDet[$key]['keterangan'] = $value['keterangan'];
-				$ArrDet[$key]['created_by'] = $this->auth->user_id();
-				$ArrDet[$key]['created_date'] = date('Y-m-d H:i:s');
-				if ($value['width'] > $width) {
-					$ArrDet[$key]['sts_over'] = '1';
-				} else {
-					$ArrDet[$key]['sts_over'] = '1';
+				if (!empty($value['id2'])) {
+					$stock_ids[] = $value['id2'];
 				}
-
-				$ArrUpdate[$key]['id_stock'] = $value['id2'];
-				$ArrUpdate[$key]['booking'] = $get_booking[0]->booking + $value['berat'];
-				$ArrUpdate[$key]['delivery_book'] = $get_booking[0]->delivery_book + $value['berat'];
-				$ArrUpdate[$key]['customer'] = $cust->name_customer;
-				$ArrUpdate[$key]['no_surat'] = $post['no_surat'];
-				$ArrUpdate[$key]['id_dt_spkmarketing'] = $post['id_dt_spkmarketing'];
 			}
 		}
+
+		$stock_data = [];
+		if (!empty($stock_ids)) {
+			$stock_ids = array_unique($stock_ids);
+			$get_stocks = $this->db->select('id_stock, booking, delivery_book')
+								   ->where_in('id_stock', $stock_ids)
+								   ->get('stock_material')
+								   ->result();
+			foreach ($get_stocks as $st) {
+				$stock_data[$st->id_stock] = $st;
+			}
+		}
+
+		$ArrDet = [];
+		$ArrUpdate = [];
+		
+		if (!empty($detail)) {
+			foreach ($detail as $key => $value) {
+				// Process id2 (Kirim) first if it's checked, it includes booking & delivery
+				if (!empty($value['id2'])) {
+					$stock_id = $value['id2'];
+					$booking = isset($stock_data[$stock_id]) ? $stock_data[$stock_id]->booking : 0;
+					$delivery_book = isset($stock_data[$stock_id]) ? $stock_data[$stock_id]->delivery_book : 0;
+
+					$ArrDet[$key]['id_stock'] 	= $stock_id;
+					$ArrDet[$key]['id_customer'] = $id_customer;
+					$ArrDet[$key]['berat'] 		= $value['berat'];
+					$ArrDet[$key]['width'] 		= $value['width'];
+					$ArrDet[$key]['qty'] 		= $value['qty'];
+					$ArrDet[$key]['weight'] 	= $value['weight'];
+					$ArrDet[$key]['id_dt_spkmarketing'] = $post['id_dt_spkmarketing'];
+					$ArrDet[$key]['keterangan'] = $value['keterangan'];
+					$ArrDet[$key]['created_by'] = $this->auth->user_id();
+					$ArrDet[$key]['created_date'] = date('Y-m-d H:i:s');
+					$ArrDet[$key]['sts_over'] 	= '1'; // Logic unchanged from original
+
+					// Keep track of updates by stock_id to avoid duplication in batch update
+					$ArrUpdate[$stock_id]['id_stock'] = $stock_id;
+					$ArrUpdate[$stock_id]['booking']  = $booking + $value['berat'];
+					$ArrUpdate[$stock_id]['delivery_book'] = $delivery_book + $value['berat'];
+					$ArrUpdate[$stock_id]['customer'] = isset($cust->name_customer) ? $cust->name_customer : '';
+					$ArrUpdate[$stock_id]['no_surat'] = $post['no_surat'];
+					$ArrUpdate[$stock_id]['id_dt_spkmarketing'] = $post['id_dt_spkmarketing'];
+
+					// Update local reference to handle multiple selections of same stock properly
+					if (isset($stock_data[$stock_id])) {
+						$stock_data[$stock_id]->booking += $value['berat'];
+						$stock_data[$stock_id]->delivery_book += $value['berat'];
+					}
+
+				} elseif (!empty($value['id'])) {
+					$stock_id = $value['id'];
+					$booking = isset($stock_data[$stock_id]) ? $stock_data[$stock_id]->booking : 0;
+					
+					$ArrDet[$key]['id_stock'] 	= $stock_id;
+					$ArrDet[$key]['id_customer'] = $id_customer;
+					$ArrDet[$key]['berat'] 		= $value['berat'];
+					$ArrDet[$key]['width'] 		= $value['width'];
+					$ArrDet[$key]['qty'] 		= $value['qty'];
+					$ArrDet[$key]['weight'] 	= $value['weight'];
+					$ArrDet[$key]['id_dt_spkmarketing'] = $post['id_dt_spkmarketing'];
+					$ArrDet[$key]['keterangan'] = $value['keterangan'];
+					$ArrDet[$key]['created_by'] = $this->auth->user_id();
+					$ArrDet[$key]['created_date'] = date('Y-m-d H:i:s');
+					$ArrDet[$key]['sts_over'] 	= '1';
+
+					$ArrUpdate[$stock_id]['id_stock'] = $stock_id;
+					$ArrUpdate[$stock_id]['booking']  = $booking + $value['berat'];
+
+					if (isset($stock_data[$stock_id])) {
+						$stock_data[$stock_id]->booking += $value['berat'];
+					}
+				}
+			}
+		}
+
+		// Re-index arrays for batch operations
+		$ArrDet = array_values($ArrDet);
+		$ArrUpdate = array_values($ArrUpdate);
+
 		// print_r($ArrDet); 
 		// print_r($ArrUpdate);
 		// exit;
 
 		$this->db->trans_start();
-		$this->db->insert_batch('stock_material_customer', $ArrDet);
-		$this->db->update_batch('stock_material', $ArrUpdate, 'id_stock');
+		if (!empty($ArrDet)) {
+			$this->db->insert_batch('stock_material_customer', $ArrDet);
+		}
+		if (!empty($ArrUpdate)) {
+			$this->db->update_batch('stock_material', $ArrUpdate, 'id_stock');
+		}
 		$this->db->trans_complete();
 
 		if ($this->db->trans_status() === FALSE) {
