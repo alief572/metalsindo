@@ -169,7 +169,7 @@ class Retur_pembelian extends Admin_Controller
 				$return .= '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item->no_po . '[' . $no_detail . '][qty_receive]" value="' . $item->width_recive . '">';
 				$return .= '</td>';
 				$return .= '<td>';
-				$return .= '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item->no_po . '[' . $no_detail . '][retur]" data-no_po="' . $item->no_po . '" data-no="' . $no_detail . '">';
+				$return .= '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item->no_po . '[' . $no_detail . '][retur]" value="' . $item->width_recive . '" data-no_po="' . $item->no_po . '" data-no="' . $no_detail . '">';
 				$return .= '</td>';
 				$return .= '<td>';
 				$return .= '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item->no_po . '[' . $no_detail . '][harga]" value="' . $item->hargasatuan . '" data-no_po="' . $item->no_po . '" data-no="' . $no_detail . '">';
@@ -181,6 +181,15 @@ class Retur_pembelian extends Admin_Controller
 			}
 
 			$return .= '</tbody>';
+			$return .= '<tfoot>';
+			$return .= '<tr>';
+			$return .= '<td colspan="4" class="text-right text-bold">Grand Total</td>';
+			$return .= '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_qty_receive" readonly></td>';
+			$return .= '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_retur" readonly></td>';
+			$return .= '<td></td>';
+			$return .= '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_grand_total" readonly></td>';
+			$return .= '</tr>';
+			$return .= '</tfoot>';
 			$return .= '</table>';
 
 			http_response_code(200);
@@ -467,7 +476,7 @@ class Retur_pembelian extends Admin_Controller
 				'updated_by' => $this->auth->user_id(),
 				'updated_date' => date('Y-m-d H:i:s')
 			];
-			if(!empty($filenames)) {
+			if (!empty($filenames)) {
 				$arr_insert_header['file_ba'] = 'assets/file_ba/' . $filenames;
 			}
 
@@ -667,11 +676,12 @@ class Retur_pembelian extends Admin_Controller
 		return $action;
 	}
 
-	public function _render_dn_status($item) {
+	public function _render_dn_status($item)
+	{
 		$get_dn = $this->db->get_where('tr_dn_retur_pmb', ['id_retur' => $item->id])->result();
 
 		$status = '<span class="badge bg-blue">Waiting DN</span>';
-		if(count($get_dn) > 0) {
+		if (count($get_dn) > 0) {
 			$status = '<span class="badge bg-green">DN Created</span>';
 		}
 
@@ -732,13 +742,14 @@ class Retur_pembelian extends Admin_Controller
 		}
 	}
 
-	public function view_retur($id) {
+	public function view_retur($id)
+	{
 		$retur_header = $this->Retur_pembelian_model->get_retur_header($id);
 		$retur_detail = $this->Retur_pembelian_model->get_retur_detail($retur_header->no_surat);
 		$get_supplier = $this->Retur_pembelian_model->get_supplier();
 
 		$arr_detail = [];
-		foreach($retur_detail as $item_detail) {
+		foreach ($retur_detail as $item_detail) {
 			$arr_detail[$item_detail->id_detail_po] = $item_detail;
 		}
 
@@ -761,13 +772,14 @@ class Retur_pembelian extends Admin_Controller
 		$this->template->render('view_retur');
 	}
 
-	public function edit_retur($id) {
+	public function edit_retur($id)
+	{
 		$retur_header = $this->Retur_pembelian_model->get_retur_header($id);
 		$retur_detail = $this->Retur_pembelian_model->get_retur_detail($retur_header->no_surat);
 		$get_supplier = $this->Retur_pembelian_model->get_supplier();
 
 		$arr_detail = [];
-		foreach($retur_detail as $item_detail) {
+		foreach ($retur_detail as $item_detail) {
 			$arr_detail[$item_detail->id_detail_po] = $item_detail;
 		}
 

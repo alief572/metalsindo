@@ -171,6 +171,31 @@
                 success: function(result) {
                     $('.list_detail_po').html(result.hasil);
                     auto_num();
+                    // Trigger hitung total untuk setiap baris yang sudah punya value default
+                    $('.hitung_detail_total').each(function() {
+                        var no_po = $(this).data('no_po');
+                        var no = $(this).data('no');
+
+                        var qty_retur = $('input[name="dt_' + no_po + '[' + no + '][retur]"]').val();
+                        if (qty_retur && qty_retur.length > 0) {
+                            qty_retur = qty_retur.split(',').join('');
+                            qty_retur = parseFloat(qty_retur);
+                        } else {
+                            qty_retur = 0;
+                        }
+
+                        var harga = $('input[name="dt_' + no_po + '[' + no + '][harga]"]').val();
+                        if (harga && harga.length > 0) {
+                            harga = harga.split(',').join('');
+                            harga = parseFloat(harga);
+                        } else {
+                            harga = 0;
+                        }
+
+                        var total_harga = (qty_retur * harga);
+                        $('input[name="dt_' + no_po + '[' + no + '][total_harga]"]').autoNumeric('set', total_harga);
+                    });
+                    hitungFooter();
                 },
                 error: function(xhr, status, error) {
                     Swal.fire({
@@ -211,6 +236,8 @@
         var total_harga = (qty_retur * harga);
 
         $('input[name="dt_' + no_po + '[' + no + '][total_harga]"]').autoNumeric('set', total_harga);
+
+        hitungFooter();
     });
 
     $(document).on('submit', '#frm-data', function(e) {
@@ -267,5 +294,44 @@
 
     function auto_num() {
         $('.auto_num').autoNumeric('init');
+    }
+
+    function hitungFooter() {
+        var totalQtyReceive = 0;
+        var totalRetur = 0;
+        var grandTotal = 0;
+
+        $('.list_detail_po tbody tr').each(function() {
+            var qtyReceiveInput = $(this).find('input[name$="[qty_receive]"]');
+            var returInput = $(this).find('input[name$="[retur]"]');
+            var totalHargaInput = $(this).find('input[name$="[total_harga]"]');
+
+            if (qtyReceiveInput.length > 0) {
+                var qtyVal = qtyReceiveInput.val();
+                if (qtyVal && qtyVal.length > 0) {
+                    totalQtyReceive += parseFloat(qtyVal.split(',').join('')) || 0;
+                }
+            }
+
+            if (returInput.length > 0) {
+                var returVal = returInput.val();
+                if (returVal && returVal.length > 0) {
+                    totalRetur += parseFloat(returVal.split(',').join('')) || 0;
+                }
+            }
+
+            if (totalHargaInput.length > 0) {
+                var totalVal = totalHargaInput.val();
+                if (totalVal && totalVal.length > 0) {
+                    grandTotal += parseFloat(totalVal.split(',').join('')) || 0;
+                }
+            }
+        });
+
+        if ($('#footer_total_qty_receive').length > 0) {
+            $('#footer_total_qty_receive').autoNumeric('set', totalQtyReceive);
+            $('#footer_total_retur').autoNumeric('set', totalRetur);
+            $('#footer_grand_total').autoNumeric('set', grandTotal);
+        }
     }
 </script>
