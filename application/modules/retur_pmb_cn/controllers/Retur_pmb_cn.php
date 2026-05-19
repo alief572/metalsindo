@@ -341,7 +341,7 @@ class Retur_pmb_cn extends Admin_Controller
 	public function view($id_dn)
 	{
 		$get_dn_header = $this->Retur_pmb_cn_model->get_dn_header($id_dn);
-		$get_dn_detail = $this->Retur_pmb_cn_model->get_dn_detail($get_dn_header->id_cn);
+		$get_dn_detail = $this->Retur_pmb_cn_model->get_dn_detail($get_dn_header->no_surat);
 
 		$arr_po = [];
 

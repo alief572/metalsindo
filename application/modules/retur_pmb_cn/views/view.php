@@ -20,7 +20,7 @@
                     <label for="">No. DN</label>
                 </div>
                 <div class="col-md-4">
-                    <input type="text" name="" id="" class="form-control form-control-sm" value="New DN" readonly>
+                    <input type="text" name="" id="" class="form-control form-control-sm" value="<?= $header->no_surat ?>" readonly>
                 </div>
             </div>
             <div class="row">
@@ -80,8 +80,8 @@
                                         <tr>
                                             <td class="text-center">' . $no . '</td>
                                             <td>' . $item->nama_material . '</td>
-                                            <td class="text-right">' . $item->jumlah_retur . '</td>
-                                            <td class="text-right">' . number_format($item->harga_satuan, 2) . '</td>
+                                            <td class="text-right">' . $item->qty . '</td>
+                                            <td class="text-right">' . number_format($item->unit_price, 2) . '</td>
                                             <td class="text-right">' . number_format($item->grand_total, 2) . '</td>
                                         </tr>
                                     ';

@@ -178,13 +178,13 @@
             $grand_ttl += $item_detail->grand_total;
         }
         ?>
-        <tr>
-            <td style="border-left: 1px solid black; height: 120px;"></td>
-            <td style="border-left: 1px solid black; height: 120px;"></td>
-            <td style="border-left: 1px solid black; height: 120px;"></td>
-            <td style="border-left: 1px solid black; height: 120px;"></td>
-            <td style="border-right: 1px solid black; border-left: 1px solid black; height: 120px;"></td>
-        </tr>
+        <!-- <tr>
+            <td style="border-left: 1px solid black; height: 60px;"></td>
+            <td style="border-left: 1px solid black; height: 60px;"></td>
+            <td style="border-left: 1px solid black; height: 60px;"></td>
+            <td style="border-left: 1px solid black; height: 60px;"></td>
+            <td style="border-right: 1px solid black; border-left: 1px solid black; height: 60px;"></td>
+        </tr> -->
     </tbody>
     <tfoot>
         <tr>
