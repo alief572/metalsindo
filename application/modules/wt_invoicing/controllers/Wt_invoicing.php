@@ -3391,13 +3391,11 @@ class Wt_invoicing extends Admin_Controller
 			// Data untuk Sheet Detail Faktur
 			foreach ($invoice['items'] as $item) {
 
-				$nama_barang_excel = ($item['barang_jasa'] == 'B') ? 'Jasa Slitting ' . $item['nama_barang'] : $item['nama_barang'];
-
 				$dataDetail = [
 					$itemRowIndex, // Kunci penghubung
 					$item['barang_jasa'],
 					'',
-					$nama_barang_excel,
+					$item['nama_barang'],
 					$item['satuan'],
 					$item['harga_satuan'],
 					$item['qty'],
