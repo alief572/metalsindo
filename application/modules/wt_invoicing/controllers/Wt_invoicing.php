@@ -3013,7 +3013,7 @@ class Wt_invoicing extends Admin_Controller
 
 			$jasa_barang = (!empty($tipe_invoice)) ? 'B' : 'A';
 
-			$sheetFaktur->fromArray($dataFaktur, NULL, $jasa_barang . $rowFaktur);
+			$sheetFaktur->fromArray($dataFaktur, NULL, 'A' . $rowFaktur);
 			$sheetFaktur->setCellValueExplicit('B' . $rowFaktur, $tanggal_faktur_formatted, PHPExcel_Cell_DataType::TYPE_STRING);
 
 			$sheetFaktur->setCellValueExplicit('D' . $rowFaktur, "04", PHPExcel_Cell_DataType::TYPE_STRING);
@@ -3053,7 +3053,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$barang_jasa = (!empty($tipe_invoice)) ? 'B' : 'A';
 
-				$sheetDetail->fromArray($dataDetail, NULL, $barang_jasa . $rowDetail);
+				$sheetDetail->fromArray($dataDetail, NULL, 'A' . $rowDetail);
 
 				$sheetDetail->setCellValueExplicit('C' . $rowDetail, (empty($tipe_invoice)) ? $item['kode_coretax'] : '290000', PHPExcel_Cell_DataType::TYPE_STRING);
 				$sheetDetail->getStyle('C' . $rowDetail)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
@@ -3212,7 +3212,7 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
-				$nama_barang = (!empty($tipe_invoice)) ? $nama_barang . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
+				$nama_barang = (!empty($tipe_invoice)) ? 'Jasa Slitting ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
 				$barang_jasa = 'A';
 				if (!empty($tipe_invoice)) {
 					$satuan = 'UM.0033';
@@ -3232,7 +3232,7 @@ class Wt_invoicing extends Admin_Controller
 					'ppn' => $ppn,
 					'tarif_ppnbm' => 0,
 					'ppnbm' => 0,
-					'kode_barang' => $item_sheet->kode_coretax
+					'kode_barang' => (!empty($tipe_invoice)) ? '290000' : $item_sheet->kode_coretax
 				];
 			}
 			// echo '<pre>';
