@@ -3013,7 +3013,7 @@ class Wt_invoicing extends Admin_Controller
 
 			$jasa_barang = (!empty($tipe_invoice)) ? 'B' : 'A';
 
-			$sheetFaktur->fromArray($dataFaktur, NULL, 'A' . $rowFaktur);
+			$sheetFaktur->fromArray($dataFaktur, NULL, $jasa_barang . $rowFaktur);
 			$sheetFaktur->setCellValueExplicit('B' . $rowFaktur, $tanggal_faktur_formatted, PHPExcel_Cell_DataType::TYPE_STRING);
 
 			$sheetFaktur->setCellValueExplicit('D' . $rowFaktur, "04", PHPExcel_Cell_DataType::TYPE_STRING);
@@ -3053,7 +3053,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$barang_jasa = (!empty($tipe_invoice)) ? 'B' : 'A';
 
-				$sheetDetail->fromArray($dataDetail, NULL, 'A' . $rowDetail);
+				$sheetDetail->fromArray($dataDetail, NULL, $barang_jasa . $rowDetail);
 
 				$sheetDetail->setCellValueExplicit('C' . $rowDetail, (empty($tipe_invoice)) ? $item['kode_coretax'] : '290000', PHPExcel_Cell_DataType::TYPE_STRING);
 				$sheetDetail->getStyle('C' . $rowDetail)->getNumberFormat()->setFormatCode(PHPExcel_Style_NumberFormat::FORMAT_TEXT);
