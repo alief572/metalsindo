@@ -114,7 +114,7 @@ class Control_do_model extends BF_Model
         COALESCE(SUM(a.qty_ng_sheet), 0) as total_ng_sheet, 
         COALESCE(SUM(b.qty_sheet), 0) as total_sheet');
         $this->db->from('dt_delivery_order_child_scrap a');
-        $this->db->join('stock_material b', 'b.id_stock = a.id_stock');
+        $this->db->join('stock_material b', 'b.id_stock = a.id_stock', 'left');
         $this->db->where('a.id_delivery_order', $id_delivery_order);
         $get_total = $this->db->get()->row();
 
