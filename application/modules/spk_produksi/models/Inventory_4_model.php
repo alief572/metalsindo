@@ -616,4 +616,43 @@ class Inventory_4_model extends BF_Model
 			'data' => $hasil
 		]);
 	}
+
+
+	public function getMaterialJson($search = '', $limit = 10, $offset = 0)
+	{
+		$this->db->select('a.*');
+		$this->db->from('v_material_spk_produksi a');
+
+		if (!empty($search)) {
+			$this->db->group_start();
+			$this->db->like('a.id_category3', $search);
+			$this->db->or_like('a.nama_category3', $search);
+			$this->db->or_like('a.nama_type', $search);
+			$this->db->or_like('a.nama_category1', $search);
+			$this->db->or_like('a.nama_category2', $search);
+			$this->db->or_like('a.maker', $search);
+			$this->db->or_like('a.thickness', $search);
+			$this->db->group_end();
+		}
+
+		$temp_db = clone $this->db;
+		$total_count = $temp_db->get()->num_rows();
+
+		$this->db->limit($limit, $offset);
+		// $this->db->limit(10);
+		$query = $this->db->get()->result();
+
+		$items = [];
+		foreach ($query as $q) {
+			$items[] = [
+				'id' => $q->id_category3,
+				'text' => $q->id_category3 . '|' . $q->nama_category3 . '|' . $q->maker,
+			];
+		}
+
+		return [
+			'items' => $items,
+			'total_count' => $total_count
+		];
+	}
 }

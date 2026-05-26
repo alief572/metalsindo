@@ -71,12 +71,12 @@ class Spk_produksi extends Admin_Controller
 		$this->template->page_icon('fa fa-pencil');
 		$aktif = 'active';
 		$deleted = '0';
-		$penawaran 	= $this->Inventory_4_model->get_data('tr_penawaran');
+		// $penawaran 	= $this->Inventory_4_model->get_data('tr_penawaran');
 		//$stock 		= $this->Inventory_4_model->get_data('stock_material');
 
-		$stock		= $this->db->query("SELECT a.* FROM stock_material a")->result();
+		// $stock		= $this->db->query("SELECT a.* FROM stock_material a")->result();
 		$karyawan 	= $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted);
-		$material 	= $this->Inventory_4_model->get_data_category3();
+		// $material 	= $this->Inventory_4_model->get_data_category3();
 		$mata_uang 	= $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted);
 
 		$header = $this->db->get_where('tr_spk_produksi', array('id_spkproduksi' => $id))->result();
@@ -90,10 +90,10 @@ class Spk_produksi extends Admin_Controller
 		}
 
 		$data = [
-			'penawaran' => $penawaran,
-			'stock' => $stock,
+			// 'penawaran' => $penawaran,
+			// 'stock' => $stock,
 			'karyawan' => $karyawan,
-			'material' => $material,
+			// 'material' => $material,
 			'mata_uang' => $mata_uang,
 			'header' => $header,
 			'detail' => $detail,
@@ -3889,5 +3889,17 @@ class Spk_produksi extends Admin_Controller
 	public function get_data_spk_produksi_booking()
 	{
 		$this->Inventory_4_model->get_data_spk_produksi_booking();
+	}
+
+	public function getMaterialJson()
+	{
+		$search = $this->input->get('q');
+		$page   = $this->input->get('page');
+		$limit  = 10;
+		$offset = ($page - 1) * $limit;
+
+		$data   = $this->Inventory_4_model->getMaterialJson($search, $limit, $offset);
+		echo json_encode($data);
+		exit;
 	}
 }
