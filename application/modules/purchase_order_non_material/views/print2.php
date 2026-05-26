@@ -4,22 +4,32 @@
         font-family: arial, sans-serif;
         border-collapse: collapse;
     }
+
     .gridtable {
         font-size: 9px;
         color: #333333;
         border: 1px solid #808080;
     }
-    .gridtable td, .gridtable tr {
+
+    .gridtable td,
+    .gridtable tr,
+    .gridtable th {
         padding: 5px;
         border: 1px solid #808080;
+        word-wrap: break-word;
+        overflow: hidden;
     }
+
     .gridtable2 {
         font-size: 10px;
         border: none;
     }
-    p, .font {
+
+    p,
+    .font {
         font-size: 10px;
     }
+
     .header-text {
         font-size: 10px;
     }
@@ -31,7 +41,7 @@
         font-size: 10px;
         color: #555;
     }
-    
+
     /* Gunakan selector khusus HTML2PDF */
     page_footer {
         width: 100%;
@@ -40,12 +50,13 @@
 </style>
 
 <page backtop="10mm" backbottom="15mm" backleft="10mm" backright="10mm">
-    
+
 
     <?php
-    foreach ($header as $h) { } // Alias agar lebih pendek
+    foreach ($header as $h) {
+    } // Alias agar lebih pendek
     $detailsum = $this->db->query("SELECT SUM(width) as sumwidth, SUM(qty) as sumqty, SUM(totalwidth) as sumtotalwidth, SUM(jumlahharga) as sumjumlahharga, SUM(hargasatuan) as sumhargasatuan FROM dt_trans_po_non_material WHERE no_po = '" . $h->no_po . "' ")->result();
-    
+
     // Logic pencarian PIC dsb
     $findpic = $this->db->query("SELECT * FROM child_supplier_pic WHERE id_suplier = '" . $h->id_suplier . "' ")->result();
     $namapic = (!empty($findpic)) ? $findpic[0]->name_pic : '-';
@@ -55,7 +66,9 @@
     <table style="width: 100%;">
         <tr>
             <td style="width: 10%;"><img src='assets/images/logo_metalsindo.jpeg' height='30'></td>
-            <td style="width: 40%; vertical-align: middle;"><h5>PT METALSINDO PACIFIC</h5></td>
+            <td style="width: 40%; vertical-align: middle;">
+                <h5>PT METALSINDO PACIFIC</h5>
+            </td>
             <td style="width: 50%; text-align: right;"><img src='assets/img/ISO_9001V1.jpg' height='30'></td>
         </tr>
     </table>
@@ -98,17 +111,17 @@
         </tr>
     </table>
 
-    <table class="gridtable" style="width: 100%; margin-top: 15px;">
+    <table class="gridtable" style="width: 100%; margin-top: 15px; table-layout: fixed;">
         <thead>
             <tr style='background-color:#c2c2c2; font-weight:bold; text-align: center;'>
-                <th style="width: 15%;">Code</th>
-                <th style="width: 20%;">Description</th>
-                <th style="width: 10%;">UM</th>
-                <th style="width: 8%;">Qty Pk</th>
-                <th style="width: 10%;">Price</th>
-                <th style="width: 7%;">Qty</th>
-                <th style="width: 10%;">Disc</th>
-                <th style="width: 20%;">Total</th>
+                <th style="width: 10%;">Code</th>
+                <th style="width: 30%;">Description</th>
+                <th style="width: 7%;">UM</th>
+                <th style="width: 7%;">Qty Pk</th>
+                <th style="width: 14%;">Price</th>
+                <th style="width: 6%;">Qty</th>
+                <th style="width: 8%;">Disc</th>
+                <th style="width: 18%;">Total</th>
             </tr>
         </thead>
         <tbody>
@@ -118,16 +131,16 @@
                 $JH = $row->jumlahharga;
                 $TTL += $JH;
                 $konversi = ($row->konversi > 0) ? $row->konversi : 1;
-                ?>
+            ?>
                 <tr>
-                    <td style="font-size: 8px;"><?= $row->idmaterial ?></td>
-                    <td style="font-size: 8px;"><?= $row->nama ?></td>
+                    <td style="font-size: 8px; word-wrap: break-word; overflow: hidden;"><?= $row->idmaterial ?></td>
+                    <td style="font-size: 8px; word-wrap: break-word; overflow: hidden;"><?= $row->nama ?></td>
                     <td align="center"><?= ucfirst($row->satuan) ?></td>
                     <td align="right"><?= number_format($row->qty / $konversi) ?></td>
-                    <td align="right"><?= $h->matauang ?> <?= number_format($row->hargasatuan, 2) ?></td>
+                    <td align="right" style="white-space: nowrap;"><?= $h->matauang ?> <?= number_format($row->hargasatuan, 2) ?></td>
                     <td align="right"><?= number_format($row->qty) ?></td>
                     <td align="right"><?= number_format($row->nilai_disc) ?></td>
-                    <td align="right"><?= $h->matauang ?> <?= number_format($JH, 2) ?></td>
+                    <td align="right" style="white-space: nowrap;"><?= $h->matauang ?> <?= number_format($JH, 2) ?></td>
                 </tr>
             <?php } ?>
         </tbody>
@@ -155,15 +168,15 @@
         <tr>
             <td>PT. METALSINDO PACIFIC</td>
             <td><?= date('d-M-y', strtotime($h->delivery_date)) ?></td>
-            <?php 
-                $this->db->select('a.keterangan');
-                $this->db->from('tr_top_po a');
-                $this->db->where('a.no_po', $h->no_po);
-                $this->db->order_by('a.created_on', 'asc');
-                $this->db->limit(1);
-                $get_first_top = $this->db->get()->row();
+            <?php
+            $this->db->select('a.keterangan');
+            $this->db->from('tr_top_po a');
+            $this->db->where('a.no_po', $h->no_po);
+            $this->db->order_by('a.created_on', 'asc');
+            $this->db->limit(1);
+            $get_first_top = $this->db->get()->row();
 
-                $payment_terms = (!empty($get_first_top->keterangan)) ? $get_first_top->keterangan : '';
+            $payment_terms = (!empty($get_first_top->keterangan)) ? $get_first_top->keterangan : '';
             ?>
             <td><?= $payment_terms ?></td>
             <td><?= (!empty($date_required)) ? date('d-M-y', strtotime($date_required)) : '-'; ?></td>
@@ -172,8 +185,8 @@
 
     <div style="margin-top: 15px; border: 1px solid #808080; padding: 5px; font-size: 8px;">
         <b>Syarat & Ketentuan :</b><br>
-        1. Cantumkan nomor PO dalam surat jalan & invoice. 2. Sertakan nomor rekening lengkap. 
-        3. Kami berhak membatalkan jika spesifikasi tidak sesuai atau terlambat > 1 minggu. 
+        1. Cantumkan nomor PO dalam surat jalan & invoice. 2. Sertakan nomor rekening lengkap.
+        3. Kami berhak membatalkan jika spesifikasi tidak sesuai atau terlambat > 1 minggu.
         4. Penjual wajib mengganti barang reject tanpa biaya tambahan. 5. Konfirmasi PO maksimal 2 hari kerja.
     </div>
 
