@@ -3212,7 +3212,7 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
-				$nama_barang = (!empty($tipe_invoice)) ? $nama_barang . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
+				$nama_barang = (!empty($tipe_invoice)) ? 'Jasa Slitting ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
 				$barang_jasa = 'A';
 				if (!empty($tipe_invoice)) {
 					$satuan = 'UM.0033';
@@ -3232,7 +3232,7 @@ class Wt_invoicing extends Admin_Controller
 					'ppn' => $ppn,
 					'tarif_ppnbm' => 0,
 					'ppnbm' => 0,
-					'kode_barang' => $item_sheet->kode_coretax
+					'kode_barang' => (!empty($tipe_invoice)) ? '290000' : $item_sheet->kode_coretax
 				];
 			}
 			// echo '<pre>';
@@ -3391,13 +3391,11 @@ class Wt_invoicing extends Admin_Controller
 			// Data untuk Sheet Detail Faktur
 			foreach ($invoice['items'] as $item) {
 
-				$nama_barang_excel = ($item['barang_jasa'] == 'B') ? 'Jasa Slitting ' . $item['nama_barang'] : $item['nama_barang'];
-
 				$dataDetail = [
 					$itemRowIndex, // Kunci penghubung
 					$item['barang_jasa'],
 					'',
-					$nama_barang_excel,
+					$item['nama_barang'],
 					$item['satuan'],
 					$item['harga_satuan'],
 					$item['qty'],
