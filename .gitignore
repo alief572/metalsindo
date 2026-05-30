@@ -29,3 +29,9 @@ application/config/config.php
 application/config/constants.php
 docker/Dockerfile
 application/config/config.php
+docker/Dockerfile
+php.ini
+application/config/config.php
+docker/Dockerfile
+php.ini
+application/config/config.php
