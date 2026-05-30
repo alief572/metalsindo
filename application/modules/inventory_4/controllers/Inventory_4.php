@@ -957,4 +957,127 @@ class Inventory_4 extends Admin_Controller
 		$surface = $this->db->query("SELECT * FROM ms_surface WHERE id_surface='$idsurface'")->row();
 		echo "$surface->nm_surface";
 	}
+
+	public function get_data_display()
+	{
+		$id_bentuk = $this->input->post('id_bentuk');
+
+		$list = $this->Inventory_4_model->get_datatables($id_bentuk);
+		$data = array();
+		$no = $this->input->post('start');
+
+		$ENABLE_ADD     = has_permission('Level_4.Add');
+		$ENABLE_MANAGE  = has_permission('Level_4.Manage');
+		$ENABLE_VIEW    = has_permission('Level_4.View');
+		$ENABLE_DELETE  = has_permission('Level_4.Delete');
+
+		foreach ($list as $record) {
+			$no++;
+			$row = array();
+
+			$status = ($record->aktif == 'aktif') ? '<label class="label label-success">Aktif</label>' : '<label class="label label-danger">Non Aktif</label>';
+
+			$action = '<td style="padding-left:20px">';
+			if ($ENABLE_VIEW) {
+				$action .= '<a class="btn btn-primary btn-sm view" href="javascript:void(0)" title="View" data-id_inventory3="' . $record->id_category3 . '"><i class="fa fa-eye"></i></a> ';
+			}
+			if ($ENABLE_ADD) {
+				if ($id_bentuk != 'B2000001') {
+					$action .= '<a class="btn btn-warning btn-sm copy" href="javascript:void(0)" title="Copy" data-id_inventory3="' . $record->id_category3 . '"><i class="fa fa-copy"></i></a> ';
+				}
+			}
+			if ($ENABLE_MANAGE) {
+				if ($id_bentuk != 'B2000001') {
+					$action .= '<a class="btn btn-success btn-sm edit" href="javascript:void(0)" title="Edit" data-id_inventory3="' . $record->id_category3 . '"><i class="fa fa-edit"></i></a> ';
+				}
+			}
+			if ($ENABLE_DELETE) {
+				$action .= '<a class="btn btn-danger btn-sm delete" href="javascript:void(0)" title="Delete" data-id_inventory3="' . $record->id_category3 . '"><i class="fa fa-trash"></i></a>';
+			}
+			$action .= '</td>';
+
+			if ($id_bentuk == 'B2000001') {
+				$row[] = $no;
+				$row[] = $record->id_category3;
+				$row[] = $record->nama_type;
+				$row[] = $record->nama_category1;
+				$row[] = $record->nama_category2;
+				$row[] = $record->nama;
+				$row[] = $record->nama;
+				$row[] = $record->spek;
+				$row[] = $record->thickness;
+				$row[] = $record->hardness;
+				$row[] = $record->density;
+				$row[] = $record->maker;
+				$row[] = $record->negara;
+				$row[] = $status;
+				if ($ENABLE_MANAGE) {
+					$row[] = $action;
+				}
+			} else if ($id_bentuk == 'B2000002') {
+				$row[] = $no;
+				$row[] = $record->id_category3;
+				$row[] = $record->nama_type;
+				$row[] = $record->nama_category1;
+				$row[] = $record->nama_category2;
+				$row[] = $record->nama;
+				$row[] = $record->nama_category2 . '-' . $record->nama . '-' . $record->hardness;
+
+				// Supplier logic
+				$sup_names = [];
+				$id = $record->id_category3;
+				$sup = $this->db->get_where('child_inven_suplier', array('id_category3' => $id))->result();
+				foreach ($sup as $sp) {
+					$kodesup = $sp->id_suplier;
+					$sup2 = $this->db->get_where('master_supplier', array('id_suplier' => $kodesup))->result();
+					foreach ($sup2 as $sp2) {
+						$sup_names[] = $sp2->name_suplier;
+					}
+				}
+				$row[] = implode(", ", $sup_names);
+
+				$row[] = $status;
+				if ($ENABLE_MANAGE) {
+					$row[] = $action;
+				}
+			} else {
+				$row[] = $no;
+				$row[] = $record->id_category3;
+				$row[] = $record->nama_type;
+				$row[] = $record->nama_category1;
+				$row[] = $record->nama_category2;
+				$row[] = $record->nama;
+				$row[] = $record->nama_category2 . '-' . $record->nama . '-' . $record->hardness;
+
+				// Supplier logic
+				$sup_names = [];
+				$id = $record->id_category3;
+				$sup = $this->db->get_where('child_inven_suplier', array('id_category3' => $id))->result();
+				foreach ($sup as $sp) {
+					$kodesup = $sp->id_suplier;
+					$sup2 = $this->db->get_where('master_supplier', array('id_suplier' => $kodesup))->result();
+					foreach ($sup2 as $sp2) {
+						$sup_names[] = $sp2->name_suplier;
+					}
+				}
+				$row[] = implode(", ", $sup_names);
+
+				$row[] = $status;
+				if ($ENABLE_MANAGE) {
+					$row[] = $action;
+				}
+			}
+
+			$data[] = $row;
+		}
+
+		$output = array(
+			"draw" => $_POST['draw'],
+			"recordsTotal" => $this->Inventory_4_model->count_alls($id_bentuk),
+			"recordsFiltered" => $this->Inventory_4_model->count_filtered($id_bentuk),
+			"data" => $data,
+		);
+
+		echo json_encode($output);
+	}
 }
