@@ -107,13 +107,8 @@ $process = (!empty($header)) ? $kgPro : '';
 									<label for='customer'>Material</label>
 								</div>
 								<div class="col-md-8">
-									<select id="id_material" name="id_material" class="form-control select" onchange="Caristock()" required>
+									<select id="id_material" name="id_material" class="form-control select_material" onchange="Caristock()" required>
 										<option value="">--Pilih--</option>
-										<?php foreach ($results['material'] as $material) {
-											$selx = ($id_material == $material->id_category3) ? 'selected' : '';
-										?>
-											<option value="<?= $material->id_category3 ?>" <?= $selx; ?>><?= $material->id_category3 ?>|<?= ucfirst(strtolower($material->nama)) ?>|<?= ucfirst(strtolower($material->maker)) ?></option>
-										<?php } ?>
 									</select>
 								</div>
 							</div>
@@ -568,6 +563,34 @@ $process = (!empty($header)) ? $kgPro : '';
 
 		$('.autoNumeric').autoNumeric();
 		$('.select').select2();
+
+		$('.select_material').select2({
+			placeholder: 'Cari data di sini...',
+			// minimumInputLength: 2,
+			ajax: {
+				url: base_url + 'spk_produksi/getMaterialJson',
+				cache: false,
+				dataType: 'json',
+				delay: 500,
+				data: function(params) {
+					return {
+						q: params.term, // Keyword pencarian yang diketik user
+						page: params.page || 1 // Untuk pagination
+					};
+				},
+				processResults: function(data, params) {
+					params.page = params.page || 1;
+
+					return {
+						results: data.items, // Array berisi object {id: 1, text: "Nama Data"}
+						pagination: {
+							// Jika data yang dikembalikan backend masih ada kelanjutannya, set true
+							more: (params.page * 10) < data.total_count
+						}
+					};
+				}
+			}
+		});
 
 		var max_fields2 = 10; //maximum input boxes allowed
 		var wrapper2 = $(".input_fields_wrap2"); //Fields wrapper
