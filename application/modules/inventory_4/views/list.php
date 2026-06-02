@@ -30,10 +30,10 @@ $id_bentuk = $this->uri->segment(3);
 					<tr>
 						<th width="5">#</th>
 						<th width="13%">Id Material</th>
-						<th hidden>Nama Type</th>
+						<th>Nama Type</th>
 						<th>FERROUS / NON FERROUS</th>
-						<th hidden>Nama Category II</th>
-						<th hidden>Nama Category III</th>
+						<th>Nama Category II</th>
+						<th>Nama Category III</th>
 						<th>Detail Nama Material</th>
 						<th>Alloy</th>
 						<th>Thickness</th>
@@ -48,58 +48,6 @@ $id_bentuk = $this->uri->segment(3);
 					</tr>
 				</thead>
 				<tbody>
-					<?php if (empty($results)) {
-					} else {
-						$numb = 0;
-						foreach ($results as $record) {
-							$numb++; ?>
-							<tr>
-								<td><?= $numb; ?></td>
-								<td><?= $record->id_category3 ?></td>
-								<td hidden><?= $record->nama_type ?></td>
-								<td><?= $record->nama_category1 ?></td>
-
-								<td hidden><?= $record->nama_category2 ?></td>
-								<td hidden><?= $record->nama ?></td>
-								<td><?= $record->nama ?></td>
-								<td><?= $record->spek ?></td>
-								<td><?= $record->thickness ?></td>
-
-								<td><?= $record->hardness ?></td>
-								<td><?= $record->density ?></td>
-								<td><?= $record->maker ?></td>
-								<td><?= $record->negara ?></td>
-
-								<td>
-									<?php if ($record->aktif == 'aktif') { ?>
-										<label class="label label-success">Aktif</label>
-									<?php } else { ?>
-										<label class="label label-danger">Non Aktif</label>
-									<?php } ?>
-								</td>
-								<td style="padding-left:20px">
-									<?php if ($ENABLE_VIEW) : ?>
-										<a class="btn btn-primary btn-sm view" href="javascript:void(0)" title="View" data-id_inventory3="<?= $record->id_category3 ?>"><i class="fa fa-eye"></i>
-										</a>
-									<?php endif; ?>
-									<?php if ($ENABLE_ADD) : ?>
-										<!--<a class="btn btn-warning btn-sm copy" href="javascript:void(0)" title="Copy" data-id_inventory3="<?= $record->id_category3 ?>"><i class="fa fa-copy"></i>
-				</a>-->
-									<?php endif; ?>
-									<?php if ($ENABLE_MANAGE) : ?>
-										<!--<a class="btn btn-success btn-sm edit" href="javascript:void(0)" title="Edit" data-id_inventory3="<?= $record->id_category3 ?>"><i class="fa fa-edit"></i>
-				</a>-->
-									<?php endif; ?>
-
-									<?php if ($ENABLE_DELETE) : ?>
-										<a class="btn btn-danger btn-sm delete" href="javascript:void(0)" title="Delete" data-id_inventory3="<?= $record->id_category3 ?>"><i class="fa fa-trash"></i>
-										</a>
-									<?php endif; ?>
-								</td>
-
-							</tr>
-					<?php }
-					}  ?>
 				</tbody>
 			</table>
 		<?php
@@ -110,10 +58,10 @@ $id_bentuk = $this->uri->segment(3);
 					<tr>
 						<th width="5">#</th>
 						<th width="13%">Id Material</th>
-						<th hidden>Nama Type</th>
+						<th>Nama Type</th>
 						<th>FERROUS / NON FERROUS</th>
-						<th hidden>Nama Category II</th>
-						<th hidden>Nama Category III</th>
+						<th>Nama Category II</th>
+						<th>Nama Category III</th>
 						<th>Nama Material</th>
 						<th>Supplier</th>
 						<th>Status</th>
@@ -123,60 +71,6 @@ $id_bentuk = $this->uri->segment(3);
 					</tr>
 				</thead>
 				<tbody>
-					<?php if (empty($results)) {
-					} else {
-						$numb = 0;
-						foreach ($results as $record) {
-							$numb++; ?>
-							<tr>
-								<td><?= $numb; ?></td>
-								<td><?= $record->id_category3 ?></td>
-								<td hidden><?= $record->nama_type ?></td>
-								<td><?= $record->nama_category1 ?></td>
-								<td hidden><?= $record->nama_category2 ?></td>
-								<td hidden><?= $record->nama ?></td>
-								<td><?= $record->nama_category2 . '-' . $record->nama . '-' . $record->hardness ?></td>
-								<td><?php
-									$id = $record->id_category3;
-									$sup  = $this->db->get_where('child_inven_suplier', array('id_category3' => $id))->result();
-									foreach ($sup as $sp) {
-										$kodesup = $sp->id_suplier;
-										$sup2  = $this->db->get_where('master_supplier', array('id_suplier' => $kodesup))->result();
-										foreach ($sup2 as $sp2) {
-									?>
-											<?= $sp2->name_suplier ?>
-									<?php }
-									}; ?></td>
-								<td>
-									<?php if ($record->aktif == 'aktif') { ?>
-										<label class="label label-success">Aktif</label>
-									<?php } else { ?>
-										<label class="label label-danger">Non Aktif</label>
-									<?php } ?>
-								</td>
-								<td style="padding-left:20px">
-									<?php if ($ENABLE_VIEW) : ?>
-										<a class="btn btn-primary btn-sm view" href="javascript:void(0)" title="View" data-id_inventory3="<?= $record->id_category3 ?>"><i class="fa fa-eye"></i>
-										</a>
-									<?php endif; ?>
-									<?php if ($ENABLE_ADD) : ?>
-										<a class="btn btn-warning btn-sm copy" href="javascript:void(0)" title="Copy" data-id_inventory3="<?= $record->id_category3 ?>"><i class="fa fa-copy"></i>
-										</a>
-									<?php endif; ?>
-									<?php if ($ENABLE_MANAGE) : ?>
-										<a class="btn btn-success btn-sm edit" href="javascript:void(0)" title="Edit" data-id_inventory3="<?= $record->id_category3 ?>"><i class="fa fa-edit"></i>
-										</a>
-									<?php endif; ?>
-
-									<?php if ($ENABLE_DELETE) : ?>
-										<a class="btn btn-danger btn-sm delete" href="javascript:void(0)" title="Delete" data-id_inventory3="<?= $record->id_category3 ?>"><i class="fa fa-trash"></i>
-										</a>
-									<?php endif; ?>
-								</td>
-
-							</tr>
-					<?php }
-					}  ?>
 				</tbody>
 			</table>
 		<?php
@@ -187,10 +81,10 @@ $id_bentuk = $this->uri->segment(3);
 					<tr>
 						<th width="5">#</th>
 						<th width="13%">Id Material</th>
-						<th hidden>Nama Type</th>
+						<th>Nama Type</th>
 						<th>FERROUS / NON FERROUS</th>
-						<th hidden>Nama Category II</th>
-						<th hidden>Nama Category III</th>
+						<th>Nama Category II</th>
+						<th>Nama Category III</th>
 						<th>Detail Nama Material</th>
 						<th>Supplier</th>
 						<th>Status</th>
@@ -200,60 +94,6 @@ $id_bentuk = $this->uri->segment(3);
 					</tr>
 				</thead>
 				<tbody>
-					<?php if (empty($results)) {
-					} else {
-						$numb = 0;
-						foreach ($results as $record) {
-							$numb++; ?>
-							<tr>
-								<td><?= $numb; ?></td>
-								<td><?= $record->id_category3 ?></td>
-								<td hidden><?= $record->nama_type ?></td>
-								<td><?= $record->nama_category1 ?></td>
-								<td hidden><?= $record->nama_category2 ?></td>
-								<td hidden><?= $record->nama ?></td>
-								<td><?= $record->nama_category2 . '-' . $record->nama . '-' . $record->hardness ?></td>
-								<td><?php
-									$id = $record->id_category3;
-									$sup  = $this->db->get_where('child_inven_suplier', array('id_category3' => $id))->result();
-									foreach ($sup as $sp) {
-										$kodesup = $sp->id_suplier;
-										$sup2  = $this->db->get_where('master_supplier', array('id_suplier' => $kodesup))->result();
-										foreach ($sup2 as $sp2) {
-									?>
-											<?= $sp2->name_suplier ?>
-									<?php }
-									}; ?></td>
-								<td>
-									<?php if ($record->aktif == 'aktif') { ?>
-										<label class="label label-success">Aktif</label>
-									<?php } else { ?>
-										<label class="label label-danger">Non Aktif</label>
-									<?php } ?>
-								</td>
-								<td style="padding-left:20px">
-									<?php if ($ENABLE_VIEW) : ?>
-										<a class="btn btn-primary btn-sm view" href="javascript:void(0)" title="View" data-id_inventory3="<?= $record->id_category3 ?>"><i class="fa fa-eye"></i>
-										</a>
-									<?php endif; ?>
-									<?php if ($ENABLE_ADD) : ?>
-										<a class="btn btn-warning btn-sm copy" href="javascript:void(0)" title="Copy" data-id_inventory3="<?= $record->id_category3 ?>"><i class="fa fa-copy"></i>
-										</a>
-									<?php endif; ?>
-									<?php if ($ENABLE_MANAGE) : ?>
-										<a class="btn btn-success btn-sm edit" href="javascript:void(0)" title="Edit" data-id_inventory3="<?= $record->id_category3 ?>"><i class="fa fa-edit"></i>
-										</a>
-									<?php endif; ?>
-
-									<?php if ($ENABLE_DELETE) : ?>
-										<a class="btn btn-danger btn-sm delete" href="javascript:void(0)" title="Delete" data-id_inventory3="<?= $record->id_category3 ?>"><i class="fa fa-trash"></i>
-										</a>
-									<?php endif; ?>
-								</td>
-
-							</tr>
-					<?php }
-					}  ?>
 				</tbody>
 			</table>
 		<?php } ?>
@@ -425,9 +265,22 @@ $id_bentuk = $this->uri->segment(3);
 
 	$(function() {
 		var table = $('#example3').DataTable({
+			processing: true,
+			serverSide: true,
+			ajax: {
+				url: siteurl + 'inventory_4/get_data_display',
+				type: "POST",
+				data: function(d) {
+					d.id_bentuk = '<?= $id_bentuk ?>';
+				}
+			},
 			orderCellsTop: true,
 			fixedHeader: true,
-			buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+			buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+			columnDefs: [{
+				targets: [2, 4, 5],
+				visible: false
+			}]
 		});
 		$("#form-area").hide();
 	});
