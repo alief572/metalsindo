@@ -11,6 +11,14 @@ $ENABLE_DELETE  = has_permission('Invoicing.Delete');
 	}
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
+
+<?php if ($this->session->flashdata('error')): ?>
+	<div class="alert alert-danger alert-dismissable">
+		<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+		<i class="fa fa-warning"></i> <?php echo $this->session->flashdata('error'); ?>
+	</div>
+<?php endif; ?>
+
 <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
 
 <div class="box">

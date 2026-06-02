@@ -299,6 +299,20 @@ class Wt_invoicing extends Admin_Controller
 		$this->template->page_icon('fa fa-pencil');
 		$aktif = 'active';
 		$deleted = '0';
+
+		// Cek apakah ada scrap yang belum dikonfirmasi di Control DO
+		$scrap_belum_confirm = $this->db->query("
+			SELECT COUNT(*) as total 
+			FROM dt_delivery_order_child_scrap 
+			WHERE id_delivery_order='$iddo' AND qty_in <= 0
+		")->row();
+
+		if ($scrap_belum_confirm->total > 0) {
+			$this->session->set_flashdata('error', 'Invoice tidak bisa dibuat. Scrap belum dikonfirmasi di Control DO.');
+			redirect('wt_invoicing/delivery_order');
+			return;
+		}
+
 		$do      = $this->db->query("SELECT * FROM tr_delivery_order WHERE id_delivery_order ='$iddo'")->row();
 		$id      = $do->no_spk_marketing;
 		$idspk      = $this->db->query("SELECT * FROM tr_spk_marketing WHERE no_surat ='$id'")->row();
