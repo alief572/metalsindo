@@ -34,8 +34,16 @@
                                     <label for="ket_bayar" class="col-sm-4 control-label">No. Invoice </font></label>
                                     <div class="col-sm-6">
                                         <input name="no_invoice" class="form-control input-sm" id="no_invoice" value="<?= $header->no_invoice ?>" readonly>
-                                        </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group">
+                                    <label for="no_faktur_pajak" class="col-sm-4 control-label">No. Faktur Pajak </label>
+                                    <div class="col-sm-6">
+                                        <input name="no_faktur_pajak" class="form-control input-sm" id="no_faktur_pajak" value="<?= $header->no_faktur_pajak ?>" readonly>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-sm-6 form-horizontal">
@@ -101,8 +109,6 @@
                         <th class="text-center">Tanggal Incoming</th>
                         <th class="text-center">Nama Supplier</th>
                         <th class="text-center">Nilai</th>
-                        <th class="text-center">No. Faktur Pajak</th>
-                        <th class="text-center">PPn</th>
                         <th class="text-center">Total</th>
                     </tr>
                 </thead>
@@ -140,18 +146,12 @@
                             echo '<td class="text-right">';
                             echo number_format($item->nilai, 2);
                             echo '<input type="hidden" name="kp['.$no.'][nilai]" value="'.$item->nilai.'">';
+                            echo '<input type="hidden" name="kp['.$no.'][no_faktur_pajak]" value="">';
+                            echo '<input type="hidden" name="kp['.$no.'][ppn]" value="0">';
                             echo '</td>';
 
                             echo '<td class="text-center">';
-                            echo '<input type="text" class="form-control form-control-sm" name="kp['.$no.'][no_faktur_pajak]" value="'.$item->no_faktur_pajak.'" readonly>';
-                            echo '</td>';
-
-                            echo '<td class="text-center">';
-                            echo '<input type="text" class="form-control form-control-sm text-right hitung_total divide" name="kp['.$no.'][ppn]" data-no="'.$no.'" value="'.$item->ppn.'" readonly>';
-                            echo '</td>';
-
-                            echo '<td class="text-center">';
-                            echo '<input type="text" class="form-control form-control-sm text-right divide" name="kp['.$no.'][total]" value="'.$item->total_nilai.'" readonly>';
+                            echo '<input type="text" class="form-control form-control-sm text-right divide" name="kp['.$no.'][total]" value="'.$item->nilai.'" readonly>';
                             echo '</td>';
 
                             echo '</tr>';
@@ -159,6 +159,39 @@
                     ?>
                 </tbody>
             </table>
+
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-sm-4 col-sm-offset-8">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-5 control-label text-right"><b>PPn :</b></label>
+                            <div class="col-sm-7">
+                                <input type="text" 
+                                       name="ppn_global" 
+                                       id="ppn_global" 
+                                       class="form-control input-sm text-right divide" 
+                                       readonly
+                                       value="<?= $header->ppn ?>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <?php
+                            $ttl_total = 0;
+                            foreach ($detail as $item) {
+                                $ttl_total += $item->nilai;
+                            }
+                            ?>
+                            <label class="col-sm-5 control-label text-right"><b>Total Invoice :</b></label>
+                            <div class="col-sm-7">
+                                <input type="text" 
+                                       id="grand_total_with_ppn" 
+                                       class="form-control input-sm text-right divide" 
+                                       readonly value="<?= $ttl_total + $header->ppn ?>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <br><br>
 

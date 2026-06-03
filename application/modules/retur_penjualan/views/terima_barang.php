@@ -89,7 +89,7 @@ $tanggal = date('Y-m-d');
 								</div>
 								<div class="col-md-8">
 									<select id="kompensasi" name="kompensasi" class="form-control select" required>
-										<option value="brg">Ganti Barang</option>
+										<!-- <option value="brg">Ganti Barang</option> -->
 										<option value="htg">Potong Hutang</option>
 									</select>
 								</div>
@@ -109,7 +109,7 @@ $tanggal = date('Y-m-d');
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-6">
+						<!-- <div class="col-sm-6">
 							<div class="form-group row">
 								<div class="col-md-4">
 									<label>Ganti Material</label>
@@ -122,7 +122,7 @@ $tanggal = date('Y-m-d');
 									</select>
 								</div>
 							</div>
-						</div>
+						</div> -->
 					</div>
 
 					<!-- Add SPK Button -->
