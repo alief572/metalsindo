@@ -37,6 +37,14 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="form-group">
+                                    <label for="no_faktur_pajak" class="col-sm-4 control-label">No. Faktur Pajak </label>
+                                    <div class="col-sm-6">
+                                        <input name="no_faktur_pajak" class="form-control input-sm" id="no_faktur_pajak">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-sm-6 form-horizontal">
                             <div class="row">
@@ -98,8 +106,6 @@
                         <th class="text-center">Tgl Incoming</th>
                         <th class="text-center">Nama Supplier</th>
                         <th class="text-center">Nilai</th>
-                        <th class="text-center">No. Faktur Pajak</th>
-                        <th class="text-center">PPn</th>
                         <th class="text-center">Total</th>
                         <th class="text-center">Action</th>
                     </tr>
@@ -110,13 +116,38 @@
                     <tr>
                         <th colspan="4" class="text-right">Grand Total</th>
                         <th class="text-right col_ttl_nilai">0.00</th>
-                        <th></th>
-                        <th class="text-right col_ttl_ppn">0.00</th>
                         <th class="text-right col_ttl_total">0.00</th>
                         <th></th>
                     </tr>
                 </tfoot>
             </table>
+
+            <div class="row" style="margin-top: 10px;">
+                <div class="col-sm-4 col-sm-offset-8">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-5 control-label text-right"><b>PPn :</b></label>
+                            <div class="col-sm-7">
+                                <input type="text" 
+                                       name="ppn_global" 
+                                       id="ppn_global" 
+                                       class="form-control input-sm text-right divide" 
+                                       placeholder="0.00"
+                                       value="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5 control-label text-right"><b>Total Invoice :</b></label>
+                            <div class="col-sm-7">
+                                <input type="text" 
+                                       id="grand_total_with_ppn" 
+                                       class="form-control input-sm text-right" 
+                                       readonly value="0.00">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <br><br>
 
@@ -487,23 +518,25 @@
 
     function hitung_grand_total(){
         var grand_total_nilai = 0;
-        var grand_total_ppn = 0;
-        var grand_total_total = 0;
 
         for(i = 1; i <= no_list; i++) {
             var kp_nilai = get_num($('input[name="kp['+i+'][nilai]"]').val());
-            var kp_ppn = get_num($('input[name="kp['+i+'][ppn]"]').val());
-            var kp_total = get_num($('input[name="kp['+i+'][total]"]').val());
 
             grand_total_nilai += kp_nilai;
-            grand_total_ppn += kp_ppn;
-            grand_total_total += kp_total;
         }
 
+        var ppn_global = get_num($('#ppn_global').val());
+        var grand_total_total = grand_total_nilai;
+        var grand_total_with_ppn = grand_total_nilai + ppn_global;
+
         $('.col_ttl_nilai').html(number_format(grand_total_nilai, 2));
-        $('.col_ttl_ppn').html(number_format(grand_total_ppn, 2));
         $('.col_ttl_total').html(number_format(grand_total_total, 2));
+        $('#grand_total_with_ppn').val(number_format(grand_total_with_ppn, 2));
     }
+
+    $(document).on('change keyup', '#ppn_global', function() {
+        hitung_grand_total();
+    });
 
     $(document).on('click', '.add', function() {
         var id_suplier = $("#supplier").val();
@@ -639,14 +672,8 @@
         Rows += '<td class="text-right">';
         Rows += number_format(nilai, 2);
         Rows += '<input type="hidden" name="kp[' + no_list + '][nilai]" value="' + nilai + '">';
-        Rows += '</td>';
-
-        Rows += '<td class="text-center">';
-        Rows += '<input type="text" class="form-control form-control-sm" name="kp[' + no_list + '][no_faktur_pajak]">';
-        Rows += '</td>';
-
-        Rows += '<td class="text-center">';
-        Rows += '<input type="text" class="form-control form-control-sm text-right hitung_total divide" name="kp[' + no_list + '][ppn]" data-no="' + no_list + '">';
+        Rows += '<input type="hidden" name="kp[' + no_list + '][no_faktur_pajak]" value="">';
+        Rows += '<input type="hidden" name="kp[' + no_list + '][ppn]" value="0">';
         Rows += '</td>';
 
         Rows += '<td class="text-center">';
@@ -678,19 +705,10 @@
         var no = $(this).data('no');
 
         $('.tr_inc_add_' + no).remove();
-    });
-
-    $(document).on('change', '.hitung_total', function() {
-        var no = $(this).data('no');
-        var nilai_ppn = get_num($(this).val());
-        var nilai = get_num($('input[name="kp[' + no + '][nilai]"]').val());
-
-        var total = parseFloat(nilai + nilai_ppn);
-
-        $('input[name="kp[' + no + '][total]"]').val(number_format(total, 2));
-
         hitung_grand_total();
     });
+
+
 
     // $('#tgl_bayar').datepicker({
     // format: 'yyyy-mm-dd',

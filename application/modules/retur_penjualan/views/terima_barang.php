@@ -162,19 +162,11 @@ foreach ($results['tr_spk'] as $tr_spk) {
 										<textarea class="form-control" id="note" required name="note" rows='2'><?= $tr_spk->note; ?></textarea>
 									</div>
 								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="kompensasi">Ganti Material</label>
-									</div>
-									<div class="col-md-8">
-										<select id="ganti" name="ganti" class="form-control select" required>
-											<option value="" selected>None</option>
-											<option value="finisgood">Finishgood</option>
-											<option value="produksi">Produksi</option>
-										</select>
-									</div>
+								<div class="col-md-8">
+									<select id="kompensasi" name="kompensasi" class="form-control select" required>
+										<!-- <option value="brg">Ganti Barang</option> -->
+										<option value="htg">Potong Hutang</option>
+									</select>
 								</div>
 							</div>
 						</div>
