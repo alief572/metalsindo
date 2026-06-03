@@ -151,16 +151,41 @@ foreach ($results['tr_spk'] as $tr_spk) {
 								</div>
 							</div>
 						</div>
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label>No. DO</label>
+								</div>
+								<div class="col-md-8">
+									<select id="id_do" name="id_delivery_order" class="form-control select" required>
+										<option value="">--Pilih--</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
 
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">Keterangan Retur</label>
-									</div>
-									<div class="col-md-8">
-										<textarea class="form-control" id="note" required name="note" rows='2'><?= $tr_spk->note; ?></textarea>
-									</div>
+					<!-- Hidden inputs for customer & DO -->
+					<input type="hidden" id="id_customer" name="id_customer" value="">
+					<input type="hidden" id="nama_customer" name="nama_customer" value="">
+					<input type="hidden" id="no_do" name="no_do" value="">
+
+					<!-- Row 3: No. PO & Kompensasi -->
+					<div class="col-sm-12">
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label>No. PO</label>
+								</div>
+								<div class="col-md-8">
+									<input type="text" class="form-control" id="no_po" name="no_po">
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label>Kompensasi</label>
 								</div>
 								<div class="col-md-8">
 									<select id="kompensasi" name="kompensasi" class="form-control select" required>
@@ -242,6 +267,64 @@ foreach ($results['tr_spk'] as $tr_spk) {
 								</table>
 							</div>
 						</div>
+						<!-- <div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label>Ganti Material</label>
+								</div>
+								<div class="col-md-8">
+									<select id="ganti" name="ganti" class="form-control select">
+										<option value="" selected>None</option>
+										<option value="finisgood">Finishgood</option>
+										<option value="produksi">Produksi</option>
+									</select>
+								</div>
+							</div>
+						</div> -->
+					</div>
+
+					<!-- Tabel Material (Langsung Tampil setelah pilih DO) -->
+					<div class="col-sm-12" style="margin-top:15px; overflow-x:auto;">
+						<table class='table table-bordered table-striped'>
+							<thead>
+								<tr class='bg-blue'>
+									<th width='5%'>ID Material</th>
+									<th width='10%'>No. DO</th>
+									<th width='15%'>Nama Material</th>
+									<th width='10%'>Lot Number</th>
+									<th width='10%'>Gudang</th>
+									<th width='10%'>Customer Titipan</th>
+									<th width='10%'>Harga Deal</th>
+									<th width='10%'>Total Kirim (Kg)</th>
+									<th width='10%'>Qty Sheet</th>
+									<th width='5%'>Retur<br><input type='checkbox' id='chk_retur_all' onclick='checkAllRetur()'></th>
+									<th width='5%'>Action</th>
+								</tr>
+							</thead>
+							<tbody id='data_material'>
+								<tr>
+									<td colspan="11" class="text-center">Silakan pilih DO terlebih dahulu.</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<!-- Footer: Total Retur -->
+					<div class="col-sm-12" style="margin-top:15px;">
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label><strong>Total Retur (Kg)</strong></label>
+								</div>
+								<div class="col-md-8">
+									<input type="text" class="form-control" id="total_retur" value="0" readonly>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Buttons: Simpan & Kembali -->
+					<div class="col-sm-12" style="margin-top:10px;">
 						<center>
 							<button type="submit" class="btn btn-success btn-sm" name="save" id="simpan-com"><i class="fa fa-save"></i>Simpan</button>
 							<a class="btn btn-danger btn-sm" href="<?= base_url('/retur_penjualan/incoming_retur/') ?>" title="Edit">Kembali</a>
@@ -252,9 +335,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 	</div>
 </div>
 
-
-
-
+<script src="<?= base_url('assets/js/autoNumeric.js') ?>"></script>
 <script type="text/javascript">
 	//$('#input-kendaraan').hide();
 	var base_url = '<?php echo base_url(); ?>';
@@ -267,52 +348,81 @@ foreach ($results['tr_spk'] as $tr_spk) {
 
 		$('.select').select2();
 
-		var id_customerx = $('#id_customerx').val();
-		var no_penawaran = $('#no_penawaran').val();
-		$.ajax({
-			url: siteurl + 'spk_marketing/get_penawaran_edit',
-			cache: false,
-			type: "POST",
-			data: {
-				'id': id_customerx,
-				'no_penawaran': no_penawaran
-			},
-			dataType: "json",
-			success: function(data) {
-				$("#no_penawaran").html(data.option).trigger("chosen:updated");
-			},
-			error: function() {
-				swal({
-					title: "Error Message !",
-					text: 'Connection Timed Out ...',
-					type: "warning",
-					timer: 5000
+		// Event: Customer change → update No. DO dropdown
+		$(document).on('change', '#id_customerx', function(e) {
+			e.preventDefault();
+			var id_customer = this.value;
+			var selected_text = $('#id_customerx option:selected').text();
+			$('#id_customer').val(id_customer);
+			$('#nama_customer').val(selected_text.trim());
+
+			// Reset DO and table
+			$("#id_do").html('<option value="">--Pilih--</option>');
+			$('#no_do').val('');
+			$('#data_material').html('<tr><td colspan="11" class="text-center">Silakan pilih DO terlebih dahulu.</td></tr>');
+			hitungTotalRetur();
+
+			if (id_customer) {
+				$.ajax({
+					url: siteurl + 'retur_penjualan/get_do_by_customer',
+					cache: false,
+					type: "POST",
+					data: "id_customer=" + id_customer,
+					dataType: "json",
+					success: function(data) {
+						$("#id_do").html(data.option).trigger("change");
+					},
+					error: function() {
+						swal({
+							title: "Error Message !",
+							text: 'Connection Timed Out ...',
+							type: "warning",
+							timer: 5000
+						});
+					}
 				});
 			}
 		});
 
-		$(document).on('change', '#id_customerx', function(e) {
-			e.preventDefault();
-			$.ajax({
-				url: siteurl + 'spk_marketing/get_penawaran',
-				cache: false,
-				type: "POST",
-				data: "id=" + this.value,
-				dataType: "json",
-				success: function(data) {
-					$("#no_penawaran").html(data.option).trigger("chosen:updated");
-				},
-				error: function() {
-					swal({
-						title: "Error Message !",
-						text: 'Connection Timed Out ...',
-						type: "warning",
-						timer: 5000
-					});
-				}
-			});
+		// Event: DO change → load materials
+		$(document).on('change', '#id_do', function(e) {
+			var id_do = $(this).val();
+			if (id_do) {
+				var text_do = $('#id_do option:selected').text();
+				$('#no_do').val(text_do);
+				TambahMaterialRetur(id_do, text_do);
+			} else {
+				$('#no_do').val('');
+				$('#data_material').html('<tr><td colspan="11" class="text-center">Silakan pilih DO terlebih dahulu.</td></tr>');
+				hitungTotalRetur();
+			}
 		});
 
+		// Event: Total Kirim change/keyup → recalculate Total Retur
+		$(document).on('change keyup', '.total_kirim', function() {
+			hitungTotalRetur();
+		});
+
+		// Event: Checkbox Retur change → recalculate Total Retur
+		$(document).on('change', '.chk_retur', function() {
+			hitungTotalRetur();
+		});
+
+		// Event: Gudang Select2 change → enable/disable Customer Titipan
+		$(document).on('change', '.select2_gudang', function() {
+			var $row = $(this).closest('tr');
+			var gudang_val = $(this).val();
+			var $customer = $row.find('.select2_customer');
+			if (gudang_val == '3') {
+				$customer.prop('disabled', false);
+			} else {
+				$customer.val('').prop('disabled', true);
+			}
+			// Re-trigger Select2 to reflect disabled state
+			$customer.trigger('change.select2');
+		});
+
+		// Event: Simpan button click → validate and save
 		$('#simpan-com').click(function(e) {
 			e.preventDefault();
 			var deskripsi = $('#deskripsi').val();
@@ -413,192 +523,74 @@ foreach ($results['tr_spk'] as $tr_spk) {
 
 	});
 
-	function get_produk() {
-		var no_penawaran = $("#no_penawaran").val();
-
+	// Function: Tambah Material - load material rows for selected DO
+	function TambahMaterialRetur(id_do, text_do) {
 		$.ajax({
 			type: "GET",
-			url: siteurl + 'spk_marketing/GetCustomer',
-			data: "no_penawaran=" + no_penawaran,
+			data: {
+				id_delivery_order: id_do
+			},
 			success: function(html) {
-				$("#slot_customer").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'spk_marketing/GetPenawaran',
-			data: "no_penawaran=" + no_penawaran,
-			success: function(html) {
-				$("#list_penawaran_slot").html(html);
-			}
-		});
-	}
-
-	function get_lebar() {
-		var id_produk = $("#id_produk").val();
-		var lebar_coil = $("#lebar_coil").val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetStock',
-			data: "id_produk=" + id_produk + "&lebar_coil=" + lebar_coil,
-			success: function(html) {
-				$("#stock_slot").html(html);
-			}
-		});
-	}
-
-	function AksiDetail(id) {
-		var hgdeal = $('#dp_hgdeal_' + id).val();
-		var qty = $('#dp_qty_' + id).val();
-		var weight = $('#dp_weight_' + id).val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'spk_marketing/totalw',
-			data: "hgdeal=" + hgdeal + "&qty=" + qty + "&weight=" + weight + "&id=" + id,
-			success: function(html) {
-				$('#total_weight_' + id).html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'spk_marketing/totalhg',
-			data: "hgdeal=" + hgdeal + "&qty=" + qty + "&weight=" + weight + "&id=" + id,
-			success: function(html) {
-				$('#total_harga_' + id).html(html);
+				if (html.trim() == '') {
+					$('#data_material').html('<tr><td colspan="11" class="text-center">Tidak ada material untuk diretur.</td></tr>');
+				} else {
+					$('#data_material').html(html);
+					// Set No DO text for all loaded rows
+					$('#data_material .text-do').text(text_do);
+					// Initialize Select2 for gudang and customer dropdowns
+					$('#data_material .select2_gudang').select2({
+						width: '100%'
+					});
+					$('#data_material .select2_customer').select2({
+						width: '100%'
+					});
+					// Initialize autoNumeric
+					$('#data_material .autoNumeric').autoNumeric('init');
+				}
+				hitungTotalRetur();
+			},
+			error: function() {
+				swal({
+					title: "Error Message !",
+					text: 'Connection Timed Out ...',
+					type: "warning",
+					timer: 5000
+				});
 			}
 		});
 	}
 
-	function HitungPisau(id) {
-		var qty = $('#stok_qty_' + id).val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/HitungPisau',
-			data: "qty=" + qty + "&id=" + id,
-			success: function(html) {
-				$('#pisau_' + id).html(html);
-			}
+	// Function: Hapus material row
+	function HapusRow(no) {
+		$('#tr_material_' + no).remove();
+		hitungTotalRetur();
+	}
+
+	// Function: Gudang change → enable/disable Customer Titipan
+	function gudangChange(no) {
+		var gudang_val = $('#dp_gudang_' + no).val();
+		if (gudang_val == '3') {
+			$('#dp_customer_' + no).prop('disabled', false);
+		} else {
+			$('#dp_customer_' + no).prop('disabled', true).val('').trigger('change.select2');
+		}
+	}
+
+	// Function: Hitung Total Retur (sum of checked rows' total_kirim)
+	function hitungTotalRetur() {
+		var total = 0;
+		$('.chk_retur:checked').each(function() {
+			var row = $(this).closest('tr');
+			var total_kirim_str = row.find('.total_kirim').val() || '0';
+			var total_kirim = parseFloat(total_kirim_str.replace(/,/g, '')) || 0;
+			total += total_kirim;
 		});
 	}
 
-	function TambahItem(id) {
-		var idstk = $('#stok_idstk_' + id).val();
-		var lotno = $('#stok_lotno_' + id).val();
-		var namamaterial = $('#stok_namamaterial_' + id).val();
-		var weight = $('#stok_weight_' + id).val();
-		var density = $('#stok_density_' + id).val();
-		var hasilpanjang = $('#stok_hasilpanjang_' + id).val();
-		var width = $('#stok_width_' + id).val();
-		var lebarcc = $('#stok_lebarcc_' + id).val();
-		var jumlahcc = $('#stok_jumlahcc_' + id).val();
-		var sisapotongan = $('#stok_sisapotongan_' + id).val();
-		var qtystock = $('#stok_qty_' + id).val();
-		var jumlahpisau = $('#stok_jmlpisau_' + id).val();
-		var total_panjang = $("#total_panjang").val();
-		var jml_pisau = $("#jml_pisau").val();
-		var jml_mother = $("#jml_mother").val();
-		var total_berat = $("#total_berat").val();
-		var thickness = $("#thickness").val();
-		var qty = $("#qty").val();
-		var jumlah = $('#used_slot').find('tr').length;
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/HitungTPanjang',
-			data: "hasilpanjang=" + hasilpanjang + "&total_panjang=" + total_panjang,
-			success: function(html) {
-				$("#tpanjang_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/HitungJPisau',
-			data: "jumlahpisau=" + jumlahpisau + "&jml_pisau=" + jml_pisau,
-			success: function(html) {
-				$("#jpisau_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/HitungJmother',
-			data: "jml_mother=" + jml_mother,
-			success: function(html) {
-				$("#mother_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/HitungTBerat',
-			data: "hasilpanjang=" + hasilpanjang + "&total_panjang=" + total_panjang + "&thickness=" + thickness + "&lebarcc=" + lebarcc + "&density=" + density,
-			success: function(html) {
-				$("#tberat_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetUsed',
-			data: "idstk=" + idstk + "&lotno=" + lotno + "&namamaterial=" + namamaterial + "&jumlah=" + jumlah + "&weight=" + weight + "&density=" + density + "&hasilpanjang=" + hasilpanjang + "&width=" + width + "&lebarcc=" + lebarcc + "&jumlahcc=" + jumlahcc + "&sisapotongan=" + sisapotongan + "&qtystock=" + qtystock + "&jumlahpisau=" + jumlahpisau,
-			success: function(html) {
-				$("#used_slot").append(html);
-			}
-		});
-	}
-
-	function get_properties() {
-		var id_produk = $("#id_produk").val();
-		var lebar_coil = $("#lebar_coil").val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetMaterial',
-			data: "id_produk=" + id_produk,
-			success: function(html) {
-				$("#material_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetThickness',
-			data: "id_produk=" + id_produk,
-			success: function(html) {
-				$("#thickness_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetDensity',
-			data: "id_produk=" + id_produk,
-			success: function(html) {
-				$("#density_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetSurface',
-			data: "id_produk=" + id_produk,
-			success: function(html) {
-				$("#surface_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetPotongan',
-			data: "id_produk=" + id_produk,
-			success: function(html) {
-				$("#potongan_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetStock',
-			data: "id_produk=" + id_produk + "&lebar_coil=" + lebar_coil,
-			success: function(html) {
-				$("#stock_slot").html(html);
-			}
-		});
-
-	}
-
-	function DelItem(id) {
-		$('#data_barang #tr_' + id).remove();
-
+	// Function: Check/Uncheck all retur checkboxes
+	function checkAllRetur() {
+		var isChecked = $('#chk_retur_all').is(':checked');
+		$('#data_material .chk_retur').prop('checked', isChecked);
+		hitungTotalRetur();
 	}
 </script>

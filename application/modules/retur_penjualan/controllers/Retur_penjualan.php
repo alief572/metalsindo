@@ -75,11 +75,12 @@ class Retur_penjualan extends Admin_Controller
 		}
 
 		$penawaran = $this->Retur_penjualan_model->get_data('tr_penawaran');
+		$penawaran = $this->Retur_penjualan_model->get_data('tr_penawaran');
 		$customer = $this->db
 			->select('a.id_customer, b.name_customer')
-			->from('tr_penawaran a')
+			->from('tr_delivery_order a')
 			->join('master_customers b', 'a.id_customer=b.id_customer', 'left')
-			->where('a.status', 'N')
+			->where('a.status_approve', '1')
 			->group_by('a.id_customer')
 			->order_by('b.name_customer', 'asc')
 			->get()
@@ -104,148 +105,328 @@ class Retur_penjualan extends Admin_Controller
 		$this->template->render('terima_barang');
 	}
 
+	public function FormSpk()
+	{
+		$id = $_GET['id'];
+		$id_customer = isset($_GET['id_customer']) ? $_GET['id_customer'] : '';
+
+		// Filter SPK berdasarkan customer yang dipilih
+		if ($id_customer != '') {
+			$this->db->select('a.*, b.name_customer as name_customer');
+			$this->db->from('tr_spk_marketing a');
+			$this->db->join('master_customers b', 'b.id_customer=a.id_customer');
+			$this->db->where('a.id_customer', $id_customer);
+			$this->db->order_by('a.id_spkmarketing', 'DESC');
+			$listspk = $this->db->get()->result();
+		} else {
+			$listspk = $this->Retur_penjualan_model->CariSPK();
+		}
+
+		echo "
+		<div id='spk_" . $id . "' class='col-sm-12' style='margin-bottom:15px; border:1px solid #ddd; padding:10px; border-radius:5px;'>
+			<div class='row'>
+				<div class='col-md-3'>
+					<label>No. SPK Marketing</label>
+				</div>
+				<div class='col-md-5'>
+					<select id='dt_spk_" . $id . "' name='dt[" . $id . "][id_spkmarketing]' class='form-control select' onchange='TambahMaterial(" . $id . ")' required>
+						<option value=''>--Pilih--</option>";
+		foreach ($listspk as $spk) {
+			echo "<option value='" . $spk->id_spkmarketing . "'>" . $spk->no_surat . " - " . $spk->name_customer . "</option>";
+		}
+		echo "			</select>
+				</div>
+				<div class='col-md-4'>
+					<button type='button' class='btn btn-sm btn-danger' onClick='HapusSpk(" . $id . ")'><i class='fa fa-close'></i> Hapus</button>
+				</div>
+			</div>
+			<br>
+			<div class='form-group row'>
+				<table class='table table-bordered table-striped'>
+					<thead>
+						<tr class='bg-blue'>
+							<th>ID Material</th>
+							<th>No. DO</th>
+							<th>Nama Material</th>
+							<th>Lot Number</th>
+							<th>Gudang</th>
+							<th>Customer Titipan</th>
+							<th>Total Kirim (Kg)</th>
+							<th>Qty Sheet</th>
+							<th>Retur<br><input type='checkbox' class='chk_retur_all' data-spk='" . $id . "' onclick='checkAllRetur(" . $id . ")'></th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody id='data_material_" . $id . "'>
+					</tbody>
+				</table>
+			</div>
+		</div>";
+	}
+
+	public function get_do_by_customer()
+	{
+		$id_customer = $this->input->post('id_customer');
+		$data = $this->Retur_penjualan_model->get_do_by_customer($id_customer);
+
+		$option = "<option value=''>--Pilih--</option>";
+		foreach ($data as $row) {
+			$option .= "<option value='" . $row['id_delivery_order'] . "'>" . $row['no_surat'] . "</option>";
+		}
+
+		echo json_encode(['option' => $option]);
+	}
+
+	public function TambahMaterialRetur()
+	{
+		$id_do = $_GET['id_delivery_order'];
+
+		// 1. Ambil data material dari DO child
+		$materials = $this->db->query("
+			SELECT a.*, b.nama, b.id_bentuk, 
+			       c.harga_deal,
+				   d.no_penawaran AS ref_penawaran
+			FROM dt_delivery_order_child a
+			JOIN ms_inventory_category3 b ON b.id_category3 = a.id_material
+			LEFT JOIN dt_spkmarketing c ON c.id_dt_spkmarketing = a.id_dt_spkmarketing
+			LEFT JOIN tr_spk_marketing d ON d.id_spkmarketing = c.id_spkmarketing
+			WHERE a.id_delivery_order = '$id_do' 
+			ORDER BY a.id_dt_delivery_order ASC")->result();
+
+		// 3. Ambil daftar gudang
+		$gudang = $this->db->get('ms_gudang')->result();
+
+		// 4. Ambil daftar customer (untuk gudang titipan)
+		$customers = $this->db->get('master_customers')->result();
+
+		// 5. Echo HTML rows per material
+		$no = 0;
+		foreach ($materials as $material) {
+			$no++;
+			$is_sheet = ($material->id_bentuk == 'B2000002');
+
+			echo "<tr id='tr_material_" . $no . "'>";
+
+			// ID Material (readonly) + hidden inputs
+			echo "<td>
+				<input type='text' class='form-control input-sm' value='" . $material->id_material . "' name='dp[" . $no . "][id_category3]' readonly>
+				<input type='hidden' value='" . $material->id_stock . "' name='dp[" . $no . "][id_stok]'>
+				<input type='hidden' value='" . $id_do . "' name='dp[" . $no . "][id_delivery_order]'>
+				<input type='hidden' value='" . $material->thickness . "' name='dp[" . $no . "][thickness]'>
+				<input type='hidden' value='" . $material->width . "' name='dp[" . $no . "][width]'>
+				<input type='hidden' value='" . $material->length . "' name='dp[" . $no . "][length]'>
+				<input type='hidden' value='" . $material->ref_penawaran . "' name='dp[" . $no . "][ref_penawaran]'>
+				<input type='hidden' value='" . $material->id_dt_spkmarketing . "' name='dp[" . $no . "][id_dt_spkmarketing]'>
+			</td>";
+
+			// No. DO (readonly - diambil dari header/hidden POST)
+			echo "<td><span class='text-do'></span></td>";
+
+			// Nama Material (readonly)
+			echo "<td><input type='text' class='form-control input-sm' value='" . $material->nama . "' name='dp[" . $no . "][nama]' readonly></td>";
+
+			// Lot Number (input text)
+			echo "<td><input type='text' class='form-control input-sm' value='" . $material->lotno . "' name='dp[" . $no . "][lotno]' id='dp_lotno_" . $no . "'></td>";
+
+			// Gudang (dropdown)
+			echo "<td><select class='form-control input-sm select2_gudang' name='dp[" . $no . "][gudang]' id='dp_gudang_" . $no . "' onchange='gudangChange(" . $no . ")'>";
+			echo "<option value=''>Pilih Gudang</option>";
+			foreach ($gudang as $g) {
+				$sel = ($g->id_gudang == 3) ? 'selected' : '';
+				echo "<option value='" . $g->id_gudang . "' " . $sel . ">" . $g->nama_gudang . "</option>";
+			}
+			echo "</select></td>";
+
+			// Customer Titipan (dropdown, default disabled)
+			echo "<td><select class='form-control input-sm select2_customer' name='dp[" . $no . "][customer_titipan]' id='dp_customer_" . $no . "' disabled>";
+			echo "<option value=''>Pilih Customer</option>";
+			foreach ($customers as $cust) {
+				echo "<option value='" . $cust->name_customer . "'>" . $cust->name_customer . "</option>";
+			}
+			echo "</select></td>";
+
+			// Harga Deal (editable number)
+			echo "<td><input type='text' class='form-control input-sm autoNumeric text-right' value='" . $material->harga_deal . "' name='dp[" . $no . "][harga_deal]'></td>";
+
+			// Total Kirim (input number) - default value dari weight_mat
+			echo "<td><input type='text' class='form-control input-sm total_kirim autoNumeric text-right' value='" . $material->weight_mat . "' name='dp[" . $no . "][total_kirim]' id='dp_total_kirim_" . $no . "'></td>";
+
+			// Qty Sheet (only for sheet type)
+			if ($is_sheet) {
+				echo "<td><input type='text' class='form-control input-sm qty_sheet autoNumeric text-right' value='' name='dp[" . $no . "][qty_sheet]' id='dp_qty_sheet_" . $no . "'></td>";
+			} else {
+				echo "<td></td>";
+			}
+
+			// Checkbox Retur
+			echo "<td><input type='checkbox' value='1' class='chk_retur' name='dp[" . $no . "][deal]' id='dp_deal_" . $no . "'></td>";
+
+			// Tombol hapus row
+			echo "<td><button type='button' class='btn btn-xs btn-danger' onClick='HapusRow(" . $no . ")'><i class='fa fa-trash'></i></button></td>";
+
+			echo "</tr>";
+		}
+	}
+
 	public function SaveRetur()
 	{
 		$this->auth->restrict($this->addPermission);
 		$post = $this->input->post();
-		// print_r($post);
-		// exit;
 
 		try {
+			if (empty($post['id_delivery_order'])) {
+				throw new Exception('No. Delivery Order (DO) harus diisi!');
+			}
+			if (empty($post['nama_customer']) || empty($post['id_customer'])) {
+				throw new Exception('Customer harus diisi!');
+			}
+
 			$code = $this->Retur_penjualan_model->generate_code();
 			$no_surat = $this->Retur_penjualan_model->BuatNomor();
+
+			$arr_stock_retur = [];
+			$detRetur = [];
+			$numb1 = 0;
+
+			if (isset($_POST['dp']) && is_array($_POST['dp'])) {
+				foreach ($_POST['dp'] as $dp) {
+					$deal = isset($dp['deal']) ? $dp['deal'] : 0;
+					if ($deal == 1) {
+						$numb1++;
+						$id_material = $dp['id_category3'];
+						$ref_penawaran = isset($dp['ref_penawaran']) ? $dp['ref_penawaran'] : '';
+						$lotno = $dp['lotno'];
+						$gudang = $dp['gudang'];
+
+						if (empty($lotno)) {
+							throw new Exception("Lot Number pada baris ke-$numb1 harus diisi!");
+						}
+						if (empty($gudang)) {
+							throw new Exception("Gudang pada baris ke-$numb1 harus dipilih!");
+						}
+
+						$ppn = $this->db->query("SELECT exclude_vat FROM tr_penawaran WHERE no_penawaran='$ref_penawaran'")->row();
+
+						$hargadeal      = str_replace(',', '', $dp['harga_deal']);
+						$totalretur     = str_replace(',', '', $dp['total_kirim']);
+						$totalharga     = $hargadeal * $totalretur;
+						if (isset($dp['qty_sheet']) && !empty($dp['qty_sheet'])) {
+							$qty_sheet = str_replace(',', '', $dp['qty_sheet']);
+							$totalharga = ($hargadeal * $qty_sheet);
+						}
+
+						if ($ppn && ($ppn->exclude_vat != '' || $ppn->exclude_vat != '0')) {
+							$totalppn   = ($totalharga * $ppn->exclude_vat) / 100;
+						} else {
+							$totalppn   = 0;
+						}
+
+						$row = array(
+							'id_retur'              => $code,
+							'id_dt_retur'           => $code . '-' . $numb1,
+							'id_material'           => $dp['id_category3'],
+							'thickness'             => $dp['thickness'],
+							'width'                 => $dp['width'],
+							'length'                => $dp['length'],
+							'harga_deal'            => $hargadeal,
+							'qty_produk'            => 1,
+							'weight'                => $totalretur,
+							'total_weight'          => $totalretur,
+							'total_harga'           => $totalharga,
+							'total_ppn'             => $totalppn,
+							'deal'                  => $dp['deal'],
+							'created_on'            => date('Y-m-d H:i:s'),
+							'created_by'            => $this->auth->user_id(),
+							'id_stok'               => $dp['id_stok'],
+							'lotno'                 => $dp['lotno'],
+							'total_sheet'           => (isset($dp['qty_sheet']) && !empty($dp['qty_sheet'])) ? $dp['qty_sheet'] : 0
+						);
+
+						$detRetur[] = $row;
+
+						$get_last_stock = $this->Retur_penjualan_model->get_last_stock($lotno);
+						if (empty($get_last_stock)) {
+							throw new Exception("Stock material untuk Lot Number '" . $lotno . "' tidak ditemukan di stock_material!");
+						}
+
+						$arr_stock_retur[] = [
+							'id_category3' => $get_last_stock->id_category3,
+							'nama_material' => $get_last_stock->nama_material,
+							'width' => $get_last_stock->width,
+							'length' => $get_last_stock->length,
+							'id_bentuk' => $get_last_stock->id_bentuk,
+							'lotno' => $get_last_stock->lotno,
+							'qty' => 1,
+							'weight' => $totalretur,
+							'totalweight' => $totalretur,
+							'booking' => 0,
+							'thickness' => $get_last_stock->thickness,
+							'aktif' => 'Y',
+							'id_gudang' => $gudang,
+							'created_by' => $this->auth->user_id(),
+							'created_on' => date('Y-m-d H:i:s'),
+							'lot_slitting' => $get_last_stock->lot_slitting,
+							'keterangan' => $get_last_stock->keterangan . ' - RETUR (' . $code . ')',
+							'id_roll' => $get_last_stock->id_roll,
+							'panjang' => $get_last_stock->panjang,
+							'actual_berat' => $get_last_stock->actual_berat,
+							'sisa_spk' => $totalretur,
+							'no_surat' => $get_last_stock->no_surat,
+							'customer' => $get_last_stock->customer,
+							'status_do' => 'OPN',
+							'costbook' => $get_last_stock->costbook,
+							'id_dt_spkmarketing' => $get_last_stock->id_dt_spkmarketing,
+							'harga_deal' => $get_last_stock->harga_deal,
+							'tipe_material' => $get_last_stock->tipe_material,
+							'qty_sheet' => $get_last_stock->qty_sheet
+						];
+					}
+				}
+			}
+
+			if (empty($detRetur)) {
+				throw new Exception('Silakan pilih minimal satu item material untuk diretur dengan mencentang kolom Retur!');
+			}
+
 			$this->db->trans_begin();
+
 			$data = [
 				'id_retur'		        => $code,
 				'no_retur'				=> $no_surat,
-				'id_spkmarketing'		=> $post['id_spkmarketing'],
-				'no_surat'				=> $post['no_surat'],
+				'id_delivery_order'		=> $post['id_delivery_order'],
+				'no_do' 				=> $post['no_do'],
+				'id_spkmarketing'		=> '',
+				'no_surat'				=> $post['no_do'],
 				'tgl_retur'		        => $post['tgl_penawaran'],
 				'id_customer'			=> $post['id_customer'],
 				'nama_customer'			=> $post['nama_customer'],
-				'no_penawaran'			=> $post['no_penawaran'],
-				'no_po'					=> $post['no_po'],
-				'sample'				=> $post['sample'],
-				'tgl_po'				=> date('Y-m-d', strtotime($post['tgl_po'])),
-				'plan_cust'				=> date('Y-m-d', strtotime($post['plan_cust'])),
-				'note'					=> $post['note'],
+				'no_penawaran'			=> '',
+				'no_po'					=> isset($post['no_po']) ? $post['no_po'] : '',
+				'sample'				=> isset($post['sample']) ? $post['sample'] : '',
+				'tgl_po'				=> isset($post['tgl_po']) && $post['tgl_po'] != '' ? date('Y-m-d', strtotime($post['tgl_po'])) : date('Y-m-d'),
+				'plan_cust'				=> isset($post['plan_cust']) && $post['plan_cust'] != '' ? date('Y-m-d', strtotime($post['plan_cust'])) : date('Y-m-d'),
+				'note'					=> isset($post['note']) ? $post['note'] : '',
 				'created_on'			=> date('Y-m-d H:i:s'),
 				'created_by'			=> $this->auth->user_id(),
 				'tahun'					=> date('Y-m-d'),
-				'kompensasi'			=> $post['kompensasi'],
-				'ganti_material'	    => $post['ganti']
-
+				'kompensasi'			=> isset($post['kompensasi']) ? $post['kompensasi'] : '',
+				'ganti_material'	    => isset($post['ganti']) ? $post['ganti'] : ''
 			];
-			//Add Data
+
 			$insert_header_retur = $this->db->insert('tr_retur_penjualan', $data);
 			if (!$insert_header_retur) {
 				throw new Exception('Data header retur gagal dibuat !');
 			}
-			$numb1 = 0;
 
-			$arr_stock_retur = [];
-			$detRetur = [];
-			foreach ($_POST['dp'] as $dp) {
-				$numb1++;
-
-				$deal        = $dp[deal];
-				$id_material = $dp[id_category3];
-				$idspkmarketing = $post['id_spkmarketing'];
-				$idpenawaran  = $post['no_penawaran'];
-				$lotno = $dp['lotno'];
-				$gudang = $dp['gudang'];
-
-				$ppn       = $this->db->query("SELECT exclude_vat FROM tr_penawaran WHERE no_penawaran='$idpenawaran'")->row();
-
-				$harga       = $this->db->query("SELECT * FROM dt_spkmarketing WHERE id_spkmarketing='$idspkmarketing' AND id_material='$id_material'")->row();
-				$hargadeal      = $harga->harga_deal;
-				$totalretur     = $dp[total_kirim];
-				$totalharga     = $hargadeal * $totalretur;
-				if (isset($dp['qty_sheet']) && !empty($dp['qty_sheet'])) {
-					$totalharga = ($hargadeal * $dp['qty_sheet']);
-				}
-
-				if ($ppn->exclude_vat != '' || $ppn->exclude_vat != '0') {
-					$totalppn   = ($totalharga * $ppn->exclude_vat) / 100;
-				} else {
-					$totalppn   = 0;
-				}
-
-				if ($deal == 1) {
-					$row = array(
-						'id_retur'              => $code,
-						'id_dt_retur'           => $code . '-' . $numb1,
-						'id_material'           => $dp['id_category3'],
-						'thickness'             => $dp['thickness'],
-						'width'                 => $dp['width'],
-						'length'                => $dp['length'],
-						'harga_deal'            => $hargadeal,
-						'qty_produk'            => 1,
-						'weight'                => $totalretur,
-						'total_weight'          => $totalretur,
-						'total_harga'           => $totalharga,
-						'total_ppn'             => $totalppn,
-						'deal'                  => $dp['deal'],
-						'created_on'            => date('Y-m-d H:i:s'),
-						'created_by'            => $this->auth->user_id(),
-						'id_stok'               => $dp['id_stok'],
-						'lotno'                 => $dp['lotno'],
-						// Tambahkan default value di sini supaya jumlah kolom selalu sama
-						'total_sheet'           => (isset($dp['qty_sheet']) && !empty($dp['qty_sheet'])) ? $dp['qty_sheet'] : 0
-					);
-
-					$detRetur[] = $row;
-
-					$get_last_stock = $this->Retur_penjualan_model->get_last_stock($lotno);
-
-					$arr_stock_retur[] = [
-						'id_category3' => $get_last_stock->id_category3,
-						'nama_material' => $get_last_stock->nama_material,
-						'width' => $get_last_stock->width,
-						'length' => $get_last_stock->length,
-						'id_bentuk' => $get_last_stock->id_bentuk,
-						'lotno' => $get_last_stock->lotno,
-						'qty' => 1,
-						'weight' => $totalretur,
-						'totalweight' => $totalretur,
-						'booking' => 0,
-						'thickness' => $get_last_stock->thickness,
-						'aktif' => 'Y',
-						'id_gudang' => $gudang,
-						'created_by' => $this->auth->user_id(),
-						'created_on' => date('Y-m-d H:i:s'),
-						'lot_slitting' => $get_last_stock->lot_slitting,
-						'keterangan' => $get_last_stock->keterangan . ' - RETUR (' . $code . ')',
-						'id_roll' => $get_last_stock->id_roll,
-						'panjang' => $get_last_stock->panjang,
-						'actual_berat' => $get_last_stock->actual_berat,
-						'sisa_spk' => $totalretur,
-						'no_surat' => $get_last_stock->no_surat,
-						'customer' => $get_last_stock->customer,
-						'status_do' => 'OPN',
-						'costbook' => $get_last_stock->costbook,
-						'id_dt_spkmarketing' => $get_last_stock->id_dt_spkmarketing,
-						'harga_deal' => $get_last_stock->harga_deal,
-						'tipe_material' => $get_last_stock->tipe_material,
-						'qty_sheet' => $get_last_stock->qty_sheet
-					];
-				}
-			}
-
-			// if (!empty($detRetur)) {
-			// throw new Exception(''.print_r($detRetur).'');
 			$insert_detail_retur = $this->db->insert_batch('dt_returpenjualan', $detRetur);
 			if (!$insert_detail_retur) {
 				throw new Exception('Data detail retur gagal di input !');
 			}
-			// }
 
-			// if (!empty($arr_stock_retur)) {
 			$insert_stock_retur = $this->db->insert_batch('stock_material', $arr_stock_retur);
 			if (!$insert_stock_retur) {
 				throw new Exception('Data stock retur gagal di kembalikan !');
 			}
-			// }
 
 			$this->db->trans_commit();
 			$status	= array(
@@ -259,7 +440,7 @@ class Retur_penjualan extends Admin_Controller
 			$this->db->trans_rollback();
 			$status	= array(
 				'pesan'		=> $e->getMessage(),
-				'code' => $code,
+				'code' => isset($code) ? $code : '',
 				'status'	=> 0
 			);
 
