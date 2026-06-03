@@ -299,6 +299,7 @@ class Receive_invoice_ap extends Admin_Controller
       'id_suplier' => $post['supplier'],
       'nm_suplier' => $get_supplier->name_suplier,
       'ppn' => str_replace(',', '', (isset($post['ppn_global']) ? $post['ppn_global'] : 0)),
+      'ppn_persen' => str_replace(',', '', (isset($post['ppn_persen']) ? $post['ppn_persen'] : 0)),
       'no_faktur_pajak' => $post['no_faktur_pajak'],
       'created_by' => $this->auth->user_id(),
       'created_date' => date('Y-m-d H:i:s')
@@ -409,6 +410,7 @@ class Receive_invoice_ap extends Admin_Controller
       'id_suplier' => $post['supplier'],
       'nm_suplier' => $get_supplier->name_suplier,
       'ppn' => str_replace(',', '', (isset($post['ppn_global']) ? $post['ppn_global'] : 0)),
+      'ppn_persen' => str_replace(',', '', (isset($post['ppn_persen']) ? $post['ppn_persen'] : 0)),
       'no_faktur_pajak' => $post['no_faktur_pajak'],
       'created_by' => $this->auth->user_id(),
       'created_date' => date('Y-m-d H:i:s')
