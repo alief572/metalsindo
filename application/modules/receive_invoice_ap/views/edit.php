@@ -186,7 +186,24 @@
                 <div class="col-sm-4 col-sm-offset-8">
                     <div class="form-horizontal">
                         <div class="form-group">
-                            <label class="col-sm-5 control-label text-right"><b>PPn :</b></label>
+                            <?php
+                            $ppn_persen = 0;
+                            if ($ttl_total > 0) {
+                                $ppn_persen = ($header->ppn / $ttl_total) * 100;
+                            }
+                            ?>
+                            <label class="col-sm-5 control-label text-right"><b>PPn (%) :</b></label>
+                            <div class="col-sm-7">
+                                <input type="text" 
+                                       name="ppn_persen" 
+                                       id="ppn_persen" 
+                                       class="form-control input-sm text-right divide" 
+                                       placeholder="0.00"
+                                       value="<?= $ppn_persen ?>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5 control-label text-right"><b>Nilai PPn :</b></label>
                             <div class="col-sm-7">
                                 <input type="text" 
                                        name="ppn_global" 
@@ -537,17 +554,39 @@
             grand_total_nilai += kp_nilai;
         }
 
-        var ppn_global = get_num($('#ppn_global').val());
+        var ppn_persen = get_num($('#ppn_persen').val());
+        var nilai_ppn = (grand_total_nilai * ppn_persen) / 100;
+        $('#ppn_global').val(number_format(nilai_ppn, 2));
+
         var grand_total_total = grand_total_nilai;
-        var grand_total_with_ppn = grand_total_nilai + ppn_global;
+        var grand_total_with_ppn = grand_total_nilai + nilai_ppn;
 
         $('.col_ttl_nilai').html(number_format(grand_total_nilai, 2));
         $('.col_ttl_total').html(number_format(grand_total_total, 2));
         $('#grand_total_with_ppn').val(number_format(grand_total_with_ppn, 2));
     }
 
-    $(document).on('change keyup', '#ppn_global', function() {
+    $(document).on('change keyup', '#ppn_persen', function() {
         hitung_grand_total();
+    });
+
+    $(document).on('change keyup', '#ppn_global', function() {
+        var grand_total_nilai = 0;
+        for(i = 1; i <= no_list; i++) {
+            var kp_nilai = get_num($('input[name="kp['+i+'][nilai]"]').val());
+            grand_total_nilai += kp_nilai;
+        }
+        
+        var nilai_ppn = get_num($(this).val());
+        var ppn_persen = 0;
+        if(grand_total_nilai > 0) {
+            ppn_persen = (nilai_ppn / grand_total_nilai) * 100;
+        }
+        
+        $('#ppn_persen').val(number_format(ppn_persen, 2));
+        
+        var grand_total_with_ppn = grand_total_nilai + nilai_ppn;
+        $('#grand_total_with_ppn').val(number_format(grand_total_with_ppn, 2));
     });
 
     $(document).on('change', '#bank', function() {
