@@ -186,12 +186,6 @@
                 <div class="col-sm-4 col-sm-offset-8">
                     <div class="form-horizontal">
                         <div class="form-group">
-                            <?php
-                            $ppn_persen = 0;
-                            if ($ttl_total > 0) {
-                                $ppn_persen = ($header->ppn / $ttl_total) * 100;
-                            }
-                            ?>
                             <label class="col-sm-5 control-label text-right"><b>PPn (%) :</b></label>
                             <div class="col-sm-7">
                                 <input type="text" 
@@ -199,7 +193,7 @@
                                        id="ppn_persen" 
                                        class="form-control input-sm text-right divide" 
                                        placeholder="0.00"
-                                       value="<?= $ppn_persen ?>">
+                                       value="<?= $header->ppn_persen ?>">
                             </div>
                         </div>
                         <div class="form-group">
