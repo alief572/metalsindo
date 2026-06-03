@@ -179,7 +179,7 @@
                 <td><?= strtoupper($header[0]->nama_customer); ?></td>
             </tr>
             <tr>
-                <td>No SPK Marketing</td>
+                <td>No Delivery Order</td>
                 <td>:</td>
                 <td><?= strtoupper($header[0]->no_surat); ?></td>
             </tr>

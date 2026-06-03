@@ -378,7 +378,7 @@ class Retur_penjualan_model extends BF_Model
 				'no_retur'   => $item->no_retur,
 				'tgl_retur'  => date('d F Y', strtotime($item->tgl_retur)),
 				'customer'   => $item->name_customer,
-				'no_spk'     => $item->no_surat,
+				'no_do'      => !empty($item->no_do) ? $item->no_do : $item->no_surat,
 				'kompensasi' => ($item->kompensasi == 'brg') ? 'Ganti Barang' : 'Potong Hutang',
 				'action'     => $action
 			];
@@ -404,6 +404,17 @@ class Retur_penjualan_model extends BF_Model
 		$get_data = $this->db->get()->row();
 
 		return $get_data;
+	}
+
+	public function get_do_by_customer($id_customer)
+	{
+		$this->db->select('a.id_delivery_order, a.no_surat');
+		$this->db->from('tr_delivery_order a');
+		$this->db->where('a.id_customer', $id_customer);
+		$this->db->where('a.status_approve', '1');
+		$this->db->where('a.id_delivery_order NOT IN (SELECT id_delivery_order FROM tr_retur_penjualan WHERE id_delivery_order IS NOT NULL)', NULL, FALSE);
+		$this->db->order_by('a.id_delivery_order', 'DESC');
+		return $this->db->get()->result_array();
 	}
 
 	public function get_data_nota_retur($post)

@@ -29,7 +29,7 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 					<th>No. Retur</th>
 					<th>Tanggal Retur</th>
 					<th>Customer</th>
-					<th>No. SPK</th>
+					<th>No. DO</th>
 					<th>Kompensasi</th>
 					<th width="10%">Action</th>
 				</tr>
@@ -262,7 +262,7 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 					data: 'customer'
 				},
 				{
-					data: 'no_spk'
+					data: 'no_do'
 				},
 				{
 					data: 'kompensasi'

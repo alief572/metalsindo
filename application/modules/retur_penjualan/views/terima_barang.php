@@ -55,10 +55,10 @@ $tanggal = date('Y-m-d');
 						<div class="col-sm-6">
 							<div class="form-group row">
 								<div class="col-md-4">
-									<label>No. Penawaran</label>
+									<label>No. DO</label>
 								</div>
 								<div class="col-md-8">
-									<select id="no_penawaran" name="no_penawaran" class="form-control select" required>
+									<select id="id_do" name="id_delivery_order" class="form-control select" required>
 										<option value="">--Pilih--</option>
 									</select>
 								</div>
@@ -66,9 +66,10 @@ $tanggal = date('Y-m-d');
 						</div>
 					</div>
 
-					<!-- Hidden inputs for customer -->
+					<!-- Hidden inputs for customer & DO -->
 					<input type="hidden" id="id_customer" name="id_customer" value="">
 					<input type="hidden" id="nama_customer" name="nama_customer" value="">
+					<input type="hidden" id="no_do" name="no_do" value="">
 
 					<!-- Row 3: No. PO & Kompensasi -->
 					<div class="col-sm-12">
@@ -125,13 +126,30 @@ $tanggal = date('Y-m-d');
 						</div> -->
 					</div>
 
-					<!-- Add SPK Button -->
-					<div class="col-sm-12" style="margin-top:10px; margin-bottom:10px;">
-						<button type="button" class="btn btn-sm btn-success" id="btn_add_spk"><i class="fa fa-plus"></i> Add SPK</button>
-					</div>
-
-					<!-- SPK Container (AJAX content area) -->
-					<div class="col-sm-12" id="Form_Spk">
+					<!-- Tabel Material (Langsung Tampil setelah pilih DO) -->
+					<div class="col-sm-12" style="margin-top:15px; overflow-x:auto;">
+						<table class='table table-bordered table-striped'>
+							<thead>
+								<tr class='bg-blue'>
+									<th width='5%'>ID Material</th>
+									<th width='10%'>No. DO</th>
+									<th width='15%'>Nama Material</th>
+									<th width='10%'>Lot Number</th>
+									<th width='10%'>Gudang</th>
+									<th width='10%'>Customer Titipan</th>
+									<th width='10%'>Harga Deal</th>
+									<th width='10%'>Total Kirim (Kg)</th>
+									<th width='10%'>Qty Sheet</th>
+									<th width='5%'>Retur<br><input type='checkbox' id='chk_retur_all' onclick='checkAllRetur()'></th>
+									<th width='5%'>Action</th>
+								</tr>
+							</thead>
+							<tbody id='data_material'>
+								<tr>
+									<td colspan="11" class="text-center">Silakan pilih DO terlebih dahulu.</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 
 					<!-- Footer: Total Retur -->
@@ -162,6 +180,7 @@ $tanggal = date('Y-m-d');
 	</div>
 </div>
 
+<script src="<?= base_url('assets/js/autoNumeric.js') ?>"></script>
 <script type="text/javascript">
 	var base_url = '<?php echo base_url(); ?>';
 	var active_controller = '<?php echo ($this->uri->segment(1)); ?>';
@@ -170,7 +189,7 @@ $tanggal = date('Y-m-d');
 	$(document).ready(function() {
 		$('.select').select2();
 
-		// Event: Customer change → update No. Penawaran dropdown
+		// Event: Customer change → update No. DO dropdown
 		$(document).on('change', '#id_customerx', function(e) {
 			e.preventDefault();
 			var id_customer = this.value;
@@ -178,72 +197,46 @@ $tanggal = date('Y-m-d');
 			$('#id_customer').val(id_customer);
 			$('#nama_customer').val(selected_text.trim());
 
-			$.ajax({
-				url: siteurl + 'spk_marketing/get_penawaran',
-				cache: false,
-				type: "POST",
-				data: "id=" + id_customer,
-				dataType: "json",
-				success: function(data) {
-					$("#no_penawaran").html(data.option).trigger("change");
-				},
-				error: function() {
-					swal({
-						title: "Error Message !",
-						text: 'Connection Timed Out ...',
-						type: "warning",
-						timer: 5000
-					});
-				}
-			});
+			// Reset DO and table
+			$("#id_do").html('<option value="">--Pilih--</option>');
+			$('#no_do').val('');
+			$('#data_material').html('<tr><td colspan="11" class="text-center">Silakan pilih DO terlebih dahulu.</td></tr>');
+			hitungTotalRetur();
+
+			if (id_customer) {
+				$.ajax({
+					url: siteurl + 'retur_penjualan/get_do_by_customer',
+					cache: false,
+					type: "POST",
+					data: "id_customer=" + id_customer,
+					dataType: "json",
+					success: function(data) {
+						$("#id_do").html(data.option).trigger("change");
+					},
+					error: function() {
+						swal({
+							title: "Error Message !",
+							text: 'Connection Timed Out ...',
+							type: "warning",
+							timer: 5000
+						});
+					}
+				});
+			}
 		});
 
-		// Event: Add SPK button click
-		$('#btn_add_spk').click(function() {
-			// Validasi: Customer harus sudah dipilih
-			var id_customer = $('#id_customerx').val();
-			if (!id_customer || id_customer == '') {
-				swal({
-					title: "Warning!",
-					text: "Pilih Customer terlebih dahulu!",
-					type: "warning",
-					timer: 3000
-				});
-				return;
+		// Event: DO change → load materials
+		$(document).on('change', '#id_do', function(e) {
+			var id_do = $(this).val();
+			if (id_do) {
+				var text_do = $('#id_do option:selected').text();
+				$('#no_do').val(text_do);
+				TambahMaterialRetur(id_do, text_do);
+			} else {
+				$('#no_do').val('');
+				$('#data_material').html('<tr><td colspan="11" class="text-center">Silakan pilih DO terlebih dahulu.</td></tr>');
+				hitungTotalRetur();
 			}
-
-			spk_counter++;
-			var current_counter = spk_counter;
-			$.ajax({
-				url: siteurl + 'retur_penjualan/FormSpk',
-				type: "GET",
-				data: {
-					id: current_counter,
-					id_customer: id_customer
-				},
-				success: function(html) {
-					$('#Form_Spk').append(html);
-					// Reinitialize Select2 and bind change event
-					var $select = $('#dt_spk_' + current_counter);
-					$select.select2().on('change', function() {
-						TambahMaterial(current_counter);
-					});
-
-					// Auto-select jika hanya ada 1 SPK (selain option --Pilih--)
-					var options = $select.find('option[value!=""]');
-					if (options.length == 1) {
-						$select.val(options.first().val()).trigger('change');
-					}
-				},
-				error: function() {
-					swal({
-						title: "Error Message !",
-						text: 'Connection Timed Out ...',
-						type: "warning",
-						timer: 5000
-					});
-				}
-			});
 		});
 
 		// Event: Total Kirim change/keyup → recalculate Total Retur
@@ -388,32 +381,27 @@ $tanggal = date('Y-m-d');
 		});
 	});
 
-	// Function: Tambah Material - load material rows for selected SPK
-	function TambahMaterial(id) {
-		var id_spkmarketing = $('#dt_spk_' + id).val();
-		if (!id_spkmarketing || id_spkmarketing == '') {
-			// Kosongkan tabel jika tidak ada SPK dipilih
-			$('#data_material_' + id).html('');
-			hitungTotalRetur();
-			return;
-		}
-
+	// Function: Tambah Material - load material rows for selected DO
+	function TambahMaterialRetur(id_do, text_do) {
 		$.ajax({
 			url: siteurl + 'retur_penjualan/TambahMaterialRetur',
 			type: "GET",
 			data: {
-				id_spkmarketing: id_spkmarketing,
-				id: id
+				id_delivery_order: id_do
 			},
 			success: function(html) {
-				$('#data_material_' + id).html(html);
-				// Initialize Select2 for gudang and customer dropdowns
-				$('#data_material_' + id + ' .select2_gudang').select2({
-					width: '100%'
-				});
-				$('#data_material_' + id + ' .select2_customer').select2({
-					width: '100%'
-				});
+				if(html.trim() == '') {
+					$('#data_material').html('<tr><td colspan="11" class="text-center">Tidak ada material untuk diretur.</td></tr>');
+				} else {
+					$('#data_material').html(html);
+					// Set No DO text for all loaded rows
+					$('#data_material .text-do').text(text_do);
+					// Initialize Select2 for gudang and customer dropdowns
+					$('#data_material .select2_gudang').select2({ width: '100%' });
+					$('#data_material .select2_customer').select2({ width: '100%' });
+					// Initialize autoNumeric
+					$('#data_material .autoNumeric').autoNumeric('init');
+				}
 				hitungTotalRetur();
 			},
 			error: function() {
@@ -427,25 +415,19 @@ $tanggal = date('Y-m-d');
 		});
 	}
 
-	// Function: Hapus SPK block
-	function HapusSpk(id) {
-		$('#spk_' + id).remove();
-		hitungTotalRetur();
-	}
-
 	// Function: Hapus material row
-	function HapusRow(id, no) {
-		$('#tr_material_' + id + '_' + no).remove();
+	function HapusRow(no) {
+		$('#tr_material_' + no).remove();
 		hitungTotalRetur();
 	}
 
 	// Function: Gudang change → enable/disable Customer Titipan
-	function gudangChange(id, no) {
-		var gudang_val = $('#dp_gudang_' + id + '_' + no).val();
+	function gudangChange(no) {
+		var gudang_val = $('#dp_gudang_' + no).val();
 		if (gudang_val == '3') {
-			$('#dp_customer_' + id + '_' + no).prop('disabled', false);
+			$('#dp_customer_' + no).prop('disabled', false);
 		} else {
-			$('#dp_customer_' + id + '_' + no).prop('disabled', true).val('');
+			$('#dp_customer_' + no).prop('disabled', true).val('').trigger('change.select2');
 		}
 	}
 
@@ -454,16 +436,17 @@ $tanggal = date('Y-m-d');
 		var total = 0;
 		$('.chk_retur:checked').each(function() {
 			var row = $(this).closest('tr');
-			var total_kirim = parseFloat(row.find('.total_kirim').val()) || 0;
+			var total_kirim_str = row.find('.total_kirim').val() || '0';
+			var total_kirim = parseFloat(total_kirim_str.replace(/,/g, '')) || 0;
 			total += total_kirim;
 		});
 		$('#total_retur').val(total.toFixed(2));
 	}
 
-	// Function: Check/Uncheck all retur checkboxes in a SPK block
-	function checkAllRetur(id) {
-		var isChecked = $('.chk_retur_all[data-spk="' + id + '"]').is(':checked');
-		$('#data_material_' + id + ' .chk_retur').prop('checked', isChecked);
+	// Function: Check/Uncheck all retur checkboxes
+	function checkAllRetur() {
+		var isChecked = $('#chk_retur_all').is(':checked');
+		$('#data_material .chk_retur').prop('checked', isChecked);
 		hitungTotalRetur();
 	}
 </script>
