@@ -164,23 +164,34 @@
                 <div class="col-sm-4 col-sm-offset-8">
                     <div class="form-horizontal">
                         <div class="form-group">
-                            <label class="col-sm-5 control-label text-right"><b>PPn :</b></label>
+                            <?php
+                            $ttl_total = 0;
+                            foreach ($detail as $item) {
+                                $ttl_total += $item->nilai;
+                            }
+                            $ppn_persen = 0;
+                            if ($ttl_total > 0) {
+                                $ppn_persen = ($header->ppn / $ttl_total) * 100;
+                            }
+                            ?>
+                            <label class="col-sm-5 control-label text-right"><b>PPn (%) :</b></label>
                             <div class="col-sm-7">
                                 <input type="text" 
-                                       name="ppn_global" 
-                                       id="ppn_global" 
+                                       class="form-control input-sm text-right divide" 
+                                       readonly
+                                       value="<?= $ppn_persen ?>">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-5 control-label text-right"><b>Nilai PPn :</b></label>
+                            <div class="col-sm-7">
+                                <input type="text" 
                                        class="form-control input-sm text-right divide" 
                                        readonly
                                        value="<?= $header->ppn ?>">
                             </div>
                         </div>
                         <div class="form-group">
-                            <?php
-                            $ttl_total = 0;
-                            foreach ($detail as $item) {
-                                $ttl_total += $item->nilai;
-                            }
-                            ?>
                             <label class="col-sm-5 control-label text-right"><b>Total Invoice :</b></label>
                             <div class="col-sm-7">
                                 <input type="text" 
