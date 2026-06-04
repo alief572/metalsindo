@@ -1,319 +1,280 @@
 <?php
-$ENABLE_ADD     = has_permission('Retur_Penjualan.Add');
-$ENABLE_MANAGE  = has_permission('Retur_Penjualan.Manage');
-$ENABLE_VIEW    = has_permission('Retur_Penjualan.View');
-$ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
+$retur = $results['retur'];
 $tanggal = date('Y-m-d');
-foreach ($results['tr_spk'] as $tr_spk) {
-}
 ?>
 
 <div class="box box-primary">
 	<div class="box-body">
 		<form id="data-form" method="post">
-			<input type="hidden" name="id" value="<?= $id ?>">
-			<input type="hidden" name="id2" value="<?= $id2 ?>">
 			<div class="col-sm-12">
-				<div class="input_fields_wrap2">
-					<div class="row">
-						<center><label for="customer">
-								<h3>SPK MARKETING RETUR</h3>
-							</label></center>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="customer">NO.SPK</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="no_surat_tampil" required name="no_surat_tampil" readonly placeholder="OTOMATIS">
-									</div>
-									<div class="col-md-8" hidden>
-										<input type="text" class="form-control" id="id_spkmarketing" value="<?= $tr_spk->id_spkmarketing ?>" required name="id_spkmarketing" readonly placeholder="No.CRCL">
-									</div>
-									<div class="col-md-8" hidden>
-										<input type="text" class="form-control" id="no_surat" value="<?= $tr_spk->no_surat ?>" required name="no_surat" readonly placeholder="No.SPK">
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="customer">Tanggal</label>
-									</div>
-									<div class="col-md-8">
-										<input type="date" class="form-control" id="tgl_penawaran" value="<?= $tr_spk->tgl_spk_marketing ?>" onkeyup required name="tgl_penawaran" readonly>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">Customer</label>
-									</div>
-									<div class="col-md-8">
-										<select id="id_customerx" name="id_customerx" class="form-control select" required>
-											<option value="">--Pilih--</option>
-											<?php foreach ($results['customer'] as $penawaran) {
-												$sel = ($tr_spk->id_customer == $penawaran->id_customer) ? 'selected' : '';
-											?>
-												<option value="<?= $penawaran->id_customer ?>" <?= $sel ?>><?= strtoupper(strtolower($penawaran->name_customer)) ?></option>
-											<?php } ?>
-										</select>
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row" id="slot_customer">
-									<div class="col-md-4">
-										<label for="customer">Customer</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" value='<?= $tr_spk->nama_customer ?>' id="nama_customer" onkeyup required name="nama_customer" readonly>
-									</div>
-									<div class="col-md-8" hidden>
-										<input type="text" class="form-control" value='<?= $tr_spk->id_customer ?>' id="id_customer" onkeyup required name="id_customer" readonly>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">No. Penawaran</label>
-									</div>
-									<div class="col-md-8">
-										<select id="no_penawaran" name="no_penawaran" class="form-control select" onchange="get_produk()" required>
-											<option value="">--Pilih--</option>
-											<?php foreach ($results['penawaran'] as $penawaran) {
-												$select = ($tr_spk->no_penawaran == $penawaran->no_penawaran) ? 'selected' : ''; ?>
-												<option value="<?= $penawaran->no_penawaran ?>" <?= $select ?>><?= strtoupper(strtolower($penawaran->no_surat)) ?></option>
-											<?php } ?>
-										</select>
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">No PO</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="no_po" required name="no_po" value='<?= $tr_spk->no_po; ?>'>
-									</div>
-								</div>
-							</div>
-						</div>
+				<div class="row">
+					<center><label>
+							<h3>Retur Penjualan</h3>
+						</label></center>
 
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">Sample</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="sample" required name="sample" value='<?= $tr_spk->sample; ?>'>
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">Tgl PO</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control datepicker" id="tgl_po" required name="tgl_po" readonly value='<?= $tr_spk->tgl_po; ?>'>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">Date Plan By Customer</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control datepicker" id="plan_cust" required name="plan_cust" readonly value='<?= $tr_spk->plan_cust; ?>'>
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">Note</label>
-									</div>
-									<div class="col-md-8">
-										<textarea class="form-control" id="note" required name="note" rows='2'><?= $tr_spk->note; ?></textarea>
-									</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="col-sm-12">
+					<!-- Row 1: No. Dokumen & Tanggal -->
+					<div class="col-sm-12">
+						<div class="col-sm-6">
 							<div class="form-group row">
-								<table class='table table-bordered table-striped'>
-									<thead>
-										<tr class='bg-blue'>
-											<th width='22%'>Nama Material</th>
-											<th width='8%'>Thickness</th>
-											<th width='8%'>Width</th>
-											<th width='10%'>Part Number</th>
-											<th width='10%'>Harga <br> Penawaran</th>
-											<?php 
-												if($results['type_sheet'] == '1') {
-													echo "
-														<th width='10%'>Harga Deal / Sheet</th>
-														<th width='10%'>Qty (Sheet)</th>
-														<th width='10%'>Qty (Kg)</th>
-													";
-												} else {
-													echo "
-														<th width='10%'>Harga Deal / Kg</th>
-														<th width='8%'>Qty (KG)</th>
-													";
-												}
-											?>
-											
-											<th width='10%' hidden>Weight / Coil</th>
-											<th width='10%' hidden>Total<br>Weight</th>
-											<th width='10%'>Total Harga</th>
-											<th width='10%'>Delivery Date</th>
-											<th width='10%'>CRCL</th>
-										</tr>
-									</thead>
-									<tbody id="list_penawaran_slot">
-										<?php $loop = 0;
-										foreach ($results['dtspk'] as $dt) {
-											$thg = number_format($dt->total_harga, 2);
-											$qty = $dt->weight;
-											$total_harga = $dt->total_harga;
-											if($results['type_sheet'] == '1') {
-												$thg = number_format(($dt->harga_deal * $dt->total_sheet), 2);
-												$qty = $dt->total_sheet;
-												$total_harga = ($qty * $dt->harga_deal);
-											}
-
-											
-
-											$loop++;
-											echo "
-			<tr id='tabel_penawaran_$loop'>
-			<th hidden><input type='text' class='form-control' 	value='$dt->id_child_penawaran' readonly id='dp_id_child_penawaran_$loop' required name='dp[$loop][id_child_penawaran]'></th>
-			<th hidden><input type='text' class='form-control' 	value='$dt->id_material' readonly id='dp_idmaterial_$loop' required name='dp[$loop][idmaterial]'></th>
-			
-			<th><textarea class='form-control' id='dp_noalloy_$loop' name='dp[$loop][noalloy]' rows='4' readonly required>".$dt->nama."|".$dt->maker."</textarea></th>
-			<th><input type='text' class='form-control' 		value='$dt->thickness' readonly id='dp_thickness_$loop' required name='dp[$loop][thickness]'></th>
-			<th><input type='text' class='form-control' 	value='$dt->width' id='dp_width_$loop' required name='dp[$loop][width]'></th>
-			<th><input type='text' class='form-control' 	value='$dt->part_number' id='dp_part_number_$loop' required name='dp[$loop][part_number]'></th>
-			<th><input type='text' class='form-control'	 		value='$dt->harga_penawaran' readonly id='dp_hgpenwaran_$loop' required name='dp[$loop][hgpenaaran]'></th>
-			<th><input type='text' class='form-control' 		value='$dt->harga_deal' onkeyup='return AksiDetail($loop);' id='dp_hgdeal_$loop' required name='dp[$loop][hgdeal]'></th>
-			<th ><input type='text' class='form-control' 		value='$qty' onkeyup='return AksiDetail($loop);' id='dp_qty_$loop' required name='dp[$loop][qty]'></th>
-			";
-
-			if($results['type_sheet'] == '1') {
-				echo '
-					<th>
-						<input type="text" class="form-control" value="'.number_format($dt->total_weight, 2).'" readonly>
-					</th>
-				';
-			}
-
-			echo "
-			<th hidden><input type='text' class='form-control' 	value='$dt->weight' onkeyup='return AksiDetail($loop);'id='dp_weight_$loop' required name='dp[$loop][weight]'></th>
-			<th id='total_weight_$loop' hidden><input type='text' value='$dt->total_weight' class='form-control' value='$jcc'  id='dp_twight_$loop' required name='dp[$loop][twight]'></th>
-			
-			<th id='total_harga_$loop'>
-			<div hidden>
-			<input type='text' class='form-control' value='" . $total_harga . "' readonly id='dp_tharga_$id' required name='dp[$loop][tharga]'>
-            </div>
-			<input type='text' class='form-control' value='" . $thg . "' readonly></th>
-			
-			<th><input type='date' class='form-control'   value='$dt->delivery' id='dp_ddate_$loop' data-role='qtip' required name='dp[$loop][ddate]'></th>
-			
-			<th hidden><select id='dp_crcl_$loop' name='dp[$loop][crcl]' class='form-control select' required>
-						<option value=''>--Pilih--</option>";
-											foreach ($crcl as $crcl) {
-												echo "<option value='$crcl->id_dt_inquery'>$crcl->id_surat_crcl</option>";
-											}
-											echo "</select></th>
-		<th id='total_keterangan_$loop' hidden><textarea class='form-control' id='dp_keterangan_$loop' required name='dp[$loop][keterangan]' rows='2'>$dt->keterangan</textarea> </th>
-		";
-
-											if ($dt->deal == '1') {
-												echo "<th><input type='checkbox' value='1' checked id='dp_deal_$loop' required name='dp[$loop][deal]'></th>";
-											} else {
-												echo "<th><input type='checkbox' value='1' id='dp_deal_$loop' required name='dp[$loop][deal]'></th>";
-											}
-											echo "</tr>";
-										}; ?>
-									</tbody>
-								</table>
+								<div class="col-md-4">
+									<label>No. Dokumen</label>
+								</div>
+								<div class="col-md-8">
+									<input type="text" class="form-control" id="no_dokumen" value="<?= $retur->no_retur ?>" readonly>
+								</div>
 							</div>
 						</div>
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label>Tanggal Retur</label>
+								</div>
+								<div class="col-md-8">
+									<input type="date" class="form-control" id="tgl_penawaran" value="<?= $retur->tgl_retur ?>" name="tgl_penawaran" required>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Row 2: Customer & No. DO -->
+					<div class="col-sm-12">
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label>Customer</label>
+								</div>
+								<div class="col-md-8">
+									<select id="id_customerx" name="id_customerx" class="form-control select" required>
+										<option value="">--Pilih--</option>
+										<?php foreach ($results['customer'] as $cust) {
+											$sel = ($retur->id_customer == $cust->id_customer) ? 'selected' : '';
+										?>
+											<option value="<?= $cust->id_customer ?>" <?= $sel ?>><?= strtoupper(strtolower($cust->name_customer)) ?></option>
+										<?php } ?>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label>No. DO</label>
+								</div>
+								<div class="col-md-8">
+									<select id="id_do" name="id_delivery_order" class="form-control select" required>
+										<option value="">--Pilih--</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Hidden inputs for customer, DO, and retur -->
+					<input type="hidden" id="id_retur" name="id_retur" value="<?= $retur->id_retur ?>">
+					<input type="hidden" id="id_customer" name="id_customer" value="<?= $retur->id_customer ?>">
+					<input type="hidden" id="nama_customer" name="nama_customer" value="<?= $retur->nama_customer ?>">
+					<input type="hidden" id="no_do" name="no_do" value="<?= $retur->no_do ?>">
+					<input type="hidden" id="id_delivery_order_hidden" name="id_delivery_order_hidden" value="<?= $retur->id_delivery_order ?>">
+
+					<!-- Row 3: No. SJ Customer & Kompensasi -->
+					<div class="col-sm-12">
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label>No. SJ Customer</label>
+								</div>
+								<div class="col-md-8">
+									<input type="text" class="form-control" id="no_po" name="no_po" value="<?= isset($retur->no_po) ? $retur->no_po : '' ?>">
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label>Kompensasi</label>
+								</div>
+								<div class="col-md-8">
+									<select id="kompensasi" name="kompensasi" class="form-control select" required>
+										<option value="htg" <?= (isset($retur->kompensasi) && $retur->kompensasi == 'htg') ? 'selected' : '' ?>>Potong Hutang</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Row 4: Keterangan Retur -->
+					<div class="col-sm-12">
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label>Keterangan Retur</label>
+								</div>
+								<div class="col-md-8">
+									<textarea class="form-control" id="note" name="keterangan" rows="2"><?= isset($retur->note) ? $retur->note : '' ?></textarea>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Tabel Material -->
+					<div class="col-sm-12" style="margin-top:15px; overflow-x:auto;">
+						<table class='table table-bordered table-striped'>
+							<thead>
+								<tr class='bg-blue'>
+									<th width='5%'>ID Material</th>
+									<th width='10%'>No. DO</th>
+									<th width='15%'>Nama Material</th>
+									<th width='10%'>Lot Number</th>
+									<th width='10%'>Gudang</th>
+									<th width='10%'>Customer Titipan</th>
+									<th width='10%'>Harga Deal</th>
+									<th width='10%'>Total Kirim (Kg)</th>
+									<th width='10%'>Qty Sheet</th>
+									<th width='5%'>Retur<br><input type='checkbox' id='chk_retur_all' onclick='checkAllRetur()' checked></th>
+									<th width='5%'>Action</th>
+								</tr>
+							</thead>
+							<tbody id='data_material'>
+								<?php
+								$no = 0;
+								$customers_all = $this->db->get('master_customers')->result();
+								foreach ($results['dtspk'] as $dt) {
+									$no++;
+									$is_sheet = ($dt->id_bentuk == 'B2000002');
+								?>
+									<tr id="tr_material_<?= $no ?>">
+										<!-- ID Material + hidden inputs -->
+										<td>
+											<input type="text" class="form-control input-sm" value="<?= $dt->id_material ?>" name="dp[<?= $no ?>][id_category3]" readonly>
+											<input type="hidden" value="<?= isset($dt->id_stok) ? $dt->id_stok : '' ?>" name="dp[<?= $no ?>][id_stok]">
+											<input type="hidden" value="<?= $retur->id_delivery_order ?>" name="dp[<?= $no ?>][id_delivery_order]">
+											<input type="hidden" value="<?= $dt->thickness ?>" name="dp[<?= $no ?>][thickness]">
+											<input type="hidden" value="<?= $dt->width ?>" name="dp[<?= $no ?>][width]">
+											<input type="hidden" value="<?= $dt->length ?>" name="dp[<?= $no ?>][length]">
+											<input type="hidden" value="" name="dp[<?= $no ?>][ref_penawaran]">
+											<input type="hidden" value="" name="dp[<?= $no ?>][id_dt_spkmarketing]">
+										</td>
+										<!-- No. DO -->
+										<td><span class="text-do"><?= $retur->no_do ?></span></td>
+										<!-- Nama Material -->
+										<td><input type="text" class="form-control input-sm" value="<?= $dt->nama ?>" name="dp[<?= $no ?>][nama]" readonly></td>
+										<!-- Lot Number -->
+										<td><input type="text" class="form-control input-sm" value="<?= $dt->lotno ?>" name="dp[<?= $no ?>][lotno]" id="dp_lotno_<?= $no ?>"></td>
+										<!-- Gudang -->
+										<td>
+											<select class="form-control input-sm select2_gudang" name="dp[<?= $no ?>][gudang]" id="dp_gudang_<?= $no ?>" onchange="gudangChange(<?= $no ?>)">
+												<option value="">Pilih Gudang</option>
+												<?php foreach ($results['gudang'] as $g) {
+													$sel_g = (isset($dt->id_gudang) && $dt->id_gudang == $g->id_gudang) ? 'selected' : (($g->id_gudang == 3) ? 'selected' : '');
+												?>
+													<option value="<?= $g->id_gudang ?>" <?= $sel_g ?>><?= $g->nama_gudang ?></option>
+												<?php } ?>
+											</select>
+										</td>
+										<!-- Customer Titipan -->
+										<td>
+											<?php
+											$gudang_val = isset($dt->id_gudang) ? $dt->id_gudang : 3;
+											$disabled = ($gudang_val == '3') ? '' : 'disabled';
+											?>
+											<select class="form-control input-sm select2_customer" name="dp[<?= $no ?>][customer_titipan]" id="dp_customer_<?= $no ?>" <?= $disabled ?>>
+												<option value="">Pilih Customer</option>
+												<?php foreach ($customers_all as $cust_t) { ?>
+													<option value="<?= $cust_t->name_customer ?>"><?= $cust_t->name_customer ?></option>
+												<?php } ?>
+											</select>
+										</td>
+										<!-- Harga Deal -->
+										<td><input type="text" class="form-control input-sm autoNumeric text-right" value="<?= $dt->harga_deal ?>" name="dp[<?= $no ?>][harga_deal]"></td>
+										<!-- Total Kirim -->
+										<td><input type="text" class="form-control input-sm total_kirim autoNumeric text-right" value="<?= $dt->weight ?>" name="dp[<?= $no ?>][total_kirim]" id="dp_total_kirim_<?= $no ?>"></td>
+										<!-- Qty Sheet -->
+										<td>
+											<?php if ($is_sheet) { ?>
+												<input type="text" class="form-control input-sm qty_sheet autoNumeric text-right" value="<?= $dt->total_sheet ?>" name="dp[<?= $no ?>][qty_sheet]" id="dp_qty_sheet_<?= $no ?>">
+											<?php } ?>
+										</td>
+										<!-- Checkbox Retur (checked because deal=1) -->
+										<td><input type="checkbox" value="1" class="chk_retur" name="dp[<?= $no ?>][deal]" id="dp_deal_<?= $no ?>" checked></td>
+										<!-- Action -->
+										<td><button type="button" class="btn btn-xs btn-danger" onClick="HapusRow(<?= $no ?>)"><i class="fa fa-trash"></i></button></td>
+									</tr>
+								<?php } ?>
+							</tbody>
+						</table>
+					</div>
+
+					<!-- Footer: Total Retur -->
+					<div class="col-sm-12" style="margin-top:15px;">
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label><strong>Total Retur (Kg)</strong></label>
+								</div>
+								<div class="col-md-8">
+									<input type="text" class="form-control" id="total_retur" value="0" readonly>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Buttons: Simpan & Kembali -->
+					<div class="col-sm-12" style="margin-top:10px;">
 						<center>
-							<button type="submit" class="btn btn-success btn-sm" name="save" id="simpan-com"><i class="fa fa-save"></i>Simpan</button>
-							<a class="btn btn-danger btn-sm" href="<?= base_url('/retur_penjualan/list_retur_penjualan') ?>" title="Edit">Kembali</a>
+							<button type="submit" class="btn btn-success btn-sm" id="simpan-com"><i class="fa fa-save"></i> Simpan</button>
+							<a class="btn btn-danger btn-sm" href="<?= base_url('/retur_penjualan/list_retur_penjualan') ?>">Kembali</a>
 						</center>
 					</div>
+
 				</div>
+			</div>
 		</form>
 	</div>
 </div>
 
-
-
-
+<script src="<?= base_url('assets/js/autoNumeric.js') ?>"></script>
 <script type="text/javascript">
-	//$('#input-kendaraan').hide();
 	var base_url = '<?php echo base_url(); ?>';
 	var active_controller = '<?php echo ($this->uri->segment(1)); ?>';
-	$('.datepicker').datepicker();
-	$(document).ready(function() {
-		var max_fields2 = 10; //maximum input boxes allowed
-		var wrapper2 = $(".input_fields_wrap2"); //Fields wrapper
-		var add_button2 = $(".add_field_button2"); //Add button ID			
+	var spk_counter = 0;
+	var id_retur = '<?= $retur->id_retur ?>';
+	var preselect_do = '<?= $retur->id_delivery_order ?>';
 
+	$(document).ready(function() {
 		$('.select').select2();
 
-		var id_customerx = $('#id_customerx').val();
-		var no_penawaran = $('#no_penawaran').val();
-		$.ajax({
-			url: siteurl + 'spk_marketing/get_penawaran_edit',
-			cache: false,
-			type: "POST",
-			data: {
-				'id': id_customerx,
-				'no_penawaran': no_penawaran
-			},
-			dataType: "json",
-			success: function(data) {
-				$("#no_penawaran").html(data.option).trigger("chosen:updated");
-			},
-			error: function() {
-				swal({
-					title: "Error Message !",
-					text: 'Connection Timed Out ...',
-					type: "warning",
-					timer: 5000
-				});
-			}
+		// Initialize Select2 for pre-loaded gudang and customer dropdowns
+		$('#data_material .select2_gudang').select2({
+			width: '100%'
+		});
+		$('#data_material .select2_customer').select2({
+			width: '100%'
 		});
 
-		$(document).on('change', '#id_customerx', function(e) {
-			e.preventDefault();
+		// Initialize autoNumeric for pre-loaded rows
+		$('#data_material .autoNumeric').autoNumeric('init');
+
+		// Calculate initial total retur
+		hitungTotalRetur();
+
+		// On page load: fetch DO list for the pre-selected customer and pre-select the DO
+		var id_customer_init = $('#id_customerx').val();
+		if (id_customer_init) {
 			$.ajax({
-				url: siteurl + 'spk_marketing/get_penawaran',
+				url: siteurl + 'retur_penjualan/get_do_by_customer_edit',
 				cache: false,
 				type: "POST",
-				data: "id=" + this.value,
+				data: {
+					id_customer: id_customer_init,
+					id_retur: id_retur
+				},
 				dataType: "json",
 				success: function(data) {
-					$("#no_penawaran").html(data.option).trigger("chosen:updated");
+					$("#id_do").html(data.option);
+					// Pre-select the DO from existing retur
+					if (preselect_do) {
+						$('#id_do').val(preselect_do).trigger('change.select2');
+					}
 				},
 				error: function() {
 					swal({
@@ -324,25 +285,135 @@ foreach ($results['tr_spk'] as $tr_spk) {
 					});
 				}
 			});
+		}
+
+		// Event: Customer change → update No. DO dropdown
+		$(document).on('change', '#id_customerx', function(e) {
+			e.preventDefault();
+			var id_customer = this.value;
+			var selected_text = $('#id_customerx option:selected').text();
+			$('#id_customer').val(id_customer);
+			$('#nama_customer').val(selected_text.trim());
+
+			// Reset DO and table
+			$("#id_do").html('<option value="">--Pilih--</option>');
+			$('#no_do').val('');
+			$('#data_material').html('<tr><td colspan="11" class="text-center">Silakan pilih DO terlebih dahulu.</td></tr>');
+			hitungTotalRetur();
+
+			if (id_customer) {
+				$.ajax({
+					url: siteurl + 'retur_penjualan/get_do_by_customer_edit',
+					cache: false,
+					type: "POST",
+					data: {
+						id_customer: id_customer,
+						id_retur: id_retur
+					},
+					dataType: "json",
+					success: function(data) {
+						$("#id_do").html(data.option).trigger("change");
+					},
+					error: function() {
+						swal({
+							title: "Error Message !",
+							text: 'Connection Timed Out ...',
+							type: "warning",
+							timer: 5000
+						});
+					}
+				});
+			}
 		});
 
+		// Event: DO change → load materials
+		$(document).on('change', '#id_do', function(e) {
+			var id_do = $(this).val();
+			if (id_do) {
+				var text_do = $('#id_do option:selected').text();
+				$('#no_do').val(text_do);
+				TambahMaterialRetur(id_do, text_do);
+			} else {
+				$('#no_do').val('');
+				$('#data_material').html('<tr><td colspan="11" class="text-center">Silakan pilih DO terlebih dahulu.</td></tr>');
+				hitungTotalRetur();
+			}
+		});
+
+		// Event: Total Kirim change/keyup → recalculate Total Retur
+		$(document).on('change keyup', '.total_kirim', function() {
+			hitungTotalRetur();
+		});
+
+		// Event: Checkbox Retur change → recalculate Total Retur
+		$(document).on('change', '.chk_retur', function() {
+			hitungTotalRetur();
+		});
+
+		// Event: Gudang Select2 change → enable/disable Customer Titipan
+		$(document).on('change', '.select2_gudang', function() {
+			var $row = $(this).closest('tr');
+			var gudang_val = $(this).val();
+			var $customer = $row.find('.select2_customer');
+			if (gudang_val == '3') {
+				$customer.prop('disabled', false);
+			} else {
+				$customer.val('').prop('disabled', true);
+			}
+			$customer.trigger('change.select2');
+		});
+
+		// Event: Simpan button click → validate and save
 		$('#simpan-com').click(function(e) {
 			e.preventDefault();
-			var deskripsi = $('#deskripsi').val();
-			var image = $('#image').val();
-			var idtype = $('#inventory_1').val();
 
-			if ($('[type=checkbox]:checked').length == 0) {
+			// Validasi 1: Cek apakah ada checkbox yang dicentang
+			if ($('.chk_retur:checked').length == 0) {
 				swal({
 					title: "Warning!",
-					text: "Centang deal terlebih dahulu !",
+					text: "Centang barang yang akan diretur terlebih dahulu!",
 					type: "warning",
 					timer: 3000
 				});
 				return false;
 			}
 
-			var data, xhr;
+			// Validasi 2: Cek field header wajib
+			var customer = $('#id_customerx').val();
+			var tanggal = $('#tgl_penawaran').val();
+			if (!customer || !tanggal) {
+				swal({
+					title: "Warning!",
+					text: "Form Tidak Boleh Kosong (Customer & Tanggal wajib diisi)",
+					type: "warning",
+					timer: 3000
+				});
+				return false;
+			}
+
+			// Validasi 3: Cek Qty Sheet untuk material sheet yang dicentang
+			var sheet_empty = false;
+			$('.chk_retur:checked').each(function() {
+				var row = $(this).closest('tr');
+				var qty_sheet_input = row.find('.qty_sheet');
+				if (qty_sheet_input.length > 0) {
+					var val = qty_sheet_input.val();
+					if (!val || val == '' || val == '0') {
+						sheet_empty = true;
+					}
+				}
+			});
+			if (sheet_empty) {
+				swal({
+					title: "Warning!",
+					text: "Input QTY Sheet untuk barang Sheet masih ada yang kosong!",
+					type: "warning",
+					timer: 3000
+				});
+				return false;
+			}
+
+			// Semua validasi lolos → konfirmasi
 			swal({
 					title: "Are you sure?",
 					text: "You will not be able to process again this data!",
@@ -357,7 +428,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 				function(isConfirm) {
 					if (isConfirm) {
 						var formData = new FormData($('#data-form')[0]);
-						var baseurl = siteurl + 'retur_penjualan/SaveSpkRetur';
+						var baseurl = siteurl + 'retur_penjualan/UpdateRetur';
 						$.ajax({
 							url: baseurl,
 							type: "POST",
@@ -377,35 +448,20 @@ foreach ($results['tr_spk'] as $tr_spk) {
 										showConfirmButton: false,
 										allowOutsideClick: false
 									});
-									window.location.href = base_url + active_controller + '/delivery_retur';
+									window.location.href = base_url + active_controller + '/list_retur_penjualan';
 								} else {
-
-									if (data.status == 2) {
-										swal({
-											title: "Save Failed!",
-											text: data.pesan,
-											type: "warning",
-											timer: 7000,
-											showCancelButton: false,
-											showConfirmButton: false,
-											allowOutsideClick: false
-										});
-									} else {
-										swal({
-											title: "Save Failed!",
-											text: data.pesan,
-											type: "warning",
-											timer: 7000,
-											showCancelButton: false,
-											showConfirmButton: false,
-											allowOutsideClick: false
-										});
-									}
-
+									swal({
+										title: "Save Failed!",
+										text: data.pesan,
+										type: "warning",
+										timer: 7000,
+										showCancelButton: false,
+										showConfirmButton: false,
+										allowOutsideClick: false
+									});
 								}
 							},
 							error: function() {
-
 								swal({
 									title: "Error Message !",
 									text: 'An Error Occured During Process. Please try again..',
@@ -423,195 +479,78 @@ foreach ($results['tr_spk'] as $tr_spk) {
 					}
 				});
 		});
-
 	});
 
-	function get_produk() {
-		var no_penawaran = $("#no_penawaran").val();
-
+	// Function: Tambah Material - load material rows for selected DO
+	function TambahMaterialRetur(id_do, text_do) {
 		$.ajax({
+			url: siteurl + 'retur_penjualan/TambahMaterialRetur',
 			type: "GET",
-			url: siteurl + 'spk_marketing/GetCustomer',
-			data: "no_penawaran=" + no_penawaran,
+			data: {
+				id_delivery_order: id_do
+			},
 			success: function(html) {
-				$("#slot_customer").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'spk_marketing/GetPenawaran',
-			data: "no_penawaran=" + no_penawaran,
-			success: function(html) {
-				$("#list_penawaran_slot").html(html);
-			}
-		});
-	}
-
-	function get_lebar() {
-		var id_produk = $("#id_produk").val();
-		var lebar_coil = $("#lebar_coil").val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetStock',
-			data: "id_produk=" + id_produk + "&lebar_coil=" + lebar_coil,
-			success: function(html) {
-				$("#stock_slot").html(html);
-			}
-		});
-	}
-
-	function AksiDetail(id) {
-		var hgdeal = $('#dp_hgdeal_' + id).val();
-		var qty = $('#dp_qty_' + id).val();
-		var weight = $('#dp_weight_' + id).val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'spk_marketing/totalw',
-			data: "hgdeal=" + hgdeal + "&qty=" + qty + "&weight=" + weight + "&id=" + id,
-			success: function(html) {
-				$('#total_weight_' + id).html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'spk_marketing/totalhg',
-			data: "hgdeal=" + hgdeal + "&qty=" + qty + "&weight=" + weight + "&id=" + id,
-			success: function(html) {
-				$('#total_harga_' + id).html(html);
+				if (html.trim() == '') {
+					$('#data_material').html('<tr><td colspan="11" class="text-center">Tidak ada material untuk diretur.</td></tr>');
+				} else {
+					$('#data_material').html(html);
+					// Set No DO text for all loaded rows
+					$('#data_material .text-do').text(text_do);
+					// Initialize Select2 for gudang and customer dropdowns
+					$('#data_material .select2_gudang').select2({
+						width: '100%'
+					});
+					$('#data_material .select2_customer').select2({
+						width: '100%'
+					});
+					// Initialize autoNumeric
+					$('#data_material .autoNumeric').autoNumeric('init');
+				}
+				hitungTotalRetur();
+			},
+			error: function() {
+				swal({
+					title: "Error Message !",
+					text: 'Connection Timed Out ...',
+					type: "warning",
+					timer: 5000
+				});
 			}
 		});
 	}
 
-	function HitungPisau(id) {
-		var qty = $('#stok_qty_' + id).val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/HitungPisau',
-			data: "qty=" + qty + "&id=" + id,
-			success: function(html) {
-				$('#pisau_' + id).html(html);
-			}
-		});
+	// Function: Hapus material row
+	function HapusRow(no) {
+		$('#tr_material_' + no).remove();
+		hitungTotalRetur();
 	}
 
-	function TambahItem(id) {
-		var idstk = $('#stok_idstk_' + id).val();
-		var lotno = $('#stok_lotno_' + id).val();
-		var namamaterial = $('#stok_namamaterial_' + id).val();
-		var weight = $('#stok_weight_' + id).val();
-		var density = $('#stok_density_' + id).val();
-		var hasilpanjang = $('#stok_hasilpanjang_' + id).val();
-		var width = $('#stok_width_' + id).val();
-		var lebarcc = $('#stok_lebarcc_' + id).val();
-		var jumlahcc = $('#stok_jumlahcc_' + id).val();
-		var sisapotongan = $('#stok_sisapotongan_' + id).val();
-		var qtystock = $('#stok_qty_' + id).val();
-		var jumlahpisau = $('#stok_jmlpisau_' + id).val();
-		var total_panjang = $("#total_panjang").val();
-		var jml_pisau = $("#jml_pisau").val();
-		var jml_mother = $("#jml_mother").val();
-		var total_berat = $("#total_berat").val();
-		var thickness = $("#thickness").val();
-		var qty = $("#qty").val();
-		var jumlah = $('#used_slot').find('tr').length;
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/HitungTPanjang',
-			data: "hasilpanjang=" + hasilpanjang + "&total_panjang=" + total_panjang,
-			success: function(html) {
-				$("#tpanjang_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/HitungJPisau',
-			data: "jumlahpisau=" + jumlahpisau + "&jml_pisau=" + jml_pisau,
-			success: function(html) {
-				$("#jpisau_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/HitungJmother',
-			data: "jml_mother=" + jml_mother,
-			success: function(html) {
-				$("#mother_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/HitungTBerat',
-			data: "hasilpanjang=" + hasilpanjang + "&total_panjang=" + total_panjang + "&thickness=" + thickness + "&lebarcc=" + lebarcc + "&density=" + density,
-			success: function(html) {
-				$("#tberat_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetUsed',
-			data: "idstk=" + idstk + "&lotno=" + lotno + "&namamaterial=" + namamaterial + "&jumlah=" + jumlah + "&weight=" + weight + "&density=" + density + "&hasilpanjang=" + hasilpanjang + "&width=" + width + "&lebarcc=" + lebarcc + "&jumlahcc=" + jumlahcc + "&sisapotongan=" + sisapotongan + "&qtystock=" + qtystock + "&jumlahpisau=" + jumlahpisau,
-			success: function(html) {
-				$("#used_slot").append(html);
-			}
-		});
+	// Function: Gudang change → enable/disable Customer Titipan
+	function gudangChange(no) {
+		var gudang_val = $('#dp_gudang_' + no).val();
+		if (gudang_val == '3') {
+			$('#dp_customer_' + no).prop('disabled', false);
+		} else {
+			$('#dp_customer_' + no).prop('disabled', true).val('').trigger('change.select2');
+		}
 	}
 
-	function get_properties() {
-		var id_produk = $("#id_produk").val();
-		var lebar_coil = $("#lebar_coil").val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetMaterial',
-			data: "id_produk=" + id_produk,
-			success: function(html) {
-				$("#material_slot").html(html);
-			}
+	// Function: Hitung Total Retur (sum of checked rows' total_kirim)
+	function hitungTotalRetur() {
+		var total = 0;
+		$('.chk_retur:checked').each(function() {
+			var row = $(this).closest('tr');
+			var total_kirim_str = row.find('.total_kirim').val() || '0';
+			var total_kirim = parseFloat(total_kirim_str.replace(/,/g, '')) || 0;
+			total += total_kirim;
 		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetThickness',
-			data: "id_produk=" + id_produk,
-			success: function(html) {
-				$("#thickness_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetDensity',
-			data: "id_produk=" + id_produk,
-			success: function(html) {
-				$("#density_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetSurface',
-			data: "id_produk=" + id_produk,
-			success: function(html) {
-				$("#surface_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetPotongan',
-			data: "id_produk=" + id_produk,
-			success: function(html) {
-				$("#potongan_slot").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'penawaran_shearing/GetStock',
-			data: "id_produk=" + id_produk + "&lebar_coil=" + lebar_coil,
-			success: function(html) {
-				$("#stock_slot").html(html);
-			}
-		});
-
+		$('#total_retur').val(total.toFixed(2));
 	}
 
-	function DelItem(id) {
-		$('#data_barang #tr_' + id).remove();
-
+	// Function: Check/Uncheck all retur checkboxes
+	function checkAllRetur() {
+		var isChecked = $('#chk_retur_all').is(':checked');
+		$('#data_material .chk_retur').prop('checked', isChecked);
+		hitungTotalRetur();
 	}
 </script>

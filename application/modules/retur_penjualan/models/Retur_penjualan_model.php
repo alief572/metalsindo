@@ -338,15 +338,20 @@ class Retur_penjualan_model extends BF_Model
 		$start  = intval($post['start']);
 		$search = $post['search']['value'];
 
-		$this->db->from('v_retur_incoming');
+		$this->db->select('a.*, b.name_customer');
+		$this->db->from('tr_retur_penjualan a');
+		$this->db->join('master_customers b', 'b.id_customer=a.id_customer', 'left');
+		$this->db->where('a.no_do IS NOT NULL');
 
 		// Filter Search
 		if (!empty($search)) {
 			$this->db->group_start();
-			$this->db->like('no_spk', $search, 'both');
-			$this->db->or_like('name_customer', $search, 'both');
-			$this->db->or_like('all_no_do', $search, 'both');
-			$this->db->or_like('tgl_spk_marketing', $search, 'both');
+			$this->db->like('a.no_retur', $search, 'both');
+			$this->db->or_like('b.name_customer', $search, 'both');
+			$this->db->or_like('a.no_surat', $search, 'both');
+			$this->db->or_like('a.tgl_retur', $search, 'both');
+			$this->db->or_like('a.no_po', $search, 'both');
+			$this->db->or_like('a.no_do', $search, 'both');
 			$this->db->group_end();
 		}
 
@@ -382,7 +387,8 @@ class Retur_penjualan_model extends BF_Model
 				'no_retur'   => $item->no_retur,
 				'tgl_retur'  => date('d F Y', strtotime($item->tgl_retur)),
 				'customer'   => $item->name_customer,
-				'no_do'      => !empty($item->no_do) ? $item->no_do : $item->no_surat,
+				'no_do'      => !empty($item->no_do) ? $item->no_do : '-',
+				'no_po'      => !empty($item->no_po) ? $item->no_po : '-',
 				'kompensasi' => ($item->kompensasi == 'brg') ? 'Ganti Barang' : 'Potong Hutang',
 				'action'     => $action
 			];
@@ -421,9 +427,21 @@ class Retur_penjualan_model extends BF_Model
 		return $this->db->get()->result_array();
 	}
 
+	public function get_do_by_customer_edit($id_customer, $id_retur)
+	{
+		$this->db->select('a.id_delivery_order, a.no_surat');
+		$this->db->from('tr_delivery_order a');
+		$this->db->where('a.id_customer', $id_customer);
+		$this->db->where('a.status_approve', '1');
+		$this->db->where("a.id_delivery_order NOT IN (SELECT id_delivery_order FROM tr_retur_penjualan WHERE id_delivery_order IS NOT NULL AND id_retur != '$id_retur')", NULL, FALSE);
+		$this->db->order_by('a.id_delivery_order', 'DESC');
+		return $this->db->get()->result_array();
+	}
+
 	public function get_data_nota_retur($post)
 	{
 		$this->db->from('v_nota_retur');
+		$this->db->where('no_do IS NOT NULL');
 
 		// Search
 		if (!empty($post['search']['value'])) {
@@ -530,4 +548,18 @@ class Retur_penjualan_model extends BF_Model
 
 	// 	return $get_data;
 	// }
+
+	/**
+	 * Get retur penjualan header data by id_retur
+	 * Used by EditHeader to pre-fill form with existing retur data
+	 */
+	public function get_retur_by_id($id_retur)
+	{
+		$this->db->select('a.*, b.name_customer');
+		$this->db->from('tr_retur_penjualan a');
+		$this->db->join('master_customers b', 'b.id_customer = a.id_customer', 'left');
+		$this->db->where('a.id_retur', $id_retur);
+		$query = $this->db->get();
+		return $query->row();
+	}
 }

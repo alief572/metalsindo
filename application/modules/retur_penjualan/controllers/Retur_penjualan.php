@@ -75,7 +75,6 @@ class Retur_penjualan extends Admin_Controller
 		}
 
 		$penawaran = $this->Retur_penjualan_model->get_data('tr_penawaran');
-		$penawaran = $this->Retur_penjualan_model->get_data('tr_penawaran');
 		$customer = $this->db
 			->select('a.id_customer, b.name_customer')
 			->from('tr_delivery_order a')
@@ -177,21 +176,54 @@ class Retur_penjualan extends Admin_Controller
 		echo json_encode(['option' => $option]);
 	}
 
+	public function get_do_by_customer_edit()
+	{
+		$id_customer = $this->input->post('id_customer');
+		$id_retur = $this->input->post('id_retur');
+		$data = $this->Retur_penjualan_model->get_do_by_customer_edit($id_customer, $id_retur);
+
+		$option = "<option value=''>--Pilih--</option>";
+		foreach ($data as $row) {
+			$option .= "<option value='" . $row['id_delivery_order'] . "'>" . $row['no_surat'] . "</option>";
+		}
+
+		echo json_encode(['option' => $option]);
+	}
+
 	public function TambahMaterialRetur()
 	{
 		$id_do = $_GET['id_delivery_order'];
 
-		// 1. Ambil data material dari DO child
+		// 1. Ambil data material dari DO child (group per lotno agar tidak duplicate)
 		$materials = $this->db->query("
-			SELECT a.*, b.nama, b.id_bentuk, 
-			       c.harga_deal,
-				   d.no_penawaran AS ref_penawaran
+			SELECT a.id_material, a.lotno, 
+			       MAX(a.thickness) AS thickness, MAX(a.width) AS width, MAX(a.length) AS length,
+			       MAX(a.id_dt_spkmarketing) AS id_dt_spkmarketing,
+			       b.nama, b.id_bentuk,
+			       MIN(a.id_stock) AS id_stock,
+			       SUM(a.weight_mat) AS weight_mat,
+			       SUM(a.qty_mat) AS qty_mat,
+			       (
+			           SELECT MAX(sp.harga_deal)
+			           FROM dt_spkmarketing sp
+			           WHERE sp.id_spkmarketing = (
+			               SELECT sm.id_spkmarketing FROM tr_spk_marketing sm
+			               JOIN tr_delivery_order doh ON doh.no_spk_marketing = sm.no_surat
+			               WHERE doh.id_delivery_order = '$id_do' LIMIT 1
+			           )
+			           AND sp.id_material = a.id_material
+			       ) AS harga_deal,
+			       (
+			           SELECT sm2.no_penawaran
+			           FROM tr_spk_marketing sm2
+			           JOIN tr_delivery_order doh2 ON doh2.no_spk_marketing = sm2.no_surat
+			           WHERE doh2.id_delivery_order = '$id_do' LIMIT 1
+			       ) AS ref_penawaran
 			FROM dt_delivery_order_child a
 			JOIN ms_inventory_category3 b ON b.id_category3 = a.id_material
-			LEFT JOIN dt_spkmarketing c ON c.id_dt_spkmarketing = a.id_dt_spkmarketing
-			LEFT JOIN tr_spk_marketing d ON d.id_spkmarketing = c.id_spkmarketing
 			WHERE a.id_delivery_order = '$id_do' 
-			ORDER BY a.id_dt_delivery_order ASC")->result();
+			GROUP BY a.id_material, a.lotno, b.nama, b.id_bentuk
+			ORDER BY a.id_material, a.lotno ASC")->result();
 
 		// 3. Ambil daftar gudang
 		$gudang = $this->db->get('ms_gudang')->result();
@@ -245,8 +277,9 @@ class Retur_penjualan extends Admin_Controller
 			}
 			echo "</select></td>";
 
-			// Harga Deal (editable number)
-			echo "<td><input type='text' class='form-control input-sm autoNumeric text-right' value='" . $material->harga_deal . "' name='dp[" . $no . "][harga_deal]'></td>";
+			// Harga Deal (editable number, default dari SPK marketing)
+			$harga_val = ($material->harga_deal) ? $material->harga_deal : '';
+			echo "<td><input type='text' class='form-control input-sm autoNumeric text-right' value='" . $harga_val . "' name='dp[" . $no . "][harga_deal]'></td>";
 
 			// Total Kirim (input number) - default value dari weight_mat
 			echo "<td><input type='text' class='form-control input-sm total_kirim autoNumeric text-right' value='" . $material->weight_mat . "' name='dp[" . $no . "][total_kirim]' id='dp_total_kirim_" . $no . "'></td>";
@@ -448,14 +481,185 @@ class Retur_penjualan extends Admin_Controller
 		}
 	}
 
+	public function UpdateRetur()
+	{
+		$this->auth->restrict($this->addPermission);
+		$post = $this->input->post();
+
+		try {
+			if (empty($post['id_delivery_order'])) {
+				throw new Exception('No. Delivery Order (DO) harus diisi!');
+			}
+			if (empty($post['nama_customer']) || empty($post['id_customer'])) {
+				throw new Exception('Customer harus diisi!');
+			}
+
+			$id_retur = $post['id_retur'];
+
+			$arr_stock_retur = [];
+			$detRetur = [];
+			$numb1 = 0;
+
+			if (isset($_POST['dp']) && is_array($_POST['dp'])) {
+				foreach ($_POST['dp'] as $dp) {
+					$deal = isset($dp['deal']) ? $dp['deal'] : 0;
+					if ($deal == 1) {
+						$numb1++;
+						$id_material = $dp['id_category3'];
+						$ref_penawaran = isset($dp['ref_penawaran']) ? $dp['ref_penawaran'] : '';
+						$lotno = $dp['lotno'];
+						$gudang = $dp['gudang'];
+
+						if (empty($lotno)) {
+							throw new Exception("Lot Number pada baris ke-$numb1 harus diisi!");
+						}
+						if (empty($gudang)) {
+							throw new Exception("Gudang pada baris ke-$numb1 harus dipilih!");
+						}
+
+						$ppn = $this->db->query("SELECT exclude_vat FROM tr_penawaran WHERE no_penawaran='$ref_penawaran'")->row();
+
+						$hargadeal      = str_replace(',', '', $dp['harga_deal']);
+						$totalretur     = str_replace(',', '', $dp['total_kirim']);
+						$totalharga     = $hargadeal * $totalretur;
+						if (isset($dp['qty_sheet']) && !empty($dp['qty_sheet'])) {
+							$qty_sheet = str_replace(',', '', $dp['qty_sheet']);
+							$totalharga = ($hargadeal * $qty_sheet);
+						}
+
+						if ($ppn && ($ppn->exclude_vat != '' || $ppn->exclude_vat != '0')) {
+							$totalppn   = ($totalharga * $ppn->exclude_vat) / 100;
+						} else {
+							$totalppn   = 0;
+						}
+
+						$row = array(
+							'id_retur'              => $id_retur,
+							'id_dt_retur'           => $id_retur . '-' . $numb1,
+							'id_material'           => $dp['id_category3'],
+							'thickness'             => $dp['thickness'],
+							'width'                 => $dp['width'],
+							'length'                => $dp['length'],
+							'harga_deal'            => $hargadeal,
+							'qty_produk'            => 1,
+							'weight'                => $totalretur,
+							'total_weight'          => $totalretur,
+							'total_harga'           => $totalharga,
+							'total_ppn'             => $totalppn,
+							'deal'                  => $dp['deal'],
+							'created_on'            => date('Y-m-d H:i:s'),
+							'created_by'            => $this->auth->user_id(),
+							'id_stok'               => $dp['id_stok'],
+							'lotno'                 => $dp['lotno'],
+							'total_sheet'           => (isset($dp['qty_sheet']) && !empty($dp['qty_sheet'])) ? $dp['qty_sheet'] : 0
+						);
+
+						$detRetur[] = $row;
+
+						$get_last_stock = $this->Retur_penjualan_model->get_last_stock($lotno);
+						if (empty($get_last_stock)) {
+							throw new Exception("Stock material untuk Lot Number '" . $lotno . "' tidak ditemukan di stock_material!");
+						}
+
+						$arr_stock_retur[] = [
+							'id_category3' => $get_last_stock->id_category3,
+							'nama_material' => $get_last_stock->nama_material,
+							'width' => $get_last_stock->width,
+							'length' => $get_last_stock->length,
+							'id_bentuk' => $get_last_stock->id_bentuk,
+							'lotno' => $get_last_stock->lotno,
+							'qty' => 1,
+							'weight' => $totalretur,
+							'totalweight' => $totalretur,
+							'booking' => 0,
+							'thickness' => $get_last_stock->thickness,
+							'aktif' => 'Y',
+							'id_gudang' => $gudang,
+							'created_by' => $this->auth->user_id(),
+							'created_on' => date('Y-m-d H:i:s'),
+							'lot_slitting' => $get_last_stock->lot_slitting,
+							'keterangan' => $get_last_stock->keterangan . ' - RETUR (' . $id_retur . ')',
+							'id_roll' => $get_last_stock->id_roll,
+							'panjang' => $get_last_stock->panjang,
+							'actual_berat' => $get_last_stock->actual_berat,
+							'sisa_spk' => $totalretur,
+							'no_surat' => $get_last_stock->no_surat,
+							'customer' => $get_last_stock->customer,
+							'status_do' => 'OPN',
+							'costbook' => $get_last_stock->costbook,
+							'id_dt_spkmarketing' => $get_last_stock->id_dt_spkmarketing,
+							'harga_deal' => $get_last_stock->harga_deal,
+							'tipe_material' => $get_last_stock->tipe_material,
+							'qty_sheet' => $get_last_stock->qty_sheet
+						];
+					}
+				}
+			}
+
+			if (empty($detRetur)) {
+				throw new Exception('Silakan pilih minimal satu item material untuk diretur dengan mencentang kolom Retur!');
+			}
+
+			$this->db->trans_begin();
+
+			// UPDATE header tr_retur_penjualan
+			$data_update = [
+				'id_delivery_order'		=> $post['id_delivery_order'],
+				'no_do' 				=> $post['no_do'],
+				'no_surat'				=> $post['no_do'],
+				'id_customer'			=> $post['id_customer'],
+				'nama_customer'			=> $post['nama_customer'],
+				'note'					=> isset($post['keterangan']) ? $post['keterangan'] : '',
+			];
+
+			$update_header = $this->db->update('tr_retur_penjualan', $data_update, ['id_retur' => $id_retur]);
+			if (!$update_header) {
+				throw new Exception('Data header retur gagal di-update!');
+			}
+
+			// DELETE existing detail rows
+			$this->db->delete('dt_returpenjualan', ['id_retur' => $id_retur]);
+
+			// INSERT new detail rows
+			$insert_detail_retur = $this->db->insert_batch('dt_returpenjualan', $detRetur);
+			if (!$insert_detail_retur) {
+				throw new Exception('Data detail retur gagal di input!');
+			}
+
+			// DELETE old stock_material entries related to this retur
+			$this->db->like('keterangan', 'RETUR (' . $id_retur . ')', 'both');
+			$this->db->delete('stock_material');
+
+			// INSERT new stock_material entries
+			$insert_stock_retur = $this->db->insert_batch('stock_material', $arr_stock_retur);
+			if (!$insert_stock_retur) {
+				throw new Exception('Data stock retur gagal di kembalikan!');
+			}
+
+			$this->db->trans_commit();
+			$status	= array(
+				'pesan'		=> 'Success Update Retur. Thanks ...',
+				'status'	=> 1
+			);
+
+			echo json_encode($status);
+		} catch (Exception $e) {
+			$this->db->trans_rollback();
+			$status	= array(
+				'pesan'		=> $e->getMessage(),
+				'status'	=> 0
+			);
+
+			echo json_encode($status);
+		}
+	}
+
 	public function list_retur_penjualan()
 	{
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		// $data = $this->Retur_penjualan_model->CariRetur();
-		// $this->template->set('results', $data);
-		$this->template->title('Retur Penjualan');
+		$this->template->title('Credit Note Retur Penjualan');
 		$this->template->render('list_retur_penjualan');
 	}
 
@@ -527,15 +731,14 @@ class Retur_penjualan extends Admin_Controller
 
 	public function EditHeader()
 	{
-		$id = $this->uri->segment(3);
-		$id2 = $this->uri->segment(4);
+		// $id = $this->uri->segment(3);
+		$id2 = $this->uri->segment(3);
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-pencil');
-		$aktif = 'active';
-		$deleted = '0';
-		$tr_spk = $this->Retur_penjualan_model->get_data('tr_spk_marketing', 'id_spkmarketing', $id);
-		// $dtspk = $this->Retur_penjualan_model->get_data('dt_spkmarketing',array('id_spkmarketing',$id));
+
+		$retur = $this->Retur_penjualan_model->get_retur_by_id($id2);
+
 		$dtspk = $this->db->query("SELECT a.*, b.nama, b.maker, b.id_bentuk FROM dt_returpenjualan a
 		INNER JOIN ms_inventory_category3 b ON b.id_category3 = a.id_material
 		WHERE a.id_retur ='$id2' AND a.deal='1'")->result();
@@ -547,32 +750,29 @@ class Retur_penjualan extends Admin_Controller
 			}
 		}
 
-
-		$penawaran = $this->Retur_penjualan_model->get_data('tr_penawaran');
 		$customer = $this->db
 			->select('a.id_customer, b.name_customer')
-			->from('tr_penawaran a')
+			->from('tr_delivery_order a')
 			->join('master_customers b', 'a.id_customer=b.id_customer', 'left')
-			->where('a.status', 'N')
+			->where('a.status_approve', '1')
 			->group_by('a.id_customer')
 			->order_by('b.name_customer', 'asc')
 			->get()
 			->result();
-		$karyawan = $this->Retur_penjualan_model->get_data('ms_karyawan', 'deleted', $deleted);
-		$mata_uang = $this->Retur_penjualan_model->get_data('mata_uang', 'deleted', $deleted);
+
+		$gudang = $this->db->query("select * FROM ms_gudang")->result();
+
 		$data = [
-			'tr_spk' => $tr_spk,
+			'retur' => $retur,
 			'dtspk' => $dtspk,
-			'penawaran' => $penawaran,
 			'customer' => $customer,
-			'karyawan' => $karyawan,
-			'mata_uang' => $mata_uang,
+			'gudang' => $gudang,
 			'type_sheet' => $type_sheet
 		];
 		$this->template->set('id', $id);
 		$this->template->set('id2', $id2);
 		$this->template->set('results', $data);
-		$this->template->title('Create SPK Marketing Retur');
+		$this->template->title('Edit Retur Penjualan');
 		$this->template->render('EditHeader');
 	}
 
@@ -1009,7 +1209,10 @@ class Retur_penjualan extends Admin_Controller
 		$fetch = $this->Retur_penjualan_model->get_data_nota_retur($post);
 
 		// 2. Ambil total data tanpa filter (untuk recordsTotal)
-		$total_data = $this->db->count_all('v_nota_retur');
+		$this->db->select('a.*');
+		$this->db->from('v_nota_retur a');
+		$this->db->where('a.no_do IS NOT NULL');
+		$total_data = $this->db->get()->num_rows();
 
 		$arr_data = [];
 		$no = intval($post['start']);
@@ -1047,7 +1250,11 @@ class Retur_penjualan extends Admin_Controller
 		}
 
 		if (has_permission($this->managePermission)) {
-			$return .= ' <a class="btn btn-info btn-sm" href="' . base_url('/retur_penjualan/editHeader/' . $item->id_spkmarketing . '/' . $item->id_retur) . '" title="Create SPK Marketing"><i class="fa fa-edit">&nbsp;</i></i></a></a>';
+			$return .= ' <a class="btn btn-info btn-sm" href="' . base_url('/retur_penjualan/editHeader/' . $item->id_retur) . '" title="Create SPK Marketing"><i class="fa fa-edit">&nbsp;</i></i></a></a>';
+		}
+
+		if (has_permission($this->viewPermission)) {
+			$return .= ' <a class="btn btn-primary btn-sm" href="javascript:void(0);" title="Print CN"><i class="fa fa-print"></i></a>';
 		}
 
 		return $return;

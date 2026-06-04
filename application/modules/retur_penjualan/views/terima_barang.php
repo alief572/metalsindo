@@ -175,7 +175,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 						<div class="col-sm-6">
 							<div class="form-group row">
 								<div class="col-md-4">
-									<label>No. PO</label>
+									<label>No. SJ Customer</label>
 								</div>
 								<div class="col-md-8">
 									<input type="text" class="form-control" id="no_po" name="no_po">
