@@ -41,36 +41,36 @@
                     <input type="text" class="form-control" name="no_ref_invoice" placeholder="No. Reference Invoice" value="<?= $header->no_ref_invoice ?>">
                 </div>
                 <?php if (!empty($id_rec_inv_ap)) : ?>
-                <?php
-                // Requirement 6.1: show disabled Receive Invoice AP info
-                $rec_inv_ap_header = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $id_rec_inv_ap])->row();
-                $no_invoice_edit = (!empty($rec_inv_ap_header)) ? $rec_inv_ap_header->no_invoice : $id_rec_inv_ap;
-                ?>
-                <div class="col-md-2">
-                    <span class="text-bold">No. Receive Invoice AP</span>
-                </div>
-                <div class="col-md-4">
-                    <input type="hidden" name="id_rec_inv_ap" value="<?= $id_rec_inv_ap ?>">
-                    <input type="text" class="form-control" value="<?= $no_invoice_edit ?>" disabled>
-                </div>
+                    <?php
+                    // Requirement 6.1: show disabled Receive Invoice AP info
+                    $rec_inv_ap_header = $this->db->get_where('tr_receive_invoice_ap_header', ['id_rec_inv_ap' => $id_rec_inv_ap])->row();
+                    $no_invoice_edit = (!empty($rec_inv_ap_header)) ? $rec_inv_ap_header->no_invoice : $id_rec_inv_ap;
+                    ?>
+                    <div class="col-md-2">
+                        <span class="text-bold">No. Receive Invoice AP</span>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="hidden" name="id_rec_inv_ap" value="<?= $id_rec_inv_ap ?>">
+                        <input type="text" class="form-control" value="<?= $no_invoice_edit ?>" disabled>
+                    </div>
                 <?php else : ?>
-                <div class="col-md-2">
-                    <span class="text-bold">No. PO</span>
-                </div>
-                <div class="col-md-4">
-                    <select class="form-control no_po select2" multiple="multiple" disabled>
-                        <?php
-                        if (strpos($header->no_po, ',') !== false) {
-                            foreach (explode(',', $header->no_po) as $item_po) {
-                                $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $item_po])->row();
+                    <div class="col-md-2">
+                        <span class="text-bold">No. PO</span>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-control no_po select2" multiple="multiple" disabled>
+                            <?php
+                            if (strpos($header->no_po, ',') !== false) {
+                                foreach (explode(',', $header->no_po) as $item_po) {
+                                    $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $item_po])->row();
 
-                                $no_poo = (!empty($get_po)) ? $get_po->no_surat : '';
-                                echo '<option value="' . $no_poo . '" selected>' . $no_poo . '</option>';
+                                    $no_poo = (!empty($get_po)) ? $get_po->no_surat : '';
+                                    echo '<option value="' . $no_poo . '" selected>' . $no_poo . '</option>';
+                                }
                             }
-                        }
-                        ?>
-                    </select>
-                </div>
+                            ?>
+                        </select>
+                    </div>
                 <?php endif; ?>
                 <div class="col-md-2">
                     <span class="text-bold">Tanggal Invoice</span>
@@ -103,7 +103,7 @@
             </div>
             <div class="row">
                 <div class="col-md-2">
-                    <span class="text-bold">File BA</span>
+                    <span class="text-bold">File NCR</span>
                 </div>
                 <div class="col-md-4">
                     <input type="file" class="form-control" name="file_ba">
@@ -112,130 +112,161 @@
 
             <div class="col-12-md list_detail_po">
                 <?php if (!empty($id_rec_inv_ap)) : ?>
-                <?php
-                // Requirement 6.2: render detail from dt_retur_pembelian (already stored) — editable fields
-                echo '<table class="table table-striped table-bordered">';
-                echo '<thead>';
-                echo '<tr>';
-                echo '<th class="text-center">Tanggal Incoming</th>';
-                echo '<th class="text-center">Nama Material</th>';
-                echo '<th class="text-center">Width</th>';
-                echo '<th class="text-center">Qty Order</th>';
-                echo '<th class="text-center">Qty Receive</th>';
-                echo '<th class="text-center">Jumlah Retur</th>';
-                echo '<th class="text-center">Harga Satuan</th>';
-                echo '<th class="text-center">Total</th>';
-                echo '</tr>';
-                echo '</thead>';
-                echo '<tbody>';
-
-                $no_detail = 0;
-                foreach ($detail as $item_detail) {
-                    $no_detail++;
-
+                    <?php
+                    // Requirement 6.2: render detail from dt_retur_pembelian (already stored) — editable fields
+                    echo '<table class="table table-striped table-bordered">';
+                    echo '<thead>';
                     echo '<tr>';
-                    echo '<td class="text-center">';
-                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][id]" value="' . $item_detail->id_detail_po . '">';
-                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][no_po]" value="' . $item_detail->no_po . '">';
-                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][id_pr]" value="' . $item_detail->id_pr . '">';
-                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][idmaterial]" value="' . $item_detail->id_material . '">';
-                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][namamaterial]" value="' . $item_detail->nama_material . '">';
-                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][width]" value="' . $item_detail->width . '">';
-                    echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][qty_order]" value="' . $item_detail->qty_order . '">';
-                    // tanggal_incoming is not stored in dt_retur_pembelian; use tgl_retur as fallback
-                    echo date('d F Y', strtotime($header->tgl_retur));
-                    echo '</td>';
-                    echo '<td>' . $item_detail->nama_material . '</td>';
-                    echo '<td class="text-right">' . $item_detail->width . '</td>';
-                    echo '<td class="text-right">' . $item_detail->qty_order . '</td>';
-                    echo '<td>';
-                    echo '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][qty_receive]" value="' . $item_detail->qty_receive . '">';
-                    echo '</td>';
-                    echo '<td>';
-                    echo '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][retur]" data-no_po="' . $item_detail->no_po . '" data-no="' . $no_detail . '" value="' . $item_detail->jumlah_retur . '">';
-                    echo '</td>';
-                    echo '<td>';
-                    echo '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][harga]" value="' . $item_detail->harga_satuan . '" data-no_po="' . $item_detail->no_po . '" data-no="' . $no_detail . '">';
-                    echo '</td>';
-                    echo '<td>';
-                    echo '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][total_harga]" value="' . $item_detail->grand_total . '" readonly>';
-                    echo '</td>';
+                    echo '<th class="text-center">Tanggal Incoming</th>';
+                    echo '<th class="text-center">Lot Number</th>';
+                    echo '<th class="text-center">Nama Material</th>';
+                    echo '<th class="text-center">Width</th>';
+                    echo '<th class="text-center">Qty Order</th>';
+                    echo '<th class="text-center">Qty Rec (Kg)</th>';
+                    echo '<th class="text-center">Qty Rec (Sheet)</th>';
+                    echo '<th class="text-center">Retur (Kg)</th>';
+                    echo '<th class="text-center">Retur (Sheet)</th>';
                     echo '</tr>';
-                }
-
-                echo '</tbody>';
-                echo '</table>';
-                ?>
-                <?php else : ?>
-                <?php
-                // Requirement 6.2 (backward compat): render from tr_purchase_order (old logic)
-                foreach (explode(',', $header->no_po) as $item_po) {
-                    $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $item_po])->row();
-
-                    $po_detail = $this->Retur_pembelian_model->get_po_detail($get_po->no_po);
-
-                    $type_sheet = $this->Retur_pembelian_model->get_po_check_sheet($get_po->no_po);
-
-                    $satuan = ($type_sheet > 0) ? '(Sheet)' : '(Kg)';
-
-                    echo  '<h4>No. PO: ' . $get_po->no_surat . '</h4>';
-                    echo  '<table class="table table-striped table-bordered">';
-                    echo  '<thead>';
-                    echo  '<tr>';
-                    echo  '<th class="text-center">Tanggal PO</th>';
-                    echo  '<th class="text-center">Nama Material</th>';
-                    echo  '<th class="text-center">Width</th>';
-                    echo  '<th class="text-center">Qty Order ' . $satuan . '</th>';
-                    echo  '<th class="text-center">Qty Receive ' . $satuan . '</th>';
-                    echo  '<th class="text-center">Retur ' . $satuan . '</th>';
-                    echo  '<th class="text-center">Harga</th>';
-                    echo  '<th class="text-center">Total</th>';
-                    echo  '</tr>';
-                    echo  '</thead>';
-                    echo  '<tbody>';
+                    echo '</thead>';
+                    echo '<tbody>';
 
                     $no_detail = 0;
-                    foreach ($po_detail as $item_po_detail) {
+                    foreach ($detail as $item_detail) {
                         $no_detail++;
 
-                        $qty_receive = (!empty($arr_detail[$item_po_detail->id]->qty_receive)) ? $arr_detail[$item_po_detail->id]->qty_receive : 0;
-                        $jumlah_retur = (!empty($arr_detail[$item_po_detail->id]->jumlah_retur)) ? $arr_detail[$item_po_detail->id]->jumlah_retur : 0;
-                        $harga_satuan = (!empty($arr_detail[$item_po_detail->id]->harga_satuan)) ? $arr_detail[$item_po_detail->id]->harga_satuan : 0;
-                        $grand_total = (!empty($arr_detail[$item_po_detail->id]->grand_total)) ? $arr_detail[$item_po_detail->id]->grand_total : 0;
+                        $material = $this->db->select('id_shapes, id_bentuk')->get_where('ms_inventory_category3', ['id_category3' => $item_detail->id_material])->row();
+                        $is_sheet = (!empty($material) && $material->id_bentuk == 'B2000002');
+                        $readonly_sheet = $is_sheet ? '' : 'readonly';
 
                         echo '<tr>';
                         echo '<td class="text-center">';
-                        echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][id]" value="' . $item_po_detail->id . '">';
-                        echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][no_po]" value="' . $item_po_detail->no_po . '">';
-                        echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][id_pr]" value="' . $item_po_detail->idpr . '">';
-                        echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][idmaterial]" value="' . $item_po_detail->idmaterial . '">';
-                        echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][namamaterial]" value="' . $item_po_detail->namamaterial . '">';
-                        echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][width]" value="' . $item_po_detail->width . '">';
-                        echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_order]" value="' . $item_po_detail->totalwidth . '">';
-                        echo date('d F Y', strtotime($get_po->tanggal));
+                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][id]" value="' . $item_detail->id_detail_po . '">';
+                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][no_po]" value="' . $item_detail->no_po . '">';
+                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][id_pr]" value="' . $item_detail->id_pr . '">';
+                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][idmaterial]" value="' . $item_detail->id_material . '">';
+                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][namamaterial]" value="' . $item_detail->nama_material . '">';
+                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][width]" value="' . $item_detail->width . '">';
+                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][qty_order]" value="' . $item_detail->qty_order . '">';
+                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][lotno]" value="' . $item_detail->lotno . '">';
+                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][harga]" value="' . $item_detail->harga_satuan . '">';
+                        // tanggal_incoming is not stored in dt_retur_pembelian; use tgl_retur as fallback
+                        echo date('d F Y', strtotime($header->tgl_retur));
                         echo '</td>';
-                        echo '<td>' . $item_po_detail->namamaterial . '</td>';
-                        echo '<td class="text-right">' . $item_po_detail->width . '</td>';
-                        echo '<td class="text-right">' . $item_po_detail->totalwidth . '</td>';
+                        echo '<td>' . $item_detail->lotno . '</td>';
+                        echo '<td>' . $item_detail->nama_material . '</td>';
+                        echo '<td class="text-right">' . $item_detail->width . '</td>';
+                        echo '<td class="text-right">' . $item_detail->qty_order . '</td>';
                         echo '<td>';
-                        echo '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_receive]" value="' . $qty_receive . '">';
-                        echo '</td>';
-                        echo '<td>';
-                        echo '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur]" data-no_po="' . $item_po_detail->no_po . '" data-no="' . $no_detail . '" value="'.$jumlah_retur.'">';
-                        echo '</td>';
-                        echo '<td>';
-                        echo '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][harga]" value="' . $harga_satuan . '" data-no_po="' . $item_po_detail->no_po . '" data-no="' . $no_detail . '">';
+                        echo '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][qty_receive]" value="' . $item_detail->qty_receive . '" readonly>';
                         echo '</td>';
                         echo '<td>';
-                        echo '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][total_harga]" value="'.$grand_total.'" readonly>';
+                        echo '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][qty_sheet]" value="' . $item_detail->qty_sheet . '" readonly>';
+                        echo '</td>';
+                        echo '<td>';
+                        echo '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][retur]" data-no_po="' . $item_detail->no_po . '" data-no="' . $no_detail . '" value="' . $item_detail->jumlah_retur . '">';
+                        echo '</td>';
+                        echo '<td>';
+                        echo '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][retur_sheet]" data-no_po="' . $item_detail->no_po . '" data-no="' . $no_detail . '" value="' . $item_detail->qty_sheet_retur . '" ' . $readonly_sheet . '>';
                         echo '</td>';
                         echo '</tr>';
                     }
 
                     echo '</tbody>';
+                    echo '<tfoot>';
+                    echo '<tr>';
+                    echo '<td colspan="5" class="text-right text-bold">Grand Total</td>';
+                    echo '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_qty_receive" readonly></td>';
+                    echo '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_qty_receive_sheet" readonly></td>';
+                    echo '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_retur" readonly></td>';
+                    echo '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_retur_sheet" readonly></td>';
+                    echo '</tr>';
+                    echo '</tfoot>';
                     echo '</table>';
-                }
-                ?>
+                    ?>
+                <?php else : ?>
+                    <?php
+                    // Requirement 6.2 (backward compat): render from tr_purchase_order (old logic)
+                    foreach (explode(',', $header->no_po) as $item_po) {
+                        $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $item_po])->row();
+
+                        $po_detail = $this->Retur_pembelian_model->get_po_detail($get_po->no_po);
+
+                        echo  '<h4>No. PO: ' . $get_po->no_surat . '</h4>';
+                        echo  '<table class="table table-striped table-bordered">';
+                        echo  '<thead>';
+                        echo  '<tr>';
+                        echo  '<th class="text-center">Tanggal PO</th>';
+                        echo  '<th class="text-center">Lot Number</th>';
+                        echo  '<th class="text-center">Nama Material</th>';
+                        echo  '<th class="text-center">Width</th>';
+                        echo  '<th class="text-center">Qty Order</th>';
+                        echo  '<th class="text-center">Qty Rec (Kg)</th>';
+                        echo  '<th class="text-center">Qty Rec (Sheet)</th>';
+                        echo  '<th class="text-center">Retur (Kg)</th>';
+                        echo  '<th class="text-center">Retur (Sheet)</th>';
+                        echo  '</tr>';
+                        echo  '</thead>';
+                        echo  '<tbody>';
+
+                        $no_detail = 0;
+                        foreach ($po_detail as $item_po_detail) {
+                            $no_detail++;
+
+                            $qty_receive = (!empty($arr_detail[$item_po_detail->id]->qty_receive)) ? $arr_detail[$item_po_detail->id]->qty_receive : 0;
+                            $qty_sheet = (!empty($arr_detail[$item_po_detail->id]->qty_sheet)) ? $arr_detail[$item_po_detail->id]->qty_sheet : 0;
+                            $jumlah_retur = (!empty($arr_detail[$item_po_detail->id]->jumlah_retur)) ? $arr_detail[$item_po_detail->id]->jumlah_retur : 0;
+                            $qty_sheet_retur = (!empty($arr_detail[$item_po_detail->id]->qty_sheet_retur)) ? $arr_detail[$item_po_detail->id]->qty_sheet_retur : 0;
+                            $lotno = (!empty($arr_detail[$item_po_detail->id]->lotno)) ? $arr_detail[$item_po_detail->id]->lotno : '';
+
+                            $material = $this->db->select('id_shapes, id_bentuk')->get_where('ms_inventory_category3', ['id_category3' => $item_po_detail->idmaterial])->row();
+                            $is_sheet = (!empty($material) && $material->id_bentuk == 'B2000002');
+                            $readonly_sheet = $is_sheet ? '' : 'readonly';
+
+                            echo '<tr>';
+                            echo '<td class="text-center">';
+                            echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][id]" value="' . $item_po_detail->id . '">';
+                            echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][no_po]" value="' . $item_po_detail->no_po . '">';
+                            echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][id_pr]" value="' . $item_po_detail->idpr . '">';
+                            echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][idmaterial]" value="' . $item_po_detail->idmaterial . '">';
+                            echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][namamaterial]" value="' . $item_po_detail->namamaterial . '">';
+                            echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][width]" value="' . $item_po_detail->width . '">';
+                            echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_order]" value="' . $item_po_detail->totalwidth . '">';
+                            echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][lotno]" value="' . $lotno . '">';
+                            echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][harga]" value="' . $harga_satuan . '">';
+                            echo date('d F Y', strtotime($get_po->tanggal));
+                            echo '</td>';
+                            echo '<td>' . $lotno . '</td>';
+                            echo '<td>' . $item_po_detail->namamaterial . '</td>';
+                            echo '<td class="text-right">' . $item_po_detail->width . '</td>';
+                            echo '<td class="text-right">' . $item_po_detail->totalwidth . '</td>';
+                            echo '<td>';
+                            echo '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_receive]" value="' . $qty_receive . '" readonly>';
+                            echo '</td>';
+                            echo '<td>';
+                            echo '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_sheet]" value="' . $qty_sheet . '" readonly>';
+                            echo '</td>';
+                            echo '<td>';
+                            echo '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur]" data-no_po="' . $item_po_detail->no_po . '" data-no="' . $no_detail . '" value="' . $jumlah_retur . '">';
+                            echo '</td>';
+                            echo '<td>';
+                            echo '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur_sheet]" data-no_po="' . $item_po_detail->no_po . '" data-no="' . $no_detail . '" value="' . $qty_sheet_retur . '" ' . $readonly_sheet . '>';
+                            echo '</td>';
+                            echo '</tr>';
+                        }
+
+                        echo '</tbody>';
+                        echo '<tfoot>';
+                        echo '<tr>';
+                        echo '<td colspan="5" class="text-right text-bold">Grand Total</td>';
+                        echo '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_qty_receive" readonly></td>';
+                        echo '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_qty_receive_sheet" readonly></td>';
+                        echo '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_retur" readonly></td>';
+                        echo '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_retur_sheet" readonly></td>';
+                        echo '</tr>';
+                        echo '</tfoot>';
+                        echo '</table>';
+                    }
+                    ?>
                 <?php endif; ?>
             </div>
 
@@ -256,6 +287,7 @@
         });
 
         auto_num();
+        hitungFooter();
     });
 
     $(document).on('change', '.supplier', function() {
@@ -319,6 +351,7 @@
                 success: function(result) {
                     $('.list_detail_po').html(result.hasil);
                     auto_num();
+                    hitungFooter();
                 },
                 error: function(xhr, status, error) {
                     Swal.fire({
@@ -335,28 +368,7 @@
     });
 
     $(document).on('change', '.hitung_detail_total', function() {
-        var no_po = $(this).data('no_po');
-        var no = $(this).data('no');
-
-        var qty_retur = $('input[name="dt_' + no_po + '[' + no + '][retur]"]').val();
-        if (qty_retur.length > 0) {
-            qty_retur = qty_retur.split(',').join('');
-            qty_retur = parseFloat(qty_retur);
-        } else {
-            qty_retur = 0;
-        }
-
-        var harga = $('input[name="dt_' + no_po + '[' + no + '][harga]"]').val();
-        if (harga.length > 0) {
-            harga = harga.split(',').join('');
-            harga = parseFloat(harga);
-        } else {
-            harga = 0;
-        }
-
-        var total_harga = (qty_retur * harga);
-
-        $('input[name="dt_' + no_po + '[' + no + '][total_harga]"]').autoNumeric('set', total_harga);
+        hitungFooter();
     });
 
     $(document).on('submit', '#frm-data', function(e) {
@@ -413,5 +425,60 @@
 
     function auto_num() {
         $('.auto_num').autoNumeric('init');
+    }
+
+    function hitungFooter() {
+        var totalQtyReceive = 0;
+        var totalQtyReceiveSheet = 0;
+        var totalRetur = 0;
+        var totalReturSheet = 0;
+
+        $('.list_detail_po tbody tr').each(function() {
+            var qtyReceiveInput = $(this).find('input[name$="[qty_receive]"]');
+            var qtySheetInput = $(this).find('input[name$="[qty_sheet]"]');
+            var returInput = $(this).find('input[name$="[retur]"]');
+            var returSheetInput = $(this).find('input[name$="[retur_sheet]"]');
+
+            if (qtyReceiveInput.length > 0) {
+                var qtyVal = qtyReceiveInput.val();
+                if (qtyVal && qtyVal.length > 0) {
+                    totalQtyReceive += parseFloat(qtyVal.split(',').join('')) || 0;
+                }
+            }
+
+            if (qtySheetInput.length > 0) {
+                var qtySheetVal = qtySheetInput.val();
+                if (qtySheetVal && qtySheetVal.length > 0) {
+                    totalQtyReceiveSheet += parseFloat(qtySheetVal.split(',').join('')) || 0;
+                }
+            }
+
+            if (returInput.length > 0) {
+                var returVal = returInput.val();
+                if (returVal && returVal.length > 0) {
+                    totalRetur += parseFloat(returVal.split(',').join('')) || 0;
+                }
+            }
+
+            if (returSheetInput.length > 0) {
+                var returSheetVal = returSheetInput.val();
+                if (returSheetVal && returSheetVal.length > 0) {
+                    totalReturSheet += parseFloat(returSheetVal.split(',').join('')) || 0;
+                }
+            }
+        });
+
+        if ($('#footer_total_qty_receive').length > 0) {
+            $('#footer_total_qty_receive').autoNumeric('set', totalQtyReceive);
+        }
+        if ($('#footer_total_qty_receive_sheet').length > 0) {
+            $('#footer_total_qty_receive_sheet').autoNumeric('set', totalQtyReceiveSheet);
+        }
+        if ($('#footer_total_retur').length > 0) {
+            $('#footer_total_retur').autoNumeric('set', totalRetur);
+        }
+        if ($('#footer_total_retur_sheet').length > 0) {
+            $('#footer_total_retur_sheet').autoNumeric('set', totalReturSheet);
+        }
     }
 </script>

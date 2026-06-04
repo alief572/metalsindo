@@ -38,31 +38,31 @@
             </div>
 
             <?php if (!empty($id_rec_inv_ap)) : ?>
-            <div class="col-md-2">
-                <span class="text-bold">No. Receive Invoice AP</span>
-            </div>
-            <div class="col-md-4">
-                <input type="text" class="form-control" value="<?= isset($no_invoice_rec_inv_ap) ? $no_invoice_rec_inv_ap : '' ?>" readonly>
-            </div>
+                <div class="col-md-2">
+                    <span class="text-bold">No. Receive Invoice AP</span>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" value="<?= isset($no_invoice_rec_inv_ap) ? $no_invoice_rec_inv_ap : '' ?>" readonly>
+                </div>
             <?php else : ?>
-            <div class="col-md-2">
-                <span class="text-bold">No. PO</span>
-            </div>
-            <div class="col-md-4">
-                <select class="form-control no_po select2" multiple="multiple" disabled>
-                    <?php
-                    if (strpos($header->no_po, ',') !== false) {
-                        foreach (explode(',', $header->no_po) as $item_po) {
-                            $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $item_po])->row();
+                <div class="col-md-2">
+                    <span class="text-bold">No. PO</span>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-control no_po select2" multiple="multiple" disabled>
+                        <?php
+                        if (strpos($header->no_po, ',') !== false) {
+                            foreach (explode(',', $header->no_po) as $item_po) {
+                                $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $item_po])->row();
 
-                            $no_poo = (!empty($get_po)) ? $get_po->no_surat : '';
-                            echo '<option value="' . $no_poo . '" selected>' . $no_poo . '</option>';
+                                $no_poo = (!empty($get_po)) ? $get_po->no_surat : '';
+                                echo '<option value="' . $no_poo . '" selected>' . $no_poo . '</option>';
+                            }
                         }
-                    }
-                    ?>
-                    <!-- <option value="">- No. PO -</option> -->
-                </select>
-            </div>
+                        ?>
+                        <!-- <option value="">- No. PO -</option> -->
+                    </select>
+                </div>
             <?php endif; ?>
 
             <div class="col-md-2">
@@ -96,13 +96,13 @@
         </div>
         <div class="row">
             <div class="col-md-2">
-                <span class="text-bold">File BA</span>
+                <span class="text-bold">File NCR</span>
             </div>
             <div class="col-md-4">
                 <input type="file" class="form-control" name="file_ba" readonly>
                 <?php
                 if (file_exists($header->file_ba)) {
-                    echo '<a href="' . base_url($header->file_ba) . '" class="btn btn-sm btn-primary" title="Download file BA" target="_blank" download><i class="fa fa-download"></i> Download BA</a>';
+                    echo '<a href="' . base_url($header->file_ba) . '" class="btn btn-sm btn-primary" title="Download file NCR" target="_blank" download><i class="fa fa-download"></i> Download NCR</a>';
                 }
                 ?>
             </div>
@@ -110,107 +110,136 @@
 
         <div class="col-12-md list_detail_po">
             <?php if (!empty($id_rec_inv_ap)) : ?>
-            <?php
-            // Requirement 5.2: render detail from dt_retur_pembelian (already stored), read-only
-            echo '<table class="table table-striped table-bordered">';
-            echo '<thead>';
-            echo '<tr>';
-            echo '<th class="text-center">Tanggal Incoming</th>';
-            echo '<th class="text-center">Nama Material</th>';
-            echo '<th class="text-center">Width</th>';
-            echo '<th class="text-center">Qty Order</th>';
-            echo '<th class="text-center">Qty Receive</th>';
-            echo '<th class="text-center">Jumlah Retur</th>';
-            echo '<th class="text-center">Harga Satuan</th>';
-            echo '<th class="text-center">Total</th>';
-            echo '</tr>';
-            echo '</thead>';
-            echo '<tbody>';
-
-            foreach ($detail as $item_detail) {
+                <?php
+                // Requirement 5.2: render detail from dt_retur_pembelian (already stored), read-only
+                echo '<table class="table table-striped table-bordered">';
+                echo '<thead>';
                 echo '<tr>';
-                echo '<td class="text-center">';
-                // tanggal_incoming is not stored in dt_retur_pembelian; use tgl_retur as fallback
-                echo date('d F Y', strtotime($header->tgl_retur));
-                echo '</td>';
-                echo '<td>' . $item_detail->nama_material . '</td>';
-                echo '<td class="text-right">' . $item_detail->width . '</td>';
-                echo '<td class="text-right">' . $item_detail->qty_order . '</td>';
-                echo '<td class="text-right">' . number_format($item_detail->qty_receive, 2) . '</td>';
-                echo '<td class="text-right">' . number_format($item_detail->jumlah_retur, 2) . '</td>';
-                echo '<td class="text-right">' . number_format($item_detail->harga_satuan, 2) . '</td>';
-                echo '<td class="text-right">' . number_format($item_detail->grand_total, 2) . '</td>';
+                echo '<th class="text-center">Tanggal Incoming</th>';
+                echo '<th class="text-center">Lot Number</th>';
+                echo '<th class="text-center">Nama Material</th>';
+                echo '<th class="text-center">Width</th>';
+                echo '<th class="text-center">Qty Order</th>';
+                echo '<th class="text-center">Qty Rec (Kg)</th>';
+                echo '<th class="text-center">Qty Rec (Sheet)</th>';
+                echo '<th class="text-center">Retur (Kg)</th>';
+                echo '<th class="text-center">Retur (Sheet)</th>';
                 echo '</tr>';
-            }
+                echo '</thead>';
+                echo '<tbody>';
 
-            echo '</tbody>';
-            echo '</table>';
-            ?>
-            <?php else : ?>
-            <?php
-            // Requirement 5.3: backward compatibility — render from tr_purchase_order (old logic)
-            foreach (explode(',', $header->no_po) as $item_po) {
-                $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $item_po])->row();
+                $total_rec_kg = 0;
+                $total_rec_sheet = 0;
+                $total_ret_kg = 0;
+                $total_ret_sheet = 0;
 
-                $po_detail = $this->Retur_pembelian_model->get_po_detail($get_po->no_po);
-
-                $type_sheet = $this->Retur_pembelian_model->get_po_check_sheet($get_po->no_po);
-
-                $satuan = ($type_sheet > 0) ? '(Sheet)' : '(Kg)';
-
-                echo  '<h4>No. PO: ' . $get_po->no_surat . '</h4>';
-                echo  '<table class="table table-striped table-bordered">';
-                echo  '<thead>';
-                echo  '<tr>';
-                echo  '<th class="text-center">Tanggal PO</th>';
-                echo  '<th class="text-center">Nama Material</th>';
-                echo  '<th class="text-center">Width</th>';
-                echo  '<th class="text-center">Qty Order ' . $satuan . '</th>';
-                echo  '<th class="text-center">Qty Receive ' . $satuan . '</th>';
-                echo  '<th class="text-center">Retur ' . $satuan . '</th>';
-                echo  '<th class="text-center">Harga</th>';
-                echo  '<th class="text-center">Total</th>';
-                echo  '</tr>';
-                echo  '</thead>';
-                echo  '<tbody>';
-
-                $no_detail = 0;
-                foreach ($po_detail as $item_po_detail) {
-                    $no_detail++;
+                foreach ($detail as $item_detail) {
+                    $total_rec_kg += $item_detail->qty_receive;
+                    $total_rec_sheet += $item_detail->qty_sheet;
+                    $total_ret_kg += $item_detail->jumlah_retur;
+                    $total_ret_sheet += $item_detail->qty_sheet_retur;
 
                     echo '<tr>';
                     echo '<td class="text-center">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][id]" value="' . $item_po_detail->id . '">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][no_po]" value="' . $item_po_detail->no_po . '">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][id_pr]" value="' . $item_po_detail->idpr . '">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][idmaterial]" value="' . $item_po_detail->idmaterial . '">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][namamaterial]" value="' . $item_po_detail->namamaterial . '">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][width]" value="' . $item_po_detail->width . '">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_order]" value="' . $item_po_detail->totalwidth . '">';
-                    echo date('d F Y', strtotime($get_po->tanggal));
+                    // tanggal_incoming is not stored in dt_retur_pembelian; use tgl_retur as fallback
+                    echo date('d F Y', strtotime($header->tgl_retur));
                     echo '</td>';
-                    echo '<td>' . $item_po_detail->namamaterial . '</td>';
-                    echo '<td class="text-right">' . $item_po_detail->width . '</td>';
-                    echo '<td class="text-right">' . $item_po_detail->totalwidth . '</td>';
-                    echo '<td class="text-right">';
-                    echo number_format($arr_detail[$item_po_detail->id]->qty_receive, 2);
-                    echo '</td>';
-                    echo '<td class="text-right">';
-                    echo number_format($arr_detail[$item_po_detail->id]->jumlah_retur, 2);
-                    echo '</td>';
-                    echo '<td class="text-right">';
-                    echo number_format($arr_detail[$item_po_detail->id]->harga_satuan, 2);
-                    echo '</td>';
-                    echo '<td class="text-right">';
-                    echo number_format($arr_detail[$item_po_detail->id]->grand_total, 2);
-                    echo '</td>';
+                    echo '<td>' . $item_detail->lotno . '</td>';
+                    echo '<td>' . $item_detail->nama_material . '</td>';
+                    echo '<td class="text-right">' . $item_detail->width . '</td>';
+                    echo '<td class="text-right">' . $item_detail->qty_order . '</td>';
+                    echo '<td class="text-right">' . number_format($item_detail->qty_receive, 2) . '</td>';
+                    echo '<td class="text-right">' . number_format($item_detail->qty_sheet) . '</td>';
+                    echo '<td class="text-right">' . number_format($item_detail->jumlah_retur, 2) . '</td>';
+                    echo '<td class="text-right">' . number_format($item_detail->qty_sheet_retur) . '</td>';
                     echo '</tr>';
                 }
 
                 echo '</tbody>';
+                echo '<tfoot>';
+                echo '<tr>';
+                echo '<td colspan="5" class="text-right text-bold">Grand Total</td>';
+                echo '<td class="text-right text-bold">' . number_format($total_rec_kg, 2) . '</td>';
+                echo '<td class="text-right text-bold">' . number_format($total_rec_sheet) . '</td>';
+                echo '<td class="text-right text-bold">' . number_format($total_ret_kg, 2) . '</td>';
+                echo '<td class="text-right text-bold">' . number_format($total_ret_sheet) . '</td>';
+                echo '</tr>';
+                echo '</tfoot>';
                 echo '</table>';
-            }
-            ?>
+                ?>
+            <?php else : ?>
+                <?php
+                // Requirement 5.3: backward compatibility — render from tr_purchase_order (old logic)
+                foreach (explode(',', $header->no_po) as $item_po) {
+                    $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $item_po])->row();
+
+                    $po_detail = $this->Retur_pembelian_model->get_po_detail($get_po->no_po);
+
+                    echo  '<h4>No. PO: ' . $get_po->no_surat . '</h4>';
+                    echo  '<table class="table table-striped table-bordered">';
+                    echo  '<thead>';
+                    echo  '<tr>';
+                    echo  '<th class="text-center">Tanggal PO</th>';
+                    echo  '<th class="text-center">Lot Number</th>';
+                    echo  '<th class="text-center">Nama Material</th>';
+                    echo  '<th class="text-center">Width</th>';
+                    echo  '<th class="text-center">Qty Order</th>';
+                    echo  '<th class="text-center">Qty Rec (Kg)</th>';
+                    echo  '<th class="text-center">Qty Rec (Sheet)</th>';
+                    echo  '<th class="text-center">Retur (Kg)</th>';
+                    echo  '<th class="text-center">Retur (Sheet)</th>';
+                    echo  '</tr>';
+                    echo  '</thead>';
+                    echo  '<tbody>';
+
+                    $total_rec_kg = 0;
+                    $total_rec_sheet = 0;
+                    $total_ret_kg = 0;
+                    $total_ret_sheet = 0;
+
+                    $no_detail = 0;
+                    foreach ($po_detail as $item_po_detail) {
+                        $no_detail++;
+
+                        $qty_receive = (!empty($arr_detail[$item_po_detail->id]->qty_receive)) ? $arr_detail[$item_po_detail->id]->qty_receive : 0;
+                        $qty_sheet = (!empty($arr_detail[$item_po_detail->id]->qty_sheet)) ? $arr_detail[$item_po_detail->id]->qty_sheet : 0;
+                        $jumlah_retur = (!empty($arr_detail[$item_po_detail->id]->jumlah_retur)) ? $arr_detail[$item_po_detail->id]->jumlah_retur : 0;
+                        $qty_sheet_retur = (!empty($arr_detail[$item_po_detail->id]->qty_sheet_retur)) ? $arr_detail[$item_po_detail->id]->qty_sheet_retur : 0;
+                        $lotno = (!empty($arr_detail[$item_po_detail->id]->lotno)) ? $arr_detail[$item_po_detail->id]->lotno : '';
+
+                        $total_rec_kg += $qty_receive;
+                        $total_rec_sheet += $qty_sheet;
+                        $total_ret_kg += $jumlah_retur;
+                        $total_ret_sheet += $qty_sheet_retur;
+
+                        echo '<tr>';
+                        echo '<td class="text-center">';
+                        echo date('d F Y', strtotime($get_po->tanggal));
+                        echo '</td>';
+                        echo '<td>' . $lotno . '</td>';
+                        echo '<td>' . $item_po_detail->namamaterial . '</td>';
+                        echo '<td class="text-right">' . $item_po_detail->width . '</td>';
+                        echo '<td class="text-right">' . $item_po_detail->totalwidth . '</td>';
+                        echo '<td class="text-right">' . number_format($qty_receive, 2) . '</td>';
+                        echo '<td class="text-right">' . number_format($qty_sheet) . '</td>';
+                        echo '<td class="text-right">' . number_format($jumlah_retur, 2) . '</td>';
+                        echo '<td class="text-right">' . number_format($qty_sheet_retur) . '</td>';
+                        echo '</tr>';
+                    }
+
+                    echo '</tbody>';
+                    echo '<tfoot>';
+                    echo '<tr>';
+                    echo '<td colspan="5" class="text-right text-bold">Grand Total</td>';
+                    echo '<td class="text-right text-bold">' . number_format($total_rec_kg, 2) . '</td>';
+                    echo '<td class="text-right text-bold">' . number_format($total_rec_sheet) . '</td>';
+                    echo '<td class="text-right text-bold">' . number_format($total_ret_kg, 2) . '</td>';
+                    echo '<td class="text-right text-bold">' . number_format($total_ret_sheet) . '</td>';
+                    echo '</tr>';
+                    echo '</tfoot>';
+                    echo '</table>';
+                }
+                ?>
             <?php endif; ?>
         </div>
 

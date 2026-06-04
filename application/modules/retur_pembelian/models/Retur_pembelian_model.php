@@ -224,6 +224,9 @@ class Retur_pembelian_model extends BF_Model
 			dtp.hargasatuan,
 			dtp.idpr,
 			di.width_recive,
+			di.lotno,
+			di.qty_sheet,
+			mic3.id_bentuk,
 			ti.tanggal AS tanggal_incoming,
 			riad.id_rec_inv_ap
 		', FALSE);
@@ -231,6 +234,7 @@ class Retur_pembelian_model extends BF_Model
 		$this->db->join('tr_incoming ti', 'ti.id_incoming = riad.id_incoming');
 		$this->db->join('dt_incoming di', 'di.id_incoming = ti.id_incoming');
 		$this->db->join('dt_trans_po dtp', 'dtp.id_dt_po = di.id_dt_po');
+		$this->db->join('ms_inventory_category3 mic3', 'mic3.id_category3 = dtp.idmaterial', 'left');
 		$this->db->where('riad.id_rec_inv_ap', $id_rec_inv_ap);
 		return $this->db->get()->result();
 	}

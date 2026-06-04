@@ -75,7 +75,7 @@
             </div>
             <div class="row">
                 <div class="col-md-2">
-                    <span class="text-bold">File BA</span>
+                    <span class="text-bold">File NCR</span>
                 </div>
                 <div class="col-md-4">
                     <input type="file" class="form-control" name="file_ba" required>
@@ -171,30 +171,6 @@
                 success: function(result) {
                     $('.list_detail_po').html(result.hasil);
                     auto_num();
-                    // Trigger hitung total untuk setiap baris yang sudah punya value default
-                    $('.hitung_detail_total').each(function() {
-                        var no_po = $(this).data('no_po');
-                        var no = $(this).data('no');
-
-                        var qty_retur = $('input[name="dt_' + no_po + '[' + no + '][retur]"]').val();
-                        if (qty_retur && qty_retur.length > 0) {
-                            qty_retur = qty_retur.split(',').join('');
-                            qty_retur = parseFloat(qty_retur);
-                        } else {
-                            qty_retur = 0;
-                        }
-
-                        var harga = $('input[name="dt_' + no_po + '[' + no + '][harga]"]').val();
-                        if (harga && harga.length > 0) {
-                            harga = harga.split(',').join('');
-                            harga = parseFloat(harga);
-                        } else {
-                            harga = 0;
-                        }
-
-                        var total_harga = (qty_retur * harga);
-                        $('input[name="dt_' + no_po + '[' + no + '][total_harga]"]').autoNumeric('set', total_harga);
-                    });
                     hitungFooter();
                 },
                 error: function(xhr, status, error) {
@@ -214,29 +190,6 @@
     });
 
     $(document).on('change', '.hitung_detail_total', function() {
-        var no_po = $(this).data('no_po');
-        var no = $(this).data('no');
-
-        var qty_retur = $('input[name="dt_' + no_po + '[' + no + '][retur]"]').val();
-        if (qty_retur.length > 0) {
-            qty_retur = qty_retur.split(',').join('');
-            qty_retur = parseFloat(qty_retur);
-        } else {
-            qty_retur = 0;
-        }
-
-        var harga = $('input[name="dt_' + no_po + '[' + no + '][harga]"]').val();
-        if (harga.length > 0) {
-            harga = harga.split(',').join('');
-            harga = parseFloat(harga);
-        } else {
-            harga = 0;
-        }
-
-        var total_harga = (qty_retur * harga);
-
-        $('input[name="dt_' + no_po + '[' + no + '][total_harga]"]').autoNumeric('set', total_harga);
-
         hitungFooter();
     });
 
@@ -298,18 +251,27 @@
 
     function hitungFooter() {
         var totalQtyReceive = 0;
+        var totalQtyReceiveSheet = 0;
         var totalRetur = 0;
-        var grandTotal = 0;
+        var totalReturSheet = 0;
 
         $('.list_detail_po tbody tr').each(function() {
             var qtyReceiveInput = $(this).find('input[name$="[qty_receive]"]');
+            var qtySheetInput = $(this).find('input[name$="[qty_sheet]"]');
             var returInput = $(this).find('input[name$="[retur]"]');
-            var totalHargaInput = $(this).find('input[name$="[total_harga]"]');
+            var returSheetInput = $(this).find('input[name$="[retur_sheet]"]');
 
             if (qtyReceiveInput.length > 0) {
                 var qtyVal = qtyReceiveInput.val();
                 if (qtyVal && qtyVal.length > 0) {
                     totalQtyReceive += parseFloat(qtyVal.split(',').join('')) || 0;
+                }
+            }
+
+            if (qtySheetInput.length > 0) {
+                var qtySheetVal = qtySheetInput.val();
+                if (qtySheetVal && qtySheetVal.length > 0) {
+                    totalQtyReceiveSheet += parseFloat(qtySheetVal.split(',').join('')) || 0;
                 }
             }
 
@@ -320,18 +282,25 @@
                 }
             }
 
-            if (totalHargaInput.length > 0) {
-                var totalVal = totalHargaInput.val();
-                if (totalVal && totalVal.length > 0) {
-                    grandTotal += parseFloat(totalVal.split(',').join('')) || 0;
+            if (returSheetInput.length > 0) {
+                var returSheetVal = returSheetInput.val();
+                if (returSheetVal && returSheetVal.length > 0) {
+                    totalReturSheet += parseFloat(returSheetVal.split(',').join('')) || 0;
                 }
             }
         });
 
         if ($('#footer_total_qty_receive').length > 0) {
             $('#footer_total_qty_receive').autoNumeric('set', totalQtyReceive);
+        }
+        if ($('#footer_total_qty_receive_sheet').length > 0) {
+            $('#footer_total_qty_receive_sheet').autoNumeric('set', totalQtyReceiveSheet);
+        }
+        if ($('#footer_total_retur').length > 0) {
             $('#footer_total_retur').autoNumeric('set', totalRetur);
-            $('#footer_grand_total').autoNumeric('set', grandTotal);
+        }
+        if ($('#footer_total_retur_sheet').length > 0) {
+            $('#footer_total_retur_sheet').autoNumeric('set', totalReturSheet);
         }
     }
 </script>
