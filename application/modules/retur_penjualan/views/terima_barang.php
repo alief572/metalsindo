@@ -76,7 +76,7 @@ $tanggal = date('Y-m-d');
 						<div class="col-sm-6">
 							<div class="form-group row">
 								<div class="col-md-4">
-									<label>No. PO</label>
+									<label>No. SJ Customer</label>
 								</div>
 								<div class="col-md-8">
 									<input type="text" class="form-control" id="no_po" name="no_po">
@@ -390,15 +390,19 @@ $tanggal = date('Y-m-d');
 				id_delivery_order: id_do
 			},
 			success: function(html) {
-				if(html.trim() == '') {
+				if (html.trim() == '') {
 					$('#data_material').html('<tr><td colspan="11" class="text-center">Tidak ada material untuk diretur.</td></tr>');
 				} else {
 					$('#data_material').html(html);
 					// Set No DO text for all loaded rows
 					$('#data_material .text-do').text(text_do);
 					// Initialize Select2 for gudang and customer dropdowns
-					$('#data_material .select2_gudang').select2({ width: '100%' });
-					$('#data_material .select2_customer').select2({ width: '100%' });
+					$('#data_material .select2_gudang').select2({
+						width: '100%'
+					});
+					$('#data_material .select2_customer').select2({
+						width: '100%'
+					});
 					// Initialize autoNumeric
 					$('#data_material .autoNumeric').autoNumeric('init');
 				}

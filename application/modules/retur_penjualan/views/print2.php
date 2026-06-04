@@ -169,7 +169,7 @@
         </tr>
     </table>
     <div style='display:block; border-color:none; background-color:#c2c2c2;' align='center'>
-        <h3>NOTA RETUR PENJUALAN<br>NO : <?= $header[0]->no_retur; ?></h3>
+        <h3>TANDA TERIMA RETUR PENJUALAN<br>NO : <?= $header[0]->no_retur; ?></h3>
     </div>
     <table class='gridtableX' width='100%' cellpadding='0' cellspacing='0' border='0'>
         <tbody>
@@ -182,6 +182,11 @@
                 <td>No Delivery Order</td>
                 <td>:</td>
                 <td><?= strtoupper($header[0]->no_surat); ?></td>
+            </tr>
+            <tr>
+                <td>No SJ Customer</td>
+                <td>:</td>
+                <td><?= strtoupper($header[0]->no_po); ?></td>
             </tr>
             <tr>
                 <td>Kompensasi</td>
@@ -209,29 +214,23 @@
                 if ($type_sheet == '1') {
                 ?>
 
-                    <th width='10%'>Nama Material</th>
-                    <th width='10%'>Lot Number</th>
+                    <th width='20%'>Nama Material</th>
+                    <th width='20%'>Lot Number</th>
                     <th width='10%'>Lebar</th>
                     <th width='10%'>Thickness</th>
+                    <th width='10%'>Qty KG</th>
                     <th width='10%'>Qty Sheet</th>
-                    <th width='10%'>Harga Deal / Sheet</th>
-                    <th width='10%'>Total Harga</th>
-                    <th width='10%'>PPN</th>
-                    <th width='10%'>Total Harga</th>
+
 
                 <?php
                 } else {
                 ?>
 
-                    <th width='10%'>Nama Material</th>
-                    <th width='10%'>Lot Number</th>
-                    <th width='10%'>Lebar</th>
-                    <th width='10%'>Berat</th>
-                    <th width='10%'>Thickness</th>
-                    <th width='10%'>Harga Deal / Kg</th>
-                    <th width='10%'>Total Harga</th>
-                    <th width='10%'>PPN</th>
-                    <th width='10%'>Total Harga</th>
+                    <th width='20%'>Nama Material</th>
+                    <th width='20%'>Lot Number</th>
+                    <th width='8%'>Lebar</th>
+                    <th width='9%'>Thickness</th>
+                    <th width='8%'>Qty KG</th>
 
                 <?php
                 }
@@ -242,11 +241,11 @@
             <?php
             $loop = 0;
             $SUM = 0;
+            $SUM_PPN = 0;
             $thg = 0;
             foreach ($detail as $dt) {
                 $SUM += $dt->total_harga;
-
-
+                $SUM_PPN += $dt->total_ppn;
 
                 $thg = number_format($dt->total_harga, 2);
                 $loop++;
@@ -257,44 +256,54 @@
                 if ($type_sheet == '1') {
                 ?>
                     <tr>
-                        <td><?= wordwrap($dt->item, 25, "<br />\n", true) ?></td>
+                        <td width="20%"><?= wordwrap($dt->item, 25, "<br />\n", true) ?></td>
                         <td><?= $dt->lotno ?></td>
-                        <td><?= $dt->width ?></td>
-                        <td><?= $dt->thickness ?></td>
-                        <td><?= $dt->total_sheet ?></td>
-                        <td><?= number_format($dt->harga_deal, 0) ?></td>
-                        <td><?= number_format($dt->total_harga, 0) ?></td>
-                        <td><?= number_format($dt->total_ppn, 0) ?></td>
-                        <td><?= number_format($dt->total_harga + $dt->total_ppn, 0) ?></td>
+                        <td align="right"><?= $dt->width ?></td>
+                        <td align="right"><?= $dt->thickness ?></td>
+                        <td align="right"><?= $dt->weight ?></td>
+                        <td align="right"><?= $dt->total_sheet ?></td>
                     </tr>
                 <?php
                 } else {
                 ?>
                     <tr>
-                        <td><?= wordwrap($dt->item, 25, "<br />\n", true) ?></td>
-                        <td><?= $dt->lotno ?></td>
-                        <td><?= $dt->width ?></td>
-                        <td><?= $dt->weight ?></td>
-                        <td><?= $dt->thickness ?></td>
-                        <td><?= number_format($dt->harga_deal, 0) ?></td>
-                        <td><?= number_format($dt->total_harga, 0) ?></td>
-                        <td><?= number_format($dt->total_ppn, 0) ?></td>
-                        <td><?= number_format($dt->total_harga + $dt->total_ppn, 0) ?></td>
+                        <td width="20%"><?= wordwrap($dt->item, 25, "<br />\n", true) ?></td>
+                        <td align="right"><?= $dt->lotno ?></td>
+                        <td align="right"><?= $dt->width ?></td>
+                        <td align="right"><?= $dt->thickness ?></td>
+                        <td align="right"><?= $dt->weight ?></td>
                     </tr>
                 <?php
                 }
                 ?>
 
-
-
-
             <?php
-
             }
             ?>
         </tbody>
-
+        <tfoot>
+            <tr>
+                <td colspan="<?= ($type_sheet == 1) ? '5' : '4'; ?>" align="right"><strong>Subtotal :</strong></td>
+                <td align="right" style="padding: 4px;">
+                    <strong><?= number_format($SUM, 0) ?></strong>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="<?= ($type_sheet == 1) ? '5' : '4'; ?>" align="right"><strong>PPn :</strong></td>
+                <td align="right" style="padding: 4px;">
+                    <strong><?= number_format($SUM_PPN, 0) ?></strong>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="<?= ($type_sheet == 1) ? '5' : '4'; ?>" align="right"><strong>Grand Total :</strong></td>
+                <td align="right" style="padding: 4px;">
+                    <strong><?= number_format($SUM + $SUM_PPN, 0) ?></strong>
+                </td>
+            </tr>
+        </tfoot>
     </table>
+
+    <!-- Summary Total -->
 
     <br>
     <table class='gridtable' width='100%' border='1' cellpadding='0' cellspacing='0'>
