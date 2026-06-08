@@ -35,3 +35,5 @@ application/config/config.php
 docker/Dockerfile
 php.ini
 application/config/config.php
+*.kiro
+/assets/file_ba
