@@ -423,7 +423,6 @@ $ENABLE_DELETE  = has_permission('Material_Planing.Delete');
 			serverSide: true,
 			responsive: true,
 			processing: true,
-			serverSide: true,
 			stateSave: true,
 			destroy: true,
 			paging: true

@@ -620,42 +620,42 @@ class Delivery_order extends Admin_Controller
 					$numb++;
 
 
-					echo " <tr id='row_" . $loop . "' class='baris_" . $loop . $numb . "'>
-				<td rowspan='1' class='id_" . $loop . $numb . "'>
-				<input type='text' class='form-control input-sm' id='dp_id_material_$loop$numb'  value='$dt->id_material' name='dp[$loop$numb][id_material]' readonly>
+					echo " <tr id='row_" . $loop . "' class='baris_{$loop}_{$numb}'>
+				<td rowspan='1' class='id_{$loop}_{$numb}'>
+				<input type='text' class='form-control input-sm' id='dp_id_material_{$loop}_{$numb}'  value='$dt->id_material' name='dp[{$loop}_{$numb}][id_material]' readonly>
 				</td>
-				<td rowspan='1' class='id_" . $loop . $numb . "'>					
-					<input type='hidden' value='$dt->no_alloy' id='dp_no_alloy_$loop$numb' name='dp[$loop$numb][no_alloy]' readonly>
-					<input type='hidden' value='$dt->thickness' id='dp_thickness_$loop$numb' name='dp[$loop$numb][thickness]' readonly>
-					<input type='text' class='form-control input-sm' value='$nm_material' id='dp_material_$loop$numb' name='dp[$loop$numb][material]' readonly>
-					<input type='hidden' class='form-control input-sm' value='$part_number' id='dp_part_number_$loop$numb' name='dp[$loop$numb][part_number]' readonly>
+				<td rowspan='1' class='id_{$loop}_{$numb}'>					
+					<input type='hidden' value='$dt->no_alloy' id='dp_no_alloy_{$loop}_{$numb}' name='dp[{$loop}_{$numb}][no_alloy]' readonly>
+					<input type='hidden' value='$dt->thickness' id='dp_thickness_{$loop}_{$numb}' name='dp[{$loop}_{$numb}][thickness]' readonly>
+					<input type='text' class='form-control input-sm' value='$nm_material' id='dp_material_{$loop}_{$numb}' name='dp[{$loop}_{$numb}][material]' readonly>
+					<input type='hidden' class='form-control input-sm' value='$part_number' id='dp_part_number_{$loop}_{$numb}' name='dp[{$loop}_{$numb}][part_number]' readonly>
 				</td>
-				<td rowspan='1' class='id_" . $loop . $numb . "'>
-					<input type='text' class='form-control input-sm text-right' value='" . number_format($dt->width, 2) . "' id='dp_width_$loop$numb' name='dp[$loop$numb][width]' readonly>
+				<td rowspan='1' class='id_{$loop}_{$numb}'>
+					<input type='text' class='form-control input-sm text-right' value='" . number_format($dt->width, 2) . "' id='dp_width_{$loop}_{$numb}' name='dp[{$loop}_{$numb}][width]' readonly>
 				</td>
-				<td rowspan='1' class='id_" . $loop . $numb . "'>
-					<input type='text' class='form-control input-sm text-right' value='" . number_format($child[0]->length, 2) . "' id='dp_length_$loop$numb' name='dp[$loop$numb][length]' readonly>
+				<td rowspan='1' class='id_{$loop}_{$numb}'>
+					<input type='text' class='form-control input-sm text-right' value='" . number_format($child[0]->length, 2) . "' id='dp_length_{$loop}_{$numb}' name='dp[{$loop}_{$numb}][length]' readonly>
 					</td>
-				<td rowspan='1' class='id_" . $loop . $numb . "'><input type='text' class='form-control input-sm text-right' value='" . number_format($lot->totalweight, 2) . "'  id='dp_qty_produk_$loop$numb' name='dp[$loop$numb][qty_produk]' readonly></td>
-				<td rowspan='1' class='id_" . $loop . $numb . "'>
+				<td rowspan='1' class='id_{$loop}_{$numb}'><input type='text' class='form-control input-sm text-right' value='" . number_format($lot->totalweight, 2) . "'  id='dp_qty_produk_{$loop}_{$numb}' name='dp[{$loop}_{$numb}][qty_produk]' readonly></td>
+				<td rowspan='1' class='id_{$loop}_{$numb}'>
 				</a>
 				</td>";
 
 
 					echo "<td>";
-					echo "<input type='hidden' value='0' name='dp[$loop$numb][bantuan]' readonly>
-				<input type='hidden' class='form-control input-sm' id='dp_idstock_$loop$numb'  value='$lot->id_stock' name='dp[$loop$numb][id_stock]' readonly>
+					echo "<input type='hidden' value='0' name='dp[{$loop}_{$numb}][bantuan]' readonly>
+				<input type='hidden' class='form-control input-sm' id='dp_idstock_{$loop}_{$numb}'  value='$lot->id_stock' name='dp[{$loop}_{$numb}][id_stock]' readonly>
 				
-				<input type='text' class='form-control' value='$lot->lotno' id='dp_lot_$loop$numb' name='dp[$loop$numb][lot]' readonly>			
+				<input type='text' class='form-control' value='$lot->lotno' id='dp_lot_{$loop}_{$numb}' name='dp[{$loop}_{$numb}][lot]' readonly>			
 				
 				</td>
-				<td><input type='text' class='form-control input-sm text-right autoNumeric qty' value='$lot->qty' placeholder='Qty' id='dp_qty_mat_$loop$numb' required name='dp[$loop$numb][qty_mat]' readonly></td>
-				<td><input type='text' class='form-control input-sm text-right autoNumeric berat' placeholder='Weight' id='dp_weight_mat_$loop$numb' required name='dp[$loop$numb][weight_mat]' value='$lot->totalweight' readonly></td>
-				<td><input type='text' class='form-control input-sm' placeholder='Remarks' id='dp_remarks_$loop$numb' name='dp[$loop$numb][remarks]'></td>
+				<td><input type='text' class='form-control input-sm text-right autoNumeric qty' value='$lot->qty' placeholder='Qty' id='dp_qty_mat_{$loop}_{$numb}' required name='dp[{$loop}_{$numb}][qty_mat]' readonly></td>
+				<td><input type='text' class='form-control input-sm text-right autoNumeric berat' placeholder='Weight' id='dp_weight_mat_{$loop}_{$numb}' required name='dp[{$loop}_{$numb}][weight_mat]' value='$lot->totalweight' readonly></td>
+				<td><input type='text' class='form-control input-sm' placeholder='Remarks' id='dp_remarks_{$loop}_{$numb}' name='dp[{$loop}_{$numb}][remarks]'></td>
 				
-				<td><a class='text-red' href='javascript:void(0)' title='Hapus' onClick='delRow($loop$numb,$loop)'><i class='fa fa-trash'></i>
+				<td><a class='text-red' href='javascript:void(0)' title='Hapus' onClick='delRow(\"{$loop}_{$numb}\",$loop)'><i class='fa fa-trash'></i>
 				</a>
-				<a class='text-red' href='javascript:void(0)' title='Cancel' onClick='cancel($loop$numb,$loop,$lot->id_stock)'><i class='fa fa-times-circle'></i>
+				<a class='text-red' href='javascript:void(0)' title='Cancel' onClick='cancel(\"{$loop}_{$numb}\",$loop,\"$lot->id_stock\")'><i class='fa fa-times-circle'></i>
 				</a></td>
 			</tr>";
 				};
@@ -701,46 +701,46 @@ class Delivery_order extends Admin_Controller
 
 
 
-		echo "<tr class='baris_" . $loop . $loop . $jumlah . "'>
-			    <td width='8%' rowspan='1' class='id_" . $loop . $loop . $jumlah . "'>
-				<input type='text' class='form-control input-sm' value='$id_category3' name='dp2[$loop$loop$jumlah][id_material]' readonly>
+		echo "<tr class='baris_{$loop}_{$loop}_{$jumlah}'>
+			    <td width='8%' rowspan='1' class='id_{$loop}_{$loop}_{$jumlah}'>
+				<input type='text' class='form-control input-sm' value='$id_category3' name='dp2[{$loop}_{$loop}_{$jumlah}][id_material]' readonly>
 				</td>
-				<td width='25%' rowspan='1' class='id_" . $loop . $loop . $jumlah . "'>
+				<td width='25%' rowspan='1' class='id_{$loop}_{$loop}_{$jumlah}'>
 					
-					<input type='hidden' value='$dt->no_alloy' name='dp2[$loop$loop$jumlah][no_alloy]' readonly>
-					<input type='hidden' value='$dt->thickness' name='dp2[$loop$loop$jumlah][thickness]' readonly>
-					<input type='text' class='form-control input-sm' value='$namamaterial' name='dp2[$loop$loop$jumlah][material]' readonly>
+					<input type='hidden' value='$dt->no_alloy' name='dp2[{$loop}_{$loop}_{$jumlah}][no_alloy]' readonly>
+					<input type='hidden' value='$dt->thickness' name='dp2[{$loop}_{$loop}_{$jumlah}][thickness]' readonly>
+					<input type='text' class='form-control input-sm' value='$namamaterial' name='dp2[{$loop}_{$loop}_{$jumlah}][material]' readonly>
 				</td>
-				<td width='7%' rowspan='1' class='id_" . $loop . $loop . $jumlah . "'><input type='text' class='form-control input-sm text-right' value='" . number_format($width, 2) . "' name='dp2[$loop$loop$jumlah][width]' readonly></td>
-				<td width='7%' rowspan='1' class='id_" . $loop . $loop . $jumlah . "'><input type='text' class='form-control input-sm text-right' value='" . number_format($length, 2) . "' name='dp2[$loop$loop$jumlah][length]' readonly></td>
-				<td width='7%'rowspan='1' class='id_" . $loop . $loop . $jumlah . "'><input type='text' class='form-control input-sm text-right' value='" . number_format($qty_order, 2) . "' name='dp2[$loop$loop$jumlah][qty_produk]' readonly></td>
-				<td width='5%'rowspan='1' class='id_" . $loop . $loop . $jumlah . "'>
+				<td width='7%' rowspan='1' class='id_{$loop}_{$loop}_{$jumlah}'><input type='text' class='form-control input-sm text-right' value='" . number_format($width, 2) . "' name='dp2[{$loop}_{$loop}_{$jumlah}][width]' readonly></td>
+				<td width='7%' rowspan='1' class='id_{$loop}_{$loop}_{$jumlah}'><input type='text' class='form-control input-sm text-right' value='" . number_format($length, 2) . "' name='dp2[{$loop}_{$loop}_{$jumlah}][length]' readonly></td>
+				<td width='7%'rowspan='1' class='id_{$loop}_{$loop}_{$jumlah}'><input type='text' class='form-control input-sm text-right' value='" . number_format($qty_order, 2) . "' name='dp2[{$loop}_{$loop}_{$jumlah}][qty_produk]' readonly></td>
+				<td width='5%'rowspan='1' class='id_{$loop}_{$loop}_{$jumlah}'>
 					
 				</td>
 				<td width='20%'>
-					<select name='dp2[$loop$loop$jumlah][lot]' class='form-control select changeLot' data-id='" . $loop . "'  data-baris='" . $loop . $loop . $jumlah . "'  id='list_$loop$loop$jumlah'>
+					<select name='dp2[{$loop}_{$loop}_{$jumlah}][lot]' class='form-control select changeLot' data-id='" . $loop . "'  data-baris='{$loop}_{$loop}_{$jumlah}'  id='list_{$loop}_{$loop}_{$jumlah}'>
 						<option value='0'>--Pilih--</option>";
 		foreach ($lot as $lot) {
 			$lotslit = $lot->lotno . '|' . $lot->no_surat . '|' . $lot->weight . '|' . $lot->customer;
 			echo "<option value='$lot->id_stock'>$lotslit</option>";
 		}
 		echo "</select>
-				<input type='hidden' value='0' name='dp2[$loop$loop$jumlah][bantuan]' readonly>
+				<input type='hidden' value='0' name='dp2[{$loop}_{$loop}_{$jumlah}][bantuan]' readonly>
 				</td>
 				<td width='5%'>
 				
 				
-				<input type='hidden' class='form-control input-sm text-right numberlot  dp_numberlot_$loop$loop$jumlah' placeholder='numberlot' value='0' id='dp_numberlot_$loop$loop$jumlah' required name='dp2[$loop$loop$jumlah][numberlot]'>
+				<input type='hidden' class='form-control input-sm text-right numberlot  dp_numberlot_{$loop}_{$loop}_{$jumlah}' placeholder='numberlot' value='0' id='dp_numberlot_{$loop}_{$loop}_{$jumlah}' required name='dp2[{$loop}_{$loop}_{$jumlah}][numberlot]'>
 				
-				<input type='text' class='form-control input-sm text-right autoNumeric qty  dp_qty_mat_$loop$loop$jumlah' placeholder='Qty' value='0' id='dp_qty_mat_$loop$loop$jumlah' required name='dp2[$loop$loop$jumlah][qty_mat]'>
+				<input type='text' class='form-control input-sm text-right autoNumeric qty  dp_qty_mat_{$loop}_{$loop}_{$jumlah}' placeholder='Qty' value='0' id='dp_qty_mat_{$loop}_{$loop}_{$jumlah}' required name='dp2[{$loop}_{$loop}_{$jumlah}][qty_mat]'>
 				
 				</td>
-				<td width='5%' ><input type='text' class='form-control input-sm text-right autoNumeric weight dp_weight_mat_$loop$loop$jumlah' placeholder='Weight' id='dp_weight_mat_$loop$loop$jumlah' value='0' required name='dp2[$loop$loop$jumlah][weight_mat]'></td>
+				<td width='5%' ><input type='text' class='form-control input-sm text-right autoNumeric weight dp_weight_mat_{$loop}_{$loop}_{$jumlah}' placeholder='Weight' id='dp_weight_mat_{$loop}_{$loop}_{$jumlah}' value='0' required name='dp2[{$loop}_{$loop}_{$jumlah}][weight_mat]'></td>
 				
-				<td width='10%' ><input type='text' class='form-control input-sm' placeholder='Remarks' id='dp_remarks_$loop$loop$jumlah' name='dp2[$loop$loop$jumlah][remarks]'></td>
+				<td width='10%' ><input type='text' class='form-control input-sm' placeholder='Remarks' id='dp_remarks_{$loop}_{$loop}_{$jumlah}' name='dp2[{$loop}_{$loop}_{$jumlah}][remarks]'></td>
 				
 				
-				<td width='4%'><a class='text-red' href='javascript:void(0)' title='Hapus' onClick='delRow($loop$loop$jumlah,$loop)'><i class='fa fa-trash'></i>
+				<td width='4%'><a class='text-red' href='javascript:void(0)' title='Hapus' onClick='delRow(\"{$loop}_{$loop}_{$jumlah}\",$loop)'><i class='fa fa-trash'></i>
 				</a></td>
 				</tr>
 				";
