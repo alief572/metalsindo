@@ -146,6 +146,7 @@ class Receive_invoice_ap extends Admin_Controller
       $get_nominal_invoice = $this->db->get()->row();
 
       $nominal_invoice = (!empty($get_nominal_invoice->nominal_invoice)) ? $get_nominal_invoice->nominal_invoice : 0;
+      $nominal_invoice += (isset($item->ppn) ? $item->ppn : 0);
 
       $btn_view = '<a href="' . base_url('receive_invoice_ap/view/' . $item->id_rec_inv_ap) . '" class="btn btn-sm btn-info" title="View Receiving Invoice"><i class="fa fa-eye"></i></a>';
 
@@ -297,6 +298,9 @@ class Receive_invoice_ap extends Admin_Controller
       'no_invoice' => $post['no_invoice'],
       'id_suplier' => $post['supplier'],
       'nm_suplier' => $get_supplier->name_suplier,
+      'ppn' => str_replace(',', '', (isset($post['ppn_global']) ? $post['ppn_global'] : 0)),
+      'ppn_persen' => str_replace(',', '', (isset($post['ppn_persen']) ? $post['ppn_persen'] : 0)),
+      'no_faktur_pajak' => $post['no_faktur_pajak'],
       'created_by' => $this->auth->user_id(),
       'created_date' => date('Y-m-d H:i:s')
     ];
@@ -312,8 +316,8 @@ class Receive_invoice_ap extends Admin_Controller
           'id_suplier' => $item['id_suplier'],
           'nm_suplier' => $item['nm_suplier'],
           'nilai' => str_replace(',', '', $item['nilai']),
-          'no_faktur_pajak' => $item['no_faktur_pajak'],
-          'ppn' => str_replace(',', '', $item['ppn']),
+          'no_faktur_pajak' => '',
+          'ppn' => 0,
           'total_nilai' => str_replace(',', '', $item['total']),
           'created_by' => $this->auth->user_id(),
           'created_date' => date('Y-m-d')
@@ -323,8 +327,8 @@ class Receive_invoice_ap extends Admin_Controller
           'id_incoming' => $item['id_incoming'],
           'no_invoice_rec_ap' => $post['no_invoice'],
           'nilai_invoice' => str_replace(',', '', $item['total']),
-          'nilai_ppn' => (str_replace(',', '', $item['total']) - str_replace(',', '', $item['nilai'])),
-          'no_faktur_pajak' => $item['no_faktur_pajak'],
+          'nilai_ppn' => str_replace(',', '', (isset($post['ppn_global']) ? $post['ppn_global'] : 0)),
+          'no_faktur_pajak' => $post['no_faktur_pajak'],
           'rec_ap' => 1
         ];
 
@@ -405,6 +409,9 @@ class Receive_invoice_ap extends Admin_Controller
       'no_invoice' => $post['no_invoice'],
       'id_suplier' => $post['supplier'],
       'nm_suplier' => $get_supplier->name_suplier,
+      'ppn' => str_replace(',', '', (isset($post['ppn_global']) ? $post['ppn_global'] : 0)),
+      'ppn_persen' => str_replace(',', '', (isset($post['ppn_persen']) ? $post['ppn_persen'] : 0)),
+      'no_faktur_pajak' => $post['no_faktur_pajak'],
       'created_by' => $this->auth->user_id(),
       'created_date' => date('Y-m-d H:i:s')
     ];
@@ -420,8 +427,8 @@ class Receive_invoice_ap extends Admin_Controller
           'id_suplier' => $item['id_suplier'],
           'nm_suplier' => $item['nm_suplier'],
           'nilai' => str_replace(',', '', $item['nilai']),
-          'no_faktur_pajak' => $item['no_faktur_pajak'],
-          'ppn' => str_replace(',', '', $item['ppn']),
+          'no_faktur_pajak' => '',
+          'ppn' => 0,
           'total_nilai' => str_replace(',', '', $item['total']),
           'created_by' => $this->auth->user_id(),
           'created_date' => date('Y-m-d')
@@ -431,8 +438,8 @@ class Receive_invoice_ap extends Admin_Controller
           'id_incoming' => $item['id_incoming'],
           'no_invoice_rec_ap' => $post['no_invoice'],
           'nilai_invoice' => str_replace(',', '', $item['total']),
-          'nilai_ppn' => (str_replace(',', '', $item['total']) - str_replace(',', '', $item['nilai'])),
-          'no_faktur_pajak' => $item['no_faktur_pajak'],
+          'nilai_ppn' => str_replace(',', '', (isset($post['ppn_global']) ? $post['ppn_global'] : 0)),
+          'no_faktur_pajak' => $post['no_faktur_pajak'],
           'rec_ap' => 1
         ];
 
