@@ -385,7 +385,11 @@
             if ($header->loi == 'Lokal') {
                 if ($check_sheet > 0) {
             ?>
-
+                    <tr>
+                        <td align="center" colspan='8'>Total</td>
+                        <td align="right"><?= number_format($ttl_amount - $TOT_PPH, 2) ?></td>
+                        <td align="center"></td>
+                    </tr>
                     <tr>
                         <td align="center" colspan='7'>PPN </td>
                         <td align="right"><?= number_format($TOT_PPH, 2) ?></td>
@@ -396,7 +400,13 @@
                 <?php
                 } else {
                 ?>
-
+                    <tr>
+                        <td align="center" colspan='4'>Total Sebelum PPN</td>
+                        <td align="right"><?= number_format($detailsum[0]->sumtotalwidth, 2) ?></td>
+                        <td align="right" colspan="1"></td>
+                        <td align="right"><?= number_format($detailsum[0]->sumjumlahharga, 2) ?></td>
+                        <td align="center"></td>
+                    </tr>
                     <tr>
                         <td align="center" colspan='3'>PPN </td>
                         <td align="right" colspan='2'></td>
@@ -420,7 +430,7 @@
             }
             ?>
             <tr>
-                <td align="center" colspan='4'>Total </td>
+                <td align="center" colspan='4'>Grand Total </td>
                 <?php
                 if ($check_sheet > 0) {
                 ?>
