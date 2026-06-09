@@ -354,7 +354,7 @@
                         <td width='50' align='right'>" . number_format($harga_sheet, 2) . "</td>
                         <td width='50' align='right'>" . number_format($total_weight_kgs, 2) . "</td>
                         <td width='50' align='right'>" . $HS . "</td>
-                        <td width='50' align='right'>" . number_format(($total_weight_kgs) * $detail->hargasatuan, 2) . "</td>
+                        <td width='50' align='right'>" . number_format(($weight_sheet) * $harga_sheet, 2) . "</td>
                         <td width='50'>" . $detail->description . "</td>
                     </tr>";
 
