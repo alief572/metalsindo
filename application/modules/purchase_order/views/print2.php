@@ -320,7 +320,7 @@
 
                 if ($check_sheet > 0) {
                     $no++;
-                    $TOT_PPH += (($detail->totalwidth) * $detail->hargasatuan) * $detail->pajak / 100;
+                    
                     $total_weight_kgs = ($detail->totalwidth);
                     $harga_satuan_kgs = ($detail->hargasatuan * $detail->total_weight);
 
@@ -360,7 +360,8 @@
 
                     $ttl_sheet += $weight_sheet;
                     $ttl_kgs += $total_weight_kgs;
-                    $ttl_amount += ((($detail->totalwidth) * $detail->hargasatuan) + ((($detail->totalwidth) * $detail->hargasatuan) * $detail->pajak / 100));
+                    $TOT_PPH += (($weight_sheet * $harga_sheet) * $detail->pajak / 100);
+                    $ttl_amount += (($weight_sheet * $harga_sheet) + (($weight_sheet * $harga_sheet) * $detail->pajak / 100));
                 } else {
                     $no++;
                     $TOT_PPH += $detail->jumlahharga * $detail->pajak / 100;
