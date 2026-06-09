@@ -14,10 +14,10 @@ if (!defined('BASEPATH')) {
 class Purchase_order_payment extends Admin_Controller
 {
 	//Permission
-	protected $viewPermission 	= 'Purchase_Order.View';
-	protected $addPermission  	= 'Purchase_Order.Add';
-	protected $managePermission = 'Purchase_Order.Manage';
-	protected $deletePermission = 'Purchase_Order.Delete';
+	protected $viewPermission 	= 'Receive_Invoice_Non_Material.View';
+	protected $addPermission  	= 'Receive_Invoice_Non_Material.Add';
+	protected $managePermission = 'Receive_Invoice_Non_Material.Manage';
+	protected $deletePermission = 'Receive_Invoice_Non_Material.Delete';
 
 	public function __construct()
 	{

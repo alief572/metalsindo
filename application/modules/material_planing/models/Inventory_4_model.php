@@ -339,11 +339,11 @@ class Inventory_4_model extends BF_Model
 
 		$count_filtered = $this->db->count_all_results('', false);
 
-		$rows = $this->db
-			->order_by('id_dt_spkmarketing', 'ASC')
-			->limit($length, $start)
-			->get()
-			->result();
+		$this->db->order_by('id_dt_spkmarketing', 'ASC');
+		if ($length > 0) {
+			$this->db->limit($length, $start);
+		}
+		$rows = $this->db->get()->result();
 
 		$no   = $start;
 		$data = array_map(function ($item) use (&$no, $can_access) {
@@ -356,12 +356,12 @@ class Inventory_4_model extends BF_Model
 				'no_aloy'       => $item->no_alloy,
 				'thickness'     => $item->thickness,
 				'width'         => $item->width,
-				'length'        => number_format($item->length_val, 2),
-				'delivery_date' => date('d-M-Y', strtotime($item->delivery_date)),
-				'total_weight'  => number_format($item->total_weight),
-				'total_sheet'   => number_format($item->total_sheet),
+				'length'        => number_format((float) $item->length_val, 2),
+				'delivery_date' => $item->delivery_date ? date('d-M-Y', strtotime($item->delivery_date)) : '-',
+				'total_weight'  => number_format((float) $item->total_weight),
+				'total_sheet'   => number_format((float) $item->total_sheet),
 				'total_spk'     => '-',
-				'fg'            => number_format($item->fg_booking, 2),
+				'fg'            => number_format((float) $item->fg_booking, 2),
 				'action'        => $this->_material_planning_action_buttons($item, $can_access),
 			];
 		}, $rows);
