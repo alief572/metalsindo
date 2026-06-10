@@ -254,6 +254,7 @@
                         });
                     },
                     error: function(xhr, status, error) {
+                        $('.save_btn').attr('disabled', false);
                         Swal.fire({
                             icon: 'error',
                             title: 'Error !',
