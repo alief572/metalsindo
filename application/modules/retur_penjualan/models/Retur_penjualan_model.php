@@ -341,7 +341,7 @@ class Retur_penjualan_model extends BF_Model
 		$this->db->select('a.*, b.name_customer');
 		$this->db->from('tr_retur_penjualan a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer', 'left');
-		$this->db->where('a.no_do IS NOT NULL');
+		// $this->db->where('a.no_do IS NOT NULL');
 
 		// Filter Search
 		if (!empty($search)) {

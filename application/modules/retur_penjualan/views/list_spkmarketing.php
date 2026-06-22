@@ -15,7 +15,8 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 
 <div class="box">
 	<!-- /.box-header -->
-	<!-- /.box-header -->
+
+	<!-- /.box-body -->
 	<div class="box-body">
 		<table id="table_retur_incoming" class="table table-bordered table-striped">
 			<thead>
