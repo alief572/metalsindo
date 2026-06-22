@@ -15,7 +15,11 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 
 <div class="box">
 	<!-- /.box-header -->
-
+	<div class="box-header">
+		<?php if ($ENABLE_MANAGE) { ?>
+			<a class="btn btn-success btn-sm" href="<?= base_url('/retur_penjualan/proses_incoming') ?>"><i class="fa fa-plus"></i> Input Retur Baru</a>
+		<?php } ?>
+	</div>
 	<!-- /.box-body -->
 	<div class="box-body">
 		<table id="table_retur_incoming" class="table table-bordered table-striped">
