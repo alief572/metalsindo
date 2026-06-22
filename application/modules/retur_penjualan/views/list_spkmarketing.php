@@ -254,10 +254,10 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 					data: 'no'
 				},
 				{
-					data: 'tgl_retur'
+					data: 'no_retur'
 				},
 				{
-					data: 'no_do'
+					data: 'tgl_retur'
 				},
 				{
 					data: 'customer'
