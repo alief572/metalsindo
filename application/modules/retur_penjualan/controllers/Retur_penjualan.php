@@ -45,34 +45,8 @@ class Retur_penjualan extends Admin_Controller
 
 	public function proses_incoming()
 	{
-
-		$id = $this->uri->segment(3);
 		$this->auth->restrict($this->viewPermission);
-		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-pencil');
-		$aktif = 'active';
-		$deleted = '0';
-
-		$nospk  = $this->db->query("SELECT a.no_surat FROM tr_spk_marketing a WHERE a.id_spkmarketing='$id'")->row();
-		$spkmkt = $nospk->no_surat;
-		$tr_spk = $this->Retur_penjualan_model->get_data('tr_spk_marketing', 'id_spkmarketing', $id);
-		// $dtspk = $this->Retur_penjualan_model->get_data('dt_spkmarketing',array('id_spkmarketing',$id));
-		$dtspk = $this->db->query("SELECT a.*, b.nama, b.maker, b.id_bentuk, b.total_weight, c.no_surat as no_do FROM stock_material a
-		JOIN ms_inventory_category3 b ON b.id_category3 = a.id_category3
-		JOIN tr_delivery_order c ON c.id_delivery_order = a.no_kirim
-		WHERE a.no_surat ='$spkmkt' ORDER BY c.no_surat ASC")->result();
-
-		$check_sheet = 0;
-
-		$data_weight_per_sheet = [];
-
-		foreach ($dtspk as $item) {
-			if ($check_sheet == 0 && $item->id_bentuk == 'B2000002') {
-				$check_sheet = 1;
-
-				$data_weight_per_sheet[$item->id_category3] = $item->total_weight;
-			}
-		}
 
 		$penawaran = $this->Retur_penjualan_model->get_data('tr_penawaran');
 		$customer = $this->db
@@ -84,20 +58,13 @@ class Retur_penjualan extends Admin_Controller
 			->order_by('b.name_customer', 'asc')
 			->get()
 			->result();
-		$karyawan = $this->Retur_penjualan_model->get_data('ms_karyawan', 'deleted', $deleted);
-		$mata_uang = $this->Retur_penjualan_model->get_data('mata_uang', 'deleted', $deleted);
+
 		$data = [
-			'tr_spk' => $tr_spk,
-			'dtspk' => $dtspk,
 			'penawaran' => $penawaran,
 			'customer' => $customer,
-			'karyawan' => $karyawan,
-			'mata_uang' => $mata_uang,
-			'check_sheet' => $check_sheet,
-			'data_weight_per_sheet' => $data_weight_per_sheet
 		];
 
-		$gudang	= $this->db->query("select * FROM ms_gudang ")->result();
+		$gudang = $this->db->query("select * FROM ms_gudang")->result();
 		$this->template->set('gudang', $gudang);
 		$this->template->set('results', $data);
 		$this->template->title('Terima Retur Penjualan');

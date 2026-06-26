@@ -359,7 +359,7 @@ class Retur_penjualan_model extends BF_Model
 		$count_filter = $this->db->count_all_results('', false);
 
 		// Ordering
-		$this->db->order_by('id_spkmarketing', 'DESC');
+		$this->db->order_by('a.id_retur', 'DESC');
 
 		// Limit & Offset
 		$this->db->limit($length, $start);
@@ -371,15 +371,9 @@ class Retur_penjualan_model extends BF_Model
 		foreach ($get_data as $item) {
 			$no++;
 
-			// Status Badge logic
-			$status = ($item->status_approve == '1')
-				? '<span class="badge bg-green">Approve</span>'
-				: '<span class="badge bg-red">Belum di Approve</span>';
-
-			// Action logic
 			$action = '';
 			if ($ENABLE_MANAGE) {
-				$action = '<a class="btn btn-info btn-sm" href="' . base_url('/retur_penjualan/proses_incoming/' . $item->id_spkmarketing) . '" title="Edit"><i class="fa fa-edit"></i></a>';
+				$action = '<a class="btn btn-success btn-sm" href="' . base_url('/retur_penjualan/PrintH2/' . $item->id_retur) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
 			}
 
 			$hasil[] = [
@@ -396,7 +390,7 @@ class Retur_penjualan_model extends BF_Model
 
 		$response = [
 			'draw'            => $draw,
-			'recordsTotal'    => $count_filter, // Sesuaikan jika ingin real count_all tanpa filter
+			'recordsTotal'    => $count_filter,
 			'recordsFiltered' => $count_filter,
 			'data'            => $hasil
 		];

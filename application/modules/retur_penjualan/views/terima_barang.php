@@ -1,153 +1,54 @@
 <?php
-$ENABLE_ADD     = has_permission('Trans_inquiry.Add');
-$ENABLE_MANAGE  = has_permission('Trans_inquiry.Manage');
-$ENABLE_VIEW    = has_permission('Trans_inquiry.View');
-$ENABLE_DELETE  = has_permission('Trans_inquiry.Delete');
 $tanggal = date('Y-m-d');
-foreach ($results['tr_spk'] as $tr_spk) {
-}
 ?>
 
 <div class="box box-primary">
 	<div class="box-body">
 		<form id="data-form" method="post">
 			<div class="col-sm-12">
-				<div class="input_fields_wrap2">
-					<div class="row">
-						<center><label for="customer">
-								<h3>Retur Penjualan</h3>
-							</label></center>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="customer">NO.SPK</label>
-									</div>
-									<div class="col-md-8" hidden>
-										<input type="text" class="form-control" id="id_spkmarketing" value="<?= $tr_spk->id_spkmarketing ?>" required name="id_spkmarketing" readonly placeholder="No.CRCL">
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="no_surat" value="<?= $tr_spk->no_surat ?>" required name="no_surat" readonly placeholder="No.SPK">
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="customer">Tanggal</label>
-									</div>
-									<div class="col-md-8">
-										<input type="date" class="form-control" id="tgl_penawaran" value="<?= $tr_spk->tgl_spk_marketing ?>" onkeyup required name="tgl_penawaran">
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">Customer</label>
-									</div>
-									<div class="col-md-8">
-										<select id="id_customerx" name="id_customerx" class="form-control select" required>
-											<option value="">--Pilih--</option>
-											<?php foreach ($results['customer'] as $penawaran) {
-												$sel = ($tr_spk->id_customer == $penawaran->id_customer) ? 'selected' : '';
-											?>
-												<option value="<?= $penawaran->id_customer ?>" <?= $sel ?>><?= strtoupper(strtolower($penawaran->name_customer)) ?></option>
-											<?php } ?>
-										</select>
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row" id="slot_customer">
-									<div class="col-md-4">
-										<label for="customer"></label>
-									</div>
-									<div class="col-md-8" hidden>
-										<input type="text" class="form-control" value='<?= $tr_spk->nama_customer ?>' id="nama_customer" onkeyup required name="nama_customer" readonly>
-									</div>
-									<div class="col-md-8" hidden>
-										<input type="text" class="form-control" value='<?= $tr_spk->id_customer ?>' id="id_customer" onkeyup required name="id_customer" readonly>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">No. Penawaran</label>
-									</div>
-									<div class="col-md-8">
-										<select id="no_penawaran" name="no_penawaran" class="form-control select" onchange="get_produk()" required>
-											<option value="">--Pilih--</option>
-											<?php foreach ($results['penawaran'] as $penawaran) {
-												$select = ($tr_spk->no_penawaran == $penawaran->no_penawaran) ? 'selected' : ''; ?>
-												<option value="<?= $penawaran->no_penawaran ?>" <?= $select ?>><?= strtoupper(strtolower($penawaran->no_surat)) ?></option>
-											<?php } ?>
-										</select>
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">No PO</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="no_po" required name="no_po" value='<?= $tr_spk->no_po; ?>'>
-									</div>
-								</div>
-							</div>
-						</div>
+				<div class="row">
+					<center><label>
+							<h3>Retur Penjualan</h3>
+						</label></center>
 
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">Sample</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="sample" required name="sample" value='<?= $tr_spk->sample; ?>'>
-									</div>
+					<!-- Row 1: No. Dokumen & Tanggal -->
+					<div class="col-sm-12">
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label>No. Dokumen</label>
 								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">Tgl PO</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control datepicker" id="tgl_po" required name="tgl_po" readonly value='<?= $tr_spk->tgl_po; ?>'>
-									</div>
+								<div class="col-md-8">
+									<input type="text" class="form-control" id="no_dokumen" value="(Auto Generate)" readonly>
 								</div>
 							</div>
 						</div>
-
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="no_penawaran">Date Plan By Customer</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control datepicker" id="plan_cust" required name="plan_cust" readonly value='<?= $tr_spk->plan_cust; ?>'>
-									</div>
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label>Tanggal Retur</label>
+								</div>
+								<div class="col-md-8">
+									<input type="date" class="form-control" id="tgl_penawaran" value="<?= $tanggal ?>" name="tgl_penawaran" required>
 								</div>
 							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="kompensasi">Kompensasi</label>
-									</div>
-									<div class="col-md-8">
-										<select id="kompensasi" name="kompensasi" class="form-control select" required>
-											<option value="brg">Ganti Barang</option>
-											<option value="htg">Potong Hutang</option>
-										</select>
-									</div>
+						</div>
+					</div>
+
+					<!-- Row 2: Customer & No. Penawaran -->
+					<div class="col-sm-12">
+						<div class="col-sm-6">
+							<div class="form-group row">
+								<div class="col-md-4">
+									<label>Customer</label>
+								</div>
+								<div class="col-md-8">
+									<select id="id_customerx" name="id_customerx" class="form-control select" required>
+										<option value="">--Pilih--</option>
+										<?php foreach ($results['customer'] as $cust) { ?>
+											<option value="<?= $cust->id_customer ?>"><?= strtoupper(strtolower($cust->name_customer)) ?></option>
+										<?php } ?>
+									</select>
 								</div>
 							</div>
 						</div>
@@ -195,76 +96,18 @@ foreach ($results['tr_spk'] as $tr_spk) {
 								</div>
 							</div>
 						</div>
+					</div>
 
-						<div class="col-sm-12">
+					<!-- Row 4: Keterangan Retur & Ganti Material -->
+					<div class="col-sm-12">
+						<div class="col-sm-6">
 							<div class="form-group row">
-								<table class='table table-bordered table-striped'>
-									<thead>
-										<tr class='bg-blue'>
-											<th>ID Material</th>
-											<th>No. DO</th>
-											<th>Nama Material</th>
-											<th>Lot Number</th>
-											<th>Thickness</th>
-											<th>Width</th>
-											<th>Length</th>
-											<th>Total Kirim (Kg)</th>
-											<?php
-											if ($results['check_sheet'] == 1) {
-												echo '<th>Total Kirim (Sheet)</th>';
-											}
-											?>
-											<th>Diterima Di Gudang</th>
-											<th>Retur</th>
-										</tr>
-									</thead>
-									<tbody id="list_penawaran_slot">
-										<?php $loop = 0;
-										foreach ($results['dtspk'] as $dt) {
-											$thg = number_format($dt->total_harga, 2);
-											$loop++;
-											echo "
-			<tr id='tabel_penawaran_$loop'>
-			<th>
-			<input type='text' class='form-control'   value='$dt->id_category3' id='dp_id_category3_$loop' data-role='qtip' required name='dp[$loop][id_category3]'>
-			<input type='hidden' class='form-control'   value='$dt->id_stock' id='dp_id_stok_$loop' data-role='qtip' required name='dp[$loop][id_stok]'>
-			</th>
-			<th>" . $dt->no_do . "</th>
-			<th><input type='text' class='form-control'   value='$dt->nama' id='dp_nama_$loop' data-role='qtip' required name='dp[$loop][nama]'></th>
-			<th><input type='text' class='form-control'   value='$dt->lotno' id='dp_lotno_$loop' data-role='qtip' required name='dp[$loop][lotno]'></th>
-			<th><input type='text' class='form-control'   value='$dt->thickness' id='dp_thickness_$loop' data-role='qtip' required name='dp[$loop][thickness]'></th>
-			<th><input type='text' class='form-control'   value='$dt->width' id='dp_width_$loop' data-role='qtip' required name='dp[$loop][width]'></th>
-			<th><input type='text' class='form-control'   value='$dt->length' id='dp_length_$loop' data-role='qtip' required name='dp[$loop][length]'></th>
-			<th><input type='text' class='form-control'   value='$dt->total_kirim' id='dp_total_kirim_$loop' data-role='qtip' required name='dp[$loop][total_kirim]'></th>";
-
-											if ($results['check_sheet'] == 1) {
-												$qty_sheet = (isset($results['data_weight_per_sheet'][$dt->id_category3])) ? $results['data_weight_per_sheet'][$dt->id_category3] : '';
-												$val_sheet = 0;
-												if ($dt->total_kirim > 0 && $qty_sheet > 0) {
-													$val_sheet = ceil($dt->total_kirim / $qty_sheet);
-												}
-												echo "<th><input type='text' class='form-control'   value='" . $val_sheet . "' id='dp_qty_sheet_$loop' data-role='qtip' required name='dp[$loop][qty_sheet]'></th>";
-											}
-
-											echo "
-			<th><select class='form-control' id='dp_gudang_$loop' data-role='qtip' required name='dp[$loop][gudang]'>";
-											foreach ($gudang as $gudangx) {
-												$sel = ($gudangx->id_gudang == 3) ? 'selected' : '';
-												echo "<option value='$gudangx->id_gudang' " . $sel . ">$gudangx->nama_gudang</option>";
-											};
-											echo "</select></td>
-			</th>
-			";
-
-											if ($dt->deal == '1') {
-												echo "<th><input type='checkbox' value='1' checked id='dp_deal_$loop' required name='dp[$loop][deal]'></th>";
-											} else {
-												echo "<th><input type='checkbox' value='1' id='dp_deal_$loop' required name='dp[$loop][deal]'></th>";
-											}
-											echo "</tr>";
-										}; ?>
-									</tbody>
-								</table>
+								<div class="col-md-4">
+									<label>Keterangan Retur</label>
+								</div>
+								<div class="col-md-8">
+									<textarea class="form-control" id="note" name="note" rows="2"></textarea>
+								</div>
 							</div>
 						</div>
 						<!-- <div class="col-sm-6">
@@ -326,26 +169,24 @@ foreach ($results['tr_spk'] as $tr_spk) {
 					<!-- Buttons: Simpan & Kembali -->
 					<div class="col-sm-12" style="margin-top:10px;">
 						<center>
-							<button type="submit" class="btn btn-success btn-sm" name="save" id="simpan-com"><i class="fa fa-save"></i>Simpan</button>
-							<a class="btn btn-danger btn-sm" href="<?= base_url('/retur_penjualan/incoming_retur/') ?>" title="Edit">Kembali</a>
+							<button type="submit" class="btn btn-success btn-sm" id="simpan-com"><i class="fa fa-save"></i> Simpan</button>
+							<a class="btn btn-danger btn-sm" href="<?= base_url('/retur_penjualan/incoming_retur/') ?>">Kembali</a>
 						</center>
 					</div>
+
 				</div>
+			</div>
 		</form>
 	</div>
 </div>
 
 <script src="<?= base_url('assets/js/autoNumeric.js') ?>"></script>
 <script type="text/javascript">
-	//$('#input-kendaraan').hide();
 	var base_url = '<?php echo base_url(); ?>';
 	var active_controller = '<?php echo ($this->uri->segment(1)); ?>';
-	$('.datepicker').datepicker();
-	$(document).ready(function() {
-		var max_fields2 = 10; //maximum input boxes allowed
-		var wrapper2 = $(".input_fields_wrap2"); //Fields wrapper
-		var add_button2 = $(".add_field_button2"); //Add button ID			
+	var spk_counter = 0;
 
+	$(document).ready(function() {
 		$('.select').select2();
 
 		// Event: Customer change → update No. DO dropdown
@@ -425,21 +266,54 @@ foreach ($results['tr_spk'] as $tr_spk) {
 		// Event: Simpan button click → validate and save
 		$('#simpan-com').click(function(e) {
 			e.preventDefault();
-			var deskripsi = $('#deskripsi').val();
-			var image = $('#image').val();
-			var idtype = $('#inventory_1').val();
 
-			if ($('[type=checkbox]:checked').length == 0) {
+			// Validasi 1: Cek apakah ada checkbox yang dicentang
+			if ($('.chk_retur:checked').length == 0) {
 				swal({
 					title: "Warning!",
-					text: "Centang barang yang akan diretur terlebih dahulu !",
+					text: "Centang barang yang akan diretur terlebih dahulu!",
 					type: "warning",
 					timer: 3000
 				});
 				return false;
 			}
 
-			var data, xhr;
+			// Validasi 2: Cek field header wajib
+			var customer = $('#id_customerx').val();
+			var tanggal = $('#tgl_penawaran').val();
+			if (!customer || !tanggal) {
+				swal({
+					title: "Warning!",
+					text: "Form Tidak Boleh Kosong (Customer & Tanggal wajib diisi)",
+					type: "warning",
+					timer: 3000
+				});
+				return false;
+			}
+
+			// Validasi 3: Cek Qty Sheet untuk material sheet yang dicentang
+			var sheet_empty = false;
+			$('.chk_retur:checked').each(function() {
+				var row = $(this).closest('tr');
+				var qty_sheet_input = row.find('.qty_sheet');
+				if (qty_sheet_input.length > 0) {
+					var val = qty_sheet_input.val();
+					if (!val || val == '' || val == '0') {
+						sheet_empty = true;
+					}
+				}
+			});
+			if (sheet_empty) {
+				swal({
+					title: "Warning!",
+					text: "Input QTY Sheet untuk barang Sheet masih ada yang kosong!",
+					type: "warning",
+					timer: 3000
+				});
+				return false;
+			}
+
+			// Semua validasi lolos → konfirmasi
 			swal({
 					title: "Are you sure?",
 					text: "You will not be able to process again this data!",
@@ -476,33 +350,18 @@ foreach ($results['tr_spk'] as $tr_spk) {
 									});
 									window.location.href = base_url + active_controller + '/incoming_retur';
 								} else {
-
-									if (data.status == 2) {
-										swal({
-											title: "Save Failed!",
-											text: data.pesan,
-											type: "warning",
-											timer: 7000,
-											showCancelButton: false,
-											showConfirmButton: false,
-											allowOutsideClick: false
-										});
-									} else {
-										swal({
-											title: "Save Failed!",
-											text: data.pesan,
-											type: "warning",
-											timer: 7000,
-											showCancelButton: false,
-											showConfirmButton: false,
-											allowOutsideClick: false
-										});
-									}
-
+									swal({
+										title: "Save Failed!",
+										text: data.pesan,
+										type: "warning",
+										timer: 7000,
+										showCancelButton: false,
+										showConfirmButton: false,
+										allowOutsideClick: false
+									});
 								}
 							},
 							error: function() {
-
 								swal({
 									title: "Error Message !",
 									text: 'An Error Occured During Process. Please try again..',
@@ -520,12 +379,12 @@ foreach ($results['tr_spk'] as $tr_spk) {
 					}
 				});
 		});
-
 	});
 
 	// Function: Tambah Material - load material rows for selected DO
 	function TambahMaterialRetur(id_do, text_do) {
 		$.ajax({
+			url: siteurl + 'retur_penjualan/TambahMaterialRetur',
 			type: "GET",
 			data: {
 				id_delivery_order: id_do
@@ -585,6 +444,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 			var total_kirim = parseFloat(total_kirim_str.replace(/,/g, '')) || 0;
 			total += total_kirim;
 		});
+		$('#total_retur').val(total.toFixed(2));
 	}
 
 	// Function: Check/Uncheck all retur checkboxes
