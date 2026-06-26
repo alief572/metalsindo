@@ -899,8 +899,8 @@ class Expense extends Admin_Controller
 		$grand_total		= $this->input->post("grand_total");
 		$id_expense_detail		= $this->input->post("id_expense_detail");
 
-		$nilai_ppn = str_replace(',', '', $post['nilai_ppn']);
-		$nilai_pph = str_replace(',', '', $post['nilai_pph']);
+		$nilai_ppn = (isset($post['nilai_ppn'])) ? str_replace(',', '', $post['nilai_ppn']) : 0;
+		$nilai_pph = (isset($post['nilai_pph'])) ? str_replace(',', '', $post['nilai_pph']) : 0;
 
 		$pengembalian = $this->input->post('pengembalian');
 		if (!isset($pengembalian)) {
