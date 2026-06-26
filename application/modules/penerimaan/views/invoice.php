@@ -9,7 +9,6 @@
  							<th width="30%">No Invoice</th>
  							<th width="30%">Nama Customer</th>
  							<th width="30%">Total Invoice</th>
- 							<th width="30%">Total CN Retur</th>
  							<th width="30%">Sisa Invoice</th>
  							<th width="2%" class="text-center">Aksi</th>
  						</tr>
@@ -75,19 +74,6 @@
 										$nilai_invoice = $grand_total;
 										$sisa_invoice_idr = ($nilai_invoice - $vs->total_bayar_idr);
 									}
-
-
-									$get_retur = $this->db->select('SUM(a.total_harga) as total_cn_retur')
-										->from('dt_returpenjualan a')
-										->join('tr_retur_penjualan b', 'b.id_retur = a.id_retur')
-										->where('b.no_do', $vs->id_do)
-										->get()
-										->row();
-
-									$total_cn_retur = (!empty($get_retur->total_cn_retur)) ? $get_retur->total_cn_retur : 0;
-
-									$sisa_invoice_idr -= $total_cn_retur;
-
 									if ($sisa_invoice_idr > 0) {
 							?>
  									<tr>
@@ -98,9 +84,6 @@
  										</td>
  										<td>
  											<center><?php echo number_format($nilai_invoice) ?></center>
- 										</td>
- 										<td>
- 											<center style="color: red;">(<?php echo number_format($total_cn_retur) ?>)</center>
  										</td>
  										<td>
  											<center><?php echo number_format($sisa_invoice_idr) ?></center>
