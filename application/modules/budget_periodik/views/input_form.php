@@ -22,7 +22,7 @@
 							<th>Post Pengeluaran</th>
 							<th>Nama Barang /Jasa</th>
 							<th>Bulanan/ Tahunan</th>
-							<th>Jadual Pembayaran</th>
+							<th>Jadwal Pembayaran</th>
 							<th>Perkiraan Biaya</th>
 							<th>Baseline</th>
 							<th width=100>
@@ -63,7 +63,7 @@
 												echo $combocoa;
 											} ?>
 										</select></td>
-									<td><input type="text" class="form-control" name="nama[]" id="nama_<?= $idd; ?>" value=""></td>
+									<td><textarea class="form-control" name="nama[]" id="nama_<?= $idd; ?>" rows="2" style="min-height:60px;font-size:13px;resize:vertical;"></textarea></td>
 									<td><select class="form-control" name="tipe[]" id="tipe_<?= $idd; ?>" onchange="cektipe(<?= $idd; ?>)">
 											<?php echo $combowaktu; ?>
 										</select></td>
@@ -96,7 +96,7 @@
 												echo $combocoa;
 											} ?>
 										</select></td>
-									<td><input type="text" class="form-control" name="nama[]" id="nama_<?= $idd; ?>" value="<?= $record->nama; ?>"></td>
+									<td><textarea class="form-control" name="nama[]" id="nama_<?= $idd; ?>" rows="2" style="min-height:60px;font-size:13px;resize:vertical;"><?= htmlspecialchars($record->nama); ?></textarea></td>
 									<td><select class="form-control" name="tipe[]" id="tipe_<?= $idd; ?>" onchange="cektipe(<?= $idd; ?>)">
 											<?php
 											if ($record->coa != '') {
@@ -110,7 +110,15 @@
 										<input type="text" class="form-control tanggal <?php echo ($record->tipe == 'bulan' ? ' hidden' : ''); ?>" name="thn[]" id="thn_<?= $idd; ?>" value="<?= $record->tanggal; ?>" readonly style="background:#fff;cursor: pointer;">
 										<select class="form-control <?php echo ($record->tipe == 'bulan' ? ' ' : ' hidden'); ?>" name="bln[]" id="bln_<?= $idd; ?>">
 											<?php
-											echo str_ireplace($record->tanggal . "'", $record->tanggal . "' selected ", $combotgl); ?>
+											for ($tgl = 1; $tgl <= 31; $tgl++) {
+												$selected = '';
+												if ($record->tanggal == $tgl) {
+													$selected = 'selected';
+												}
+												echo "<option value='" . $tgl . "' " . $selected . ">" . $tgl . "</option>";
+											}
+											// echo str_ireplace($record->tanggal . "'", $record->tanggal . "' selected ", $combotgl); 
+											?>
 										</select>
 									</td>
 									<td><input type="text" class="form-control divide" name="nilai[]" id="nilai_<?= $idd; ?>" value="<?= ($record->nilai); ?>"></td>
@@ -245,7 +253,7 @@
 		Rows += "<select class='form-control select2' style='width:100%' name='coa[]' id='coa_" + nomor + "'><?php echo $combocoa; ?></select>";
 		Rows += "</td>";
 		Rows += "<td>";
-		Rows += "<input type='text' class='form-control' name='nama[]' id='nama_" + nomor + "' />";
+		Rows += "<textarea class='form-control' name='nama[]' id='nama_" + nomor + "' rows='2' style='min-height:60px;font-size:13px;resize:vertical;'></textarea>";
 		Rows += "</td>";
 		Rows += "<td>";
 		Rows += "<select class='form-control' name='tipe[]' id='tipe_" + nomor + "' onchange='cektipe(" + nomor + ")'><?php echo $combowaktu; ?></select>";

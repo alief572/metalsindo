@@ -8,18 +8,19 @@ $app = '';
 $bank_id = '';
 $accnumber = '';
 $accname = '';
-// if (!isset($data->departement)) {
-// 	$data_user = $this->db->get_where('users', ['username' => $this->auth->user_name()])->row();
-// 	$data_employee = $this->db->get_where('employee', ['id' => $data_user->employee_id])->row();
-// 	if (!empty($data_employee)) {
-// 		$dept = $data_employee->department_id;
-// 		$bank_id = $data_employee->bank_id;
-// 		$accnumber = $data_employee->accnumber;
-// 		$accname = $data_employee->accname;
-// 		//$data_head = $this->db->get_where('divisions_head', ['id' => $data_employee->division_head])->row();
-// 		//$app=$data_head->employee_id;
-// 	}
-// }
+if (!isset($data->departement)) {
+	$data_user = $this->db->get_where('users', ['username' => $this->auth->user_name()])->row();
+	$data_employee = $this->db->get_where('employee', ['id' => $data_user->employee_id])->row();
+	if (!empty($data_employee)) {
+		$dept = $data_employee->department_id;
+		$bank_id = $data_employee->bank_id;
+		$accnumber = $data_employee->accnumber;
+		$accname = $data_employee->accname;
+		//$data_head = $this->db->get_where('divisions_head', ['id' => $data_employee->division_head])->row();
+		//$app=$data_head->employee_id;
+		// awdawd
+	}
+}
 $budgets = 0;
 ?>
 <?= form_open($this->uri->uri_string(), array('id' => 'frm_data', 'name' => 'frm_data', 'role' => 'form', 'class' => 'form-horizontal', 'enctype' => 'multipart/form-data')); ?>
@@ -28,9 +29,43 @@ $budgets = 0;
 <input type="hidden" id="nama" name="nama" value="<?php echo (isset($data->nama) ? $data->nama : $this->auth->user_name()); ?>">
 <input type="hidden" id="approval" name="approval" value="<?php echo (isset($data->approval) ? $data->approval : $app); ?>">
 <style>
+	/* Tabel selalu bisa scroll horizontal */
+	.table-responsive {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	/* Lebar minimum tabel agar semua kolom cukup */
+	.table-responsive>table.table {
+		min-width: 1600px;
+	}
+
+	/* Semua sel vertikal dari atas */
+	#detail_body td,
+	#detail_body th {
+		vertical-align: top;
+	}
+
+	/* Font semua kolom cukup besar untuk dibaca */
+	table.table th,
+	table.table td {
+		font-size: 14px;
+		white-space: normal;
+	}
+
+	/* Textarea Barang/Jasa & Spesifikasi */
+	textarea.form-control {
+		min-height: 80px;
+		font-size: 14px;
+		resize: vertical;
+		line-height: 1.5;
+		width: 100%;
+	}
+
+	/* Mobile stacked layout */
 	@media screen and (max-width: 520px) {
-		table {
-			width: 100%;
+		.table-responsive>table.table {
+			min-width: unset;
 		}
 
 		thead th.column-primary {
@@ -66,6 +101,11 @@ $budgets = 0;
 			text-transform: uppercase;
 			font-weight: bold;
 			content: attr(data-header);
+		}
+
+		textarea.form-control {
+			font-size: 14px;
+			text-align: left;
 		}
 	}
 </style>
@@ -124,9 +164,9 @@ $budgets = 0;
 
 
 
-				<?php
-				if (!isset($stsview) || (isset($stsview) && $stsview == '')) {
-				?>
+				<!-- <?php
+						if (!isset($stsview) || (isset($stsview) && $stsview == '')) {
+						?>
 
 					<h4>List Penggantian/Pengembalian Kasbon</h4>
 					<table class="table table-bordered">
@@ -159,7 +199,7 @@ $budgets = 0;
 						</tbody>
 					</table>
 
-					<!-- <h4>List Penggunaan Pettycash</h4>
+					<h4>List Penggunaan Pettycash</h4>
 					<table class="table table-bordered ">
 						<thead>
 							<tr>
@@ -185,11 +225,11 @@ $budgets = 0;
 							}
 							?>
 						</tbody>
-					</table> -->
+					</table>
 
 				<?php
-				}
-				?>
+						}
+				?> -->
 
 				<div>
 					<h4>Transfer ke</h4>
@@ -212,17 +252,19 @@ $budgets = 0;
 					<table class="table table-bordered table-striped" width="100%">
 						<thead>
 							<tr>
-								<th width="5" scope="col" class="column-primary">#</th>
-								<th scope="col" width="250">Jenis dan<br /> Tanggal</th>
-								<th scope="col" width="250">Barang/Jasa &<br />Keterangan</th>
-								<th scope="col" width=150 nowrap>Jumlah</th>
-								<th scope="col" width=200 nowrap>Harga Satuan</th>
-								<th scope="col" width="200">Expense</th>
-								<th scope="col" width="200">Kasbon</th>
-								<th scope="col" width="50">Bon Bukti</th>
-								<th scope="col" class="column-primary">
+								<th width="30" scope="col" class="column-primary">#</th>
+								<th scope="col" width="220">Jenis</th>
+								<th scope="col" width="110">Tanggal</th>
+								<th scope="col" width="200">Barang/Jasa</th>
+								<th scope="col" width="200">Spesifikasi</th>
+								<th scope="col" width="70">Jumlah</th>
+								<th scope="col" width="120">Harga Satuan</th>
+								<th scope="col" width="120">Expense</th>
+								<th scope="col" width="100">Kasbon</th>
+								<th scope="col" width="120">Bon Bukti</th>
+								<th scope="col" width="80" class="column-primary">
 									<div class="pull-right">
-										<!-- <a class="btn btn-info btn-xs stsview" href="javascript:void(0)" title="Kasbon" onclick="add_kasbon()" id="add-kasbon"><i class="fa fa-user"></i> Kasbon</a><br /> -->
+										<a class="btn btn-info btn-xs stsview" href="javascript:void(0)" title="Kasbon" onclick="add_kasbon()" id="add-kasbon"><i class="fa fa-user"></i> Kasbon</a><br />
 										<a class="btn btn-success btn-xs stsview" href="javascript:void(0)" title="Tambah" onclick="add_detail()" id="add-material"><i class="fa fa-plus"></i> Tambah</a>
 									</div>
 								</th>
@@ -253,18 +295,23 @@ $budgets = 0;
 											}
 											?>
 										</td>
-										<td data-header="Jenis & Tanggal">
+										<td data-header="Jenis">
 											<?php
 											if ($tekskasbon == '') {
-												echo form_dropdown('coa[]', $data_budget, (isset($record->coa) ? $record->coa : ''), array('id' => 'coa' . $idd, 'required' => 'required', 'class' => 'form-control select2', 'style' => 'width:300px'));
+												echo form_dropdown('coa[]', $data_budget, (isset($record->coa) ? $record->coa : ''), array('id' => 'coa' . $idd, 'required' => 'required', 'class' => 'form-control select2', 'style' => 'width:100%'));
 											} else {
 												echo '<input type="hidden" name="coa[]" id="coa' . $idd . '" value="' . $record->coa . '">';
 											}
 											?>
+										</td>
+										<td data-header="Tanggal">
 											<input type="text" class="form-control tanggal input-sm" name="tanggal[]" id="tanggal<?= $idd; ?>" value="<?= $record->tanggal; ?>" <?= $tekskasbon ?>>
 										</td>
-										<td data-header="Barang / Jasa & Keterangan"><input type="text" class="form-control input-sm" name="deskripsi[]" id="deskripsi_<?= $idd; ?>" value="<?= $record->deskripsi; ?>" <?= $tekskasbon ?> style='width:100px'>
-											<input type="text" class="form-control input-sm" name="keterangan[]" id="keterangan_<?= $idd; ?>" value="<?= $record->keterangan; ?>" style='width:100px'>
+										<td data-header="Barang / Jasa">
+											<textarea class="form-control input-sm" name="deskripsi[]" id="deskripsi_<?= $idd; ?>" style="min-height:80px;min-width:200px;font-size:14px;" <?= $tekskasbon ?>><?= $record->deskripsi ?></textarea>
+										</td>
+										<td data-header="Spesifikasi">
+											<textarea class="form-control input-sm" name="keterangan[]" id="keterangan_<?= $idd; ?>" style="min-height:80px;min-width:200px;font-size:14px;" <?= $tekskasbon ?>><?= $record->keterangan ?></textarea>
 										</td>
 										<td data-header="Qty"><input type="text" class="form-control divide input-sm" name="qty[]" id="qty_<?= $idd; ?>" value="<?= $record->qty; ?>" onblur="cektotal(<?= $idd; ?>)" <?= $tekskasbon ?> size="15"></td>
 										<td data-header="Harga Satuan"><input type="text" class="form-control divide input-sm" name="harga[]" id="harga_<?= $idd; ?>" value="<?= $record->harga; ?>" onblur="cektotal(<?= $idd; ?>)" <?= $tekskasbon ?>></td>
@@ -314,7 +361,7 @@ $budgets = 0;
 						</tbody>
 						<tfoot>
 							<tr>
-								<td colspan="5" align=right>TOTAL</td>
+								<td colspan="7" align=right>TOTAL</td>
 								<td><input type="text" class="form-control divide input-sm" id="total_expense" name="total_expense" value="<?= $total_expense ?>" placeholder="Total Expense" tabindex="-1" readonly style='width:90px'></td>
 								<td><input type="text" class="form-control divide input-sm" id="total_kasbon" name="total_kasbon" value="<?= $total_kasbon ?>" placeholder="Total Kasbon" tabindex="-1" readonly style='width:90px'></td>
 								<td align=right colspan=2>
@@ -366,6 +413,7 @@ foreach($data_budget as $keys=>$val){
 */
 	?>
 	<script src="<?= base_url('assets/js/number-divider.min.js') ?>"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script type="text/javascript">
 		var combocoa = "<?= $datacombocoa ?>";
 
@@ -396,7 +444,7 @@ foreach($data_budget as $keys=>$val){
 			echo "getcoabudget('" . $datacombocoa . "');
 	";
 		} ?>
-		$('#pettycash').blur(function() {
+		$('#pettycash').change(function() {
 			tipe = $(this).val();
 			budgets = $(this).find(':selected').data('budget');
 			approval = $(this).find(':selected').data('approval');
@@ -414,14 +462,14 @@ foreach($data_budget as $keys=>$val){
 			e.preventDefault();
 			var errors = "";
 			var lops = 0;
-			$('.dtlloop').each(function() {
+			$('input[name="detail_id[]"]').each(function() {
 				lops++;
 				var iddtl = $(this).val();
-				// if($("#filename_"+iddtl).val()=="") {
-				// 	if ($('#doc_file_'+iddtl).get(0).files.length === 0) {
-				// 		errors="Bon Bukti harus diupload";
-				// 	}
-				// }
+				if ($("#filename_" + iddtl).val() == "") {
+					if ($('#doc_file_' + iddtl).get(0).files.length === 0) {
+						errors = "Bon Bukti wajib diupload untuk semua detail";
+					}
+				}
 			});
 			if (lops == 0) errors = "Detail harus diisi";
 			if ($("#informasi").val() == "") errors = "Keterangan tidak boleh kosong";
@@ -430,64 +478,65 @@ foreach($data_budget as $keys=>$val){
 			if (parseFloat($("#grand_total").val()) > parseFloat($("#budgets").val())) errors = "Saldo lebih dari budget";
 			if (errors == "") {
 
-				swal({
-						title: "Anda Yakin?",
-						text: "Data Akan Disimpan!",
-						type: "info",
-						showCancelButton: true,
-						confirmButtonText: "Ya, simpan!",
-						cancelButtonText: "Tidak!",
-						closeOnConfirm: false,
-						closeOnCancel: true
-					},
-					function(isConfirm) {
-						if (isConfirm) {
-							var formdata = new FormData($('#frm_data')[0]);
-							$.ajax({
-								url: url_save,
-								dataType: "json",
-								type: 'POST',
-								data: formdata,
-								processData: false,
-								contentType: false,
-								success: function(msg) {
-									if (msg['save'] == '1') {
-										swal({
-											title: "Sukses!",
-											text: "Data Berhasil Di Simpan",
-											type: "success",
-											timer: 1500,
-											showConfirmButton: false
-										});
-										window.location = siteurl + 'expense/<?= $urlback ?>';
-									} else {
-										swal({
-											title: "Gagal!",
-											text: "Data Gagal Di Simpan",
-											type: "error",
-											timer: 1500,
-											showConfirmButton: false
-										});
-									};
-									console.log(msg);
-								},
-								error: function(msg) {
-									swal({
-										title: "Gagal!",
-										text: "Ajax Data Gagal Di Proses",
-										type: "error",
+				Swal.fire({
+					title: "Anda Yakin?",
+					text: "Data Akan Disimpan!",
+					icon: "info",
+					showCancelButton: true,
+					confirmButtonText: "Ya, simpan!",
+					cancelButtonText: "Tidak!",
+					closeOnConfirm: false,
+					closeOnCancel: true
+				}).then((next) => {
+					if (next.isConfirmed) {
+						var formdata = new FormData($('#frm_data')[0]);
+						$.ajax({
+							url: url_save,
+							dataType: "json",
+							type: 'POST',
+							data: formdata,
+							processData: false,
+							contentType: false,
+							success: function(msg) {
+								if (msg['save'] == '1') {
+									Swal.fire({
+										title: "Sukses!",
+										text: "Data Berhasil Di Simpan",
+										icon: "success",
 										timer: 1500,
 										showConfirmButton: false
 									});
-									console.log(msg);
-								}
-							});
-						}
-					});
+									location.reload();
+								} else {
+									var errorText = "Data Gagal Di Simpan";
+									if (msg['message']) {
+										errorText = msg['message'];
+									}
+									Swal.fire({
+										title: "Gagal!",
+										text: errorText,
+										icon: "error"
+									});
+								};
+								console.log(msg);
+							},
+							error: function(msg) {
+								Swal.fire({
+									title: "Gagal!",
+									text: "Ajax Data Gagal Di Proses",
+									icon: "error",
+									timer: 1500,
+									showConfirmButton: false
+								});
+								console.log(msg);
+							}
+						});
+					}
+				});
 
 				//			data_save();
 			} else {
-				swal(errors);
+				Swal.fire(errors);
 				return false;
 			}
 		});
@@ -587,10 +636,10 @@ foreach($data_budget as $keys=>$val){
 					$(".divide").divide();
 				},
 				error: function() {
-					swal({
+					Swal.fire({
 						title: "Error Message !",
 						text: 'Connection Time Out. Please try again..',
-						type: "warning",
+						icon: "warning",
 						timer: 3000,
 						showCancelButton: false,
 						showConfirmButton: false,
@@ -606,13 +655,17 @@ foreach($data_budget as $keys=>$val){
 			Rows += "<input type='hidden' name='detail_id[]' id='raw_id_" + nomor + "' value='" + nomor + "' class='dtlloop'>";
 			Rows += "<input type='hidden' name='id_detail[]' id='id_detail_" + nomor + "' value='' class='dtlloop'>";
 			Rows += "<input type='hidden' name='filename[]' id='filename_" + nomor + "' value=''></td>";
-			Rows += "<td data-header='Jenis & Tanggal'>";
-			Rows += "<select name='coa[]' id='coa_" + nomor + "' required='required' class='form-control select2' style='width:300px'>" + combocoa + "</select>";
+			Rows += "<td data-header='Jenis'>";
+			Rows += "<select name='coa[]' id='coa_" + nomor + "' required='required' class='form-control select2' style='width:100%'>" + combocoa + "</select>";
+			Rows += "</td>";
+			Rows += "<td data-header='Tanggal'>";
 			Rows += "<input type='text' class='form-control tanggal input-sm' placeholder='Tanggal' name='tanggal[]' id='tanggal_" + nomor + "' />";
 			Rows += "</td>";
-			Rows += "<td data-header='Barang / Jasa & Keterangan'>";
-			Rows += "<input type='text' class='form-control input-sm' placeholder='Barang/Jasa' name='deskripsi[]' id='deskripsi_" + nomor + "' style='width:100px' />";
-			Rows += "<input type='text' class='form-control input-sm' placeholder='Keterangan' name='keterangan[]' id='keterangan_" + nomor + "' style='width:100px' />";
+			Rows += "<td data-header='Barang / Jasa'>";
+			Rows += "<textarea class='form-control input-sm' placeholder='Deskripsi' name='deskripsi[]' id='deskripsi_" + nomor + "' style='min-height:80px;min-width:200px;font-size:14px;'></textarea>";
+			Rows += "</td>";
+			Rows += "<td data-header='Spesifikasi'>";
+			Rows += "<textarea class='form-control input-sm' placeholder='Keterangan' name='keterangan[]' id='keterangan_" + nomor + "' style='min-height:80px;min-width:200px;font-size:14px;'></textarea>";
 			Rows += "</td>";
 			Rows += "<td data-header='Qty'>";
 			Rows += "<input type='text' class='form-control divide input-sm' name='qty[]' value='0' id='qty_" + nomor + "' onblur='cektotal(" + nomor + ")' style='width:60px' />";
@@ -706,38 +759,109 @@ foreach($data_budget as $keys=>$val){
 		}
 
 		function data_approve() {
-			swal({
+			Swal.fire({
+				title: "Anda Yakin?",
+				text: "Data Akan Disetujui!",
+				icon: "info",
+				showCancelButton: true,
+				confirmButtonText: "Ya, setuju!",
+				cancelButtonText: "Tidak!",
+				closeOnConfirm: false,
+				closeOnCancel: true
+			}).then((next) => {
+				if (next.isConfirmed) {
+					id = $("#id").val();
+					$.ajax({
+						url: url_approve + id,
+						dataType: "json",
+						type: 'POST',
+						success: function(msg) {
+							if (msg['save'] == '1') {
+								Swal.fire({
+									title: "Sukses!",
+									text: "Data Berhasil Di Setujui",
+									icon: "success",
+									timer: 1500,
+									showConfirmButton: false
+								});
+								location.reload();
+							} else {
+								Swal.fire({
+									title: "Gagal!",
+									text: "Data Gagal Di Setujui",
+									icon: "error",
+									timer: 1500,
+									showConfirmButton: false
+								});
+							};
+							console.log(msg);
+						},
+						error: function(msg) {
+							Swal.fire({
+								title: "Gagal!",
+								text: "Ajax Data Gagal Di Proses",
+								icon: "error",
+								timer: 1500,
+								showConfirmButton: false
+							});
+							console.log(msg);
+						}
+					});
+				}
+			});
+		}
+
+		function data_reject() {
+			Swal.fire({
+				title: "Perhatian",
+				text: "Berikan alasan penolakan",
+				icon: "input",
+				showCancelButton: true,
+				closeOnConfirm: false,
+				closeOnCancel: true
+			}).then((inputValue) => {
+				if (inputValue === false) return false;
+				if (inputValue === "") {
+					Swal.fire.showInputError("Tuliskan alasan anda");
+					return false
+				}
+
+				Swal.fire({
 					title: "Anda Yakin?",
-					text: "Data Akan Disetujui!",
-					type: "info",
+					text: "Data Akan Tolak!",
+					icon: "warning",
 					showCancelButton: true,
-					confirmButtonText: "Ya, setuju!",
+					confirmButtonText: "Ya, tolak!",
 					cancelButtonText: "Tidak!",
 					closeOnConfirm: false,
 					closeOnCancel: true
-				},
-				function(isConfirm) {
-					if (isConfirm) {
+				}).then((next) => {
+					if (next.isConfirmed) {
 						id = $("#id").val();
 						$.ajax({
-							url: url_approve + id,
+							url: base_url + 'expense/reject/',
+							data: {
+								'id': id,
+								'reason': inputValue,
+								'table': 'tr_expense'
+							},
 							dataType: "json",
 							type: 'POST',
 							success: function(msg) {
 								if (msg['save'] == '1') {
-									swal({
+									Swal.fire({
 										title: "Sukses!",
-										text: "Data Berhasil Di Setujui",
-										type: "success",
+										text: "Data Berhasil Di Tolak",
+										icon: "success",
 										timer: 1500,
 										showConfirmButton: false
 									});
-									window.location = siteurl + 'expense/<?= $urlback ?>';
+									window.location.reload();
 								} else {
-									swal({
+									Swal.fire({
 										title: "Gagal!",
-										text: "Data Gagal Di Setujui",
-										type: "error",
+										text: "Data Gagal Di Tolak",
+										icon: "error",
 										timer: 1500,
 										showConfirmButton: false
 									});
@@ -745,10 +869,10 @@ foreach($data_budget as $keys=>$val){
 								console.log(msg);
 							},
 							error: function(msg) {
-								swal({
+								Swal.fire({
 									title: "Gagal!",
 									text: "Ajax Data Gagal Di Proses",
-									type: "error",
+									icon: "error",
 									timer: 1500,
 									showConfirmButton: false
 								});
@@ -757,82 +881,7 @@ foreach($data_budget as $keys=>$val){
 						});
 					}
 				});
-		}
-
-		function data_reject() {
-			swal({
-					title: "Perhatian",
-					text: "Berikan alasan penolakan",
-					type: "input",
-					showCancelButton: true,
-					closeOnConfirm: false,
-					closeOnCancel: true
-				},
-				function(inputValue) {
-					if (inputValue === false) return false;
-					if (inputValue === "") {
-						swal.showInputError("Tuliskan alasan anda");
-						return false
-					}
-
-					swal({
-							title: "Anda Yakin?",
-							text: "Data Akan Tolak!",
-							type: "warning",
-							showCancelButton: true,
-							confirmButtonText: "Ya, tolak!",
-							cancelButtonText: "Tidak!",
-							closeOnConfirm: false,
-							closeOnCancel: true
-						},
-						function(isConfirm) {
-							if (isConfirm) {
-								id = $("#id").val();
-								$.ajax({
-									url: base_url + 'expense/reject/',
-									data: {
-										'id': id,
-										'reason': inputValue,
-										'table': 'tr_expense'
-									},
-									dataType: "json",
-									type: 'POST',
-									success: function(msg) {
-										if (msg['save'] == '1') {
-											swal({
-												title: "Sukses!",
-												text: "Data Berhasil Di Tolak",
-												type: "success",
-												timer: 1500,
-												showConfirmButton: false
-											});
-											window.location.reload();
-										} else {
-											swal({
-												title: "Gagal!",
-												text: "Data Gagal Di Tolak",
-												type: "error",
-												timer: 1500,
-												showConfirmButton: false
-											});
-										};
-										console.log(msg);
-									},
-									error: function(msg) {
-										swal({
-											title: "Gagal!",
-											text: "Ajax Data Gagal Di Proses",
-											type: "error",
-											timer: 1500,
-											showConfirmButton: false
-										});
-										console.log(msg);
-									}
-								});
-							}
-						});
-
-				});
+			});
 		}
 
 		function refresh_list_kasbon_non_pr(no_doc = null) {
@@ -847,10 +896,10 @@ foreach($data_budget as $keys=>$val){
 					$('.list_kasbon_pr_non_po').html(result);
 				},
 				error: function(result) {
-					swal({
+					Swal.fire({
 						title: 'Error !',
 						text: 'Please try again later !',
-						type: 'error'
+						icon: 'error'
 					});
 				}
 			});
@@ -868,10 +917,10 @@ foreach($data_budget as $keys=>$val){
 					$('.list_expense_kembalian').html(result);
 				},
 				error: function(result) {
-					swal({
+					Swal.fire({
 						title: 'Error !',
 						text: 'Please try again later !',
-						type: 'error'
+						icon: 'error'
 					});
 				}
 			});
@@ -901,13 +950,17 @@ foreach($data_budget as $keys=>$val){
 					Rows += "<input type='hidden' name='detail_id[]' id='raw_id_" + nomor + "' value='" + nomor + "' class='dtlloop'>";
 					Rows += "<input type='hidden' name='id_detail[]' id='id_detail_" + nomor + "' value='' class='dtlloop'>";
 					Rows += "<input type='hidden' name='filename[]' id='filename_" + nomor + "' value=''></td>";
-					Rows += "<td data-header='Jenis & Tanggal'>";
-					Rows += "<select name='coa[]' id='coa_" + nomor + "' required='required' class='form-control select2' style='width:300px'>" + combocoa + "</select>";
+					Rows += "<td data-header='Jenis'>";
+					Rows += "<select name='coa[]' id='coa_" + nomor + "' required='required' class='form-control select2' style='width:100%'>" + combocoa + "</select>";
+					Rows += "</td>";
+					Rows += "<td data-header='Tanggal'>";
 					Rows += "<input type='text' class='form-control tanggal input-sm' placeholder='Tanggal' name='tanggal[]' id='tanggal_" + nomor + "' />";
 					Rows += "</td>";
-					Rows += "<td data-header='Barang / Jasa & Keterangan'>";
-					Rows += "<input type='text' class='form-control input-sm' placeholder='Barang/Jasa' name='deskripsi[]' id='deskripsi_" + nomor + "' value='" + result.keperluan + "' style='width:100px' />";
-					Rows += "<input type='text' class='form-control input-sm' placeholder='Keterangan' name='keterangan[]' id='keterangan_" + nomor + "' style='width:100px' />";
+					Rows += "<td data-header='Barang / Jasa'>";
+					Rows += "<textarea class='form-control input-sm' placeholder='Barang/Jasa' name='deskripsi[]' id='deskripsi_" + nomor + "' style='min-height:80px;min-width:200px;font-size:14px;'>" + result.keperluan + "</textarea>";
+					Rows += "</td>";
+					Rows += "<td data-header='Spesifikasi'>";
+					Rows += "<textarea class='form-control input-sm' placeholder='Keterangan' name='keterangan[]' id='keterangan_" + nomor + "' style='min-height:80px;min-width:200px;font-size:14px;'></textarea>";
 					Rows += "</td>";
 					Rows += "<td data-header='Qty'>";
 					Rows += "<input type='text' class='form-control divide input-sm' name='qty[]' value='1' id='qty_" + nomor + "' onblur='cektotal(" + nomor + ")' style='width:60px' />";
@@ -942,10 +995,10 @@ foreach($data_budget as $keys=>$val){
 					cektotal(nomor - 1);
 				},
 				error: function(result) {
-					swal({
+					Swal.fire({
 						title: 'Error !',
 						text: 'Please try again later !',
-						type: 'error'
+						icon: 'error'
 					});
 				}
 			});
@@ -974,13 +1027,17 @@ foreach($data_budget as $keys=>$val){
 					Rows += "<input type='hidden' name='id_detail[]' id='id_detail_" + nomor + "' value='" + result.id_detail + "' class='dtlloop'>";
 					Rows += "<input type='hidden' name='no_docc[]' id='no_doc_" + nomor + "' value='" + result.no_doc2 + "' class='dtlloop'>";
 					Rows += "<input type='hidden' name='filename[]' id='filename_" + nomor + "' value=''></td>";
-					Rows += "<td data-header='Jenis & Tanggal'>";
-					Rows += "<select name='coa[]' id='coa_" + nomor + "' required='required' class='form-control select2' style='width:300px'>" + combocoa + "</select>";
+					Rows += "<td data-header='Jenis'>";
+					Rows += "<select name='coa[]' id='coa_" + nomor + "' required='required' class='form-control select2' style='width:100%'>" + combocoa + "</select>";
+					Rows += "</td>";
+					Rows += "<td data-header='Tanggal'>";
 					Rows += "<input type='text' class='form-control tanggal input-sm' placeholder='Tanggal' name='tanggal[]' id='tanggal_" + nomor + "' />";
 					Rows += "</td>";
-					Rows += "<td data-header='Barang / Jasa & Keterangan'>";
-					Rows += "<input type='text' class='form-control input-sm' placeholder='Barang/Jasa' name='deskripsi[]' id='deskripsi_" + nomor + "' value='" + result.informasi + "' style='width:100px' />";
-					Rows += "<input type='text' class='form-control input-sm' placeholder='Keterangan' name='keterangan[]' id='keterangan_" + nomor + "' style='width:100px' />";
+					Rows += "<td data-header='Barang / Jasa'>";
+					Rows += "<textarea class='form-control input-sm' placeholder='Barang/Jasa' name='deskripsi[]' id='deskripsi_" + nomor + "' style='min-height:80px;min-width:200px;font-size:14px;'>" + result.informasi + "</textarea>";
+					Rows += "</td>";
+					Rows += "<td data-header='Spesifikasi'>";
+					Rows += "<textarea class='form-control input-sm' placeholder='Keterangan' name='keterangan[]' id='keterangan_" + nomor + "' style='min-height:80px;min-width:200px;font-size:14px;'></textarea>";
 					Rows += "</td>";
 					Rows += "<td data-header='Qty'>";
 					Rows += "<input type='text' class='form-control divide input-sm' name='qty[]' value='1' id='qty_" + nomor + "' onblur='cektotal(" + nomor + ")' style='width:60px' />";
@@ -1015,7 +1072,7 @@ foreach($data_budget as $keys=>$val){
 					cektotal(nomor - 1);
 				},
 				error: function(result) {
-					swal({
+					Swal.fire({
 						title: 'Error !',
 						text: 'Please try again later !',
 						type: 'error'

@@ -1,10 +1,15 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+// require_once 'vendor/autoload.php';
+
+// use Mpdf\Mpdf;
 /*
  * @author harboens
  * @copyright Copyright (c) 2021, Harboens
  *
  * This is controller for Budget
  */
+
 $listtahun = array();
 class Budget_coa extends Admin_Controller
 {
@@ -14,10 +19,13 @@ class Budget_coa extends Admin_Controller
 	protected $managePermission = "Budget.Manage";
 	protected $deletePermission = "Budget.Delete";
 
+	protected $listtahun;
+	protected $datakategori;
+
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model(array('Budget_coa/Budget_coa_model', 'jurnal_nomor/Acc_model', 'All/All_model'));
+		$this->load->model(array('Budget_coa/Budget_coa_model', 'All/All_model'));
 		$this->template->title('Manage Data Budget');
 		$this->template->page_icon('fa fa-table');
 		date_default_timezone_set("Asia/Bangkok");
@@ -25,7 +33,7 @@ class Budget_coa extends Admin_Controller
 		for ($i = 2020; $i <= (date("Y") + 1); $i++) {
 			$list_tahun[] = $i;
 		}
-		$this->load->library('Mpdf');
+
 		$this->listtahun = $list_tahun;
 		$this->datakategori = $this->All_model->GetCategory();
 	}
@@ -45,8 +53,8 @@ class Budget_coa extends Admin_Controller
 
 	public function create()
 	{
-		$query = "( a.no_perkiraan like '1106-01-0%' or a.no_perkiraan like '2103-01-0%' or a.no_perkiraan like '4%' or a.no_perkiraan like '5%' or a.no_perkiraan like '6%' or a.no_perkiraan like '7%' or a.no_perkiraan like '8%' )";
-		$datcoa	= $this->Budget_coa_model->GetCoa('5', $query);
+		$query = "(a.no_perkiraan like '1106-01-0%' or a.no_perkiraan like '2103-01-0%' or a.no_perkiraan like '4%' or a.no_perkiraan like '5%' or a.no_perkiraan like '6%' or a.no_perkiraan like '7%' or a.no_perkiraan like '8%')";
+		$datcoa	= $this->Budget_coa_model->GetCoa('5');
 		$this->template->set('datakategori', $this->datakategori);
 		$this->template->set('type', 'add');
 		$this->template->set('data', $datcoa);
@@ -132,21 +140,30 @@ class Budget_coa extends Admin_Controller
 		$this->db->trans_start();
 		if ($type == "edit") {
 			for ($x = 0; $x < count($coa); $x++) {
-				if ($finance_tahun[$x] == '') $finance_tahun[$x] = 0;
-				if ($finance_bulan[$x] == '') $finance_bulan[$x] = 0;
+				if (!isset($finance_tahun[$x]) || $finance_tahun[$x] == '') $finance_tahun[$x] = 0;
+				if (!isset($finance_bulan[$x]) || $finance_bulan[$x] == '') $finance_bulan[$x] = 0;
 				//			  if($finance_tahun[$x]>0){
-				if ($id[$x] != '') {
+				if (isset($id[$x]) && !empty($id[$x])) {
+					$id = (!empty($id[$x])) ? $id[$x] : 0;
+					$coaa = (!empty($coa[$x])) ? $coa[$x] : 0;
+					$info = (!empty($info[$x])) ? $info[$x] : 0;
+					$divisi = (!empty($divisi[$x])) ? $divisi[$x] : 0;
+					$kategori = (!empty($kategori[$x])) ? $kategori[$x] : 0;
+					$definisi = (!empty($definisi[$x])) ? $definisi[$x] : 0;
+					$finance_tahunn = (!empty($finance_tahun[$x])) ? $finance_tahun[$x] : 0;
+					$finance_bulann = (!empty($finance_bulan[$x])) ? $finance_bulan[$x] : 0;
+
 					$data = array(
 						array(
-							'id' => $id[$x],
+							'id' => $id,
 							'tahun' => $tahun,
-							'coa' => $coa[$x],
-							'info' => $info[$x],
-							'divisi' => $divisi[$x],
-							'kategori' => $kategori[$x],
-							'definisi' => $definisi[$x],
-							'finance_bulan' => $finance_bulan[$x],
-							'finance_tahun' => $finance_tahun[$x],
+							'coa' => $coaa,
+							'info' => $info,
+							'divisi' => $divisi,
+							'kategori' => $kategori,
+							'definisi' => $definisi,
+							'finance_bulan' => $finance_bulann,
+							'finance_tahun' => $finance_tahunn,
 							/*
 								'total'=>$total[$x],
 								'bulan_1'=>$bulan_1[$x], 'bulan_2'=>$bulan_2[$x], 'bulan_3'=>$bulan_3[$x],'bulan_4'=>$bulan_4[$x], 'bulan_5'=>$bulan_5[$x],'bulan_6'=>$bulan_6[$x],
@@ -156,15 +173,23 @@ class Budget_coa extends Admin_Controller
 					);
 					$this->Budget_coa_model->update_batch($data, 'id');
 				} else {
+					$coaa = (!empty($coa[$x])) ? $coa[$x] : 0;
+					$info = (!empty($info[$x])) ? $info[$x] : 0;
+					$divisi = (!empty($divisi[$x])) ? $divisi[$x] : 0;
+					$kategori = (!empty($kategori[$x])) ? $kategori[$x] : 0;
+					$definisi = (!empty($definisi[$x])) ? $definisi[$x] : 0;
+					$finance_tahunn = (!empty($finance_tahun[$x])) ? $finance_tahun[$x] : 0;
+					$finance_bulann = (!empty($finance_bulan[$x])) ? $finance_bulan[$x] : 0;
+
 					$data =  array(
 						'tahun' => $tahun,
-						'coa' => $coa[$x],
-						'info' => $info[$x],
-						'divisi' => $divisi[$x],
-						'kategori' => $kategori[$x],
-						'definisi' => $definisi[$x],
-						'finance_bulan' => $finance_bulan[$x],
-						'finance_tahun' => $finance_tahun[$x],
+						'coa' => $coaa,
+						'info' => $info,
+						'divisi' => $divisi,
+						'kategori' => $kategori,
+						'definisi' => $definisi,
+						'finance_bulan' => $finance_bulann,
+						'finance_tahun' => $finance_tahunn,
 						/*
 								'total'=>$total[$x],
 								'sisa'=>0,
@@ -186,18 +211,27 @@ class Budget_coa extends Admin_Controller
 			$result			= TRUE;
 		} else {
 			for ($x = 0; $x < count($coa); $x++) {
-				if ($finance_tahun[$x] == '') $finance_tahun[$x] = 0;
-				if ($finance_bulan[$x] == '') $finance_bulan[$x] = 0;
+				if (isset($finance_tahun[$x]) && $finance_tahun[$x] == '') $finance_tahun[$x] = 0;
+				if (isset($finance_bulan[$x]) && $finance_bulan[$x] == '') $finance_bulan[$x] = 0;
 				//			  if($finance_tahun[$x]>0){
+
+				$coaa = (!empty($coa[$x])) ? $coa[$x] : 0;
+				$info = (!empty($info[$x])) ? $info[$x] : 0;
+				$divisi = (!empty($divisi[$x])) ? $divisi[$x] : 0;
+				$kategori = (!empty($kategori[$x])) ? $kategori[$x] : 0;
+				$definisi = (!empty($definisi[$x])) ? $definisi[$x] : 0;
+				$finance_tahunn = (!empty($finance_tahun[$x])) ? $finance_tahun[$x] : 0;
+				$finance_bulann = (!empty($finance_bulan[$x])) ? $finance_bulan[$x] : 0;
+
 				$data =  array(
 					'tahun' => $tahun,
-					'coa' => $coa[$x],
-					'info' => $info[$x],
-					'divisi' => $divisi[$x],
-					'kategori' => $kategori[$x],
-					'finance_bulan' => $finance_bulan[$x],
-					'finance_tahun' => $finance_tahun[$x],
-					'definisi' => $definisi[$x],
+					'coa' => $coaa,
+					'info' => $info,
+					'divisi' => $divisi,
+					'kategori' => $kategori,
+					'finance_bulan' => $finance_bulann,
+					'finance_tahun' => $finance_tahunn,
+					'definisi' => $definisi,
 					/*
 							'total'=>$total[$x],
 							'sisa'=>0,
