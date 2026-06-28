@@ -16,10 +16,10 @@ $waktu = array();
 class Budget_periodik extends Admin_Controller
 {
 	//Permission
-	protected $viewPermission 	= 'Budget_Pembayaran_Periodik.View';
-	protected $addPermission  	= 'Budget_Pembayaran_Periodik.Add';
-	protected $managePermission = 'Budget_Pembayaran_Periodik.Manage';
-	protected $deletePermission = 'Budget_Pembayaran_Periodik.Delete';
+	protected $viewPermission 	= 'Pembayaran_Periodik.View';
+	protected $addPermission  	= 'Pembayaran_Periodik.Add';
+	protected $managePermission = 'Pembayaran_Periodik.Manage';
+	protected $deletePermission = 'Pembayaran_Periodik.Delete';
 	public function __construct()
 	{
 		parent::__construct();
@@ -33,8 +33,10 @@ class Budget_periodik extends Admin_Controller
 	public function index()
 	{
 		$this->auth->restrict($this->viewPermission);
+
 		$data = $this->Budget_periodik_model->GetBudgetRutinGroup();
 		$datdept  = $this->All_model->GetDeptCombo();
+
 		$this->template->set('datdept', $datdept);
 		$this->template->set('results', $data);
 		$this->template->title('Master Pembayaran Periodik');
@@ -91,11 +93,7 @@ class Budget_periodik extends Admin_Controller
 
 		$this->db->trans_begin();
 
-		if(empty($detail_id)){
-			$delid = [''];
-		} else {
-			$delid = implode("','", $detail_id);
-		}
+		$delid = implode("','", $detail_id);
 		$budgetcoa = array();
 		$this->All_model->dataDelete('ms_budget_rutin', "id not in ('" . $delid . "') and departement='" . $departement . "'");
 		for ($x = 0; $x < count($detail_id); $x++) {
@@ -140,16 +138,18 @@ class Budget_periodik extends Admin_Controller
 		$coa_alokasi	= $this->input->post("coa_alokasi");
 		$nilai_alokasi	= $this->input->post("nilai_alokasi");
 		$this->All_model->dataDelete('ms_budget_rutin_alokasi', array('departement' => $departement));
-		for ($x = 0; $x < count($kode_detail); $x++) {
-			$dataalokasi =  array(
-				'kode' => $kode_detail[$x],
-				'coa' => $coa_alokasi[$x],
-				'nilai' => $nilai_alokasi[$x],
-				'departement' => $departement,
-				'created_by' => $this->auth->user_id(),
-				'created_on' => date('Y-m-d H:i:s')
-			);
-			$this->All_model->dataSave('ms_budget_rutin_alokasi', $dataalokasi);
+		if (isset($kode_detail)) {
+			for ($x = 0; $x < count($kode_detail); $x++) {
+				$dataalokasi =  array(
+					'kode' => $kode_detail[$x],
+					'coa' => $coa_alokasi[$x],
+					'nilai' => $nilai_alokasi[$x],
+					'departement' => $departement,
+					'created_by' => $this->auth->user_id(),
+					'created_on' => date('Y-m-d H:i:s')
+				);
+				$this->All_model->dataSave('ms_budget_rutin_alokasi', $dataalokasi);
+			}
 		}
 
 		if ($this->db->trans_status()) {

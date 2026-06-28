@@ -16,17 +16,17 @@ $accname = '';
 
 $data_user = $this->db->get_where('users', ['id_user' => $this->auth->user_id()])->row();
 
-$metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : '';
+$metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : 1;
 
-$department_id = (isset($data_user->department_id)) ? $data_user->department_id : '';  
+
 
 ?>
-
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <form action="" id="frm_data" class="form-horizontal" enctype="multipart/form-data">
 	<input type="hidden" id="id" name="id" value="<?php echo set_value('id', isset($data->id) ? $data->id : ''); ?>">
-	<input type="hidden" id="departement" name="departement" value="<?php echo $department_id ?>">
+	<input type="hidden" id="departement" name="departement" value="<?php echo ($data_user->department_id) ?>">
 	<input type="hidden" id="nama" name="nama" value="<?php echo (isset($data->nama) ? $data->nama : $this->auth->user_name()); ?>">
-	<input type="hidden" name="" class="stsview" value="<?= (isset($stsview)) ? $stsview : null ?>">
+	<input type="hidden" name="stsview" class="stsview" value="<?= (isset($stsview)) ? $stsview : null ?>">
 
 	<div class="tab-content">
 		<div class="tab-pane active">
@@ -53,48 +53,28 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 						</div>
 					</div>
 					<div class="form-group ">
-						<label class="col-sm-2 control-label">Project</label>
-						<div class="col-sm-4">
-							<input type="text" class="form-control" id="project" name="project" value="<?php echo (isset($data->project) ? $data->project : ''); ?>" placeholder="Project">
-						</div>
-						<label class="col-sm-2 control-label">Keterangan</label>
-						<div class="col-sm-4">
-							<input type="text" class="form-control" id="keterangan" name="keterangan" value="<?php echo (isset($data->keterangan) ? $data->keterangan : ''); ?>" placeholder="Keterangan" required>
-
-							<?php
-							if (isset($data->st_reject)) {
-								if ($data->st_reject != '') {
-									echo '
-							  <div class="alert alert-danger alert-dismissible">
-								<h4><i class="icon fa fa-ban"></i> Alasan Penolakan!</h4>
-								' . $data->st_reject . '
-							  </div>';
-								}
-							}
-							?>
-						</div>
-					</div>
-					<div class="form-group ">
 						<label class="col-sm-2 control-label">Dokumen 1</label>
 						<div class="col-sm-4">
 							<input type="hidden" name="filename" id="filename" value="<?= (isset($data->doc_file) ? $data->doc_file : ''); ?>">
 							<input type="file" name="doc_file" id="doc_file">
-							<span class="pull-right"><?php
-														if (isset($data->doc_file)) {
-															echo ($data->doc_file != '' ? '<a href="' . base_url('assets/expense/' . $data->doc_file) . '" download target="_blank"><i class="fa fa-download"></i></a>' : '');
-														}
-														?>
+							<span class="pull-right">
+								<?php
+								if (isset($data->doc_file)) {
+									echo ($data->doc_file != '' ? '<a href="' . base_url('assets/expense/' . $data->doc_file) . '" download target="_blank"><i class="fa fa-download"></i></a>' : '');
+								}
+								?>
 							</span>
 						</div>
 						<label class="col-sm-2 control-label">Dokumen 2</label>
 						<div class="col-sm-4">
 							<input type="hidden" name="filename2" id="filename2" value="<?= (isset($data->doc_file_2) ? $data->doc_file_2 : ''); ?>">
 							<input type="file" name="doc_file_2" id="doc_file_2">
-							<span class="pull-right"><?php
-														if (isset($data->doc_file_2)) {
-															echo ($data->doc_file_2 != '' ? '<a href="' . base_url('assets/expense/' . $data->doc_file_2) . '" download target="_blank"><i class="fa fa-download"></i></a>' : '');
-														}
-														?>
+							<span class="pull-right">
+								<?php
+								if (isset($data->doc_file_2)) {
+									echo ($data->doc_file_2 != '' ? '<a href="' . base_url('assets/expense/' . $data->doc_file_2) . '" download target="_blank"><i class="fa fa-download"></i></a>' : '');
+								}
+								?>
 							</span>
 						</div>
 					</div>
@@ -108,9 +88,53 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 								<option value="2" <?= ($metode_pembayaran == 2) ? 'selected' : null ?>>Pettycash Finance</option>
 							</select>
 						</div> -->
+						<label class="col-sm-2 control-label">Keterangan</label>
+						<div class="col-sm-4">
+							<textarea class="form-control" id="keterangan" name="keterangan" placeholder="Keterangan" required><?php echo (isset($data->keterangan) ? $data->keterangan : ''); ?></textarea>
+
+							<?php
+							if (isset($data->st_reject)) {
+								if ($data->st_reject !== '') {
+									echo '
+							  <div class="alert alert-danger alert-dismissible">
+								<h4><i class="icon fa fa-ban"></i> Alasan Penolakan!</h4>
+								' . $data->st_reject . '
+							  </div>';
+								}
+							}
+							?>
+						</div>
+						<label class="col-sm-2 control-label">COA</label>
+						<div class="col-sm-4">
+							<?php
+							// if ($mod == '') {
+							echo '<select name="coa" class="form-control form-control-sm coa_select chosen_select">
+										<option value="">- Pilih COA -</option>
+										';
+							if (!empty($list_coa)) {
+								foreach ($list_coa as $item_coa) {
+									$selected = '';
+									if (isset($data->no_coa) && $data->no_coa == $item_coa['no_perkiraan']) {
+										$selected = 'selected';
+									}
+									echo '<option value="' . $item_coa['no_perkiraan'] . '" ' . $selected . '>' . $item_coa['no_perkiraan'] . ' - ' . $item_coa['nama'] . '</option>';
+								}
+							}
+							?>
+							<?php
+							echo '</select>';
+							// } else {
+							// 	$val_coa = (isset($data->no_coa) && isset($data->nm_coa)) ? $data->no_coa . ' - ' . $data->nm_coa : '';
+							// 	echo '<input type="text" name="nm_coa" value="' . $val_coa . '" class="form-control form-control-sm" readonly>';
+							// }
+							?>
+
+							<input type="hidden" name="nm_coa" value="<?= (isset($data->nm_coa) ? $data->nm_coa : ''); ?>">
+						</div>
+
 					</div>
 
-					<div class="transfer_ke_cont" >
+					<div class="transfer_ke_cont">
 						<h4>Transfer ke</h4>
 						<div class="form-group ">
 							<label class="col-md-1 control-label">Bank</label>
@@ -129,7 +153,7 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 					</div>
 
 					<h4>Kasbon PR Non PO</h4>
-					<div class="form-group" >
+					<div class="form-group">
 						<div class="col-md-1 control-label">
 							No. PR
 						</div>
@@ -146,10 +170,14 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 									<option value="">- No PR -</option>
 									<?php
 									foreach ($list_pr_non_po as $item_pr_non_po) {
-										echo '<option value="' . $item_pr_non_po . '">' . $item_pr_non_po . '</option>';
+										echo '<option value="' . $item_pr_non_po['no_pr'] . '">' . $item_pr_non_po['no_pr'] . ' - ' . $item_pr_non_po['keterangan'] . '</option>';
 									}
 									?>
 								</select>
+
+								<input type="hidden" name="file_name" class="file_name">
+								<input type="hidden" name="doc_pr" class="doc_pr">
+								<input type="hidden" name="to_doc_pr" class="to_doc_pr">
 
 							<?php
 							}
@@ -159,7 +187,7 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 							<label for="">*Note: Klik enter jika sudah</label>
 						</div>
 					</div>
-					<div class="col-md-12" >
+					<div class="col-md-12">
 						<table class="table table-striped">
 							<thead>
 								<tr>
@@ -168,12 +196,13 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 									<th class="text-center">Qty</th>
 									<th class="text-center">Unit</th>
 									<th class="text-center">Harga Satuan</th>
-									<th class="text-center">Grand Total</th>
+									<th class="text-center">Total</th>
 									<th class="text-center">Action</th>
 								</tr>
 							</thead>
 							<tbody class="list_barang_pr">
 								<?php
+								$grand_total_non_pr = 0;
 								if (isset($list_detail_pr_kasbon)) {
 									$no = 1;
 									foreach ($list_detail_pr_kasbon as $detail_pr) :
@@ -187,7 +216,7 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 										echo '<td class="text-center">' . number_format($detail_pr['qty']) . ' <input type="hidden" class="qty_' . $detail_pr['id_detail'] . '" value="' . $detail_pr['qty'] . '"></td>';
 										echo '<td class="text-center">' . $detail_pr['satuan'] . '</td>';
 										echo '<td class="text-center"><input type="text" name="price_input_' . $detail_pr['id_detail'] . '" class="form-control form-control-sm text-right price_input price_input_' . $detail_pr['id_detail'] . ' autonum" data-no="' . $detail_pr['id_detail'] . '" value="' . $detail_pr['harga'] . '" ' . $readonly . '></td>';
-										echo '<td class="text-center"><input type="text" name="grand_total_' . $detail_pr['id_detail'] . '" class="form-control form-control-sm text-right grand_total grand_total_' . $detail_pr['id_detail'] . ' autonum" value="' . $detail_pr['total_harga'] . '" ' . $readonly . '></td>';
+										echo '<td class="text-center"><input type="text" name="grand_total_' . $detail_pr['id_detail'] . '" class="form-control form-control-sm text-right grand_total_' . $detail_pr['id_detail'] . ' autonum" value="' . $detail_pr['total_harga'] . '" ' . $readonly . '></td>';
 										echo '<td class="text-center">';
 										if (($mod == '_fin' || $mod == '_mgt')) {
 										} else {
@@ -197,11 +226,20 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 										}
 										echo '</td>';
 										echo '</tr>';
+
+										$grand_total_non_pr += $detail_pr['total_harga'];
 										$no++;
 									endforeach;
 								}
 								?>
 							</tbody>
+							<tfoot>
+								<tr>
+									<th class="text-right" colspan="5">Grand Total</th>
+									<th class="text-right grand_total_non_pr"><?= number_format($grand_total_non_pr, 2) ?></th>
+									<th></th>
+								</tr>
+							</tfoot>
 						</table>
 					</div>
 				</div>
@@ -234,22 +272,26 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 							if (strpos($data->doc_file, 'pdf', 0) > 1) {
 								echo '<div class="col-md-12">
 						<iframe src="' . base_url('assets/expense/' . $data->doc_file) . '#toolbar=0&navpanes=0" title="PDF" style="width:600px; height:500px;" frameborder="0">
-								 <a href="' . base_url('assets/expense/' . $data->doc_file) . '">Download PDF</a>
 						</iframe>
+						<a href="' . base_url('assets/expense/' . $data->doc_file) . '" class="btn btn-sm btn-primary" target="_blank">Check PDF</a>
 						<br />' . $data->no_doc . '</div>';
 							} else {
-								echo '<div class="col-md-12"><a href="' . base_url('assets/expense/' . $data->doc_file) . '" target="_blank"><img src="' . base_url('assets/expense/' . $data->doc_file) . '" class="img-responsive"></a><br />' . $data->no_doc . '</div>';
+								if (file_exists('assets/expense' . $data->doc_file)) {
+									echo '<div class="col-md-12"><a href="' . base_url('assets/expense/' . $data->doc_file) . '" target="_blank"><img src="' . base_url('assets/expense/' . $data->doc_file) . '" class="img-responsive"></a><br />' . $data->no_doc . '</div>';
+								}
 							}
 						}
 						if ($data->doc_file_2 != '') {
 							if (strpos($data->doc_file_2, 'pdf', 0) > 1) {
 								echo '<div class="col-md-12">
-						<iframe src="' . base_url('assets/expense/' . $data->doc_file_2) . '#toolbar=0&navpanes=0" title="PDF" style="width:600px; height:500px;" frameborder="0">
-								 <a href="' . base_url('assets/expense/' . $data->doc_file_2) . '">Download PDF</a>
+						<iframe src="' . base_url('./assets/expense/' . $data->doc_file_2) . '#toolbar=0&navpanes=0" title="PDF" style="width:600px; height:500px;" frameborder="0">
 						</iframe>
+						<a href="' . base_url('assets/expense/' . $data->doc_file_2) . '" class="btn btn-sm btn-primary" target="_blank">Check PDF</a>
 						<br />' . $data->no_doc . '</div>';
 							} else {
-								echo '<div class="col-md-12"><a href="' . base_url('assets/expense/' . $data->doc_file_2) . '" target="_blank"><img src="' . base_url('assets/expense/' . $data->doc_file_2) . '" class="img-responsive"></a><br />' . $data->no_doc . '</div>';
+								if (file_exists('./assets/expense' . $data->doc_file_2)) {
+									echo '<div class="col-md-12"><a href="' . base_url('assets/expense/' . $data->doc_file_2) . '" target="_blank"><img src="' . base_url('assets/expense/' . $data->doc_file_2) . '" class="img-responsive"></a><br />' . $data->no_doc . '</div>';
+								}
 							}
 						}
 					}
@@ -262,14 +304,22 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 
 <script src="<?= base_url('assets/js/number-divider.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/autoNumeric.js') ?>"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
 	var url_save = siteurl + 'expense/kasbon_save/';
 	var url_approve = siteurl + 'expense/kasbon_approve/';
+
+	var mod = '<?= $mod ?>';
+	if (mod !== '') {
+		$('input').attr('readonly', true);
+		$('textarea').attr('readonly', true);
+		$('input[type="file"]').prop('disabled', true);
+	}
+
 	$('.divide').divide();
 
 	$('.autonum').autoNumeric('init');
-	$('.chosen_select').chosen({
+	$('.chosen_select').select2({
 		width: '100%'
 	});
 
@@ -301,27 +351,32 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 	$('#frm_data').on('submit', function(e) {
 		e.preventDefault();
 		var errors = "";
-		if ($("#filename").val() == "") {
+
+		var doc_pr = $('.doc_pr').val();
+		var to_doc_pr = $('.to_doc_pr').val();
+		var search_pr_non_po = $('#search_pr_non_po').val();
+
+		if ($("#filename").val() == "" && search_pr_non_po == '') {
 			if ($('#doc_file').get(0).files.length === 0) {
 				errors = "Dokumen 1 harus diupload";
 			}
 		}
 
-		var metode_pembayaran = $('.metode_pembayaran').val();
+		// var metode_pembayaran = $('.metode_pembayaran').val();
 
 		if ($("#jumlah_kasbon").val() == "0") errors = "Jumlah Kasbon tidak boleh kosong";
 		if ($("#keperluan").val() == "") errors = "keperluan tidak boleh kosong";
 		if ($("#tgl_doc").val() == "") errors = "Tanggal Transaksi tidak boleh kosong";
-		if (metode_pembayaran == "") errors = "Pilih metode pembayaran";
-		if (metode_pembayaran == 1) {
-			var bank_id = $('#bank_id').val();
-			var accnumber = $('#accnumber').val();
-			var accname = $('#accname').val();
+		// if (metode_pembayaran == "") errors = "Pilih metode pembayaran";
+		// if (metode_pembayaran == 1) {
+		// 	var bank_id = $('#bank_id').val();
+		// 	var accnumber = $('#accnumber').val();
+		// 	var accname = $('#accname').val();
 
-			if (bank_id == '' || accnumber == '' || accname == '') {
-				errors = "Pastikan data transfer terisi";
-			}
-		}
+		// 	if (bank_id == '' || accnumber == '' || accname == '') {
+		// 		errors = "Pastikan data transfer terisi";
+		// 	}
+		// }
 
 		var price_no_input = 0;
 		$('.price_input').each(function() {
@@ -400,6 +455,30 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 		}
 	});
 
+	function number_format(number, decimals, dec_point, thousands_sep) {
+		// Strip all characters but numerical ones.
+		number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+		var n = !isFinite(+number) ? 0 : +number,
+			prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+			sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+			dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+			s = '',
+			toFixedFix = function(n, prec) {
+				var k = Math.pow(10, prec);
+				return '' + Math.round(n * k) / k;
+			};
+		// Fix for IE parseFloat(0.55).toFixed(0) = 0;
+		s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+		if (s[0].length > 3) {
+			s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+		}
+		if ((s[1] || '').length < prec) {
+			s[1] = s[1] || '';
+			s[1] += new Array(prec - s[1].length + 1).join('0');
+		}
+		return s.join(dec);
+	}
+
 	$(document).on('change', '#search_pr_non_po', function(e) {
 		// e.preventDefault();
 		const no_pr = $(this).val();
@@ -423,7 +502,7 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 					$('.list_barang_pr').html(result.hasil);
 					$('#tipe_pr').val(result.tipe_pr);
 					$('.autonum').autoNumeric();
-					hitung_total_pr();
+					$('.grand_total_non_pr').html(number_format(result.grand_total, 2));
 				} else {
 					swal({
 						title: 'Error !',
@@ -437,6 +516,28 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 					title: 'Error !',
 					text: 'Error occured, please try again later !',
 					type: 'error'
+				});
+			}
+		});
+
+		$.ajax({
+			type: 'post',
+			url: siteurl + active_controller + 'copy_pr_doc',
+			data: {
+				'no_pr': no_pr
+			},
+			cache: false,
+			dataType: 'json',
+			success: function(result) {
+				$('.file_name').val(result.file_name);
+				$('.doc_pr').val(result.doc_file);
+				$('.to_doc_pr').val(result.to_doc_file);
+			},
+			error: function(result) {
+				swal({
+					type: 'error',
+					title: 'Error !',
+					text: ''
 				});
 			}
 		});
@@ -467,8 +568,59 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 
 		$('.grand_total_' + no).autoNumeric('set', total);
 
-		hitung_total_pr();
+		hitung_grand_total_non_pr();
 	})
+
+	$(document).on('change', '.coa_select', function() {
+		var no_coa = $(this).val();
+
+		$.ajax({
+			type: 'post',
+			url: siteurl + active_controller + 'get_coa_name',
+			data: {
+				'no_coa': no_coa
+			},
+			cache: false,
+			dataType: 'json',
+			success: function(result) {
+				$('input[name="nm_coa"]').val(result.nm_coa);
+			},
+			error: function(result) {
+				swal({
+					type: 'error',
+					title: 'Error !',
+					text: 'Please try again later !',
+					showConfirmButton: false,
+					showCancelButton: false,
+					allowOutsideClick: false,
+					timer: 3000
+				});
+			}
+		});
+	});
+
+	function getNum(val) {
+		if (isNaN(val) || val == '') {
+			return 0;
+		}
+		return parseFloat(val);
+	}
+
+	function hitung_grand_total_non_pr() {
+		var grand_total = 0;
+		$('.price_input').each(function() {
+			var value = $(this).val();
+			value = value.replace(/,/g, '');
+			value = parseFloat(value);
+
+			var no = $(this).data('no');
+			var qty = $('.qty_' + no).val();
+
+			grand_total += (value * qty);
+		});
+
+		$('.grand_total_non_pr').html(number_format(grand_total, 2));
+	}
 
 	$(function() {
 		$(".tanggal").datepicker({
@@ -492,9 +644,16 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 			},
 			function(isConfirm) {
 				if (isConfirm) {
+					var coa = $('select[name="coa"]').val();
+					var nm_coa = $('input[name="nm_coa"]').val();
+
 					id = $("#id").val();
 					$.ajax({
 						url: url_approve + id,
+						data: {
+							'coa': coa,
+							'nm_coa': nm_coa
+						},
 						dataType: "json",
 						type: 'POST',
 						success: function(msg) {
@@ -506,7 +665,7 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 									timer: 1500,
 									showConfirmButton: false
 								});
-								window.location = siteurl + 'expense/kasbon<?= $mod ?>';
+								window.location = siteurl + 'expense/kasbon_fin';
 							} else {
 								swal({
 									title: "Gagal!",
@@ -551,7 +710,7 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 
 				swal({
 						title: "Anda Yakin?",
-						text: "Data Akan Tolak!",
+						text: "Data Akan ditolak!",
 						type: "warning",
 						showCancelButton: true,
 						confirmButtonText: "Ya, tolak!",
@@ -580,7 +739,7 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 											timer: 1500,
 											showConfirmButton: false
 										});
-										window.location = siteurl + 'expense/kasbon<?= $mod ?>'
+										window.location = siteurl + 'expense/kasbon_fin'
 									} else {
 										swal({
 											title: "Gagal!",
@@ -607,23 +766,5 @@ $department_id = (isset($data_user->department_id)) ? $data_user->department_id 
 					});
 
 			});
-	}
-
-	function hitung_total_pr() {
-		var total_pr = 0;
-
-		$('.grand_total').each(function() {
-			var nilai = $(this).val();
-			if(nilai !== '') {
-				nilai = nilai.split(',').join('');
-				nilai = parseFloat(nilai);
-			} else {
-				nilai = 0;
-			}
-
-			total_pr += nilai;
-		});
-
-		$('#jumlah_kasbon').val(total_pr);
 	}
 </script>

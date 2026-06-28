@@ -3,23 +3,23 @@
 <div class="box box-primary" style='margin-right: 17px;'>
 	<div class="box-body">
 		<div class="table-responsive" >
-			<table class="table table-bordered table-striped" id="example1" width='100%'>
-				<thead>
-					<tr>
+			<table class="table table-bordered table-striped" id="my-grid" width='100%'>
+				<thead  class="thead">
+					<tr class='bg-blue'>
 						<th class="text-center th">#</th>
 						<th class="text-left th">KATEGORI</th> 
 						<th class="text-left th">NAMA BARANG</th>
 						<th class="text-left th">SPESIFIKASI</th>
 						<th class="text-left th">BRAND</th>
-						<th class="text-center th">TOTAL</th>
-						<th class="text-center th">UNIT</th>
+						<th class="text-left th">TOTAL</th>
+						<th class="text-left th">UNIT</th>
 						<?php
 						foreach($group_header AS $val => $valx){
 							$cc = '';
 							if($valx['cost_center'] <> '0'){
 								$cc = $valx['cost_center'];
 							}
-							echo "<th class='text-center th'><u>".strtoupper($valx['nm_dept'])."</u><i><br>".$cc."</i></th>";
+							echo "<th class='text-left th'><u>".strtoupper($valx['nm_dept'])."</u><i><br>".$cc."</i></th>";
 						}
 						?>
 					</tr>
@@ -38,8 +38,8 @@
 								$get_qty = $this->db->query("SELECT a.kebutuhan_month FROM budget_rutin_detail a LEFT JOIN budget_rutin_header b ON a.code_budget=b.code_budget WHERE a.id_barang='".$valx['id_barang']."' AND b.department='".$valx2['department']."' AND b.costcenter='".$valx2['costcenter']."' ")->result();
 								$total_kebutuhan += (!empty($get_qty))?$get_qty[0]->kebutuhan_month:0;
 							}
-							echo "<td class='text-center'>".number_format($total_kebutuhan)."</td>";
-							echo "<td class='text-center'>".strtoupper($valx['satuan'])."</td>";
+							echo "<td class='text-right'>".number_format($total_kebutuhan)."</td>";
+							echo "<td class='text-left'>".strtoupper($valx['satuan'])."</td>";
 							foreach($group_header AS $val2 => $valx2){
 								$get_qty = $this->db->query("SELECT a.kebutuhan_month FROM budget_rutin_detail a LEFT JOIN budget_rutin_header b ON a.code_budget=b.code_budget WHERE a.id_barang='".$valx['id_barang']."' AND b.department='".$valx2['department']."' AND b.costcenter='".$valx2['costcenter']."' ")->result();
 								$qty = (!empty($get_qty))?number_format($get_qty[0]->kebutuhan_month):'-';
@@ -52,7 +52,7 @@
 			</table>
 		</div>
 		<?php
-			echo form_button(array('type'=>'button','class'=>'btn btn-md btn-danger','style'=>'float:right; margin: 5px 0px 5px 0px;','content'=>'Back','id'=>'back')).' ';
+			echo form_button(array('type'=>'button','class'=>'btn btn-md btn-danger','style'=>'min-width:100px; float:right; margin: 5px 0px 5px 0px;','content'=>'Back','id'=>'back')).' ';
 		?>
 	</div>
  </div>
@@ -86,7 +86,7 @@
 		window.location.href = base_url +'budget_rutin/';
 	});
   	$(function() {
-    	$("#example1").DataTable({
+    	$("#my-grid").DataTable({
 			dom: 'Blfrtip',
 			buttons: [
 				{
