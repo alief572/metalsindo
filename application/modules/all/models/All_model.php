@@ -517,4 +517,24 @@ class All_model extends BF_Model
 		}
 		return $aCombo;
 	}
+
+	function GetListCoa($coa_numbers = [])
+	{
+		$aMenu	= array();
+		$aMenu[0] = 'Select An Option';
+		$this->db->select('a.no_perkiraan, a.nama');
+		$this->db->from(DBACC . '.coa_master a');
+		if (!empty($coa_numbers)) {
+			$this->db->where_in('a.no_perkiraan', $coa_numbers);
+		}
+		$this->db->order_by('a.no_perkiraan', 'asc');
+		$query = $this->db->get();
+		$results	= $query->result_array();
+		if ($results) {
+			foreach ($results as $key => $vals) {
+				$aMenu[$vals['no_perkiraan']]	= $vals['no_perkiraan'] . ' - ' . $vals['nama'];
+			}
+		}
+		return $aMenu;
+	}
 }
