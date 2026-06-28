@@ -8,26 +8,24 @@
 <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css')?>">
 <div class="box">
 	<div class="box-header">
-		<span class="pull-right">
-			<?php if ($ENABLE_VIEW) : ?>
-				<a class="btn btn-sm btn-primary" href="<?=base_url().'budget_rutin/kompilasi'?>" title="Kompilasi"><i class="fa fa-clone">&nbsp;</i>Kompilasi Budget</a>
-			<?php endif; ?>
-			<?php if ($ENABLE_ADD) : ?>
-				<a class="btn btn-sm btn-success" href="javascript:void(0)" title="Add" onclick="add_data()"><i class="fa fa-plus">&nbsp;</i>Add Budget</a>
-			<?php endif; ?>
-		</span>
+		<?php if ($ENABLE_VIEW) : ?>
+			<a class="btn btn-info" href="<?=base_url().'budget_rutin/kompilasi'?>" title="Kompilasi"><i class="fa fa-clone">&nbsp;</i>Kompilasi Budget</a>
+		<?php endif; ?>
+		<?php if ($ENABLE_ADD) : ?>
+			<a class="btn btn-success" href="javascript:void(0)" title="Add" onclick="add_data()"><i class="fa fa-plus">&nbsp;</i>Add Budget</a>
+		<?php endif; ?>
 	</div>
 	<!-- /.box-header -->
 	<div class="box-body">
-		<table id="example1" class="table table-bordered table-striped">
+		<table id="mytabledata" class="table table-bordered table-striped">
 		<thead>
 		<tr>
-			<th class='text-center'>#</th>
-			<th class='text-left'>Tanggal Dibuat</th>
-			<th>Warehouse</th>
-			<!-- <th>Costcenter</th> -->
-			<th class='text-center'>Rev</th>
-			<th class='text-center'>
+			<th>#</th>
+			<th>Tanggal Dibuat</th>
+			<th>Departement</th>
+			<th>Costcenter</th>
+			<th>Rev</th>
+			<th width="50">
 			<?php if($ENABLE_MANAGE) : ?>
 			Action
 			<?php endif; ?>
@@ -40,20 +38,20 @@
 		}else{
 			$numb=0; foreach($results AS $record){ $numb++; ?>
 		<tr>
-		    <td class='text-center'><?= $numb ?></td>
-			<td class='text-left'><?= date('d-M-Y',strtotime($record->tanggal)) ?></td>
-			<td><?= strtoupper($record->nm_dept)?></td>
-			<!-- <td><?= $record->cost_center ?></td> -->
-			<td class='text-center'><?= $record->rev ?></td>
-			<td class='text-center'>
+		    <td><?= $numb ?></td>
+			<td><?= $record->tanggal ?></td>
+			<td><?= $record->nm_dept?></td>
+			<td><?= $record->cost_center ?></td>
+			<td><?= $record->rev ?></td>
+			<td>
 			<?php if($ENABLE_VIEW) : ?>
-				<!-- <button type='button' class="btn btn-sm btn-primary" title="View" onclick="view_data('<?=$record->code_budget?>')"><i class="fa fa-eye"></i></button> -->
+				<a class="text-green" href="javascript:void(0)" title="View" onclick="view_data('<?=$record->code_budget?>')"><i class="fa fa-view"></i></a>
 			<?php endif;
 			if($ENABLE_MANAGE) : ?>
-				<button type='button' class="btn btn-sm btn-success" title="Edit" onclick="edit_data('<?=$record->code_budget?>')"><i class="fa fa-pencil"></i></button>
+				<a class="text-green" href="javascript:void(0)" title="Edit" onclick="edit_data('<?=$record->code_budget?>')"><i class="fa fa-pencil"></i></a>
 			<?php endif;
 			if($ENABLE_DELETE) : ?>
-				<button type='button' class="btn btn-sm btn-danger" title="Delete" onclick="delete_data('<?=$record->code_budget?>')"><i class="fa fa-trash"></i></button>
+				<a class="text-red" href="javascript:void(0)" title="Delete" onclick="delete_data('<?=$record->code_budget?>')"><i class="fa fa-trash"></i></a>
 			<?php endif; ?>
 			</td>
 		</tr>
@@ -74,7 +72,7 @@
 <script type="text/javascript">
 
   	$(function() {
-    	$("#example1").DataTable({
+    	$("#mytabledata").DataTable({
 			"paging":   true,
 		});
     	$("#form-data").hide();

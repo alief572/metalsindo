@@ -28,16 +28,17 @@ $ENABLE_DELETE = has_permission('Rencana_Pembelian_Asset.Delete');
 				<thead>
 					<tr class='bg-blue'>
 						<th class="text-center">#</th>
-						<th class="text-center">Category</th>
 						<th class="text-center">Department</th>
-						<th class="text-center">Costcenter</th>
 						<th class="text-center">Nama Asset</th>
+						<th class="text-center">Keterangan</th>
 						<th class="text-center">Qty</th>
 						<th class="text-center">Budget</th>
 						<th class="text-center">Sisa Budget PR</th>
 						<th class="text-center">Sisa Budget PO</th>
 						<th class="text-center no-sort">Planning</th>
 						<th class="text-center no-sort">Status</th>
+						<th class="text-center no-sort">Dibuat Oleh</th>
+						<th class="text-center no-sort">Dibuat Tgl</th>
 						<th class="text-center no-sort">Option</th>
 					</tr>
 				</thead>
@@ -90,7 +91,7 @@ $ENABLE_DELETE = has_permission('Rencana_Pembelian_Asset.Delete');
 <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
 <script>
 	$(document).ready(function() {
-		var tanda = "<?= $tanda ?>";
+		var tanda = $('#tanda').val();
 		DataTables(tanda);
 	});
 
@@ -215,7 +216,7 @@ $ENABLE_DELETE = has_permission('Rencana_Pembelian_Asset.Delete');
 				}
 			},
 			"aaSorting": [
-				[1, "desc"]
+				[0, "asc"]
 			],
 			"columnDefs": [{
 				"targets": 'no-sort',

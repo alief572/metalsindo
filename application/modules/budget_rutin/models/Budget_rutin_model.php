@@ -65,11 +65,10 @@ class Budget_rutin_model extends BF_Model
     }
 
 	function GetBudgetRutin(){
-		$this->db->select('a.*, b.nm_gudang AS nm_dept, c.cost_center');
+		$this->db->select('a.*, b.nm_dept, c.cost_center');
 		$this->db->from('budget_rutin_header a');
-		$this->db->join('warehouse b','a.department=b.id', 'left');
+		$this->db->join('department b','a.department=b.id', 'left');
 		$this->db->join('department_center c','a.department=c.id_dept','left');
-		$this->db->group_by('a.code_budget');
 		$this->db->order_by('a.department', 'asc');
 		$query = $this->db->get();
 		if($query->num_rows() != 0) {
@@ -79,13 +78,12 @@ class Budget_rutin_model extends BF_Model
 		}
 	}
 	function GetBudgetRutinDetail($code_budget){
-		$this->db->select('a.*, b.stock_name nama_barang, b.spec spec1, c.nm_category nama_jenis, c.id AS id_type, b.id_unit_gudang AS id_satuan, z.code AS nm_satuan');
+		$this->db->select('a.*, b.nama nama_barang, b.spec1, c.nama nama_jenis, c.id_type');
 		$this->db->from("(select * from budget_rutin_detail where code_budget='".$code_budget."') a");
-		$this->db->join('accessories b','a.id_barang=b.id','left');
-		$this->db->join('accessories_category c','a.jenis_barang=c.id','right');
-        $this->db->join('ms_satuan z','b.id_unit_gudang=z.id','left');
-		// $this->db->where("c.id_type != 'I2000001'");
-		$this->db->order_by('c.nm_category', 'asc');
+		$this->db->join('ms_material b','a.id_barang=b.id_material','left');
+		$this->db->join('ms_inventory_type c','a.jenis_barang=c.id_type','right');
+		$this->db->where("c.id_type != 'I2000001'");
+		$this->db->order_by('c.nama', 'asc');
 		$query = $this->db->get();
 		if($query->num_rows() != 0) {
 			return $query->result();
