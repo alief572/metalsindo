@@ -78,58 +78,60 @@ class Expense extends Admin_Controller
 	public function kasbon_create()
 	{
 
-		$list_pr_non_po = [];
-		$this->db->select('b.no_pr, b.category')
-			->from('material_planning_base_on_produksi_detail a')
-			->join('material_planning_base_on_produksi b', 'b.so_number = a.so_number')
-			->join('new_inventory_4 c', 'c.code_lv4 = a.id_material', 'left')
-			->join('ms_satuan d', 'd.id = c.id_unit', 'left')
-			->join('accessories e', 'e.id = a.id_material', 'left')
-			->join('ms_satuan f', 'f.id = e.id_unit', 'left')
-			->where('b.metode_pembelian', '2')
-			->where('a.kasbon_created', null)
-			->group_by('b.no_pr');
-		$get_detail_pr_stok_material = $this->db->get()->result_array();
-		foreach ($get_detail_pr_stok_material as $item) {
-			$list_pr_non_po[] = [
-				'no_pr' => $item['no_pr'],
-				'keterangan' => strtoupper($item['category'])
-			];
-		}
+		// $list_pr_non_po = [];
+		// $this->db->select('b.no_pr, b.category')
+		// 	->from('material_planning_base_on_produksi_detail a')
+		// 	->join('material_planning_base_on_produksi b', 'b.so_number = a.so_number')
+		// 	->join('ms_inventory_category3 c', 'c.id_category3 = a.id_material', 'left')
+		// 	->join('ms_satuan d', 'd.id = c.id_unit', 'left')
+		// 	->join('accessories e', 'e.id = a.id_material', 'left')
+		// 	->join('ms_satuan f', 'f.id = e.id_unit', 'left')
+		// 	->where('b.metode_pembelian', '2')
+		// 	->where('a.kasbon_created', null)
+		// 	->group_by('b.no_pr');
+		// $get_detail_pr_stok_material = $this->db->get()->result_array();
+		// foreach ($get_detail_pr_stok_material as $item) {
+		// 	$list_pr_non_po[] = [
+		// 		'no_pr' => $item['no_pr'],
+		// 		'keterangan' => strtoupper($item['category'])
+		// 	];
+		// }
 
-		$this->db->select('b.no_pr, b.project_name')
-			->from('non_rutin_planning_detail a')
-			->join('non_rutin_planning_header b', 'b.no_pr = a.no_pr', 'left')
-			->join('ms_satuan c', 'c.id = a.satuan', 'left')
-			->where('b.metode_pembelian', '2')
-			->where('a.kasbon_created', null)
-			->group_by('b.no_pr');
-		$get_detail_pr_departemen = $this->db->get()->result_array();
-		foreach ($get_detail_pr_departemen as $item) {
-			$list_pr_non_po[] = [
-				'no_pr' => $item['no_pr'],
-				'keterangan' => $item['project_name']
-			];
-		}
+		// $this->db->select('b.no_pr, b.project_name')
+		// 	->from('non_rutin_planning_detail a')
+		// 	->join('non_rutin_planning_header b', 'b.no_pr = a.no_pr', 'left')
+		// 	->join('ms_satuan c', 'c.id = a.satuan', 'left')
+		// 	->where('b.metode_pembelian', '2')
+		// 	->where('a.kasbon_created', null)
+		// 	->group_by('b.no_pr');
+		// $get_detail_pr_departemen = $this->db->get()->result_array();
+		// foreach ($get_detail_pr_departemen as $item) {
+		// 	$list_pr_non_po[] = [
+		// 		'no_pr' => $item['no_pr'],
+		// 		'keterangan' => $item['project_name']
+		// 	];
+		// }
 
-		$this->db->select('b.no_pr, b.nama_asset');
-		$this->db->from('tran_pr_header a');
-		$this->db->join('asset_planning b', 'b.no_pr = a.no_pr', 'left');
-		$this->db->where('a.metode_pembelian', 2);
-		$this->db->where('a.kasbon_created', null);
-		$this->db->group_by('b.no_pr');
-		$get_pr_asset = $this->db->get()->result_array();
-		foreach ($get_pr_asset as $item) {
-			$list_pr_non_po[] = [
-				'no_pr' => $item['no_pr'],
-				'keterangan' => strtoupper($item['nama_asset'])
-			];
-		}
+		// $this->db->select('b.no_pr, b.nama_asset');
+		// $this->db->from('tran_pr_header a');
+		// $this->db->join('asset_planning b', 'b.no_pr = a.no_pr', 'left');
+		// $this->db->where('a.metode_pembelian', 2);
+		// $this->db->where('a.kasbon_created', null);
+		// $this->db->group_by('b.no_pr');
+		// $get_pr_asset = $this->db->get()->result_array();
+		// foreach ($get_pr_asset as $item) {
+		// 	$list_pr_non_po[] = [
+		// 		'no_pr' => $item['no_pr'],
+		// 		'keterangan' => strtoupper($item['nama_asset'])
+		// 	];
+		// }
 
 		$get_list_coa = $this->Expense_model->GetListCoa('Kasbon');
 
-		$this->template->set('list_pr_non_po', $list_pr_non_po);
+		// $this->template->set('list_pr_non_po', $list_pr_non_po);
 		$this->template->set('list_coa', $get_list_coa);
+		$this->template->set('list_detail_pr_kasbon', []);
+		$this->template->set('stsview', '');
 		$this->template->set('mod', '');
 		$this->template->render('kasbon_form');
 	}
@@ -334,7 +336,7 @@ class Expense extends Admin_Controller
 					$this->db->select('a.*, if(c.nama IS NULL, e.stock_name, c.nama) as nm_barang, if(d.code IS NULL, f.code, d.code) as satuan');
 					$this->db->from('material_planning_base_on_produksi_detail a');
 					$this->db->join('material_planning_base_on_produksi b', 'b.so_number = a.so_number');
-					$this->db->join('new_inventory_4 c', 'c.code_lv4 = a.id_material', 'left');
+					$this->db->join('ms_inventory_category3 c', 'c.id_category3 = a.id_material', 'left');
 					$this->db->join('ms_satuan d', 'd.id = c.id_unit', 'left');
 					$this->db->join('accessories e', 'e.id = a.id_material', 'left');
 					$this->db->join('ms_satuan f', 'f.id = e.id_unit', 'left');
@@ -502,7 +504,7 @@ class Expense extends Admin_Controller
 					$this->db->select('a.*, if(c.nama IS NULL, e.stock_name, c.nama) as nm_barang, if(d.code IS NULL, f.code, d.code) as satuan');
 					$this->db->from('material_planning_base_on_produksi_detail a');
 					$this->db->join('material_planning_base_on_produksi b', 'b.so_number = a.so_number');
-					$this->db->join('new_inventory_4 c', 'c.code_lv4 = a.id_material', 'left');
+					$this->db->join('ms_inventory_category3 c', 'c.id_category3 = a.id_material', 'left');
 					$this->db->join('ms_satuan d', 'd.id = c.id_unit', 'left');
 					$this->db->join('accessories e', 'e.id = a.id_material', 'left');
 					$this->db->join('ms_satuan f', 'f.id = e.id_unit', 'left');
@@ -560,6 +562,9 @@ class Expense extends Admin_Controller
 
 	public function get_kasbon($nama = '', $departement = '')
 	{
+		$nama = $this->db->escape_str($nama);
+		$departement = $this->db->escape_str($departement);
+
 		$data = $this->db->query("SELECT * FROM tr_kasbon WHERE status = 3")->result();
 		$query1 = $this->db->query("
 			SELECT
@@ -618,13 +623,11 @@ class Expense extends Admin_Controller
 				a.status = '3' AND
 				a.metode_pembelian = '2' AND 
 				(SELECT COUNT(aa.id) FROM tr_expense aa JOIN tr_expense_detail ab ON ab.no_doc = aa.no_doc WHERE ab.id_expense_detail = a.id AND aa.status IN ('0','1','2','3')) < 1
-		")->num_rows();
-		if (!$query1) {
-			print_r($this->db->error($query1));
-			exit;
-		}
+		");
 
-		if ($query1 > 0) {
+		$query1_count = $query1->num_rows();
+
+		if ($query1_count > 0) {
 
 			$data = $this->db->query("
 			SELECT
@@ -688,10 +691,6 @@ class Expense extends Admin_Controller
 				a.metode_pembelian = '2' AND 
 				(SELECT COUNT(aa.id) FROM tr_expense aa JOIN tr_expense_detail ab ON ab.no_doc = aa.no_doc WHERE ab.id_expense_detail = a.id AND aa.status IN ('0','1','2','3')) < 1
 		")->result();
-			if (!$data) {
-				print_r($this->db->error($data));
-				exit;
-			}
 		} else {
 			$data = false;
 		}
@@ -715,6 +714,7 @@ class Expense extends Admin_Controller
 		$this->template->set('status', $this->status);
 		$this->template->set('data', $data);
 		$this->template->set('list_coa', $get_list_coa);
+		$this->template->set('list_pr_non_po', []);
 		$this->template->set('stsview', '');
 		$this->template->set('list_detail_pr_kasbon', $get_pr_detail_kasbon);
 		$this->template->title('Kasbon Form');
@@ -738,6 +738,7 @@ class Expense extends Admin_Controller
 		$this->template->set('status', $this->status);
 		$this->template->set('data', $data);
 		$this->template->set('list_coa', $get_list_coa);
+		$this->template->set('list_pr_non_po', []);
 		$this->template->set('stsview', '');
 		$this->template->set('list_detail_pr_kasbon', $get_pr_detail_kasbon);
 		$this->template->title('Approval Kasbon by Management');
@@ -965,15 +966,18 @@ class Expense extends Admin_Controller
 	// kasbon delete
 	public function kasbon_delete($id)
 	{
+		$this->db->trans_begin();
+
 		$get_kasbon = $this->db->get_where('tr_kasbon', ['id' => $id])->row();
 
 		$no_doc = $get_kasbon->no_doc;
 		$get_detail_kasbon = $this->db->get_where('tr_pr_detail_kasbon', ['id_kasbon' => $no_doc])->result_array();
-		// print_r($get_detail_kasbon);
-		// exit;
+
 		foreach ($get_detail_kasbon as $detail_kasbon) :
 			if ($detail_kasbon['tipe_pr'] == 'pr departemen') {
 				$this->db->update('non_rutin_planning_detail', ['kasbon_created' => null], ['id' => $detail_kasbon['id_detail']]);
+			} else if ($detail_kasbon['tipe_pr'] == 'pr asset') {
+				$this->db->update('tran_pr_header', ['kasbon_created' => null], ['id' => $detail_kasbon['id_detail']]);
 			} else {
 				$this->db->update('material_planning_base_on_produksi_detail', ['kasbon_created' => null], ['id' => $detail_kasbon['id_detail']]);
 			}
@@ -2985,7 +2989,7 @@ class Expense extends Admin_Controller
 		$this->db->select('if(c.nama IS NULL, e.stock_name, c.nama) as material_name, a.propose_purchase as qty, if(d.code IS NULL, f.code, d.code) as unit, b.category as tipe_pr, a.id, a.price_ref')
 			->from('material_planning_base_on_produksi_detail a')
 			->join('material_planning_base_on_produksi b', 'b.so_number = a.so_number')
-			->join('new_inventory_4 c', 'c.code_lv4 = a.id_material', 'left')
+			->join('ms_inventory_category3 c', 'c.id_category3 = a.id_material', 'left')
 			->join('ms_satuan d', 'd.id = c.id_unit', 'left')
 			->join('accessories e', 'e.id = a.id_material', 'left')
 			->join('ms_satuan f', 'f.id = e.id_unit', 'left')
@@ -3125,7 +3129,11 @@ class Expense extends Admin_Controller
 		$this->db->update('tr_kasbon', ['id_expense_pett_pr_non_po' => null], ['no_doc' => $id_kasbon_non_po]);
 		$this->db->delete('tr_expense_detail', ['id' => $id_detail]);
 
-		$this->db->trans_commit();
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+		} else {
+			$this->db->trans_commit();
+		}
 	}
 
 	public function add_kasbon_pr()
@@ -3612,6 +3620,7 @@ class Expense extends Admin_Controller
 		foreach ($get_data as $item) :
 			$no++;
 
+			$sts = '';
 			if ($item['status'] == '0') {
 				$sts = '<div class="badge bg-yellow text-light">New</div>';
 			}
@@ -3636,7 +3645,7 @@ class Expense extends Admin_Controller
 			$action = '';
 
 			if (has_permission($this->viewPermissionKasbonApp)) {
-				$action .= ' <a class="btn btn-default btn-sm print" href="' . base_url("expense/kasbon_print" . $item['id']) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
+				$action .= ' <a class="btn btn-default btn-sm print" href="' . base_url("expense/kasbon_print/" . $item['id']) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
 
 				$action .= ' <a class="btn btn-warning btn-sm view" href="' . base_url('expense/kasbon_view/' . $item['id'] . '/_fin') . '" title="View"><i class="fa fa-eye"></i> </a>';
 			}
@@ -3768,6 +3777,7 @@ class Expense extends Admin_Controller
 		foreach ($get_data as $item) :
 			$no++;
 
+			$sts = '';
 			if ($item['status'] == '0') {
 				$sts = '<div class="badge bg-yellow text-light">New</div>';
 			}
@@ -3792,7 +3802,7 @@ class Expense extends Admin_Controller
 			$action = '';
 
 			if (has_permission($this->viewPermissionKasbonAppMan)) {
-				$action .= ' <a class="btn btn-default btn-sm print" href="' . base_url("expense/kasbon_print" . $item['id']) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
+				$action .= ' <a class="btn btn-default btn-sm print" href="' . base_url("expense/kasbon_print/" . $item['id']) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
 
 				$action .= ' <a class="btn btn-warning btn-sm view" href="' . base_url('expense/kasbon_view/' . $item['id'] . '/_fin') . '" title="View"><i class="fa fa-eye"></i> </a>';
 			}
