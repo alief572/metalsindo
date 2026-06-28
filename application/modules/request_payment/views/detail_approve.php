@@ -44,20 +44,14 @@ if ($type == 'expense') {
 	$bank_id = $header->bank_id;
 	$accnumber = $header->accnumber;
 	$accname = $header->accname;
-} elseif ($type == "po_material") {
-	$keterangan = $header->keterangan_bayar;
-	$no_doc = $header->id_rec_inv_ap;
-	$tgl_doc = date('Y-m-d', strtotime($header->created_date));
+} elseif ($type == 'direct_payment') {
+	$keterangan = $header->deskripsi;
+	$no_doc = $header->no_doc;
+	$tgl_doc = $header->tgl_doc;
 
-	$bank_id = '';
-	$accnumber = '';
-	$accname = '';
-}
-
-if ($type == 'po_material') {
-	$id = $header->id_rec_inv_ap;
-} else {
-	$id = $header->id;
+	$bank_id = $header->bank;
+	$accnumber = $header->bank_number;
+	$accname = $header->bank_account;
 }
 
 ?>
@@ -68,7 +62,7 @@ if ($type == 'po_material') {
 	<div class="box-body">
 
 		<div class="row">
-			<input type="hidden" name="id" value="<?= $id; ?>">
+			<input type="hidden" name="id" value="<?= $header->id; ?>">
 			<input type="hidden" name="tipe" value="<?= $type; ?>">
 			<input type="hidden" name="tingkat_approval" value="2">
 			<div class="col-md-6">
@@ -145,25 +139,16 @@ if ($type == 'po_material') {
 					<?php
 					if (!empty($details)) {
 						$n = $gTotal = 0;
-
-						$nilai_pph = $data_req_payment['total_pph'];
-						$bank_charge = $data_req_payment['admin_bank'];
-
 						foreach ($details as $dtl) : $n++;
-							if ($type == 'po_material') {
-								$nm_coa = '';
-							} else {
-								$nm_coa = (isset($list_coa[$dtl->coa]) && $dtl->coa !== '') ? $list_coa[$dtl->coa] : '';
-							}
+							$coa = (isset($dtl->coa)) ? $dtl->coa : '';
+							$nm_coa = (isset($list_coa[$coa]) && $coa !== '') ? $list_coa[$coa] : '';
 							if ($type == 'expense') :
 								$harga  = $dtl->harga;
 								if (isset($dtl->id_kasbon) && $dtl->id_kasbon !== '') {
 									$harga = $dtl->kasbon * -1;
 								}
 
-
-
-								$gTotal += ($dtl->expense + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']); ?>
+								$gTotal += ($data_req_payment['jumlah'] + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']); ?>
 								<tr>
 									<td><?= $n; ?></td>
 									<td><?= $dtl->coa . ' - ' . $nm_coa; ?></td>
@@ -177,7 +162,28 @@ if ($type == 'po_material') {
 												<td>Nilai Pengajuan</td>
 												<td class="text-center" style="min-width: 50px;">:</td>
 												<td class="text-right">
-													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($dtl->expense, 2) ?>" readonly>
+													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($data_req_payment['jumlah'], 2) ?>" readonly>
+												</td>
+											</tr>
+											<tr>
+												<td>Nilai PPh</td>
+												<td class="text-center" style="min-width: 50px;">:</td>
+												<td class="text-right">
+													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($data_req_payment['total_pph'], 2) ?>" readonly>
+												</td>
+											</tr>
+											<tr>
+												<td>Bank Charge</td>
+												<td class="text-center" style="min-width: 50px;">:</td>
+												<td class="text-right">
+													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($data_req_payment['admin_bank'], 2) ?>" readonly>
+												</td>
+											</tr>
+											<tr>
+												<td>Net Payment</td>
+												<td class="text-center" style="min-width: 50px;">:</td>
+												<td class="text-right">
+													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format(($data_req_payment['jumlah'] + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']), 2) ?>" readonly>
 												</td>
 											</tr>
 										</table>
@@ -185,9 +191,13 @@ if ($type == 'po_material') {
 									<td class="text-center">
 										<?php
 
-										// $get_ros = $this->db->get_where('tr_ros', ['id' => $dtl->no_doc])->row_array();
+										$get_ros = $this->db->get_where('tr_ros', ['id' => $dtl->no_doc])->row_array();
 										$get_invoice = $this->db->get_where('tr_invoice_po', ['id' => $dtl->no_doc])->row_array();
-										if (!empty($get_invoice)) {
+										if (!empty($get_ros)) {
+											if (file_exists($get_ros['link_doc'])) {
+												echo '<a href="' . base_url('./' . $get_ros['link_doc']) . '" target="_blank"><i class="fa fa-download"></i></a>';
+											}
+										} else if (!empty($get_invoice)) {
 											if (file_exists($get_invoice['link_doc'])) {
 												echo '<a href="' . base_url('./' . $get_invoice['link_doc']) . '" target="_blank"><i class="fa fa-download"></i></a>';
 											}
@@ -268,7 +278,7 @@ if ($type == 'po_material') {
 													<td>Nilai Pengajuan</td>
 													<td class="text-center" style="min-width: 50px;">:</td>
 													<td class="text-right">
-														<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($dtl->jumlah_kasbon, 2) ?>">
+														<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($data_req_payment['jumlah'], 2) ?>">
 													</td>
 												</tr>
 												<tr>
@@ -289,7 +299,7 @@ if ($type == 'po_material') {
 													<td>Net Payment</td>
 													<td class="text-center" style="min-width: 50px;">:</td>
 													<td class="text-right">
-														<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format(($dtl->jumlah_kasbon + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']), 2) ?>">
+														<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format(($data_req_payment['jumlah'] + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']), 2) ?>">
 													</td>
 												</tr>
 											</table>
@@ -481,83 +491,40 @@ if ($type == 'po_material') {
 
 									</td>
 								</tr>
-
-							<?php elseif ($type == 'po_material') :
-								$gTotal += ($data_req_payment['jumlah'] + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']);
+							<?php endif;
+							if ($type == 'direct_payment') {
 							?>
 
 								<tr>
 									<td><?= $n; ?></td>
-									<td></td>
-									<td><?= $keterangan; ?></td>
-									<td><?= date('Y-m-d', strtotime($dtl->created_date)); ?></td>
-									<td>1</td>
+									<td><?= $coa . ' - ' . $nm_coa; ?></td>
+									<td><?= $dtl->deskripsi; ?></td>
+									<td><?= $dtl->tgl_doc; ?></td>
+									<td><?= number_format($dtl->grand_total, 2) ?></td>
 									<td><?= $data_req_payment['currency']; ?></td>
-									<td class="text-left">
-										<table class="w-100">
-											<tr>
-												<td>Nilai Pengajuan</td>
-												<td class="text-center" style="min-width: 50px;">:</td>
-												<td class="text-right">
-													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($data_req_payment['jumlah'], 2) ?>" readonly>
-												</td>
-											</tr>
-											<tr>
-												<td>Nilai PPh</td>
-												<td class="text-center" style="min-width: 50px;">:</td>
-												<td class="text-right">
-													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($data_req_payment['total_pph'], 2) ?>" readonly>
-												</td>
-											</tr>
-											<tr>
-												<td>Bank Charge</td>
-												<td class="text-center" style="min-width: 50px;">:</td>
-												<td class="text-right">
-													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format($data_req_payment['admin_bank'], 2) ?>" readonly>
-												</td>
-											</tr>
-											<tr>
-												<td>Net Payment</td>
-												<td class="text-center" style="min-width: 50px;">:</td>
-												<td class="text-right">
-													<input type="text" name="" id="" class="form-control form-control-sm text-right" value="<?= number_format(($data_req_payment['jumlah'] + $data_req_payment['admin_bank'] - $data_req_payment['total_pph']), 2) ?>" readonly>
-												</td>
-											</tr>
-										</table>
-									</td>
-									<td class="text-center">
+									<td class="text-right"><?= number_format($dtl->grand_total, 2) ?></td>
 
-									</td>
+									<td class="text-center"><a href="<?= base_url('assets/expense/') . $data_req_payment['link_doc']; ?>" target="_blank"><i class="fa fa-download"></i></a></td>
 									<td>
-
-										<input type="checkbox" checked value="<?= $dtl->id_rec_inv_ap; ?>" name="item[<?= $n; ?>][id]" class="check_item" id="check_<?= $dtl->id_rec_inv_ap; ?>" readonly>
-
+										<?php if ($dtl->sts == '2') : ?>
+											<input type="checkbox" checked value="<?= $dtl->id; ?>" name="item[<?= $n; ?>][id]" class="check_item" id="check_<?= $dtl->id; ?>">
+										<?php elseif ($dtl->sts == '3') : ?>
+											<label for="" class="label bg-maroon">Process</label>
+										<?php elseif ($dtl->sts == '4') : ?>
+											<label for="" class="label bg-green">PAID</label>
+										<?php else : ?>
+											<label for="" class="label bg-gray"><span class="text-muted">Undefined</span></label>
+										<?php endif; ?>
 									</td>
 								</tr>
-					<?php endif;
+
+					<?php
+								$gTotal += $dtl->grand_total;
+							}
 						endforeach;
 					}  ?>
 				</tbody>
 				<tfoot>
-				<?php 
-						if($type == 'expense') {
-							echo '
-								<tr class="bg-blue">
-									<th colspan="6" class="text-right">Nilai PPh</th>
-									<th class="text-right">'.number_format($nilai_pph).'</th>
-									<th colspan="3" class="text-center"></th>
-								</tr>
-							';
-
-							echo '
-								<tr class="bg-blue">
-									<th colspan="6" class="text-right">Bank Charge</th>
-									<th class="text-right">'.number_format($bank_charge).'</th>
-									<th colspan="3" class="text-center"></th>
-								</tr>
-							';
-						}
-					?>
 					<tr class="bg-blue">
 						<th colspan="6" class="text-right">Total</th>
 						<th class="text-right"><?= number_format($gTotal); ?></th>
@@ -565,13 +532,7 @@ if ($type == 'po_material') {
 					</tr>
 				</tfoot>
 			</table>
-			<?php
-			$hide_info_transfer = '';
-			if ($type == 'po_material') {
-				$hide_info_transfer = 'style="display:none;"';
-			}
-			?>
-			<div class="col-md-4" <?= $hide_info_transfer ?>>
+			<div class="col-md-4">
 				<table class="table table-bordered">
 					<thead>
 						<tr>

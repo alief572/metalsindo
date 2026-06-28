@@ -152,6 +152,12 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : 1;
 						</div>
 					</div>
 
+					<!-- ============================================================
+					     SECTION KASBON PR NON PO - DINONAKTIFKAN SEMENTARA
+					     Alasan: Tabel material yang diakses tidak sesuai dengan struktur DB saat ini.
+					     Uncomment jika sudah disesuaikan.
+					============================================================ -->
+					<?php /*
 					<h4>Kasbon PR Non PO</h4>
 					<div class="form-group">
 						<div class="col-md-1 control-label">
@@ -159,18 +165,25 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : 1;
 						</div>
 						<div class="col-md-4">
 							<?php
-							if (isset($data->id_pr)) {
+							if (isset($data->id_pr) && !empty($data->id_pr)) {
 							?>
-								<input type="text" name="no_pr" id="search_pr_non_po" class="form-control" placeholder="- No PR -" value="<?= (isset($data->id_pr)) ? $data->id_pr : null ?>">
+								<input type="text" name="no_pr" id="search_pr_non_po" class="form-control" placeholder="- No PR -" value="<?= $data->id_pr ?>" readonly>
 							<?php
 							} else {
 							?>
 
-								<select name="no_pr" id="search_pr_non_po" class="form-control chosen_select" id="">
+								<select name="no_pr" id="search_pr_non_po" class="form-control chosen_select">
 									<option value="">- No PR -</option>
 									<?php
+<<<<<<< HEAD
 									foreach ($list_pr_non_po as $item_pr_non_po) {
 										echo '<option value="' . $item_pr_non_po['no_pr'] . '">' . $item_pr_non_po['no_pr'] . ' - ' . $item_pr_non_po['keterangan'] . '</option>';
+=======
+									if (isset($list_pr_non_po)) {
+										foreach ($list_pr_non_po as $item_pr_non_po) {
+											echo '<option value="' . $item_pr_non_po['no_pr'] . '">' . $item_pr_non_po['no_pr'] . ' - ' . $item_pr_non_po['keterangan'] . '</option>';
+										}
+>>>>>>> 087480fa22b2572204878986088fd93291240c59
 									}
 									?>
 								</select>
@@ -183,8 +196,8 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : 1;
 							}
 							?>
 
-							<input type="hidden" name="tipe_pr" id="tipe_pr" value="<?= (isset($list_detail_pr_kasbon[0]['tipe_pr'])) ? $list_detail_pr_kasbon[0]['tipe_pr'] : null ?>">
-							<label for="">*Note: Klik enter jika sudah</label>
+							<input type="hidden" name="tipe_pr" id="tipe_pr" value="<?= (isset($list_detail_pr_kasbon) && isset($list_detail_pr_kasbon[0]['tipe_pr'])) ? $list_detail_pr_kasbon[0]['tipe_pr'] : '' ?>">
+							<label for="">*Note: Pilih PR lalu detail material akan muncul</label>
 						</div>
 					</div>
 					<div class="col-md-12">
@@ -203,11 +216,15 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : 1;
 							<tbody class="list_barang_pr">
 								<?php
 								$grand_total_non_pr = 0;
+<<<<<<< HEAD
 								if (isset($list_detail_pr_kasbon)) {
+=======
+								if (isset($list_detail_pr_kasbon) && !empty($list_detail_pr_kasbon)) {
+>>>>>>> 087480fa22b2572204878986088fd93291240c59
 									$no = 1;
 									foreach ($list_detail_pr_kasbon as $detail_pr) :
 										$readonly = '';
-										if (($mod == '_fin' || $mod == '_mgt')) {
+										if (isset($mod) && ($mod == '_fin' || $mod == '_mgt')) {
 											$readonly = 'readonly';
 										}
 										echo '<tr class="detail_pr_' . $detail_pr['id_detail'] . '">';
@@ -218,7 +235,7 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : 1;
 										echo '<td class="text-center"><input type="text" name="price_input_' . $detail_pr['id_detail'] . '" class="form-control form-control-sm text-right price_input price_input_' . $detail_pr['id_detail'] . ' autonum" data-no="' . $detail_pr['id_detail'] . '" value="' . $detail_pr['harga'] . '" ' . $readonly . '></td>';
 										echo '<td class="text-center"><input type="text" name="grand_total_' . $detail_pr['id_detail'] . '" class="form-control form-control-sm text-right grand_total_' . $detail_pr['id_detail'] . ' autonum" value="' . $detail_pr['total_harga'] . '" ' . $readonly . '></td>';
 										echo '<td class="text-center">';
-										if (($mod == '_fin' || $mod == '_mgt')) {
+										if (isset($mod) && ($mod == '_fin' || $mod == '_mgt')) {
 										} else {
 											if (!isset($stsview) || $stsview == '') {
 												echo '<button type="button" class="btn btn-sm btn-danger del_detail" data-no="' . $detail_pr['id_detail'] . '"><i class="fa fa-trash"></i></button>';
@@ -242,6 +259,10 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : 1;
 							</tfoot>
 						</table>
 					</div>
+					*/ ?>
+					<!-- Hidden fields agar kasbon_save tidak error -->
+					<input type="hidden" name="no_pr" value="">
+					<input type="hidden" name="tipe_pr" id="tipe_pr" value="">
 				</div>
 				<div class="box-footer">
 					<div class="form-group">
@@ -352,11 +373,26 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : 1;
 		e.preventDefault();
 		var errors = "";
 
+<<<<<<< HEAD
 		var doc_pr = $('.doc_pr').val();
 		var to_doc_pr = $('.to_doc_pr').val();
 		var search_pr_non_po = $('#search_pr_non_po').val();
 
 		if ($("#filename").val() == "" && search_pr_non_po == '') {
+=======
+		// var doc_pr = $('.doc_pr').val();
+		// var to_doc_pr = $('.to_doc_pr').val();
+		// var search_pr_non_po = $('#search_pr_non_po').val();
+
+		// DISABLED: Validasi PR Non PO dinonaktifkan sementara
+		// if ($("#filename").val() == "" && search_pr_non_po == '') {
+		// 	if ($('#doc_file').get(0).files.length === 0) {
+		// 		errors = "Dokumen 1 harus diupload";
+		// 	}
+		// }
+
+		if ($("#filename").val() == "") {
+>>>>>>> 087480fa22b2572204878986088fd93291240c59
 			if ($('#doc_file').get(0).files.length === 0) {
 				errors = "Dokumen 1 harus diupload";
 			}
@@ -377,6 +413,7 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : 1;
 		// 		errors = "Pastikan data transfer terisi";
 		// 	}
 		// }
+<<<<<<< HEAD
 
 		var price_no_input = 0;
 		$('.price_input').each(function() {
@@ -385,10 +422,21 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : 1;
 				price_no_input += 1;
 			}
 		});
+=======
+>>>>>>> 087480fa22b2572204878986088fd93291240c59
 
-		if (price_no_input > 0) {
-			errors = "Please make sure all material price is filled !";
-		}
+		// DISABLED: Validasi price_input PR Non PO dinonaktifkan sementara
+		// var price_no_input = 0;
+		// $('.price_input').each(function() {
+		// 	var value = parseFloat($(this).val());
+		// 	if (isNaN(value)) {
+		// 		price_no_input += 1;
+		// 	}
+		// });
+
+		// if (price_no_input > 0) {
+		// 	errors = "Please make sure all material price is filled !";
+		// }
 		if (errors == "") {
 			swal({
 					title: "Anda Yakin?",
@@ -479,15 +527,22 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : 1;
 		return s.join(dec);
 	}
 
+<<<<<<< HEAD
+=======
+	/* ============================================================
+	   JAVASCRIPT KASBON PR NON PO - DINONAKTIFKAN SEMENTARA
+	   Alasan: Tabel material yang diakses tidak sesuai dengan struktur DB saat ini.
+	============================================================
+>>>>>>> 087480fa22b2572204878986088fd93291240c59
 	$(document).on('change', '#search_pr_non_po', function(e) {
-		// e.preventDefault();
 		const no_pr = $(this).val();
 
-		// if (e.keyCode == '13') {
-
-		// } else {
-		// 	$('#search_pr_non_po').val(no_pr);
-		// }
+		if (!no_pr || no_pr == '') {
+			$('.list_barang_pr').html('');
+			$('#tipe_pr').val('');
+			$('.grand_total_non_pr').html('0.00');
+			return;
+		}
 
 		$.ajax({
 			type: "POST",
@@ -501,7 +556,16 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : 1;
 				if (result.sts == '1') {
 					$('.list_barang_pr').html(result.hasil);
 					$('#tipe_pr').val(result.tipe_pr);
+<<<<<<< HEAD
 					$('.autonum').autoNumeric();
+=======
+					// Re-init autoNumeric pada elemen baru
+					$('.list_barang_pr .autonum').each(function() {
+						if (!$(this).data('autoNumeric')) {
+							$(this).autoNumeric('init');
+						}
+					});
+>>>>>>> 087480fa22b2572204878986088fd93291240c59
 					$('.grand_total_non_pr').html(number_format(result.grand_total, 2));
 				} else {
 					swal({
@@ -547,29 +611,89 @@ $metode_pembayaran = (isset($data)) ? $data->metode_pembayaran : 1;
 		var no = $(this).data('no');
 
 		$('.detail_pr_' + no).remove();
+
+		// Recalculate grand total setelah row dihapus
+		hitung_grand_total_non_pr();
 	});
 
 	$(document).on('change', '.price_input', function() {
 		var no = $(this).data('no');
 		var nilai = $(this).val();
 		if (nilai == null || nilai == '') {
-			var nilai = 0;
+			nilai = 0;
 		} else {
-			var nilai = nilai.split(',').join('');
+			nilai = nilai.split(',').join('');
 			nilai = parseFloat(nilai);
 		}
 
-		var qty = $('.qty_' + no).val();
+		var qty = parseFloat($('.qty_' + no).val());
 
-		// alert(nilai);
-		// alert(qty);
+		var total = nilai * qty;
 
-		var total = parseFloat(nilai * qty);
-
-		$('.grand_total_' + no).autoNumeric('set', total);
+		// Set value pada grand_total field
+		var grandTotalField = $('.grand_total_' + no);
+		try {
+			grandTotalField.autoNumeric('set', total);
+		} catch (e) {
+			grandTotalField.val(total);
+		}
 
 		hitung_grand_total_non_pr();
 	})
+	============================================================ */
+
+	$(document).on('change', '.coa_select', function() {
+		var no_coa = $(this).val();
+
+		$.ajax({
+			type: 'post',
+			url: siteurl + active_controller + 'get_coa_name',
+			data: {
+				'no_coa': no_coa
+			},
+			cache: false,
+			dataType: 'json',
+			success: function(result) {
+				$('input[name="nm_coa"]').val(result.nm_coa);
+			},
+			error: function(result) {
+				swal({
+					type: 'error',
+					title: 'Error !',
+					text: 'Please try again later !',
+					showConfirmButton: false,
+					showCancelButton: false,
+					allowOutsideClick: false,
+					timer: 3000
+				});
+			}
+		});
+	});
+
+	function getNum(val) {
+		if (isNaN(val) || val == '') {
+			return 0;
+		}
+		return parseFloat(val);
+	}
+
+	/* DISABLED - hitung_grand_total_non_pr
+	function hitung_grand_total_non_pr() {
+		var grand_total = 0;
+		$('.price_input').each(function() {
+			var value = $(this).val();
+			value = value.replace(/,/g, '');
+			value = parseFloat(value);
+
+			var no = $(this).data('no');
+			var qty = $('.qty_' + no).val();
+
+			grand_total += (value * qty);
+		});
+
+		$('.grand_total_non_pr').html(number_format(grand_total, 2));
+	}
+	*/
 
 	$(document).on('change', '.coa_select', function() {
 		var no_coa = $(this).val();

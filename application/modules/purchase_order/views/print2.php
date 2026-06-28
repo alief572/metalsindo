@@ -320,7 +320,7 @@
 
                 if ($check_sheet > 0) {
                     $no++;
-                    $TOT_PPH += (($detail->totalwidth) * $detail->hargasatuan) * $detail->pajak / 100;
+                    
                     $total_weight_kgs = ($detail->totalwidth);
                     $harga_satuan_kgs = ($detail->hargasatuan * $detail->total_weight);
 
@@ -360,7 +360,8 @@
 
                     $ttl_sheet += $weight_sheet;
                     $ttl_kgs += $total_weight_kgs;
-                    $ttl_amount += ((($detail->totalwidth) * $detail->hargasatuan) + ((($detail->totalwidth) * $detail->hargasatuan) * $detail->pajak / 100));
+                    $TOT_PPH += (($weight_sheet * $harga_sheet) * $detail->pajak / 100);
+                    $ttl_amount += (($weight_sheet * $harga_sheet) + (($weight_sheet * $harga_sheet) * $detail->pajak / 100));
                 } else {
                     $no++;
                     $TOT_PPH += $detail->jumlahharga * $detail->pajak / 100;
@@ -385,7 +386,11 @@
             if ($header->loi == 'Lokal') {
                 if ($check_sheet > 0) {
             ?>
-
+                    <tr>
+                        <td align="center" colspan='8'>Total</td>
+                        <td align="right"><?= number_format($ttl_amount - $TOT_PPH, 2) ?></td>
+                        <td align="center"></td>
+                    </tr>
                     <tr>
                         <td align="center" colspan='7'>PPN </td>
                         <td align="right"><?= number_format($TOT_PPH, 2) ?></td>
@@ -396,7 +401,13 @@
                 <?php
                 } else {
                 ?>
-
+                    <tr>
+                        <td align="center" colspan='4'>Total Sebelum PPN</td>
+                        <td align="right"><?= number_format($detailsum[0]->sumtotalwidth, 2) ?></td>
+                        <td align="right" colspan="1"></td>
+                        <td align="right"><?= number_format($detailsum[0]->sumjumlahharga, 2) ?></td>
+                        <td align="center"></td>
+                    </tr>
                     <tr>
                         <td align="center" colspan='3'>PPN </td>
                         <td align="right" colspan='2'></td>
@@ -420,7 +431,7 @@
             }
             ?>
             <tr>
-                <td align="center" colspan='4'>Total </td>
+                <td align="center" colspan='4'>Grand Total </td>
                 <?php
                 if ($check_sheet > 0) {
                 ?>
