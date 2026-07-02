@@ -128,7 +128,7 @@
             <?php
             $TTL = 0;
             foreach ($detail as $row) {
-                $JH = $row->jumlahharga;
+                $JH = $row->jumlahharga - $row->nilai_disc;
                 $TTL += $JH;
                 $konversi = ($row->konversi > 0) ? $row->konversi : 1;
             ?>

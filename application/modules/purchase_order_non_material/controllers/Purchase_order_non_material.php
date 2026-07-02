@@ -1952,13 +1952,13 @@ class Purchase_order_non_material extends Admin_Controller
 		// exit;
 		if ($data['header'][0]->tipe !== '' && $data['header'][0]->tipe !== null) {
 			if ($data['header'][0]->tipe == 'pr depart') {
-				$data['detail']  = $this->db->query("SELECT a.id as id, a.no_po as no_po, a.id_dt_po as id_dt_po, a.idpr as idpr, a.idmaterial as idmaterial, a.namamaterial as namamaterial, a.description as description, a.hargasatuan as hargasatuan, a.jumlahharga as jumlahharga, a.kode_barang as kode_barang, a.ppn as ppn, a.ppn_persen as ppn_persen, a.harga_total as harga_total, a.tipe as tipe, a.keterangan as keterangan, a.namamaterial as nama, '' as code, '1' as konversi, c.code as satuan, c.code as satuan_packing, a.qty as qty FROM dt_trans_po_non_material a 
+				$data['detail']  = $this->db->query("SELECT a.id as id, a.no_po as no_po, a.id_dt_po as id_dt_po, a.idpr as idpr, a.idmaterial as idmaterial, a.namamaterial as namamaterial, a.description as description, a.hargasatuan as hargasatuan, a.jumlahharga as jumlahharga, a.kode_barang as kode_barang, a.ppn as ppn, a.ppn_persen as ppn_persen, a.harga_total as harga_total, a.tipe as tipe, a.keterangan as keterangan, a.namamaterial as nama, '' as code, '1' as konversi, c.code as satuan, c.code as satuan_packing, a.qty as qty, a.persen_disc as persen_disc, a.nilai_disc as nilai_disc FROM dt_trans_po_non_material a 
 				LEFT JOIN rutin_non_planning_detail b ON b.id = a.idpr
 				LEFT JOIN ms_satuan c ON c.id = b.satuan
 				WHERE a.no_po = '" . $id . "' ")->result();
 			}
 			if ($data['header'][0]->tipe == 'pr asset') {
-				$data['detail']  = $this->db->query("SELECT a.id as id, a.no_po as no_po, a.id_dt_po as id_dt_po, a.idpr as idpr, a.idmaterial as idmaterial, a.namamaterial as namamaterial, a.description as description, a.hargasatuan as hargasatuan, a.jumlahharga as jumlahharga, a.kode_barang as kode_barang, a.ppn as ppn, a.ppn_persen as ppn_persen, a.harga_total as harga_total, a.tipe as tipe, a.keterangan as keterangan, a.namamaterial as nama, '' as code, '1' as konversi, 'Pcs' as satuan, 'Pcs' as satuan_packing, a.qty as qty FROM dt_trans_po_non_material a 
+				$data['detail']  = $this->db->query("SELECT a.id as id, a.no_po as no_po, a.id_dt_po as id_dt_po, a.idpr as idpr, a.idmaterial as idmaterial, a.namamaterial as namamaterial, a.description as description, a.hargasatuan as hargasatuan, a.jumlahharga as jumlahharga, a.kode_barang as kode_barang, a.ppn as ppn, a.ppn_persen as ppn_persen, a.harga_total as harga_total, a.tipe as tipe, a.keterangan as keterangan, a.namamaterial as nama, '' as code, '1' as konversi, 'Pcs' as satuan, 'Pcs' as satuan_packing, a.qty as qty, a.persen_disc as persen_disc, a.nilai_disc as nilai_disc FROM dt_trans_po_non_material a 
 				LEFT JOIN asset_planning b ON b.id = a.idpr
 				WHERE a.no_po = '" . $id . "' ")->result();
 			}
