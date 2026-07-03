@@ -14,10 +14,10 @@ if (!defined('BASEPATH')) {
 class Retur_pembelian extends Admin_Controller
 {
 	//Permission
-	protected $viewPermission 	= 'Retur_Pembelian.View';
-	protected $addPermission  	= 'Retur_Pembelian.Add';
-	protected $managePermission = 'Retur_Pembelian.Manage';
-	protected $deletePermission = 'Retur_Pembelian.Delete';
+	protected $viewPermission 	= 'Input Retur Pembelian.View';
+	protected $addPermission  	= 'Input Retur Pembelian.Add';
+	protected $managePermission = 'Input Retur Pembelian.Manage';
+	protected $deletePermission = 'Input Retur Pembelian.Delete';
 
 	public function __construct()
 	{
