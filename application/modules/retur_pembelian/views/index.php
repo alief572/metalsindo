@@ -1,8 +1,8 @@
 <?php
-$ENABLE_ADD     = has_permission('Retur_Pembelian.Add');
-$ENABLE_MANAGE  = has_permission('Retur_Pembelian.Manage');
-$ENABLE_VIEW    = has_permission('Retur_Pembelian.View');
-$ENABLE_DELETE  = has_permission('Retur_Pembelian.Delete');
+$ENABLE_ADD     = has_permission('Input Retur Pembelian.Add');
+$ENABLE_MANAGE  = has_permission('Input Retur Pembelian.Manage');
+$ENABLE_VIEW    = has_permission('Input Retur Pembelian.View');
+$ENABLE_DELETE  = has_permission('Input Retur Pembelian.Delete');
 
 ?>
 <style type="text/css">
