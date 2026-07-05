@@ -483,6 +483,42 @@ $alamat_cust =  $this->db->query("SELECT * FROM master_customers WHERE id_custom
 
 		function savemutasi() {
 
+			// Validate CN crossing amounts before saving
+			if (!validateCnCrossing()) {
+				// Determine the specific error message
+				var cnErrorMsg = '';
+				$('#list_item_mutasi').find('tr').each(function() {
+					var row = $(this);
+					var typeInput = row.find('input[name="type[]"]');
+					if (typeInput.length > 0 && typeInput.val() == 'cn') {
+						var kode_row = row.attr('id');
+						var id_row = kode_row.split('_');
+						var rowIdx = id_row[1];
+						var jmlBayarField = $('#jml_bayar' + rowIdx);
+						var sisaField = $('#sisa_invoice' + rowIdx);
+						var jmlBayar = Math.abs(getNum(jmlBayarField.val().split(",").join("")));
+						var sisaInvoice = Math.abs(getNum(sisaField.val().split(",").join("")));
+
+						if (jmlBayar <= 0) {
+							cnErrorMsg = 'Nilai crossing harus lebih dari 0!';
+						} else if (jmlBayar > sisaInvoice) {
+							cnErrorMsg = 'Nilai crossing melebihi sisa CN!';
+						}
+					}
+				});
+
+				swal({
+					title: "Validasi CN Gagal!",
+					text: cnErrorMsg,
+					type: "warning",
+					timer: 3000,
+					showCancelButton: false,
+					showConfirmButton: false,
+					allowOutsideClick: false
+				});
+				return;
+			}
+
 			if ($('#tgl_bayar').val() == "") {
 				swal({
 					title: "TANGGAL BAYAR TIDAK BOLEH KOSONG!",
@@ -603,17 +639,68 @@ $alamat_cust =  $this->db->query("SELECT * FROM master_customers WHERE id_custom
 		}
 
 		function cekall() {
-			var total_bank = $("#total_bank").val();
-			var total_invoice = $("#total_invoice").val();
-			var selisih = (parseFloat(total_bank) - parseFloat(total_invoice));
-			$("#selisih").val(selisih);
-			var biaya_adm = $("#biaya_adm").val();
-			var biaya_pph = $("#biaya_pph").val();
-			var tambah_lebih_bayar = $("#tambah_lebih_bayar").val();
-			var control = (parseFloat(selisih) + parseFloat(biaya_adm) + parseFloat(biaya_pph) - parseFloat(tambah_lebih_bayar));
-			$("#control").val(control);
-			var total_terima = (parseFloat(total_invoice) - parseFloat(biaya_adm) - parseFloat(biaya_pph) + parseFloat(tambah_lebih_bayar));
-			$("#total_terima").val(total_terima);
+			// Validate CN crossing amounts
+			validateCnCrossing();
+
+			// Strip commas from formatted values before parsing
+			// This ensures correct arithmetic when Total Bayar includes negative CN values
+			var total_bank = getNum($("#total_bank").val().split(",").join(""));
+			var total_invoice = getNum($("#total_invoice").val().split(",").join(""));
+			var selisih = total_bank - total_invoice;
+			$("#selisih").val(number_format(selisih));
+			var biaya_adm = getNum($("#biaya_adm").val().split(",").join(""));
+			var biaya_pph = getNum($("#biaya_pph").val().split(",").join(""));
+			var tambah_lebih_bayar = getNum($("#tambah_lebih_bayar").val().split(",").join(""));
+			var control = selisih + biaya_adm + biaya_pph - tambah_lebih_bayar;
+			$("#control").val(number_format(control));
+			var total_terima = total_invoice - biaya_adm - biaya_pph + tambah_lebih_bayar;
+			$("#total_terima").val(number_format(total_terima));
+		}
+
+		/**
+		 * Validate CN crossing amounts for all CN rows.
+		 * Rules: 0 < crossing amount <= CN Balance (sisa)
+		 * Returns true if all CN rows are valid, false otherwise.
+		 */
+		function validateCnCrossing() {
+			var isValid = true;
+
+			$('#list_item_mutasi').find('tr').each(function() {
+				var row = $(this);
+				var typeInput = row.find('input[name="type[]"]');
+
+				// Only validate CN rows
+				if (typeInput.length > 0 && typeInput.val() == 'cn') {
+					var kode_row = row.attr('id');
+					var id_row = kode_row.split('_');
+					var rowIdx = id_row[1];
+
+					var jmlBayarField = $('#jml_bayar' + rowIdx);
+					var sisaField = $('#sisa_invoice' + rowIdx);
+
+					// Get absolute values (CN amounts are stored as negative)
+					var jmlBayar = Math.abs(getNum(jmlBayarField.val().split(",").join("")));
+					var sisaInvoice = Math.abs(getNum(sisaField.val().split(",").join("")));
+
+					// Remove previous error styling
+					jmlBayarField.css('border-color', '');
+					jmlBayarField.attr('title', '');
+
+					if (jmlBayar <= 0) {
+						jmlBayarField.css('border-color', 'red');
+						jmlBayarField.attr('title', 'Nilai crossing harus lebih dari 0!');
+						isValid = false;
+					} else if (jmlBayar > sisaInvoice) {
+						jmlBayarField.css('border-color', 'red');
+						jmlBayarField.attr('title', 'Nilai crossing melebihi sisa CN!');
+						isValid = false;
+					} else {
+						jmlBayarField.css('border-color', 'green');
+					}
+				}
+			});
+
+			return isValid;
 		}
 		// $(document).on('blur', '#total_bank', function(){
 		// var dataTotal	  = $(this).val().split(",").join("");
@@ -659,10 +746,22 @@ $alamat_cust =  $this->db->query("SELECT * FROM master_customers WHERE id_custom
 			//        $("#list_item_unlocated").DataTable({lengthMenu:[10,15,25,30]}).draw();
 		});
 
-		function startmutasi(id, surat, nm, avl, real) {
+		function startmutasi(id, surat, nm, avl, real, type) {
+			// Default type to 'invoice' if not provided
+			type = type || 'invoice';
+
 			var avl2 = numx(avl);
 			var real2 = numx(real);
 
+			// For CN rows, display values as negative
+			var displayAvl = avl2;
+			var displayReal = real2;
+			var bayarValue = real;
+			if (type == 'cn') {
+				displayAvl = '-' + avl2;
+				displayReal = '-' + real2;
+				bayarValue = -Math.abs(parseFloat(real));
+			}
 
 			//  Cek Ada Data Gagal
 			var Cek_OK = 1;
@@ -683,15 +782,17 @@ $alamat_cust =  $this->db->query("SELECT * FROM master_customers WHERE id_custom
 			}
 			if (Cek_OK == 1) {
 				var idnya = "'" + id + "'";
+				var typeBadge = (type == 'cn') ? '<span class=\"label label-info\">CN</span>' : '<span class=\"label label-default\">Invoice</span>';
 				html = '<tr id="tr_' + Urut + '">' +
 					'<td style="padding:3px;">' +
 					'<input type="text" class="form-control input-sm kode-produk" name="kode_produk[]" id="kode_produk_' + Urut + '" readonly value="' + id + '">' +
+					'<input type="hidden" name="type[]" value="' + type + '">' +
 					'</td>' +
 					'<td style="padding:3px;"><input type="text" class="form-control input-sm" name="no_surat[]" id="no_surat' + Urut + '" readonly value="' + surat + '"></td>' +
 					'<td style="padding:3px;"><input type="text" class="form-control input-sm" name="nm_customer2[]" id="nm_customer2' + Urut + '" readonly value="' + nm + '"></td>' +
-					'<td style="padding:3px;"><input type="text" class="form-control input-sm" name="jml_invoice[]" id="jml_invoice' + Urut + '" style="text-align:center;" readonly value="' + avl2 + '"></td>' +
-					'<td style="padding:3px;"><input type="text" class="form-control input-sm" name="sisa_invoice[]" id="sisa_invoice' + Urut + '" style="text-align:center;" readonly value="' + real2 + '"></td>' +
-					'<td style="padding:3px;"><input type="text" class="form-control input-sm sum_change_bayar divide" name="jml_bayar[]" id="jml_bayar' + Urut + '" style="text-align:right;" value="' + number_format(real) + '" onchange="cekall()" ></td>' +
+					'<td style="padding:3px;"><input type="text" class="form-control input-sm" name="jml_invoice[]" id="jml_invoice' + Urut + '" style="text-align:center;" readonly value="' + displayAvl + '"></td>' +
+					'<td style="padding:3px;"><input type="text" class="form-control input-sm" name="sisa_invoice[]" id="sisa_invoice' + Urut + '" style="text-align:center;" readonly value="' + displayReal + '"></td>' +
+					'<td style="padding:3px;"><input type="text" class="form-control input-sm sum_change_bayar divide" name="jml_bayar[]" id="jml_bayar' + Urut + '" style="text-align:right;" value="' + number_format(bayarValue) + '" onchange="cekall()" ></td>' +
 					'<td style="padding:3px;"><input type="text" class="form-control input-sm sum_change_pph  hidden" name="pph[]" id="pph' + Urut + '" style="text-align:right;" value="0" data-decimal="." data-thousand="" data-precision="0" data-allow-zero=""></td>' +
 					'<td style="padding:3px;"><center><div class="btn-group" style="margin:0px;">' +
 					'<button type="button" onclick="deleterow(' + Urut + ',' + idnya + ')" id="delete-row" class="btn btn-sm btn-danger delete_bayar"><i class="fa fa-trash"></i> Hapus</button>' +
@@ -702,6 +803,7 @@ $alamat_cust =  $this->db->query("SELECT * FROM master_customers WHERE id_custom
 				$("#btn-" + id).addClass('btn-danger');
 				$("#btn-" + id).attr('disabled', true);
 				$("#btn-" + id).text('Sudah');
+				$("#jml_bayar" + Urut).divide();
 				sumchangebayar();
 			}
 		}
@@ -722,6 +824,8 @@ $alamat_cust =  $this->db->query("SELECT * FROM master_customers WHERE id_custom
 				jumlah_bayar += getNum($(this).val().split(",").join(""));
 			});
 			$('#total_invoice').val(number_format(jumlah_bayar));
+			// Recalculate Selisih and Kontrol with updated Total Bayar Invoice
+			cekall();
 		});
 
 		//SYAM
@@ -737,9 +841,13 @@ $alamat_cust =  $this->db->query("SELECT * FROM master_customers WHERE id_custom
 		function sumchangebayar() {
 			var jumlah_bayar = 0;
 			$(".sum_change_bayar").each(function() {
+				// split(",").join("") strips thousands separators but preserves negative sign
+				// CN rows have negative values, so they naturally reduce the total
 				jumlah_bayar += getNum($(this).val().split(",").join(""));
 			});
 			$('#total_invoice').val(number_format(jumlah_bayar));
+			// Recalculate Selisih and Kontrol with updated Total Bayar Invoice
+			cekall();
 		}
 
 		function getNum(val) {
