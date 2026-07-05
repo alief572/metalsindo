@@ -28,8 +28,6 @@ class Penerimaan extends Admin_Controller
 	public function index()
 	{
 		$this->template->page_icon('fa fa-list');
-		$data = $this->penerimaan_model->get_data_pn();
-		$this->template->set('results', $data);
 		$this->template->title('Indeks Of Receivable');
 		$this->template->render('list_payment');
 	}
@@ -159,6 +157,74 @@ class Penerimaan extends Admin_Controller
 
 
 
+		// === SERVER-SIDE VALIDATION (Task 7.3) ===
+		// 1. Kontrol validation: Kontrol = Selisih + Biaya Adm + PPH - Lebih Bayar must equal 0
+		$val_total_bank = floatval(str_replace(",", "", $this->input->post('total_bank')));
+		$val_total_invoice = floatval(str_replace(",", "", $this->input->post('total_invoice')));
+		$val_biaya_adm = floatval(str_replace(",", "", $this->input->post('biaya_adm')));
+		$val_biaya_pph = floatval(str_replace(",", "", $this->input->post('biaya_pph')));
+		$val_tambah_lebih_bayar = floatval(str_replace(",", "", $this->input->post('tambah_lebih_bayar')));
+
+		$val_selisih = $val_total_bank - $val_total_invoice;
+		$val_kontrol = $val_selisih + $val_biaya_adm + $val_biaya_pph - $val_tambah_lebih_bayar;
+
+		if (round($val_kontrol, 2) != 0) {
+			echo json_encode(array(
+				'status' => 2,
+				'pesan'  => 'Kontrol harus 0!'
+			));
+			return;
+		}
+
+		// 2. CN crossing amount validation: for each CN row, validate 0 < crossing_amount <= CN Balance
+		$types_val = $this->input->post('type');
+		$kode_produk_val = $this->input->post('kode_produk');
+		$jml_bayar_val = $this->input->post('jml_bayar');
+
+		if (!empty($kode_produk_val) && !empty($types_val)) {
+			for ($v = 0; $v < count($kode_produk_val); $v++) {
+				$row_type_val = isset($types_val[$v]) ? $types_val[$v] : 'invoice';
+				if ($row_type_val == 'cn') {
+					$id_retur_val = $kode_produk_val[$v];
+					$crossing_amount = abs(floatval(str_replace(",", "", $jml_bayar_val[$v])));
+
+					// Validate crossing amount > 0
+					if ($crossing_amount <= 0) {
+						echo json_encode(array(
+							'status' => 2,
+							'pesan'  => 'Nilai crossing harus lebih dari 0!'
+						));
+						return;
+					}
+
+					// Calculate CN Balance server-side: SUM(total_harga) - SUM(amount_crossed)
+					$cn_total_query = $this->db->query(
+						"SELECT COALESCE(SUM(total_harga), 0) as total_cn FROM dt_returpenjualan WHERE id_retur = ?",
+						array($id_retur_val)
+					)->row();
+					$cn_total = floatval($cn_total_query->total_cn);
+
+					$cn_crossed_query = $this->db->query(
+						"SELECT COALESCE(SUM(amount_crossed), 0) as total_crossed FROM tr_cn_cross WHERE id_retur = ?",
+						array($id_retur_val)
+					)->row();
+					$cn_crossed = floatval($cn_crossed_query->total_crossed);
+
+					$cn_balance = $cn_total - $cn_crossed;
+
+					// Validate crossing amount <= CN Balance
+					if ($crossing_amount > round($cn_balance, 2)) {
+						echo json_encode(array(
+							'status' => 2,
+							'pesan'  => 'Nilai crossing melebihi sisa CN!'
+						));
+						return;
+					}
+				}
+			}
+		}
+		// === END SERVER-SIDE VALIDATION ===
+
 		$data = array(
 			'no_invoice' => $this->input->post('no_invoice'),
 			'kd_pembayaran' => $kd_bayar,
@@ -193,31 +259,70 @@ class Penerimaan extends Admin_Controller
 		$this->db->insert('tr_invoice_payment', $data);
 
 
+		$types = $this->input->post('type');
+		$no_surat_arr = $this->input->post('no_surat');
+
 		for ($i = 0; $i < count($this->input->post('kode_produk')); $i++) {
-			$datadetail = array(
-				'kd_pembayaran'     => $kd_bayar,
-				'no_invoice'        => $this->input->post('kode_produk')[$i],
-				'nm_customer'       => $this->input->post('nm_customer2')[$i],
-				'total_invoice_idr'    => str_replace(",", "", $this->input->post('sisa_invoice')[$i]),
-				'total_bayar_idr'     => str_replace(",", "", $this->input->post('jml_bayar')[$i]),
-				'sisa_invoice_idr'    => str_replace(",", "", $this->input->post('sisa_invoice')[$i]) - str_replace(",", "", $this->input->post('jml_bayar')[$i]),
-				'total_pph_idr'     => str_replace(",", "", $this->input->post('pph')[$i]),
-				'created_on'    => date('Y-m-d H:i:s'),
-				'created_by'    => $session['id_user']
-			);
-			$this->db->insert('tr_invoice_payment_detail', $datadetail);
-			//Update QTY_AVL
-			$invoice = $this->input->post('kode_produk')[$i];
-			$jmlbyr  = str_replace(",", "", $this->input->post('jml_bayar')[$i]);
-			$Qry_Update	 = "UPDATE tr_invoice SET total_bayar_idr=total_bayar_idr + $jmlbyr, sisa_invoice_idr=sisa_invoice_idr - $jmlbyr WHERE no_invoice='$invoice'";
-			$this->db->query($Qry_Update);
+			$row_type = isset($types[$i]) ? $types[$i] : 'invoice';
+
+			if ($row_type == 'cn') {
+				// CN type row: insert payment detail with negative total_bayar_idr
+				$jmlbyr = str_replace(",", "", $this->input->post('jml_bayar')[$i]);
+				$datadetail = array(
+					'kd_pembayaran'     => $kd_bayar,
+					'no_invoice'        => $this->input->post('kode_produk')[$i],
+					'nm_customer'       => $this->input->post('nm_customer2')[$i],
+					'total_invoice_idr' => str_replace(",", "", $this->input->post('sisa_invoice')[$i]),
+					'total_bayar_idr'   => $jmlbyr,
+					'sisa_invoice_idr'  => str_replace(",", "", $this->input->post('sisa_invoice')[$i]) - $jmlbyr,
+					'total_pph_idr'     => str_replace(",", "", $this->input->post('pph')[$i]),
+					'created_on'        => date('Y-m-d H:i:s'),
+					'created_by'        => $session['id_user']
+				);
+				$this->db->insert('tr_invoice_payment_detail', $datadetail);
+
+				// Insert into tr_cn_cross with positive amount_crossed
+				$id_retur = $this->input->post('kode_produk')[$i];
+				$no_cn = isset($no_surat_arr[$i]) ? $no_surat_arr[$i] : '';
+				$cn_cross_data = array(
+					'id_retur'        => $id_retur,
+					'no_cn'           => $no_cn,
+					'kd_pembayaran'   => $kd_bayar,
+					'amount_crossed'  => abs($jmlbyr),
+					'tgl_cross'       => $this->input->post('tgl_bayar'),
+					'created_by'      => $session['id_user'],
+					'created_on'      => date('Y-m-d H:i:s')
+				);
+				$this->db->insert('tr_cn_cross', $cn_cross_data);
+
+				// Do NOT update tr_invoice for CN rows
+			} else {
+				// Invoice type row: preserve existing logic
+				$datadetail = array(
+					'kd_pembayaran'     => $kd_bayar,
+					'no_invoice'        => $this->input->post('kode_produk')[$i],
+					'nm_customer'       => $this->input->post('nm_customer2')[$i],
+					'total_invoice_idr'    => str_replace(",", "", $this->input->post('sisa_invoice')[$i]),
+					'total_bayar_idr'     => str_replace(",", "", $this->input->post('jml_bayar')[$i]),
+					'sisa_invoice_idr'    => str_replace(",", "", $this->input->post('sisa_invoice')[$i]) - str_replace(",", "", $this->input->post('jml_bayar')[$i]),
+					'total_pph_idr'     => str_replace(",", "", $this->input->post('pph')[$i]),
+					'created_on'    => date('Y-m-d H:i:s'),
+					'created_by'    => $session['id_user']
+				);
+				$this->db->insert('tr_invoice_payment_detail', $datadetail);
+				//Update QTY_AVL
+				$invoice = $this->input->post('kode_produk')[$i];
+				$jmlbyr  = str_replace(",", "", $this->input->post('jml_bayar')[$i]);
+				$Qry_Update	 = "UPDATE tr_invoice SET total_bayar_idr=total_bayar_idr + $jmlbyr, sisa_invoice_idr=sisa_invoice_idr - $jmlbyr WHERE no_invoice='$invoice'";
+				$this->db->query($Qry_Update);
 
 
-			$so  = $this->db->query("SELECT * FROM tr_invoice WHERE no_invoice='$invoice'")->row();
-			$no_so = $so->no_so;
+				$so  = $this->db->query("SELECT * FROM tr_invoice WHERE no_invoice='$invoice'")->row();
+				$no_so = $so->no_so;
 
-			$Qry_Update_so	 = "UPDATE tr_spk_marketing SET total_bayar_so=total_bayar_so + $jmlbyr WHERE id_spkmarketing='$no_so'";
-			$this->db->query($Qry_Update_so);
+				$Qry_Update_so	 = "UPDATE tr_spk_marketing SET total_bayar_so=total_bayar_so + $jmlbyr WHERE id_spkmarketing='$no_so'";
+				$this->db->query($Qry_Update_so);
+			}
 		}
 		$tambah_lebih_bayar = $this->input->post('tambah_lebih_bayar');
 
@@ -1043,6 +1148,125 @@ class Penerimaan extends Admin_Controller
 			'draw'            => intval($draw),
 			'recordsTotal'    => $count_all,
 			'recordsFiltered' => $count_filtered,
+			'data'            => $hasil
+		];
+
+		echo json_encode($response);
+	}
+
+	/**
+	 * Server-side DataTable endpoint returning both invoices and available CNs
+	 * Uses UNION ALL to combine regular invoices with Credit Notes that have remaining balance > 0
+	 * @return JSON DataTables response
+	 */
+	public function get_invoice_cn_serverside()
+	{
+		$draw   = intval($this->input->post('draw'));
+		$start  = intval($this->input->post('start'));
+		$length = intval($this->input->post('length'));
+		$search = $this->input->post('search');
+		$id_customer = $this->input->post('id_customer');
+		$filter_type = $this->input->post('filter_type');
+
+		$search_value = '';
+		if (!empty($search['value'])) {
+			$search_value = $this->db->escape_like_str($search['value']);
+		}
+
+		// Build the UNION ALL query for invoices + CN
+		$sql_invoice = "
+			SELECT 'invoice' as type, a.no_invoice as code, a.no_surat, b.name_customer as nm_customer,
+			       (a.total_bayar_idr + a.sisa_invoice_idr) as total_invoice_idr, a.sisa_invoice_idr as sisa
+			FROM tr_invoice a
+			JOIN master_customers b ON b.id_customer = a.id_customer
+			WHERE a.id_customer = " . $this->db->escape($id_customer) . "
+			  AND a.sisa_invoice_idr > 0
+			  AND a.printed_on IS NOT NULL
+		";
+
+		$sql_cn = "
+			SELECT 'cn' as type, r.id_retur as code, r.no_cn as no_surat, r.nama_customer as nm_customer,
+			       cn_total.total_cn as total_invoice_idr,
+			       (cn_total.total_cn - COALESCE(crossed.total_crossed, 0)) as sisa
+			FROM tr_retur_penjualan r
+			INNER JOIN (
+			    SELECT id_retur, SUM(total_harga) as total_cn FROM dt_returpenjualan GROUP BY id_retur
+			) cn_total ON cn_total.id_retur = r.id_retur
+			LEFT JOIN (
+			    SELECT id_retur, SUM(amount_crossed) as total_crossed FROM tr_cn_cross GROUP BY id_retur
+			) crossed ON crossed.id_retur = r.id_retur
+			WHERE r.id_customer = " . $this->db->escape($id_customer) . "
+			  AND r.no_cn IS NOT NULL
+			  AND (cn_total.total_cn - COALESCE(crossed.total_crossed, 0)) > 0
+		";
+
+		$sql_union = "(" . $sql_invoice . ") UNION ALL (" . $sql_cn . ")";
+
+		// Apply type filter
+		if ($filter_type == 'invoice') {
+			$sql_union = "(" . $sql_invoice . ")";
+		} elseif ($filter_type == 'cn') {
+			$sql_union = "(" . $sql_cn . ")";
+		}
+
+		// Total count (without search filter)
+		$sql_count_total = "SELECT COUNT(*) as total FROM (" . $sql_union . ") as combined";
+		$count_all = $this->db->query($sql_count_total)->row()->total;
+
+		// Apply search filter if provided
+		if (!empty($search_value)) {
+			$sql_filtered = "SELECT * FROM (" . $sql_union . ") as combined
+				WHERE combined.no_surat LIKE '%" . $search_value . "%'
+				OR combined.nm_customer LIKE '%" . $search_value . "%'
+				OR combined.code LIKE '%" . $search_value . "%'";
+		} else {
+			$sql_filtered = "SELECT * FROM (" . $sql_union . ") as combined";
+		}
+
+		// Filtered count
+		$sql_count_filtered = "SELECT COUNT(*) as total FROM (" . $sql_filtered . ") as filtered_combined";
+		$count_filtered = $this->db->query($sql_count_filtered)->row()->total;
+
+		// Apply order and limit
+		$sql_data = $sql_filtered . " ORDER BY type ASC, code DESC LIMIT " . intval($start) . ", " . intval($length);
+		$get_data = $this->db->query($sql_data)->result();
+
+		$hasil = [];
+		foreach ($get_data as $item) {
+			if ($item->type == 'cn') {
+				$action = '<button class="btn btn-info btn-sm" type="button" onclick="startmutasi(\'' . $item->code . '\', \'' . addslashes($item->no_surat) . '\',\'' . addslashes($item->nm_customer) . '\',\'' . $item->total_invoice_idr . '\',\'' . $item->sisa . '\', \'cn\')"><i class="fa fa-check"></i> Pilih</button>';
+			} else {
+				$action = '<button class="btn btn-warning btn-sm" type="button" onclick="startmutasi(\'' . $item->code . '\', \'' . addslashes($item->no_surat) . '\',\'' . addslashes($item->nm_customer) . '\',\'' . $item->total_invoice_idr . '\',\'' . $item->sisa . '\', \'invoice\')"><i class="fa fa-check"></i> Pilih</button>';
+			}
+
+			$type_label = ($item->type == 'cn')
+				? '<span class="label label-info">CN</span>'
+				: '<span class="label label-default">Invoice</span>';
+
+			// Display CN values as negative numbers with -Rp prefix
+			if ($item->type == 'cn') {
+				$display_total = '-Rp ' . number_format($item->total_invoice_idr);
+				$display_sisa  = '-Rp ' . number_format($item->sisa);
+			} else {
+				$display_total = number_format($item->total_invoice_idr);
+				$display_sisa  = number_format($item->sisa);
+			}
+
+			$hasil[] = [
+				'type'          => $type_label,
+				'code'          => $item->code,
+				'no_surat'      => $item->no_surat,
+				'nm_customer'   => $item->nm_customer,
+				'total_invoice' => $display_total,
+				'sisa'          => $display_sisa,
+				'action'        => $action
+			];
+		}
+
+		$response = [
+			'draw'            => $draw,
+			'recordsTotal'    => intval($count_all),
+			'recordsFiltered' => intval($count_filtered),
 			'data'            => $hasil
 		];
 

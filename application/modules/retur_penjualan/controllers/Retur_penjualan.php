@@ -428,6 +428,12 @@ class Retur_penjualan extends Admin_Controller
 				throw new Exception('Data stock retur gagal di kembalikan !');
 			}
 
+			// Generate Credit Note number and update the retur record
+			if (!empty($detRetur)) {
+				$cn_number = $this->Retur_penjualan_model->generate_cn_number($post['tgl_penawaran']);
+				$this->db->where('id_retur', $code)->update('tr_retur_penjualan', ['no_cn' => $cn_number]);
+			}
+
 			$this->db->trans_commit();
 			$status	= array(
 				'pesan'		=> 'Success Save Item. invenThanks ...',
@@ -570,6 +576,10 @@ class Retur_penjualan extends Admin_Controller
 			$this->db->trans_begin();
 
 			// UPDATE header tr_retur_penjualan
+			// IMPORTANT: Do NOT include 'no_cn' in the update data.
+			// Per Requirement 1.4: If a Retur record already has a CN_Number assigned,
+			// it must be preserved without generating a new one.
+			// Per Requirement 1.5: If no_cn is NULL, leave it unchanged.
 			$data_update = [
 				'id_delivery_order'		=> $post['id_delivery_order'],
 				'no_do' 				=> $post['no_do'],
@@ -578,6 +588,9 @@ class Retur_penjualan extends Admin_Controller
 				'nama_customer'			=> $post['nama_customer'],
 				'note'					=> isset($post['keterangan']) ? $post['keterangan'] : '',
 			];
+
+			// Safeguard: Ensure no_cn is never overwritten during update
+			unset($data_update['no_cn']);
 
 			$update_header = $this->db->update('tr_retur_penjualan', $data_update, ['id_retur' => $id_retur]);
 			if (!$update_header) {
