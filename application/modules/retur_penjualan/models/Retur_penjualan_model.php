@@ -117,6 +117,53 @@ class Retur_penjualan_model extends BF_Model
 		return $idcust;
 	}
 
+	/**
+	 * Generate Credit Note number with format CN/YY/ROMAWI/NNNN
+	 * @param string $tgl Date for month/year extraction (Y-m-d format)
+	 * @return string Generated CN number
+	 */
+	public function generate_cn_number($tgl)
+	{
+		$bulan = date('m', strtotime($tgl));
+		$tahun = date('y', strtotime($tgl));
+
+		if ($bulan == '01') {
+			$romawi = 'I';
+		} elseif ($bulan == '02') {
+			$romawi = 'II';
+		} elseif ($bulan == '03') {
+			$romawi = 'III';
+		} elseif ($bulan == '04') {
+			$romawi = 'IV';
+		} elseif ($bulan == '05') {
+			$romawi = 'V';
+		} elseif ($bulan == '06') {
+			$romawi = 'VI';
+		} elseif ($bulan == '07') {
+			$romawi = 'VII';
+		} elseif ($bulan == '08') {
+			$romawi = 'VIII';
+		} elseif ($bulan == '09') {
+			$romawi = 'IX';
+		} elseif ($bulan == '10') {
+			$romawi = 'X';
+		} elseif ($bulan == '11') {
+			$romawi = 'XI';
+		} elseif ($bulan == '12') {
+			$romawi = 'XII';
+		}
+
+		$prefix = "CN/" . $tahun . "/" . $romawi;
+		$query = $this->db->query("SELECT MAX(no_cn) as max_cn FROM tr_retur_penjualan WHERE no_cn LIKE '$prefix/%'");
+		$row = $query->row_array();
+		$max_cn = $row['max_cn'];
+		$max_seq = (int) substr($max_cn, -4);
+		$counter = $max_seq + 1;
+		$cn_number = $prefix . "/" . sprintf("%04s", $counter);
+
+		return $cn_number;
+	}
+
 	public function CariMaterial($id_crcl)
 	{
 		$this->db->select('a.*, b.nama as nama3, b.hardness as hardness, c.nama as nama2');

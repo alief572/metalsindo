@@ -37,37 +37,6 @@ $ENABLE_DELETE  = has_permission('Penerimaan.Delete');
 					</tr>
 				</thead>
 				<tbody>
-					<?php if (empty($results)) {
-					} else {
-
-						$numb = 0;
-						foreach ($results as $record) {
-							$numb++;
-
-							$tanggal = $record->tgl_pembayaran;
-					?>
-							<tr>
-								<td><?= $numb; ?></td>
-								<td><?= date('d-F-Y', strtotime($record->tgl_pembayaran)) ?></td>
-								<td><?= $record->kd_pembayaran ?></td>
-								<td><?= $record->nm_customer ?></td>
-								<td><?= $record->keterangan ?></td>
-								<td><?= $record->invoiced ?></td>
-								<td align="right"><?= number_format($record->totalinvoiced) ?></td>
-								<td align="right"><?= number_format($record->biaya_pph_idr) ?></td>
-								<td align="right"><?= number_format($record->biaya_admin_idr) ?></td>
-								<td align="right"><?= number_format($record->jumlah_pembayaran_idr) ?></td>
-								<td style="padding-left:20px">
-									<?php if ($ENABLE_MANAGE) : ?>
-										<button class='btn btn-sm btn-warning detail' title='View' data-id_bq='<?= $record->kd_pembayaran ?>'><i class='fa fa-eye'></i></button>
-
-									<?php endif; ?>
-
-								</td>
-
-							</tr>
-					<?php }
-					}  ?>
 				</tbody>
 			</table>
 		</div>
@@ -149,7 +118,7 @@ $ENABLE_DELETE  = has_permission('Penerimaan.Delete');
 <script>
 	$(document).ready(function() {
 		$('#spinnerx').hide();
-		$('#example1').dataTable();
+		DataTables();
 	});
 	$(document).on('click', '.buktip', function(e) {
 		e.preventDefault();
@@ -197,55 +166,53 @@ $ENABLE_DELETE  = has_permission('Penerimaan.Delete');
 			}
 		});
 	});
-	// function DataTables(){
-	// 	var dataTable = $('#my-grid').DataTable({
-	// 		"serverSide": true,
-	// 		"stateSave" : true,
-	// 		"bAutoWidth": true,
-	// 		"destroy": true,
-	// 		"processing": true,
-	// 		"responsive": true,
-	// 		"fixedHeader": {
-	// 			"header": true,
-	// 			"footer": true
-	// 		},
-	// 		"oLanguage": {
-	// 			"sSearch": "<b>Search : </b>",
-	// 			"sLengthMenu": "_MENU_ &nbsp;&nbsp;<b>Records Per Page</b>&nbsp;&nbsp;",
-	// 			"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
-	// 			"sInfoFiltered": "(filtered from _MAX_ total entries)",
-	// 			"sZeroRecords": "No matching records found",
-	// 			"sEmptyTable": "No data available in table",
-	// 			"sLoadingRecords": "Please wait - loading...",
-	// 			"oPaginate": {
-	// 				"sPrevious": "Prev",
-	// 				"sNext": "Next"
-	// 			}
-	// 		},
-	// 		"aaSorting": [[ 1, "asc" ]],
-	// 		"columnDefs": [ {
-	// 			"targets": 'no-sort',
-	// 			"orderable": false,
-	// 		}],
-	// 		"sPaginationType": "simple_numbers",
-	// 		"iDisplayLength": 10,
-	// 		"aLengthMenu": [[10, 20, 50, 100, 150], [10, 20, 50, 100, 150]],
-	// 		"ajax":{
-	// 			url: siteurl + active_controller + 'server_side_payment',
-	// 			//url : base_url + active_controller+'/server_side_inv', 
-	// 			type: "post",
-	// 			data: function(d){
-	// 				// d.kode_partner = $('#kode_partner').val()
-	// 			},
-	// 			cache: false,
-	// 			error: function(){
-	// 				$(".my-grid-error").html("");
-	// 				$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-	// 				$("#my-grid_processing").css("display","none");
-	// 			}
-	// 		}
-	// 	});
-	// }
+	function DataTables(){
+		var dataTable = $('#example1').DataTable({
+			"serverSide": true,
+			"stateSave" : true,
+			"bAutoWidth": true,
+			"destroy": true,
+			"processing": true,
+			"responsive": true,
+			"fixedHeader": {
+				"header": true,
+				"footer": true
+			},
+			"oLanguage": {
+				"sSearch": "<b>Search : </b>",
+				"sLengthMenu": "_MENU_ &nbsp;&nbsp;<b>Records Per Page</b>&nbsp;&nbsp;",
+				"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
+				"sInfoFiltered": "(filtered from _MAX_ total entries)",
+				"sZeroRecords": "No matching records found",
+				"sEmptyTable": "No data available in table",
+				"sLoadingRecords": "Please wait - loading...",
+				"oPaginate": {
+					"sPrevious": "Prev",
+					"sNext": "Next"
+				}
+			},
+			"aaSorting": [[ 1, "asc" ]],
+			"columnDefs": [ {
+				"targets": 'no-sort',
+				"orderable": false,
+			}],
+			"sPaginationType": "simple_numbers",
+			"iDisplayLength": 10,
+			"aLengthMenu": [[10, 20, 50, 100, 150], [10, 20, 50, 100, 150]],
+			"ajax":{
+				url: base_url + active_controller + 'server_side_payment',
+				type: "post",
+				data: function(d){
+				},
+				cache: false,
+				error: function(){
+					$(".my-grid-error").html("");
+					$("#example1").append('<tbody class="my-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
+					$("#example1_processing").css("display","none");
+				}
+			}
+		});
+	}
 
 	// function add_inv(){ 
 	// window.location.href = base_url + active_controller +'create_new'; modal_detail_invoice

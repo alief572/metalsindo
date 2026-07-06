@@ -229,7 +229,9 @@ class Penerimaan_model extends BF_Model
 			$nestedData[]	= "<div align='left'>" . $row['kd_pembayaran'] . "</div>";
 			$nestedData[]	= "<div align='left'>" . $row['nm_customer'] . "</div>";
 			$nestedData[]	= "<div align='left'>" . $row['keterangan'] . "</div>";
-			$nestedData[]	= "<div align='left'>" . $row['invoiced'] . "</div>";
+			// Combine invoice numbers and CN numbers for display
+			$display_invoiced = trim(implode(',', array_filter([$row['invoiced'], $row['cn_numbers']])), ',');
+			$nestedData[]	= "<div align='left'>" . $display_invoiced . "</div>";
 			$nestedData[]	= "<div align='left'>" . number_format($row['totalinvoiced']) . "</div>";
 			$nestedData[]	= "<div align='left'>" . number_format($row['biaya_pph_idr']) . "</div>";
 			$nestedData[]	= "<div align='left'>" . number_format($row['biaya_admin_idr']) . "</div>";
@@ -242,6 +244,8 @@ class Penerimaan_model extends BF_Model
 			$Hist	= "";
 			$Buktip = "";
 			$ApprvX2Edit = "";
+			$Jurnal1 = "";
+			$Terima = "";
 
 			$viewX	= "<button class='btn btn-sm btn-warning detail' title='View' data-id_bq='" . $row['kd_pembayaran'] . "'><i class='fa fa-eye'></i></button>";
 
@@ -294,24 +298,33 @@ class Penerimaan_model extends BF_Model
 	public function query_data_payment($like_value = NULL, $column_order = NULL, $column_dir = NULL, $limit_start = NULL, $limit_length = NULL)
 	{
 		$sql = "
-			SELECT a.*, c.invoiced, c.totalinvoiced FROM tr_invoice_payment a			
+			SELECT a.*, c.invoiced, c.totalinvoiced, cn.cn_numbers FROM tr_invoice_payment a			
 			
 			left outer join (
 				SELECT kd_pembayaran,
 				GROUP_CONCAT(no_invoice SEPARATOR ',') as invoiced,
 				sum(total_bayar_idr) as totalinvoiced
 				FROM tr_invoice_payment_detail
+				WHERE total_bayar_idr >= 0
 				GROUP BY kd_pembayaran
 			) c on a.kd_pembayaran=c.kd_pembayaran
+			LEFT JOIN (
+				SELECT kd_pembayaran,
+				GROUP_CONCAT(no_cn SEPARATOR ',') as cn_numbers
+				FROM tr_cn_cross
+				GROUP BY kd_pembayaran
+			) cn ON cn.kd_pembayaran = a.kd_pembayaran
 		    WHERE 1=1
                	AND (
 				c.invoiced LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 				OR a.kd_pembayaran LIKE '%" . $this->db->escape_like_str($like_value) . "%'
-				OR a.nm_customer LIKE '%" . $this->db->escape_like_str($like_value) . "%' 
+				OR a.nm_customer LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+				OR cn.cn_numbers LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 	        )
 		";
-		$data['totalData'] = $this->db->query($sql)->num_rows();
-		$data['totalFiltered'] = $this->db->query($sql)->num_rows();
+		$num_rows = $this->db->query($sql)->num_rows();
+		$data['totalData'] = $num_rows;
+		$data['totalFiltered'] = $num_rows;
 		$columns_order_by = array(
 			0 => 'tgl_pembayaran',
 			1 => 'kd_pembayaran',
