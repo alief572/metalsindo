@@ -417,6 +417,7 @@ class Receive_invoice_ap extends Admin_Controller
     if (!empty($search['value'])) {
       $this->db->group_start();
       $this->db->like('a.id_incoming', $search['value'], 'both');
+      $this->db->or_like('a.sj_supplier', $search['value'], 'both');
       $this->db->or_like('b.name_suplier', $search['value'], 'both');
       $this->db->group_end();
     }
@@ -472,11 +473,12 @@ class Receive_invoice_ap extends Admin_Controller
         }
       }
 
-      $action = '<button type="button" class="btn btn-sm btn-warning add_incoming add_incoming_' . $no . '" data-id_incoming="' . $item->id_incoming . '" data-no_po="' . $no_po . '" data-id_suplier="' . $item->id_suplier . '" data-name_suplier="' . $item->name_suplier . '" data-nilai="' . $total_incoming . '" data-tanggal_incoming="' . $item->tanggal . '" data-no="' . $no . '"><i class="fa fa-plus"></i> Add</button>';
+      $action = '<button type="button" class="btn btn-sm btn-warning add_incoming add_incoming_' . $no . '" data-id_incoming="' . $item->id_incoming . '" data-no_po="' . $no_po . '" data-sj_supplier="' . (isset($item->sj_supplier) ? $item->sj_supplier : '') . '" data-id_suplier="' . $item->id_suplier . '" data-name_suplier="' . $item->name_suplier . '" data-nilai="' . $total_incoming . '" data-tanggal_incoming="' . $item->tanggal . '" data-no="' . $no . '"><i class="fa fa-plus"></i> Add</button>';
 
       $data[] = [
         '<div class="text-center">' . htmlspecialchars($item->id_incoming) . '</div>',
         '<div class="text-center">' . htmlspecialchars($no_po) . '</div>',
+        '<div class="text-center">' . htmlspecialchars(isset($item->sj_supplier) ? $item->sj_supplier : '') . '</div>',
         '<div class="text-center">' . date('d F Y', strtotime($item->tanggal)) . '</div>',
         '<div class="text-center">' . htmlspecialchars($item->name_suplier) . '</div>',
         '<div class="text-right">' . number_format($total_incoming, 2) . '</div>',
