@@ -230,19 +230,181 @@ class Receive_invoice_ap extends Admin_Controller
     ]);
   }
 
+  public function test_query()
+  {
+    $id = 'IC-001/MP-06/2026';
+
+    $sql = "
+      SELECT 
+        a.hargasatuan, a.idmaterial, a.totalwidth, a.jumlahharga,
+        b.width_recive, b.qty_sheet, b.id_material,
+        mic.id_bentuk, mic.total_weight, mic.nama
+      FROM dt_trans_po a
+      JOIN dt_incoming b ON b.id_dt_po = a.id_dt_po AND b.id_material = a.idmaterial
+      JOIN ms_inventory_category3 mic ON mic.id_category3 = a.idmaterial
+      WHERE b.id_incoming = '$id'
+    ";
+    $data = $this->db->query($sql)->result_array();
+
+    echo "<pre>";
+    echo "=== DATA UNTUK INCOMING: $id ===\n\n";
+
+    $total_old = 0;
+    $total_new = 0;
+    $total_width = 0;
+
+    foreach ($data as $i => $row) {
+      echo "--- Item " . ($i + 1) . " ---\n";
+      echo "Material: " . $row['nama'] . "\n";
+      echo "id_bentuk: " . $row['id_bentuk'] . "\n";
+      echo "hargasatuan (per kg): " . $row['hargasatuan'] . "\n";
+      echo "qty_sheet (dt_incoming): " . $row['qty_sheet'] . "\n";
+      echo "width_recive (dt_incoming): " . $row['width_recive'] . "\n";
+      echo "total_weight (ms_inventory_category3): " . $row['total_weight'] . "\n";
+      echo "totalwidth (dt_trans_po): " . $row['totalwidth'] . "\n";
+      echo "jumlahharga (dt_trans_po): " . $row['jumlahharga'] . "\n";
+      echo "\n";
+
+      // Old formula: hargasatuan * qty_sheet
+      $total_old += $row['hargasatuan'] * $row['qty_sheet'];
+
+      // New formula (PO style): qty_sheet * hargasatuan * total_weight
+      $total_new += $row['qty_sheet'] * $row['hargasatuan'] * $row['total_weight'];
+
+      // Alternative: hargasatuan * width_recive (same as coil)
+      $total_width += $row['hargasatuan'] * $row['width_recive'];
+
+      echo "  Calc old (harga*qty_sheet): " . number_format($row['hargasatuan'] * $row['qty_sheet'], 2) . "\n";
+      echo "  Calc new (qty_sheet*harga*total_weight): " . number_format($row['qty_sheet'] * $row['hargasatuan'] * $row['total_weight'], 2) . "\n";
+      echo "  Calc alt (harga*width_recive): " . number_format($row['hargasatuan'] * $row['width_recive'], 2) . "\n";
+      echo "\n";
+    }
+
+    echo "=== TOTALS ===\n";
+    echo "Old (harga*qty_sheet): " . number_format($total_old, 2) . "\n";
+    echo "New (qty_sheet*harga*total_weight): " . number_format($total_new, 2) . "\n";
+    echo "Alt (harga*width_recive): " . number_format($total_width, 2) . "\n";
+    echo "Target: 174,141,714.80\n";
+
+    echo "\n=== CHECK DUPLICATES ===\n";
+    $sql2 = "
+      SELECT 
+        b.id_dt_incoming, b.id_dt_po, b.id_material, b.qty_sheet, b.width_recive,
+        a.id_dt_po as po_id_dt_po, a.idmaterial, a.hargasatuan
+      FROM dt_trans_po a
+      JOIN dt_incoming b ON b.id_dt_po = a.id_dt_po AND b.id_material = a.idmaterial
+      WHERE b.id_incoming = '$id'
+    ";
+    $raw = $this->db->query($sql2)->result_array();
+    echo "Total rows from JOIN: " . count($raw) . "\n\n";
+
+    // Check unique dt_incoming rows
+    $sql3 = "SELECT * FROM dt_incoming WHERE id_incoming = '$id'";
+    $inc_rows = $this->db->query($sql3)->result_array();
+    echo "Actual dt_incoming rows: " . count($inc_rows) . "\n\n";
+
+    // Try correct formula: per dt_incoming row, use width_recive * hargasatuan but only match ONCE
+    echo "=== CORRECT CALC (per unique incoming row) ===\n";
+    $total_correct = 0;
+    foreach ($inc_rows as $inc) {
+      // Get hargasatuan from dt_trans_po matching this specific incoming detail
+      $sql4 = "SELECT a.hargasatuan FROM dt_trans_po a WHERE a.id_dt_po = '" . $inc['id_dt_po'] . "' AND a.idmaterial = '" . $inc['id_material'] . "' LIMIT 1";
+      $po_row = $this->db->query($sql4)->row_array();
+      $harga = ($po_row) ? $po_row['hargasatuan'] : 0;
+      $sub = $harga * $inc['width_recive'];
+      $total_correct += $sub;
+      echo "  inc id_dt_po=" . $inc['id_dt_po'] . " | material=" . $inc['id_material'] . " | width_recive=" . $inc['width_recive'] . " | harga=" . $harga . " | sub=" . number_format($sub, 2) . "\n";
+    }
+    echo "\nTotal (unique incoming × harga × width_recive): " . number_format($total_correct, 2) . "\n";
+
+    echo "\n=== TEST GROUP BY id_dt_po ===\n";
+    $sql5 = "
+      SELECT 
+        b.id_dt_po, b.id_material, 
+        SUM(b.width_recive) as total_width_recive,
+        SUM(b.qty_sheet) as total_qty_sheet,
+        a.hargasatuan,
+        mic.total_weight,
+        mic.id_bentuk
+      FROM dt_incoming b
+      JOIN dt_trans_po a ON a.id_dt_po = b.id_dt_po AND a.idmaterial = b.id_material
+      JOIN ms_inventory_category3 mic ON mic.id_category3 = b.id_material
+      WHERE b.id_incoming = '$id'
+      GROUP BY b.id_dt_po, b.id_material
+    ";
+    $grouped = $this->db->query($sql5)->result_array();
+
+    $total_grouped_width = 0;
+    $total_grouped_sheet = 0;
+    $total_grouped_sheet_weight = 0;
+
+    foreach ($grouped as $g) {
+      $sub_width = $g['hargasatuan'] * $g['total_width_recive'];
+      $sub_sheet = $g['total_qty_sheet'] * $g['hargasatuan'] * $g['total_weight'];
+      $sub_sheet2 = $g['total_qty_sheet'] * ($g['hargasatuan'] * $g['total_weight']);
+
+      $total_grouped_width += $sub_width;
+      $total_grouped_sheet += $sub_sheet;
+
+      echo "  id_dt_po=" . $g['id_dt_po'] . " | material=" . $g['id_material'] . "\n";
+      echo "    SUM(width_recive)=" . $g['total_width_recive'] . " | SUM(qty_sheet)=" . $g['total_qty_sheet'] . "\n";
+      echo "    hargasatuan=" . $g['hargasatuan'] . " | total_weight=" . $g['total_weight'] . "\n";
+      echo "    -> harga*SUM(width): " . number_format($sub_width, 2) . "\n";
+      echo "    -> SUM(qty_sheet)*harga*total_weight: " . number_format($sub_sheet, 2) . "\n";
+      echo "\n";
+    }
+
+    echo "Total grouped (harga*SUM(width_recive)): " . number_format($total_grouped_width, 2) . "\n";
+    echo "Total grouped (SUM(qty_sheet)*harga*total_weight): " . number_format($total_grouped_sheet, 2) . "\n";
+    echo "Target: 174,141,714.80\n";
+
+    // Also try: per dt_incoming row, use qty_sheet * harga * total_weight but from PR
+    echo "\n=== TEST WITH dt_trans_pr weight_sheet ===\n";
+    $sql6 = "
+      SELECT 
+        b.id_dt_po, b.id_material, b.qty_sheet, b.width_recive,
+        a.hargasatuan, a.idpr,
+        pr.qty_sheet as pr_qty_sheet, pr.weight_sheet as pr_weight_sheet,
+        mic.total_weight, mic.id_bentuk
+      FROM dt_incoming b
+      JOIN dt_trans_po a ON a.id_dt_po = b.id_dt_po AND a.idmaterial = b.id_material
+      JOIN ms_inventory_category3 mic ON mic.id_category3 = b.id_material
+      LEFT JOIN dt_trans_pr pr ON pr.id_dt_pr = a.idpr
+      WHERE b.id_incoming = '$id'
+    ";
+    $with_pr = $this->db->query($sql6)->result_array();
+
+    $total_pr_formula = 0;
+    foreach ($with_pr as $p) {
+      // Formula from PO Print: qty_sheet (incoming) * hargasatuan * weight_sheet (from PR)
+      $ws = (!empty($p['pr_weight_sheet'])) ? $p['pr_weight_sheet'] : $p['total_weight'];
+      $sub_pr = $p['qty_sheet'] * $p['hargasatuan'] * $ws;
+      $total_pr_formula += $sub_pr;
+    }
+    echo "Total (incoming.qty_sheet * harga * pr.weight_sheet): " . number_format($total_pr_formula, 2) . "\n";
+    echo "Target: 174,141,714.80\n";
+
+    echo "</pre>";
+  }
+
   public function TambahRequest()
   {
-    // $customer = $this->uri->segment(3);
-    // $invoice = $this->db->query("SELECT * FROM tr_request WHERE id_suplier ='$customer' AND sisa_invoice_idr >'0' and kategori='hutang'")->result();
-    // $data = [
-    // 	'detail' => $customer
-    // ];
-    // $this->template->set('results', $data);
-    // $this->template->title('List Request');
-    // $this->template->render('request');
-
     $id_suplier = $this->input->post('id_suplier');
 
+    $this->template->set('id_suplier', $id_suplier);
+    $this->template->title('List Request');
+    $this->template->render('request');
+  }
+
+  public function server_side_request()
+  {
+    $id_suplier = $this->input->post('id_suplier');
+    $draw       = (int) $this->input->post('draw');
+    $start      = (int) $this->input->post('start');
+    $length     = (int) $this->input->post('length');
+    $search     = $this->input->post('search');
+
+    // Build the query to get total filtered records
     $this->db->select('a.*, b.name_suplier');
     $this->db->from('tr_incoming a');
     $this->db->join('master_supplier b', 'b.id_suplier = a.id_suplier', 'left');
@@ -251,9 +413,34 @@ class Receive_invoice_ap extends Admin_Controller
     $this->db->where('a.no_invoice_rec_ap', '');
     $this->db->or_where('a.no_invoice_rec_ap', null);
     $this->db->group_end();
+
+    if (!empty($search['value'])) {
+      $this->db->group_start();
+      $this->db->like('a.id_incoming', $search['value'], 'both');
+      $this->db->or_like('b.name_suplier', $search['value'], 'both');
+      $this->db->group_end();
+    }
+
+    // clone db for total filtered
+    $db_filtered = clone $this->db;
+    $recordsFiltered = $db_filtered->count_all_results();
+
+    // apply limit
+    $this->db->order_by('a.tanggal', 'desc');
+    $this->db->limit($length, $start);
     $get_data_supplier = $this->db->get()->result();
 
-    $list_no_po = [];
+    // get total records without filter
+    $this->db->from('tr_incoming a');
+    $this->db->where('a.id_suplier', $id_suplier);
+    $this->db->group_start();
+    $this->db->where('a.no_invoice_rec_ap', '');
+    $this->db->or_where('a.no_invoice_rec_ap', null);
+    $this->db->group_end();
+    $recordsTotal = $this->db->count_all_results();
+
+    $data = [];
+    $no   = $start + 1;
 
     foreach ($get_data_supplier as $item) {
       $this->db->select('c.no_surat');
@@ -262,24 +449,48 @@ class Receive_invoice_ap extends Admin_Controller
       $this->db->join('tr_purchase_order c', 'c.no_po = b.no_po', 'left');
       $this->db->where('a.id_incoming', $item->id_incoming);
       $this->db->group_by('c.no_surat');
-      $get_no_po = $this->db->get()->result();
+      $get_no_po = $this->db->get()->result_array();
 
-      foreach ($get_no_po as $item_no_po) {
-        $list_no_po[$item->id_incoming] = [$item_no_po->no_surat];
+      $list_no_po = array_column($get_no_po, 'no_surat');
+      $no_po = implode(',', array_filter($list_no_po));
+
+      $total_incoming = 0;
+      $this->db->select('b.width_recive, b.qty_sheet, a.hargasatuan, mic.id_bentuk, mic.total_weight');
+      $this->db->from('dt_trans_po a');
+      $this->db->join('dt_incoming b', 'b.id_dt_po = a.id_dt_po AND b.id_material = a.idmaterial');
+      $this->db->join('ms_inventory_category3 mic', 'mic.id_category3 = a.idmaterial', 'left');
+      $this->db->where('b.id_incoming', $item->id_incoming);
+      $get_total_incoming = $this->db->get()->result();
+
+      foreach ($get_total_incoming as $item_incoming) {
+        if ($item_incoming->id_bentuk == 'B2000002') { // Material Sheet
+          // Formula ikut PO Print: qty_sheet × hargasatuan (per kg) × total_weight (berat per lembar)
+          $harga_per_sheet = $item_incoming->hargasatuan * $item_incoming->total_weight;
+          $total_incoming += ($item_incoming->qty_sheet * $harga_per_sheet);
+        } else { // Material Coil
+          $total_incoming += ($item_incoming->hargasatuan * $item_incoming->width_recive);
+        }
       }
 
-      if (!empty($list_no_po[$item->id_incoming])) {
-        $list_no_po[$item->id_incoming] = implode(',', $list_no_po[$item->id_incoming]);
-      } else {
-        $list_no_po[$item->id_incoming] = '';
-      }
+      $action = '<button type="button" class="btn btn-sm btn-warning add_incoming add_incoming_' . $no . '" data-id_incoming="' . $item->id_incoming . '" data-no_po="' . $no_po . '" data-id_suplier="' . $item->id_suplier . '" data-name_suplier="' . $item->name_suplier . '" data-nilai="' . $total_incoming . '" data-tanggal_incoming="' . $item->tanggal . '" data-no="' . $no . '"><i class="fa fa-plus"></i> Add</button>';
+
+      $data[] = [
+        '<div class="text-center">' . htmlspecialchars($item->id_incoming) . '</div>',
+        '<div class="text-center">' . htmlspecialchars($no_po) . '</div>',
+        '<div class="text-center">' . date('d F Y', strtotime($item->tanggal)) . '</div>',
+        '<div class="text-center">' . htmlspecialchars($item->name_suplier) . '</div>',
+        '<div class="text-right">' . number_format($total_incoming, 2) . '</div>',
+        '<div class="text-center">' . $action . '</div>'
+      ];
+      $no++;
     }
 
-    $this->template->set('results', $get_data_supplier);
-    $this->template->set('list_no_po', $list_no_po);
-
-    $this->template->title('List Request');
-    $this->template->render('request');
+    echo json_encode([
+      'draw'            => $draw,
+      'recordsTotal'    => $recordsTotal,
+      'recordsFiltered' => $recordsFiltered,
+      'data'            => $data
+    ]);
   }
 
   public function save_receive_invoice_ap()
@@ -487,13 +698,14 @@ class Receive_invoice_ap extends Admin_Controller
     ]);
   }
 
-  public function del_rec_inv_ap() {
+  public function del_rec_inv_ap()
+  {
     $id = $this->input->post('id');
 
     $this->db->trans_begin();
 
     $get_detail = $this->db->get_where('tr_receive_invoice_ap_detail', ['id_rec_inv_ap' => $id])->result();
-    foreach($get_detail as $item) {
+    foreach ($get_detail as $item) {
       $this->db->update('tr_incoming', [
         'no_invoice_rec_ap' => null,
         'nilai_invoice' => 0,
@@ -521,6 +733,21 @@ class Receive_invoice_ap extends Admin_Controller
     echo json_encode([
       'status' => $valid,
       'pesan' => $pesan
-    ]);    
+    ]);
+  }
+
+  public function testing()
+  {
+    $id_incoming = 'IC-001/MP-06/2026';
+
+    $get_incoming_detail = $this->db->select('a.lotno, a.qty_sheet, b.nama, b.total_weight, c.hargasatuan')
+      ->from('dt_incoming a')
+      ->join('ms_inventory_category3 b', 'b.id_category3 = a.id_material')
+      ->join('dt_trans_po c', 'c.id_dt_po = a.id_dt_po')
+      ->where('a.id_incoming', $id_incoming)
+      ->get()
+      ->result();
+
+    $this->load->view('testing', ['detail' => $get_incoming_detail]);
   }
 }
