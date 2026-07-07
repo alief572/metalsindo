@@ -103,6 +103,7 @@
                     <tr class="bg-blue">
                         <th class="text-center">No. Incoming</th>
                         <th class="text-center">No. PO</th>
+                        <th class="text-center">No. SJ Supplier</th>
                         <th class="text-center">Tgl Incoming</th>
                         <th class="text-center">Nama Supplier</th>
                         <th class="text-center">Nilai</th>
@@ -114,7 +115,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="4" class="text-right">Grand Total</th>
+                        <th colspan="5" class="text-right">Grand Total</th>
                         <th class="text-right col_ttl_nilai">0.00</th>
                         <th class="text-right col_ttl_total">0.00</th>
                         <th></th>
@@ -128,32 +129,32 @@
                         <div class="form-group">
                             <label class="col-sm-5 control-label text-right"><b>PPn (%) :</b></label>
                             <div class="col-sm-7">
-                                <input type="text" 
-                                       name="ppn_persen" 
-                                       id="ppn_persen" 
-                                       class="form-control input-sm text-right divide" 
-                                       placeholder="0.00"
-                                       value="0">
+                                <input type="text"
+                                    name="ppn_persen"
+                                    id="ppn_persen"
+                                    class="form-control input-sm text-right divide"
+                                    placeholder="0.00"
+                                    value="0">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-5 control-label text-right"><b>Nilai PPn :</b></label>
                             <div class="col-sm-7">
-                                <input type="text" 
-                                       name="ppn_global" 
-                                       id="ppn_global" 
-                                       class="form-control input-sm text-right divide" 
-                                       placeholder="0.00"
-                                       value="0">
+                                <input type="text"
+                                    name="ppn_global"
+                                    id="ppn_global"
+                                    class="form-control input-sm text-right divide"
+                                    placeholder="0.00"
+                                    value="0">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-5 control-label text-right"><b>Total Invoice :</b></label>
                             <div class="col-sm-7">
-                                <input type="text" 
-                                       id="grand_total_with_ppn" 
-                                       class="form-control input-sm text-right" 
-                                       readonly value="0.00">
+                                <input type="text"
+                                    id="grand_total_with_ppn"
+                                    class="form-control input-sm text-right"
+                                    readonly value="0.00">
                             </div>
                         </div>
                     </div>
@@ -527,11 +528,11 @@
         cekall();
     }
 
-    function hitung_grand_total(){
+    function hitung_grand_total() {
         var grand_total_nilai = 0;
 
-        for(i = 1; i <= no_list; i++) {
-            var kp_nilai = get_num($('input[name="kp['+i+'][nilai]"]').val());
+        for (i = 1; i <= no_list; i++) {
+            var kp_nilai = get_num($('input[name="kp[' + i + '][nilai]"]').val());
 
             grand_total_nilai += kp_nilai;
         }
@@ -554,19 +555,19 @@
 
     $(document).on('change keyup', '#ppn_global', function() {
         var grand_total_nilai = 0;
-        for(i = 1; i <= no_list; i++) {
-            var kp_nilai = get_num($('input[name="kp['+i+'][nilai]"]').val());
+        for (i = 1; i <= no_list; i++) {
+            var kp_nilai = get_num($('input[name="kp[' + i + '][nilai]"]').val());
             grand_total_nilai += kp_nilai;
         }
-        
+
         var nilai_ppn = get_num($(this).val());
         var ppn_persen = 0;
-        if(grand_total_nilai > 0) {
+        if (grand_total_nilai > 0) {
             ppn_persen = (nilai_ppn / grand_total_nilai) * 100;
         }
-        
+
         $('#ppn_persen').val(number_format(ppn_persen, 2));
-        
+
         var grand_total_with_ppn = grand_total_nilai + nilai_ppn;
         $('#grand_total_with_ppn').val(number_format(grand_total_with_ppn, 2));
     });
@@ -673,6 +674,7 @@
     $(document).on('click', '.add_incoming', function() {
         var id_incoming = $(this).data('id_incoming');
         var no_po = $(this).data('no_po');
+        var sj_supplier = $(this).data('sj_supplier');
         var id_suplier = $(this).data('id_suplier');
         var name_suplier = $(this).data('name_suplier');
         var nilai = $(this).data('nilai');
@@ -689,6 +691,10 @@
         Rows += '<td class="text-center">';
         Rows += no_po;
         Rows += '<input type="hidden" name="kp[' + no_list + '][no_po]" value="' + no_po + '">';
+        Rows += '</td>';
+
+        Rows += '<td class="text-center">';
+        Rows += (sj_supplier ? sj_supplier : '-');
         Rows += '</td>';
 
         Rows += '<td class="text-center">';
