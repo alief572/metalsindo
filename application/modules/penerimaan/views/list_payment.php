@@ -145,26 +145,7 @@ $ENABLE_DELETE  = has_permission('Penerimaan.Delete');
 	});
 	$(document).on('click', '.detail', function(e) {
 		e.preventDefault();
-		$("#head_title").html("<b>VIEW PAYMENT [" + $(this).data('id_bq') + "]</b>");
-		$.ajax({
-			type: 'POST',
-			url: base_url + active_controller + 'view_penerimaan/' + $(this).data('id_bq'),
-			success: function(data) {
-				$("#ModalView").modal();
-				$("#view").html(data);
-			},
-			error: function() {
-				swal({
-					title: "Error Message !",
-					text: 'Connection Timed Out ...',
-					type: "warning",
-					timer: 5000,
-					showCancelButton: false,
-					showConfirmButton: false,
-					allowOutsideClick: false
-				});
-			}
-		});
+		window.location.href = base_url + active_controller + 'view_penerimaan/' + $(this).data('id_bq');
 	});
 	function DataTables(){
 		var dataTable = $('#example1').DataTable({

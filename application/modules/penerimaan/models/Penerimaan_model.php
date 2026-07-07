@@ -255,7 +255,7 @@ class Penerimaan_model extends BF_Model
 			$Jurnal	= "";
 
 			if ($row['status_jurnal'] == 0) {
-				$Jurnal	= "<button class='btn btn-sm btn-primary jurnal'  title='Approval Jurnal Penerimaan' data-inv='" . $row['kd_pembayaran'] . "'><i class='fa fa-check'></i></button>";
+				// $Jurnal	= "<button class='btn btn-sm btn-primary jurnal'  title='Approval Jurnal Penerimaan' data-inv='" . $row['kd_pembayaran'] . "'><i class='fa fa-check'></i></button>";
 			}
 
 
