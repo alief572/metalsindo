@@ -9,6 +9,7 @@
                         <tr>
                             <th class="text-center">No. Incoming</th>
                             <th class="text-center">No. PO</th>
+                            <th class="text-center">No. SJ Supplier</th>
                             <th class="text-center">Tgl Incoming</th>
                             <th class="text-center">Nama Supplier</th>
                             <th class="text-center">Total</th>
@@ -35,13 +36,28 @@
                     d.id_suplier = $('#id_suplier_modal').val();
                 }
             },
-            "columns": [
-                {"data": 0},
-                {"data": 1},
-                {"data": 2},
-                {"data": 3},
-                {"data": 4},
-                {"data": 5, "orderable": false}
+            "columns": [{
+                    "data": 0
+                },
+                {
+                    "data": 1
+                },
+                {
+                    "data": 2
+                },
+                {
+                    "data": 3
+                },
+                {
+                    "data": 4
+                },
+                {
+                    "data": 5
+                },
+                {
+                    "data": 6,
+                    "orderable": false
+                }
             ]
         });
     });
