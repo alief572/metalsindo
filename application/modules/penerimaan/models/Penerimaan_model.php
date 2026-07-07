@@ -302,17 +302,19 @@ class Penerimaan_model extends BF_Model
 			
 			left outer join (
 				SELECT kd_pembayaran,
-				GROUP_CONCAT(no_invoice SEPARATOR ',') as invoiced,
-				sum(total_bayar_idr) as totalinvoiced
-				FROM tr_invoice_payment_detail
-				WHERE total_bayar_idr >= 0
-				GROUP BY kd_pembayaran
+				GROUP_CONCAT(COALESCE(i.no_surat, d.no_invoice) SEPARATOR ',') as invoiced,
+				sum(d.total_bayar_idr) as totalinvoiced
+				FROM tr_invoice_payment_detail d
+				LEFT JOIN tr_invoice i ON i.no_invoice = d.no_invoice
+				WHERE d.total_bayar_idr >= 0
+				GROUP BY d.kd_pembayaran
 			) c on a.kd_pembayaran=c.kd_pembayaran
 			LEFT JOIN (
-				SELECT kd_pembayaran,
-				GROUP_CONCAT(no_cn SEPARATOR ',') as cn_numbers
-				FROM tr_cn_cross
-				GROUP BY kd_pembayaran
+				SELECT t.kd_pembayaran,
+				GROUP_CONCAT(COALESCE(r.no_cn, t.no_cn) SEPARATOR ',') as cn_numbers
+				FROM tr_cn_cross t
+				LEFT JOIN tr_retur_penjualan r ON r.no_retur = t.id_retur
+				GROUP BY t.kd_pembayaran
 			) cn ON cn.kd_pembayaran = a.kd_pembayaran
 		    WHERE 1=1
                	AND (
