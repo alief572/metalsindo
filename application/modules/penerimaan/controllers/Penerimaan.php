@@ -113,10 +113,22 @@ class Penerimaan extends Admin_Controller
 	public function view_penerimaan()
 	{
 		$kd_bayar = $this->uri->segment(3);
-		$data = array(
+		
+		$data_header = $this->db->query("SELECT * FROM tr_invoice_payment WHERE kd_pembayaran ='$kd_bayar'")->row();
+		$data_detail = $this->db->query("SELECT * FROM tr_invoice_payment_detail WHERE kd_pembayaran ='$kd_bayar'")->result();
+		$data_cn = $this->db->query("SELECT * FROM tr_cn_cross WHERE kd_pembayaran ='$kd_bayar'")->result();
+		$datbank = $this->Jurnal_model->get_Coa_Bank_Aja('101');
+		$pphpenjualan = $this->Acc_model->combo_pph_penjualan();
+
+		$this->template->set([
 			'kodebayar' => $kd_bayar,
-		);
-		$this->load->view('view_penerimaan', $data);
+			'data_header' => $data_header,
+			'data_detail' => $data_detail,
+			'data_cn' => $data_cn,
+			'datbank' => $datbank,
+			'pphpenjualan' => $pphpenjualan
+		]);
+		$this->template->render('view_penerimaan_new');
 	}
 
 	public function save_penerimaan()
