@@ -481,16 +481,18 @@ class Retur_penjualan_model extends BF_Model
 
 	public function get_data_nota_retur($post)
 	{
-		$this->db->from('v_nota_retur');
-		$this->db->where('no_do IS NOT NULL');
+		$this->db->select('a.*, b.status_cn, b.no_cn');
+		$this->db->from('v_nota_retur a');
+		$this->db->join('tr_retur_penjualan b', 'a.id_retur = b.id_retur', 'left');
+		$this->db->where('a.no_do IS NOT NULL');
 
 		// Search
 		if (!empty($post['search']['value'])) {
 			$search = $post['search']['value'];
 			$this->db->group_start();
-			$this->db->like('no_retur', $search);
-			$this->db->or_like('name_customer', $search);
-			$this->db->or_like('tgl_retur', $search);
+			$this->db->like('a.no_retur', $search);
+			$this->db->or_like('a.name_customer', $search);
+			$this->db->or_like('a.tgl_retur', $search);
 			$this->db->group_end();
 		}
 
@@ -498,7 +500,7 @@ class Retur_penjualan_model extends BF_Model
 		$temp_db = clone $this->db;
 		$count_filter = $temp_db->count_all_results();
 
-		$this->db->order_by('id_retur', 'desc');
+		$this->db->order_by('a.id_retur', 'desc');
 		$this->db->limit($post['length'], $post['start']);
 		$query = $this->db->get();
 

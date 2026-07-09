@@ -24,8 +24,9 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 					<th width="5">#</th>
 					<th>Tanggal Retur</th>
 					<th>No. Retur</th>
-					<th>Custommer</th>
-					<th>Nilai Retur</th>
+					<th>No. CN</th>
+					<th>Customer</th>
+					<th>Status</th>
 					<th>Action</th>
 				</tr>
 			</thead>
@@ -248,10 +249,24 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 					data: 'no_retur'
 				},
 				{
+					data: 'no_cn'
+				},
+				{
 					data: 'customer'
 				},
 				{
-					data: 'nilai_retur'
+					data: 'status_cn',
+					render: function(data, type, row) {
+						if (data == 'PENDING') {
+							return '<span class="label label-warning">PENDING</span>';
+						} else if (data == 'COMPLETED') {
+							return '<span class="label label-info">COMPLETED</span>';
+						} else if (data == 'CLOSED') {
+							return '<span class="label label-success">CLOSED</span>';
+						} else {
+							return '<span class="label label-default">' + data + '</span>';
+						}
+					}
 				},
 				{
 					data: 'action'
