@@ -372,8 +372,11 @@
                             }
                         }
                     }
+
+                    $nama_goods = $dtl->nm_material.', '.$part_number;
+                    // $nama_goodss = wordwrap($nama_goods, 100, "<br>");
                     ?>
-                    <td width="180"><?= $dtl->nm_material . ', <br>' . $part_number ?></td>
+                    <td width="180"><?= $nama_goods ?></td>
                     <td width="55"><?= $spec ?></td>
                     <td width="145" align="left"><?= $dtl->lotno ?></td>
                     <td width="20" align="center"><?= ($get_material_bentuk->id_bentuk == 'B2000001') ? number_format($dtl->qty_order, 0) : '' ?></td>
