@@ -352,7 +352,28 @@
                 ?>
                 <tr>
                     <td width="8" align="center"><?= $loop ?></td>
-                    <td width="180"><?= $dtl->nm_material . ',' . $dtl->part_number ?></td>
+                    <?php
+                    $part_number = $dtl->part_number;
+                    if (empty($part_number)) {
+                        // Join ke stock_material dulu (bisa pakai id_stock atau lotno)
+                        $stock = $this->db->get_where('stock_material', array('id_stock' => $dtl->id_stock))->row();
+                        if (empty($stock)) {
+                            $stock = $this->db->get_where('stock_material', array('lotno' => $dtl->lotno))->row();
+                        }
+
+                        if (!empty($stock)) {
+                            // Ambil id_dt_spkmarketing dari stock_material
+                            $spk = $this->db->get_where('dt_spkmarketing', array('id_dt_spkmarketing' => $stock->id_dt_spkmarketing))->row();
+                            if (!empty($spk)) {
+                                $child = $this->db->get_where('child_penawaran', array('id_child_penawaran' => $spk->id_child_penawaran))->row();
+                                if (!empty($child)) {
+                                    $part_number = $child->lotno;
+                                }
+                            }
+                        }
+                    }
+                    ?>
+                    <td width="180"><?= $dtl->nm_material . ', <br>' . $part_number ?></td>
                     <td width="55"><?= $spec ?></td>
                     <td width="145" align="left"><?= $dtl->lotno ?></td>
                     <td width="20" align="center"><?= ($get_material_bentuk->id_bentuk == 'B2000001') ? number_format($dtl->qty_order, 0) : '' ?></td>
