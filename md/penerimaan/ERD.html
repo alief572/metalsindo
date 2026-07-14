@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERD - Modul Penerimaan Invoice | PT Metalsindo</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#1a1a2e;color:#eaeaea;padding:20px;line-height:1.6}
+.header{text-align:center;padding:30px 20px;background:linear-gradient(135deg,#16213e,#0f3460);border-radius:12px;margin-bottom:30px;border:1px solid #0f3460}
+.header h1{font-size:1.8rem;color:#00d4ff;margin-bottom:8px}
+.header p{color:#a0a0a0;font-size:0.95rem}
+.section{background:#16213e;padding:24px;border-radius:12px;border:1px solid #0f3460;margin-bottom:24px}
+.section h2{color:#00d4ff;margin-bottom:16px;font-size:1.2rem;border-bottom:1px solid #0f3460;padding-bottom:8px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;justify-content:center}
+.legend span{background:#0f3460;padding:6px 14px;border-radius:6px;font-size:0.8rem}
+table{width:100%;border-collapse:collapse;font-size:0.85rem}
+th{padding:10px;text-align:left;color:#00d4ff;border-bottom:2px solid #0f3460}
+td{padding:8px;border-bottom:1px solid #1a1a2e}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>ERD - Modul Penerimaan Invoice</h1>
+<p>PT Metalsindo | System ERP - Account Receivable Module</p>
+<p style="margin-top:8px;font-size:0.85rem;color:#666">Database: metalsindo_live &amp; gl_metalsindo_live | MySQL 5.7</p>
+</div>
+
+<div class="legend">
+<span><span style="color:#00d4ff">&#9632;</span> Tabel Utama Penerimaan</span>
+<span><span style="color:#ffd700">&#9632;</span> Tabel Referensi (READ/UPDATE)</span>
+<span><span style="color:#ff6b6b">&#9632;</span> Tabel Accounting GL</span>
+<span><span style="color:#50fa7b">&#9632;</span> Tabel Support</span>
+</div>
+
+<!-- prettier-ignore -->
+<pre class="mermaid">
+erDiagram
+    tr_invoice_payment {
+        int id PK "AUTO_INCREMENT"
+        varchar kd_pembayaran UK "PN-YYXNNNNN"
+        varchar no_invoice "Referensi awal"
+        date tgl_pembayaran "Tanggal bayar"
+        double kurs_bayar "Default 1 IDR"
+        double jumlah_piutang_idr "Total piutang"
+        double jumlah_bank_idr "Masuk bank"
+        double jumlah_pembayaran_idr "Pembayaran bersih"
+        varchar kd_bank "COA bank tujuan"
+        decimal biaya_admin_idr "Biaya admin"
+        varchar jenis_pph "COA PPH"
+        decimal biaya_pph_idr "Nilai PPH"
+        enum status_bayar "LUNAS GIRO CANCEL"
+        enum status_jurnal "0 pending 1 posted"
+        varchar nm_customer "Nama customer"
+        varchar id_customer "FK master_customers"
+        decimal lebih_bayar "Deposit dipakai"
+        decimal tambah_lebih_bayar "Lebih bayar baru"
+        varchar keterangan "Catatan"
+        int created_by "User ID"
+        datetime created_on "Timestamp"
+    }
+    tr_invoice_payment_detail {
+        int id_payment_detail PK "AUTO_INCREMENT"
+        varchar kd_pembayaran FK "FK tr_invoice_payment"
+        varchar no_invoice FK "FK tr_invoice atau id_retur"
+        varchar nm_customer "Nama customer"
+        decimal total_invoice_idr "Sisa saat bayar"
+        decimal total_bayar_idr "Jumlah bayar negatif utk CN"
+        decimal sisa_invoice_idr "Sisa setelah bayar"
+        decimal total_pph_idr "PPH per invoice"
+        varchar created_by "User ID"
+        datetime created_on "Timestamp"
+    }
+    tr_cn_cross {
+        int id_cn_cross PK "AUTO_INCREMENT"
+        varchar id_retur FK "FK tr_retur_penjualan"
+        varchar no_cn "Nomor Credit Note"
+        varchar kd_pembayaran FK "FK tr_invoice_payment"
+        decimal amount_crossed "Jumlah crossing positif"
+        date tgl_cross "Tanggal crossing"
+        int created_by "User ID"
+        datetime created_on "Timestamp"
+    }
+    tr_unlocated_bank {
+        int id PK "AUTO_INCREMENT"
+        date tgl "Tanggal penerimaan"
+        varchar keterangan "Nama customer atau desc"
+        double totalpenerimaan "Total awal"
+        double saldo "Sisa bisa dipakai"
+        varchar bank "COA bank"
+        datetime created_on "Timestamp"
+        varchar created_by "User ID"
+    }
+    tr_kartu_piutang {
+        bigint id PK "AUTO_INCREMENT"
+        char tipe "BUM"
+        varchar nomor "Nomor BUM"
+        date tanggal "Tanggal"
+        varchar no_perkiraan "COA 1103-01-01"
+        varchar keterangan "Deskripsi"
+        varchar no_reff "No invoice ref"
+        double debet "Debet"
+        double kredit "Kredit jumlah bayar"
+        varchar id_supplier "ID customer"
+        varchar nama_supplier "Nama customer"
+    }
+    tr_invoice {
+        int id PK "AUTO_INCREMENT"
+        varchar no_invoice UK "Nomor invoice"
+        varchar no_so "FK tr_spk_marketing"
+        varchar no_surat "Nomor surat jalan"
+        date tgl_invoice "Tanggal invoice"
+        varchar id_customer FK "FK master_customers"
+        varchar nm_customer "Nama customer"
+        double sisa_invoice_idr "UPDATED -= bayar"
+        double total_bayar_idr "UPDATED += bayar"
+        datetime printed_on "Syarat NOT NULL"
+        enum proses_print "1 siap terima"
+    }
+    master_customers {
+        varchar id_customer PK "Primary key"
+        varchar name_customer "Nama lengkap"
+        varchar address_office "Alamat kantor"
+        varchar npwp "NPWP"
+        varchar payment_term "Term pembayaran"
+        enum activation "aktif atau inaktif"
+    }
+    tr_retur_penjualan {
+        varchar id_retur PK "Primary key"
+        varchar no_retur "Nomor retur"
+        varchar no_cn "Nomor Credit Note"
+        varchar id_customer FK "FK master_customers"
+        varchar nama_customer "Nama customer"
+        date tgl_retur "Tanggal retur"
+    }
+    dt_returpenjualan {
+        int id PK "AUTO_INCREMENT"
+        varchar id_retur FK "FK tr_retur_penjualan"
+        double total_harga "Nilai per item"
+    }
+    tr_spk_marketing {
+        varchar id_spkmarketing PK "sama dengan tr_invoice no_so"
+        varchar no_surat "Nomor SPK"
+        varchar id_customer "FK customer"
+        double total_spk_marketing "Total SPK"
+        double total_bayar_so "UPDATED += bayar"
+    }
+    jarh {
+        varchar nomor PK "Nomor BUM generated"
+        varchar kd_pembayaran FK "FK tr_invoice_payment"
+        date tgl "Tanggal jurnal"
+        double jml "Jumlah total"
+        varchar kdcab "101 cabang"
+        varchar jenis_reff "Jenis ref"
+        varchar no_reff "No ref"
+        varchar customer "Nama customer"
+        varchar jenis_ar "V Voucher"
+        varchar note "Keterangan lengkap"
+        varchar user_id "User approver"
+        char batal "0 aktif"
+    }
+    jurnal {
+        bigint id PK "AUTO_INCREMENT"
+        char tipe "BUM atau JV"
+        varchar nomor FK "FK jarh nomor"
+        date tanggal "Tanggal"
+        varchar no_perkiraan FK "FK coa_master"
+        varchar keterangan "Deskripsi baris"
+        varchar no_reff "No invoice atau kd_bayar"
+        bigint debet "Nilai debet"
+        bigint kredit "Nilai kredit"
+    }
+    coa_master {
+        int id PK "AUTO_INCREMENT"
+        varchar no_perkiraan UK "misal 1102-01-01"
+        varchar nama "Nama akun"
+        varchar kdcab "Kode cabang"
+        varchar kode_bank "Kode bank jika bank"
+    }
+    tr_invoice_payment ||--o{ tr_invoice_payment_detail : "has many"
+    tr_invoice_payment ||--o{ tr_cn_cross : "has many"
+    tr_invoice_payment ||--o| jarh : "creates one"
+    tr_invoice ||--o{ tr_invoice_payment_detail : "paid by many"
+    master_customers ||--o{ tr_invoice : "has many"
+    master_customers ||--o{ tr_retur_penjualan : "has many"
+    master_customers ||--o{ tr_invoice_payment : "has many"
+    tr_retur_penjualan ||--o{ dt_returpenjualan : "has many"
+    tr_retur_penjualan ||--o{ tr_cn_cross : "crossed in many"
+    jarh ||--o{ jurnal : "has many lines"
+    coa_master ||--o{ jurnal : "used in many"
+    tr_invoice }o--|| tr_spk_marketing : "belongs to"
+</pre>
+
+<div class="section">
+<h2>Relasi Antar Tabel</h2>
+<table>
+<thead><tr><th>#</th><th>Parent</th><th>Child</th><th>FK Column</th><th>Card.</th><th>Keterangan</th></tr></thead>
+<tbody>
+<tr><td>1</td><td style="color:#00d4ff">tr_invoice_payment</td><td>tr_invoice_payment_detail</td><td style="color:#ffd700">kd_pembayaran</td><td>1:N</td><td>Detail per invoice yang dibayar</td></tr>
+<tr><td>2</td><td style="color:#00d4ff">tr_invoice_payment</td><td>tr_cn_cross</td><td style="color:#ffd700">kd_pembayaran</td><td>1:N</td><td>CN yang di-cross dalam penerimaan ini</td></tr>
+<tr><td>3</td><td style="color:#ffd700">tr_invoice</td><td>tr_invoice_payment_detail</td><td style="color:#ffd700">no_invoice</td><td>1:N</td><td>Invoice dibayar parsial/multi kali</td></tr>
+<tr><td>4</td><td style="color:#ffd700">master_customers</td><td>tr_invoice</td><td style="color:#ffd700">id_customer</td><td>1:N</td><td>Customer punya banyak invoice</td></tr>
+<tr><td>5</td><td style="color:#ffd700">master_customers</td><td>tr_retur_penjualan</td><td style="color:#ffd700">id_customer</td><td>1:N</td><td>Customer punya banyak retur/CN</td></tr>
+<tr><td>6</td><td style="color:#ffd700">tr_retur_penjualan</td><td>dt_returpenjualan</td><td style="color:#ffd700">id_retur</td><td>1:N</td><td>Detail item retur (SUM = total CN)</td></tr>
+<tr><td>7</td><td style="color:#ffd700">tr_retur_penjualan</td><td>tr_cn_cross</td><td style="color:#ffd700">id_retur</td><td>1:N</td><td>CN bisa di-cross partial bertahap</td></tr>
+<tr><td>8</td><td style="color:#00d4ff">tr_invoice_payment</td><td style="color:#ff6b6b">jarh (GL)</td><td style="color:#ffd700">kd_pembayaran</td><td>1:0..1</td><td>Jurnal dibuat saat approval</td></tr>
+<tr><td>9</td><td style="color:#ff6b6b">jarh</td><td style="color:#ff6b6b">jurnal</td><td style="color:#ffd700">nomor</td><td>1:N</td><td>Multiple debit/kredit lines</td></tr>
+<tr><td>10</td><td style="color:#ff6b6b">coa_master</td><td style="color:#ff6b6b">jurnal</td><td style="color:#ffd700">no_perkiraan</td><td>1:N</td><td>Referensi COA untuk setiap baris</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- prettier-ignore -->
+<div class="section">
+<h2>Data Flow - Save Penerimaan</h2>
+<pre style="font-family:monospace;font-size:0.78rem;line-height:1.7;color:#a0a0a0;white-space:pre-wrap">
+save_penerimaan() :
+|
++-- INSERT <span style="color:#00d4ff">tr_invoice_payment</span> (1 row header)
+|
++-- LOOP detail rows:
+|   +-- IF type = 'invoice':
+|   |   +-- INSERT <span style="color:#00d4ff">tr_invoice_payment_detail</span> (total_bayar_idr = positif)
+|   |   +-- UPDATE <span style="color:#ffd700">tr_invoice</span> SET sisa_invoice_idr -= X, total_bayar_idr += X
+|   |   +-- UPDATE <span style="color:#ffd700">tr_spk_marketing</span> SET total_bayar_so += X
+|   |
+|   +-- IF type = 'cn':
+|       +-- INSERT <span style="color:#00d4ff">tr_invoice_payment_detail</span> (total_bayar_idr = negatif)
+|       +-- INSERT <span style="color:#00d4ff">tr_cn_cross</span> (amount_crossed = abs(X))
+|
++-- IF tambah_lebih_bayar > 0:
+|   +-- INSERT <span style="color:#50fa7b">tr_unlocated_bank</span> (saldo = tambah_lebih_bayar)
+|
++-- IF id_unlocated != '':
+    +-- UPDATE <span style="color:#50fa7b">tr_unlocated_bank</span> SET saldo -= X
+</pre>
+</div>
+
+<!-- prettier-ignore -->
+<div class="section">
+<h2>Data Flow - Approval Jurnal (BUM)</h2>
+<pre style="font-family:monospace;font-size:0.78rem;line-height:1.7;color:#a0a0a0;white-space:pre-wrap">
+appr_jurnal(kd_bayar) :
+|
++-- Generate nomor BUM via Jurnal_model
+|
++-- INSERT <span style="color:#ff6b6b">gl.jarh</span> (header jurnal)
+|
++-- INSERT <span style="color:#ff6b6b">gl.jurnal</span> (detail):
+|   +-- DEBIT  {kd_bank}     = jumlah_bank_idr        (selalu)
+|   +-- DEBIT  7205-01-01    = biaya_admin_idr        (if &gt; 0)
+|   +-- DEBIT  2109-02-01    = lebih_bayar            (if &gt; 0)
+|   +-- DEBIT  {jenis_pph}   = biaya_pph per inv      (if &gt; 0, per detail)
+|   +-- KREDIT 1102-01-01    = total_bayar_idr        (per detail invoice)
+|
++-- UPDATE <span style="color:#ff6b6b">gl.ar</span> SET kredit += X, saldo_akhir -= X
+|
++-- UPDATE <span style="color:#ff6b6b">gl.pastibisa_tb_cabang</span> SET nobum += 1
+|
++-- INSERT <span style="color:#00d4ff">tr_kartu_piutang</span> (per detail invoice)
+|
++-- UPDATE <span style="color:#00d4ff">tr_invoice_payment</span> SET status_jurnal = '1'
+|
++-- OUTPUT PDF (Bukti Uang Masuk A5-Landscape)
+</pre>
+</div>
+
+<!-- prettier-ignore -->
+<div class="section">
+<h2>CN Balance Calculation</h2>
+<pre style="font-family:monospace;font-size:0.78rem;line-height:1.7;color:#a0a0a0;white-space:pre-wrap">
+<span style="color:#ffd700">CN_Balance</span> = SUM(<span style="color:#ffd700">dt_returpenjualan</span>.total_harga) WHERE id_retur = ?
+           - COALESCE(SUM(<span style="color:#00d4ff">tr_cn_cross</span>.amount_crossed), 0) WHERE id_retur = ?
+
+Validasi:
+  [OK] crossing_amount &gt; 0
+  [OK] crossing_amount &lt;= CN_Balance
+  [NO] CN_Balance = 0 maka CN sudah fully crossed (tidak muncul di list)
+</pre>
+</div>
+
+<div class="section">
+<h2>COA Mapping (Chart of Account)</h2>
+<table>
+<thead><tr><th>COA</th><th>Nama</th><th>Tipe</th><th>Konteks Penggunaan</th></tr></thead>
+<tbody>
+<tr><td style="color:#50fa7b">1102-01-01</td><td>OCBC NISP IDR (Mcy)</td><td>Asset - Bank</td><td>Debit penerimaan / Piutang kredit</td></tr>
+<tr><td style="color:#50fa7b">1102-01-02~09</td><td>Various Banks</td><td>Asset - Bank</td><td>Bank tujuan (pilihan user)</td></tr>
+<tr><td style="color:#50fa7b">1101-02-10~11</td><td>Bank Mandiri</td><td>Asset - Bank</td><td>Bank tujuan alternatif</td></tr>
+<tr><td style="color:#50fa7b">1103-01-01</td><td>Piutang (Kartu)</td><td>Asset - Receivable</td><td>Insert kartu piutang saat approval</td></tr>
+<tr><td style="color:#ff6b6b">2101-07-01</td><td>Deposit Customer (Bank)</td><td>Liability</td><td>Trigger modal deposit saat dipilih</td></tr>
+<tr><td style="color:#ff6b6b">2101-08-01</td><td>Deposit Customer (Unlocated)</td><td>Liability</td><td>Kredit saat save unlocated</td></tr>
+<tr><td style="color:#ff6b6b">2109-02-01</td><td>Hutang Deposit Customer</td><td>Liability</td><td>Kredit lebih bayar / Debit saat pakai</td></tr>
+<tr><td style="color:#ffd700">7205-01-01</td><td>Biaya Administrasi Bank</td><td>Expense</td><td>Debit saat biaya admin &gt; 0</td></tr>
+</tbody>
+</table>
+</div>
+
+<div style="margin-top:20px;text-align:center;color:#555;font-size:0.75rem;padding:10px">
+<p>Generated from source code analysis &amp; live database schema inspection</p>
+<p>Modul Penerimaan Invoice | PT Metalsindo - ERP System</p>
+</div>
+
+<script>mermaid.initialize({startOnLoad:true,theme:'default',er:{diagramPadding:20,layoutDirection:'TB',minEntityWidth:100,minEntityHeight:75,entityPadding:15,useMaxWidth:true}});</script>
+</body>
+</html>
