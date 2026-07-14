@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERD - Modul Invoicing | PT Metalsindo</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#1a1a2e;color:#eaeaea;padding:20px;line-height:1.6}
+.header{text-align:center;padding:30px 20px;background:linear-gradient(135deg,#16213e,#0f3460);border-radius:12px;margin-bottom:30px;border:1px solid #0f3460}
+.header h1{font-size:1.8rem;color:#00d4ff;margin-bottom:8px}
+.header p{color:#a0a0a0;font-size:0.95rem}
+.section{background:#16213e;padding:24px;border-radius:12px;border:1px solid #0f3460;margin-bottom:24px}
+.section h2{color:#00d4ff;margin-bottom:16px;font-size:1.2rem;border-bottom:1px solid #0f3460;padding-bottom:8px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;justify-content:center}
+.legend span{background:#0f3460;padding:6px 14px;border-radius:6px;font-size:0.8rem}
+table{width:100%;border-collapse:collapse;font-size:0.85rem}
+th{padding:10px;text-align:left;color:#00d4ff;border-bottom:2px solid #0f3460}
+td{padding:8px;border-bottom:1px solid #1a1a2e}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>ERD - Modul Invoicing (Wt_invoicing)</h1>
+<p>PT Metalsindo Pacific | System ERP - Sales Invoice Module</p>
+<p style="margin-top:8px;font-size:0.85rem;color:#666">Database: metalsindo_live | MySQL 5.7</p>
+</div>
+
+<div class="legend">
+<span><span style="color:#00d4ff">&#9632;</span> Tabel Utama Invoice</span>
+<span><span style="color:#ffd700">&#9632;</span> Tabel Referensi</span>
+<span><span style="color:#50fa7b">&#9632;</span> Tabel Support</span>
+</div>
+
+<!-- prettier-ignore -->
+<pre class="mermaid">
+erDiagram
+    tr_invoice {
+        int id PK "AUTO_INCREMENT"
+        varchar no_invoice UK "Internal code I-YYNNNNN"
+        varchar no_surat "INV-MP YY BLN NNNN"
+        date tgl_invoice "Tanggal invoice"
+        varchar no_so "FK tr_spk_marketing"
+        varchar id_customer "FK master_customers"
+        varchar id_do "FK tr_delivery_order"
+        varchar no_do "Nomor surat DO"
+        double nilai_invoice "Nilai tagih DPP"
+        double nilai_ppn "Nilai PPN"
+        double grand_total "Grand total"
+        double sisa_invoice_idr "Sisa piutang"
+        double total_bayar_idr "Total dibayar"
+        enum type "reguler atau slitting"
+        enum status_close "0 open 1 closed"
+        enum status_jurnal "OPN atau CLS"
+        int stat_efaktur "0 belum 1 sudah"
+        datetime printed_on "Timestamp cetak"
+        varchar note "Payment terms"
+    }
+    tr_invoice_detail {
+        int id_invoice_detail PK "AUTO_INCREMENT"
+        varchar no_invoice FK "FK tr_invoice"
+        varchar id_category3 FK "FK ms_inventory_category3"
+        varchar nama_produk "Nama produk"
+        decimal qty_invoice "Quantity Kgs"
+        decimal harga_satuan "Harga per unit"
+        decimal total_harga "Subtotal"
+        varchar tobe_size "Ukuran slitting"
+        varchar original_size "Ukuran asli"
+    }
+    tr_followup {
+        int id PK "AUTO_INCREMENT"
+        varchar no_invoice FK "FK tr_invoice"
+        varchar received "Nama penerima"
+        date tgl_terima "Tanggal terima"
+        date tgl_followup "Tanggal follow-up"
+        date tgl_janji_bayar "Janji bayar"
+        text keterangan_followup "Catatan"
+        varchar upload_tanda_terima "File path"
+        enum aktif "Y aktif N nonaktif"
+    }
+    faktur_e_logs {
+        int id PK "AUTO_INCREMENT"
+        varchar id_export "Batch ID yymmddHHMM"
+        date date_export "Tanggal export"
+        time time_export "Waktu export"
+        varchar invoice_no "No surat invoice"
+    }
+    tr_delivery_order {
+        varchar id_delivery_order PK "Primary key"
+        varchar no_surat "Nomor DO"
+        varchar no_spk_marketing "FK SPK"
+        date tgl_delivery_order "Tanggal DO"
+        varchar status_invoice "UPDATED CLS"
+        double nilai_invoice "UPDATED"
+    }
+    tr_spk_marketing {
+        varchar id_spkmarketing PK "Primary key"
+        varchar no_surat "Nomor SPK"
+        varchar id_customer "FK customer"
+        double percent_invoice "UPDATED += persen"
+        double total_invoice "UPDATED += dpp"
+    }
+    master_customers {
+        varchar id_customer PK "Primary key"
+        varchar name_customer "Nama"
+        varchar npwp "NPWP untuk E-Faktur"
+        varchar npwp_name "Nama NPWP"
+        varchar npwp_address "Alamat NPWP"
+        varchar payment_term "Default terms"
+    }
+    ms_inventory_category3 {
+        varchar id_category3 PK "Primary key"
+        varchar nama "Nama produk"
+        varchar id_bentuk "B2000002 = Sheet"
+        double thickness "Ketebalan"
+        varchar kode_coretax "Kode Coretax"
+    }
+    stock_material {
+        int id_stock PK "Primary key"
+        varchar id_category3 FK "FK product"
+        double qty_sheet "Qty sheet"
+        varchar lotno "Lot number"
+        varchar no_kirim "FK delivery order"
+    }
+    tr_invoice ||--o{ tr_invoice_detail : "has many items"
+    tr_invoice ||--o{ tr_followup : "has many follow-ups"
+    tr_invoice ||--o{ faktur_e_logs : "exported in batches"
+    master_customers ||--o{ tr_invoice : "has many invoices"
+    tr_delivery_order ||--o| tr_invoice : "creates one invoice"
+    tr_spk_marketing ||--o{ tr_invoice : "has many invoices"
+    ms_inventory_category3 ||--o{ tr_invoice_detail : "used in many"
+    ms_inventory_category3 ||--o{ stock_material : "has stock records"
+</pre>
+
+<div class="section">
+<h2>Relasi Antar Tabel</h2>
+<table>
+<thead><tr><th>#</th><th>Parent</th><th>Child</th><th>FK</th><th>Card.</th><th>Keterangan</th></tr></thead>
+<tbody>
+<tr><td>1</td><td style="color:#00d4ff">tr_invoice</td><td>tr_invoice_detail</td><td style="color:#ffd700">no_invoice</td><td>1:N</td><td>Item-item dalam invoice</td></tr>
+<tr><td>2</td><td style="color:#00d4ff">tr_invoice</td><td>tr_followup</td><td style="color:#ffd700">no_invoice</td><td>1:N</td><td>History follow-up penagihan</td></tr>
+<tr><td>3</td><td style="color:#00d4ff">tr_invoice</td><td>faktur_e_logs</td><td style="color:#ffd700">no_surat = invoice_no</td><td>1:N</td><td>Log export E-Faktur</td></tr>
+<tr><td>4</td><td style="color:#ffd700">master_customers</td><td>tr_invoice</td><td style="color:#ffd700">id_customer</td><td>1:N</td><td>Customer punya banyak invoice</td></tr>
+<tr><td>5</td><td style="color:#ffd700">tr_delivery_order</td><td>tr_invoice</td><td style="color:#ffd700">id_delivery_order = id_do</td><td>1:1</td><td>1 DO = 1 Invoice</td></tr>
+<tr><td>6</td><td style="color:#ffd700">tr_spk_marketing</td><td>tr_invoice</td><td style="color:#ffd700">id_spkmarketing = no_so</td><td>1:N</td><td>1 SPK bisa multi invoice</td></tr>
+<tr><td>7</td><td style="color:#50fa7b">ms_inventory_category3</td><td>tr_invoice_detail</td><td style="color:#ffd700">id_category3</td><td>1:N</td><td>Produk di invoice</td></tr>
+<tr><td>8</td><td style="color:#00d4ff">tr_invoice</td><td>tr_invoice_payment_detail</td><td style="color:#ffd700">no_invoice</td><td>1:N</td><td>Link ke modul Penerimaan</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- prettier-ignore -->
+<div class="section">
+<h2>Data Flow - Create Invoice</h2>
+<pre style="font-family:monospace;font-size:0.78rem;line-height:1.7;color:#a0a0a0;white-space:pre-wrap">
+SaveNewInvoice() :
+|
++-- Generate: id (MAX+1), code (I{YY}{NNNNN}), no_surat (INV-MP/YY/BLN/NNNN)
+|
++-- Upload files: PO document, SO document
+|
++-- INSERT <span style="color:#00d4ff">tr_invoice</span> (header - 40+ fields)
+|
++-- INSERT BATCH <span style="color:#00d4ff">tr_invoice_detail</span> (items)
+|
++-- UPDATE <span style="color:#ffd700">tr_spk_marketing</span>:
+|     percent_invoice += persentase
+|     total_invoice += dpp
+|
++-- UPDATE <span style="color:#ffd700">tr_delivery_order</span>:
+      status_invoice = 'CLS'
+      nilai_invoice = dpp
+</pre>
+</div>
+
+<!-- prettier-ignore -->
+<div class="section">
+<h2>PPN Calculation (DPP Nilai Lain)</h2>
+<pre style="font-family:monospace;font-size:0.78rem;line-height:1.7;color:#a0a0a0;white-space:pre-wrap">
+Total_Harga = SUM(qty * harga_satuan) per item
+
+<span style="color:#ffd700">DPP_Nilai_Lain</span> = CEIL(11/12 * Total_Harga)
+<span style="color:#ffd700">PPN</span>            = DPP_Nilai_Lain * 12 / 100
+<span style="color:#00d4ff">Grand_Total</span>    = Total_Harga + PPN
+
+Sheet product: qty = SUM(stock_material.qty_sheet) WHERE no_kirim = id_do
+Coil product:  qty = tr_invoice_detail.qty_invoice
+</pre>
+</div>
+
+<div class="section">
+<h2>Invoice Number Format</h2>
+<table>
+<thead><tr><th>Komponen</th><th>Format</th><th>Contoh</th></tr></thead>
+<tbody>
+<tr><td>Prefix</td><td>INV-MP/</td><td>INV-MP/</td></tr>
+<tr><td>Tahun</td><td>YY (2 digit)</td><td>24</td></tr>
+<tr><td>Bulan</td><td>Romawi (dari tgl DO)</td><td>II</td></tr>
+<tr><td>Sequence</td><td>4 digit zero-padded (per tahun)</td><td>0001</td></tr>
+<tr><td><b>Hasil</b></td><td><b>INV-MP/YY/ROMAWI/NNNN</b></td><td><b>INV-MP/24/II/0001</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<div style="margin-top:20px;text-align:center;color:#555;font-size:0.75rem;padding:10px">
+<p>Generated from source code analysis | Modul Invoicing (Wt_invoicing)</p>
+<p>PT Metalsindo Pacific - ERP System</p>
+</div>
+
+<script>mermaid.initialize({startOnLoad:true,theme:'default',er:{diagramPadding:20,layoutDirection:'TB',minEntityWidth:100,minEntityHeight:75,entityPadding:15,useMaxWidth:true}});</script>
+</body>
+</html>
