@@ -113,7 +113,7 @@ class Penerimaan extends Admin_Controller
 	public function view_penerimaan()
 	{
 		$kd_bayar = $this->uri->segment(3);
-		
+
 		$data_header = $this->db->query("SELECT * FROM tr_invoice_payment WHERE kd_pembayaran ='$kd_bayar'")->row();
 		$data_detail = $this->db->query("SELECT * FROM tr_invoice_payment_detail WHERE kd_pembayaran ='$kd_bayar'")->result();
 		$data_cn = $this->db->query("SELECT * FROM tr_cn_cross WHERE kd_pembayaran ='$kd_bayar'")->result();
@@ -1060,11 +1060,14 @@ class Penerimaan extends Admin_Controller
 		$id_customer = $this->input->post('id_customer');
 
 		// Base query
+		// Filter: exclude invoice yang di DB sudah sisa=0 dan sudah ada pembayaran (benar-benar lunas)
 		$this->db->select('a.*, b.name_customer as nm_customer');
 		$this->db->from('tr_invoice a');
 		$this->db->join('master_customers b', 'b.id_customer = a.id_customer');
 		$this->db->where('a.id_customer', $id_customer);
-		$this->db->where('a.sisa_invoice_idr >', 0);
+		$this->db->where('a.printed_on IS NOT NULL');
+		$this->db->where('a.status_close', '0');
+		$this->db->where('NOT (a.sisa_invoice_idr <= 0 AND a.total_bayar_idr > 0)');
 
 		// Clone for total count
 		$db_total = clone $this->db;
@@ -1091,52 +1094,23 @@ class Penerimaan extends Admin_Controller
 		$hasil = [];
 
 		foreach ($get_data as $item) {
-			// Check sheet type
-			$this->db->select('a.*');
-			$this->db->from('tr_invoice_detail a');
-			$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3');
-			$this->db->where('a.no_invoice', $item->no_invoice);
-			$this->db->where('b.id_bentuk', 'B2000002');
-			$get_detail_sheet = $this->db->get()->result();
+			// Recalculate nilai invoice menggunakan logic yang sama dengan modul Invoicing
+			$nilai_invoice = $this->_calculate_real_invoice_value($item->no_invoice, $item->no_do, $item->id_do);
 
-			$tipe_sheet = (count($get_detail_sheet) > 0) ? '1' : '0';
+			// Hitung total yang sudah dibayar dari tr_invoice_payment_detail
+			$paid_query = $this->db->query(
+				"SELECT COALESCE(SUM(total_bayar_idr), 0) as total_paid 
+				 FROM tr_invoice_payment_detail 
+				 WHERE no_invoice = ? AND total_bayar_idr > 0",
+				array($item->no_invoice)
+			)->row();
+			$total_paid = floatval($paid_query->total_paid);
 
-			if ($tipe_sheet == '1') {
-				$nilai_invoice = 0;
+			$sisa_invoice_idr = $nilai_invoice - $total_paid;
 
-				foreach ($get_detail_sheet as $item_sheet) {
-					$this->db->select('a.qty_sheet');
-					$this->db->from('stock_material a');
-					$this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
-					$this->db->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order');
-					$this->db->where('c.no_surat', $item->no_do);
-					$this->db->where('b.id_material', $item_sheet->id_category3);
-					$this->db->where('a.no_kirim', $item->id_do);
-					$this->db->group_by('a.id_stock');
-					$get_qty_sheet = $this->db->get()->result();
-
-					$qty_sheet = 0;
-					foreach ($get_qty_sheet as $item_qty_sheet) {
-						$qty_sheet += $item_qty_sheet->qty_sheet;
-					}
-
-					$total_awal = ($item_sheet->harga_satuan * $qty_sheet);
-					$dpp_lain_lain = ceil(11 / 12 * $total_awal);
-					$ppn = ($dpp_lain_lain * 12 / 100);
-					$nilai_invoice += ($total_awal + $ppn);
-				}
-				$sisa_invoice_idr = ($nilai_invoice - $item->total_bayar);
-			} else {
-				$this->db->select('SUM(a.qty_invoice * a.harga_satuan) as ttl_harga');
-				$this->db->from('tr_invoice_detail a');
-				$this->db->where('a.no_invoice', $item->no_invoice);
-				$get_total_invoice = $this->db->get()->row();
-
-				$ttl_harga = (!empty($get_total_invoice->ttl_harga)) ? $get_total_invoice->ttl_harga : 0;
-				$dpp_nilai_lain = ceil(11 / 12 * $ttl_harga);
-				$ppn = ($dpp_nilai_lain * 12 / 100);
-				$nilai_invoice = ($ttl_harga + $ppn);
-				$sisa_invoice_idr = ($nilai_invoice - $item->total_bayar_idr);
+			// Skip invoice yang sudah lunas (sisa <= 0)
+			if ($sisa_invoice_idr <= 0) {
+				continue;
 			}
 
 			// Action button
@@ -1186,18 +1160,23 @@ class Penerimaan extends Admin_Controller
 		}
 
 		// Build the UNION ALL query for invoices + CN
+		// Invoice: ambil data dasar, nilai akan di-recalculate di PHP (sama seperti modul invoicing)
+		// Filter: exclude invoice yang di DB sudah sisa=0 dan sudah ada pembayaran (benar-benar lunas)
 		$sql_invoice = "
 			SELECT 'invoice' as type, a.no_invoice as code, a.no_surat, b.name_customer as nm_customer,
-			       (a.total_bayar_idr + a.sisa_invoice_idr) as total_invoice_idr, a.sisa_invoice_idr as sisa
+			       a.no_do, a.id_do,
+			       0 as total_invoice_idr, 0 as sisa
 			FROM tr_invoice a
 			JOIN master_customers b ON b.id_customer = a.id_customer
 			WHERE a.id_customer = " . $this->db->escape($id_customer) . "
-			  AND a.sisa_invoice_idr > 0
 			  AND a.printed_on IS NOT NULL
+			  AND a.status_close = '0'
+			  AND NOT (a.sisa_invoice_idr <= 0 AND a.total_bayar_idr > 0)
 		";
 
 		$sql_cn = "
 			SELECT 'cn' as type, r.id_retur as code, r.no_cn as no_surat, r.nama_customer as nm_customer,
+			       '' as no_do, '' as id_do,
 			       cn_total.total_cn as total_invoice_idr,
 			       (cn_total.total_cn - COALESCE(crossed.total_crossed, 0)) as sisa
 			FROM tr_retur_penjualan r
@@ -1245,10 +1224,34 @@ class Penerimaan extends Admin_Controller
 
 		$hasil = [];
 		foreach ($get_data as $item) {
+			$total_invoice_idr = $item->total_invoice_idr;
+			$sisa = $item->sisa;
+
+			// Recalculate invoice value menggunakan logic yang sama dengan modul Invoicing
+			if ($item->type == 'invoice') {
+				$total_invoice_idr = $this->_calculate_real_invoice_value($item->code, $item->no_do, $item->id_do);
+
+				// Hitung total yang sudah dibayar dari tr_invoice_payment_detail
+				$paid_query = $this->db->query(
+					"SELECT COALESCE(SUM(total_bayar_idr), 0) as total_paid 
+					 FROM tr_invoice_payment_detail 
+					 WHERE no_invoice = ? AND total_bayar_idr > 0",
+					array($item->code)
+				)->row();
+				$total_paid = floatval($paid_query->total_paid);
+
+				$sisa = $total_invoice_idr - $total_paid;
+
+				// Skip invoice yang sudah lunas (sisa <= 0)
+				if ($sisa <= 0) {
+					continue;
+				}
+			}
+
 			if ($item->type == 'cn') {
-				$action = '<button class="btn btn-info btn-sm" type="button" onclick="startmutasi(\'' . $item->code . '\', \'' . addslashes($item->no_surat) . '\',\'' . addslashes($item->nm_customer) . '\',\'' . $item->total_invoice_idr . '\',\'' . $item->sisa . '\', \'cn\')"><i class="fa fa-check"></i> Pilih</button>';
+				$action = '<button class="btn btn-info btn-sm" type="button" onclick="startmutasi(\'' . $item->code . '\', \'' . addslashes($item->no_surat) . '\',\'' . addslashes($item->nm_customer) . '\',\'' . $total_invoice_idr . '\',\'' . $sisa . '\', \'cn\')"><i class="fa fa-check"></i> Pilih</button>';
 			} else {
-				$action = '<button class="btn btn-warning btn-sm" type="button" onclick="startmutasi(\'' . $item->code . '\', \'' . addslashes($item->no_surat) . '\',\'' . addslashes($item->nm_customer) . '\',\'' . $item->total_invoice_idr . '\',\'' . $item->sisa . '\', \'invoice\')"><i class="fa fa-check"></i> Pilih</button>';
+				$action = '<button class="btn btn-warning btn-sm" type="button" onclick="startmutasi(\'' . $item->code . '\', \'' . addslashes($item->no_surat) . '\',\'' . addslashes($item->nm_customer) . '\',\'' . $total_invoice_idr . '\',\'' . $sisa . '\', \'invoice\')"><i class="fa fa-check"></i> Pilih</button>';
 			}
 
 			$type_label = ($item->type == 'cn')
@@ -1257,11 +1260,11 @@ class Penerimaan extends Admin_Controller
 
 			// Display CN values as negative numbers with -Rp prefix
 			if ($item->type == 'cn') {
-				$display_total = '-Rp ' . number_format($item->total_invoice_idr);
-				$display_sisa  = '-Rp ' . number_format($item->sisa);
+				$display_total = '-Rp ' . number_format($total_invoice_idr);
+				$display_sisa  = '-Rp ' . number_format($sisa);
 			} else {
-				$display_total = number_format($item->total_invoice_idr);
-				$display_sisa  = number_format($item->sisa);
+				$display_total = number_format($total_invoice_idr);
+				$display_sisa  = number_format($sisa);
 			}
 
 			$hasil[] = [
@@ -1283,6 +1286,66 @@ class Penerimaan extends Admin_Controller
 		];
 
 		echo json_encode($response);
+	}
+
+	/**
+	 * Hitung nilai invoice real menggunakan logic yang sama dengan modul Invoicing.
+	 * Untuk produk sheet (id_bentuk = B2000002): qty dari stock_material.qty_sheet
+	 * Untuk produk non-sheet: qty dari tr_invoice_detail.qty_invoice
+	 * Semua dihitung dengan formula DPP Nilai Lain: ceil(11/12 * total) + (dpp * 12/100)
+	 */
+	private function _calculate_real_invoice_value($no_invoice, $no_do, $id_do)
+	{
+		// Cek apakah ada detail dengan produk sheet
+		$this->db->select('a.*');
+		$this->db->from('tr_invoice_detail a');
+		$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3');
+		$this->db->where('a.no_invoice', $no_invoice);
+		$this->db->where('b.id_bentuk', 'B2000002');
+		$get_detail_sheet = $this->db->get()->result();
+
+		$tipe_sheet = (count($get_detail_sheet) > 0) ? '1' : '0';
+
+		if ($tipe_sheet == '1') {
+			$nilai_invoice = 0;
+
+			foreach ($get_detail_sheet as $item_sheet) {
+				$this->db->select('a.qty_sheet');
+				$this->db->from('stock_material a');
+				$this->db->join('dt_delivery_order_child b', 'b.lotno = a.lotno');
+				$this->db->join('tr_delivery_order c', 'c.id_delivery_order = b.id_delivery_order');
+				$this->db->where('c.no_surat', $no_do);
+				$this->db->where('b.id_material', $item_sheet->id_category3);
+				$this->db->where('a.no_kirim', $id_do);
+				$this->db->group_by('a.id_stock');
+				$get_qty_sheet = $this->db->get()->result();
+
+				$qty_sheet = 0;
+				foreach ($get_qty_sheet as $item_qty_sheet) {
+					$qty_sheet += $item_qty_sheet->qty_sheet;
+				}
+
+				$total_awal = ($item_sheet->harga_satuan * $qty_sheet);
+				$dpp_lain_lain = ceil(11 / 12 * $total_awal);
+				$ppn = ($dpp_lain_lain * 12 / 100);
+				$nilai_invoice += ($total_awal + $ppn);
+			}
+
+			return $nilai_invoice;
+		} else {
+			// Non-sheet: hitung dari tr_invoice_detail
+			$this->db->select('SUM(a.qty_invoice * a.harga_satuan) as ttl_harga');
+			$this->db->from('tr_invoice_detail a');
+			$this->db->where('a.no_invoice', $no_invoice);
+			$get_total_invoice = $this->db->get()->row();
+
+			$ttl_harga = (!empty($get_total_invoice->ttl_harga)) ? $get_total_invoice->ttl_harga : 0;
+			$dpp_nilai_lain = ceil(11 / 12 * $ttl_harga);
+			$ppn = ($dpp_nilai_lain * 12 / 100);
+			$nilai_invoice = ($ttl_harga + $ppn);
+
+			return $nilai_invoice;
+		}
 	}
 
 	public function TambahLebihBayar()
