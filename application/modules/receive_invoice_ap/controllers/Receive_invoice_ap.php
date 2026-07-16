@@ -415,10 +415,18 @@ class Receive_invoice_ap extends Admin_Controller
     $this->db->group_end();
 
     if (!empty($search['value'])) {
+      $search_value = $this->db->escape_like_str($search['value']);
       $this->db->group_start();
       $this->db->like('a.id_incoming', $search['value'], 'both');
       $this->db->or_like('a.sj_supplier', $search['value'], 'both');
       $this->db->or_like('b.name_suplier', $search['value'], 'both');
+      $this->db->or_where("a.id_incoming IN (
+        SELECT a1.id_incoming 
+        FROM dt_incoming a1 
+        JOIN dt_trans_po b1 ON b1.id_dt_po = a1.id_dt_po 
+        JOIN tr_purchase_order c1 ON c1.no_po = b1.no_po 
+        WHERE c1.no_surat LIKE '%" . $search_value . "%'
+      )", NULL, FALSE);
       $this->db->group_end();
     }
 
