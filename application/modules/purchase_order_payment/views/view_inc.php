@@ -156,6 +156,23 @@
                     <?php
 
                     $get_detail_inc = $this->db->query("
+                        SELECT
+                            e.qty_oke as qty_order,   
+                            b.qty as qty_po,
+                            b.hargasatuan as hargasatuan,
+                            c.no_surat as no_surat,
+                            d.nama as nm_material
+                        FROM
+                            tr_incoming_check_detail a
+                            LEFT JOIN dt_trans_po b ON b.id = a.id_po_detail
+                            LEFT JOIN tr_purchase_order c ON c.no_po  = b.no_po
+                            LEFT JOIN new_inventory_4 d ON d.code_lv4 = a.id_material 
+                            JOIN tr_checked_incoming_detail e ON e.kode_trans = a.kode_trans AND e.id_material = a.id_material
+                        WHERE
+                            a.kode_trans = '" . $id_incoming . "'
+
+                        UNION ALL
+
                         SELECT 
                             a.qty_oke as qty_order,
                             b.qty as qty_po,
@@ -164,8 +181,8 @@
                             d.stock_name as nm_material
                         FROM
                             warehouse_adjustment_detail a
-                            LEFT JOIN dt_trans_po_non_material b ON b.id = a.no_ipp
-                            LEFT JOIN tr_purchase_order_non_material c ON c.no_po  = b.no_po
+                            LEFT JOIN dt_trans_po b ON b.id = a.no_ipp
+                            LEFT JOIN tr_purchase_order c ON c.no_po  = b.no_po
                             LEFT JOIN accessories d ON d.id = a.id_material 
                         WHERE
                             a.kode_trans = '" . $id_incoming . "'
