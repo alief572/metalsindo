@@ -10,6 +10,9 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 	thead input {
 		width: 100%;
 	}
+	.swal2-popup {
+		font-size: 1.5rem !important;
+	}
 </style>
 
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
@@ -18,13 +21,13 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 <div class="box">
 	<!-- /.box-header -->
 	<div class="box-body">
-		<b>Receive Invoice</b>
+		<b>Receive Invoice DP</b>
 		<p>Select Request Payment</p>
 
-		<input type="radio" name="checkbx" id="" class="checkbx" value="dp"> Receive Invoice DP <br>
-		<input type="radio" name="checkbx" id="" class="checkbx" value="inc"> Receive Invoice Incoming <br>
+		<input type="radio" name="checkbx" id="" class="checkbx" value="dp" checked> Receive Invoice <br>
+		<!-- <input type="radio" name="checkbx" id="" class="checkbx" value="inc"> Receive Invoice Incoming <br> -->
 		<input type="radio" name="checkbx" id="" class="checkbx" value="pro"> Receive Invoice Progress <br>
-		<input type="radio" name="checkbx" id="" class="checkbx" value="ret"> Receive Invoice Retensi <br>
+		<!-- <input type="radio" name="checkbx" id="" class="checkbx" value="ret"> Receive Invoice Retensi <br> -->
 
 		<div class="dic">
 
@@ -65,20 +68,19 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 <script src="<?= base_url('assets/js/autoNumeric.js') ?>"></script>
 <script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- page script -->
 <script>
-	
+	$(document).ready(function() {
+		checkbx('dp');
+	});
 
 	$(document).on('click', '.checkbx', function() {
+		var val = $(this).val();
+		checkbx(val);
+	});
 
-		var tipe = '';
-		$('.checkbx').each(function() {
-			var val = $(this).val();
-			if ($(this).is(':checked')) {
-				tipe = val;
-			}
-		});
-
+	function checkbx(tipe) {
 		$('.dic').html('');
 
 		$.ajax({
@@ -92,14 +94,14 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 				$('.dic').html(result);
 			},
 			error: function(result) {
-				swal({
-					title: 'Error !',
-					text: 'Please try again later !',
-					type: 'error'
+				Swal.fire({
+					title: 'Gagal!',
+					text: 'Terjadi kesalahan, silakan coba lagi nanti!',
+					icon: 'error'
 				});
 			}
 		});
-	});
+	}
 
 	$(document).on('click', '.req_app', function() {
 		var no_surat = $(this).data('no_po');
@@ -116,13 +118,13 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 			},
 			cache: false,
 			success: function(result) {
-				if(tipe == 'dp') {
+				if (tipe == 'dp') {
 					$('.modal-title').html('<i class="fa fa-users"></i> Receive Invoice Down Payment (DP)');
 				}
-				if(tipe == 'pro') {
+				if (tipe == 'pro') {
 					$('.modal-title').html('<i class="fa fa-users"></i> Receive Invoice Progress');
 				}
-				if(tipe == 'ret') {
+				if (tipe == 'ret') {
 					$('.modal-title').html('<i class="fa fa-users"></i> Receive Invoice Retensi');
 				}
 				$('.save_btn_modal').show();
@@ -166,7 +168,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 		});
 	});
 
-	$(document).on('click', '.view', function(){
+	$(document).on('click', '.view', function() {
 		var id = $(this).data('id');
 		var id_top = $(this).data('id_top');
 		var tipe = $(this).data('tipe');
@@ -180,21 +182,21 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 				'tipe': tipe
 			},
 			cache: false,
-			success: function(result){
-				if(tipe == 'dp') {
+			success: function(result) {
+				if (tipe == 'dp') {
 					$('.modal-title').html('<i class="fa fa-users"></i> Receive Invoice Down Payment (DP)');
 				}
-				if(tipe == 'pro') {
+				if (tipe == 'pro') {
 					$('.modal-title').html('<i class="fa fa-users"></i> Receive Invoice Progress');
 				}
-				if(tipe == 'ret') {
+				if (tipe == 'ret') {
 					$('.modal-title').html('<i class="fa fa-users"></i> Receive Invoice Retensi');
 				}
 				$('.save_btn_modal').hide();
 				$('#ModalView').html(result);
 				$('#dialog-popup').modal('show');
 			},
-			error: function(result){
+			error: function(result) {
 				swal({
 					title: 'Error !',
 					text: 'Please try again later !',
@@ -204,7 +206,64 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 		});
 	});
 
-	$(document).on('click', '.view_inc', function(){
+	$(document).on('click', '.list_pro_inv', function() {
+		var no_po = $(this).data('no_po');
+		var id_top = $(this).data('id_top');
+		var tipe = $(this).data('tipe');
+
+		$.ajax({
+			type: 'POST',
+			url: siteurl + active_controller + 'list_pro_inv',
+			data: {
+				'no_po': no_po,
+				'id_top': id_top,
+				'tipe': tipe
+			},
+			cache: false,
+			success: function(result) {
+				$('.modal-title').html('<i class="fa fa-list"></i> List Invoice Progress');
+				$('.save_btn_modal').hide();
+				$('#ModalView').html(result);
+				$('#dialog-popup').modal('show');
+			},
+			error: function(result) {
+				swal({
+					title: 'Error !',
+					text: 'Please try again later !',
+					type: 'error'
+				});
+			}
+		});
+	});
+
+	$(document).on('click', '.view_pro_detail', function() {
+		var id = $(this).data('id');
+		var tipe = $(this).data('tipe');
+
+		$.ajax({
+			type: 'POST',
+			url: siteurl + active_controller + 'view',
+			data: {
+				'id': id,
+				'tipe': tipe
+			},
+			cache: false,
+			success: function(result) {
+				$('.modal-title').html('<i class="fa fa-users"></i> View Detail Invoice Progress');
+				$('.save_btn_modal').hide();
+				$('#ModalView').html(result);
+			},
+			error: function(result) {
+				swal({
+					title: 'Error !',
+					text: 'Please try again later !',
+					type: 'error'
+				});
+			}
+		});
+	});
+
+	$(document).on('click', '.view_inc', function() {
 		var id = $(this).data('id');
 
 		$.ajax({
@@ -214,7 +273,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 				'id': id
 			},
 			cache: false,
-			success: function(result){
+			success: function(result) {
 
 				$('.modal-title').html('Receive Invoice Incoming');
 
@@ -222,7 +281,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 				$('#ModalView').html(result);
 				$('#dialog-popup').modal('show');
 			},
-			error: function(result){
+			error: function(result) {
 				swal({
 					title: 'Error !',
 					text: 'Please try again later !',
@@ -232,7 +291,7 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 		});
 	});
 
-	$(document).on('click', '.list_dp', function(){
+	$(document).on('click', '.list_dp', function() {
 		var no_po = $(this).data('no_po');
 
 		$.ajax({
@@ -243,10 +302,10 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 			},
 			cache: false,
 			dataType: "JSON",
-			success: function(result){
-				
+			success: function(result) {
+
 			},
-			error: function(result){
+			error: function(result) {
 
 			}
 		})
@@ -255,50 +314,79 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 	$(document).on('submit', '#frm-data', function(e) {
 		e.preventDefault();
 
-		swal({
-				title: "Warning !",
-				text: "PO Invoice will be created !",
-				type: "warning",
+		// check if 
+		var invoice_date = $('input[name="invoice_date"]').val();
+		var invoice_date_real = $('input[name="invoice_date_real"]').val();
+		var no_invoice = $('input[name="nomor_invoice"]').val();
+		var kurs = $('input[name="kurs"]').val();
+		var no_faktur_pajak = $('input[name="nomor_faktur_pajak"]').val();
+		var bank = $('input[name="bank"]').val();
+		var no_bank = $('input[name="no_bank"]').val();
+		var nm_acc_bank = $('input[name="nm_acc_bank"]').val();
+		var upload_invoice = $('input[name="upload_invoice"]').val();
+
+		if (
+			!invoice_date || invoice_date.trim() === "" ||
+			!invoice_date_real || invoice_date_real.trim() === "" ||
+			!no_invoice || no_invoice.trim() === "" ||
+			!kurs || kurs.trim() === "" ||
+			!no_faktur_pajak || no_faktur_pajak.trim() === "" ||
+			!bank || bank.trim() === "" ||
+			!no_bank || no_bank.trim() === "" ||
+			!nm_acc_bank || nm_acc_bank.trim() === "" ||
+			!upload_invoice || upload_invoice.trim() === ""
+		) {
+			Swal.fire({
+				title: 'Peringatan!',
+				text: 'Maaf, pastikan semua form input telah terisi dengan lengkap!',
+				icon: 'warning'
+			});
+			return false;
+		}
+
+
+		Swal.fire({
+				title: "Peringatan!",
+				text: "Invoice PO akan dibuat!",
+				icon: "warning",
 				showCancelButton: true,
 				confirmButtonColor: "#DD6B55",
-				confirmButtonText: "Yes, Create it!",
-				cancelButtonText: "Cancel!",
-				closeOnConfirm: false,
-				closeOnCancel: true
-			},
-			function(isConfirm) {
-				if (isConfirm) {
+				confirmButtonText: "Ya, Buat!",
+				cancelButtonText: "Batal"
+			}).then((result) => {
+				if (result.isConfirmed) {
 
 					var formdata = new FormData($('#frm-data')[0]);
 					$.ajax({
 						type: 'POST',
-						url: siteurl + active_controller + 'save_invoice',
+						url: siteurl + active_controller + '/save_invoice',
 						data: formdata,
 						cache: false,
+						dataType: 'json',
 						processData: false,
 						contentType: false,
 						success: function(result) {
-							if (result == 1) {
-								swal({
-									title: 'Success !',
-									text: 'PO Invoice has been saved !',
-									type: 'success'
+							if (result.status == 1) {
+								Swal.fire({
+									title: 'Berhasil!',
+									text: 'Invoice PO berhasil disimpan!',
+									icon: 'success'
+								}).then(() => {
+									location.reload();
 								});
-
-								location.reload();
 							} else {
-								swal({
-									title: 'Failed !',
-									text: 'PO Invoice has not been saved !',
-									type: 'error'
+								Swal.fire({
+									title: 'Gagal!',
+									text: 'Invoice PO gagal disimpan!',
+									icon: 'error'
 								});
 							}
 						},
 						error: function(result) {
-							swal({
-								title: 'Error !',
-								text: 'Please try again later !',
-								type: 'error'
+							Swal.fire({
+								title: 'Gagal!',
+								text: 'Terjadi kesalahan, silakan coba lagi nanti!',
+								icon: 'error'
 							});
 						}
 					});

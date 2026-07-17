@@ -44,16 +44,12 @@
                 $no = 1;
                 foreach ($list_inc as $item) {
 
-                    $get_nm_supplier = $this->db->query("
-                        SELECT
-                            b.name_suplier as nama
-                        FROM
-                            tr_purchase_order_non_material a
-                            LEFT JOIN master_supplier b ON b.id_suplier = a.id_suplier
-                        WHERE
-                            a.no_po IN ('" . str_replace(",", "','", $item['no_ipp']) . "') OR
-                            a.no_surat IN ('" . str_replace(",", "','", $item['no_ipp']) . "')
-                    ")->row_array();
+                    $this->db->select('b.name_suplier as nama');
+                    $this->db->from('tr_purchase_order a');
+                    $this->db->join('master_supplier b', 'b.id_suplier = a.id_suplier', 'left');
+                    $this->db->where_in('a.no_po', explode(',', $item['no_ipp']));
+                    $this->db->group_by('b.name_suplier');
+                    $get_nm_supplier = $this->db->get()->row_array();
 
                     $nm_supplier = (!empty($get_nm_supplier['nama'])) ? $get_nm_supplier['nama'] : null;
 
@@ -101,29 +97,42 @@
 
                     $check_box = '<input type="checkbox" name="check_invoice[]" class="check_invoice" data-kode_trans="' . $item['kode_trans'] . '" data-tipe_incoming="' . $item['tipe_incoming'] . '" value="' . $item['kode_trans'] . '" ' . $checked . '>';
                     if ($complete == 0) {
-                        // $this->db->select('IF(SUM(b.hargasatuan * a.qty_oke) IS NULL, 0, SUM(b.hargasatuan * a.qty_oke)) as total_invoice');
-                        // $this->db->from('warehouse_adjustment_detail a');
-                        // $this->db->join('dt_trans_po_non_material b', 'b.id = a.no_ipp');
-                        // $this->db->where('a.kode_trans', $item['kode_trans']);
-                        // $get_ttl_invoice = $this->db->get()->row();
-
-                        $get_ttl_invoice = $this->db->query("
-                            SELECT
-                                IF(SUM(b.hargasatuan * a.qty_oke) IS NULL, 0, SUM(b.hargasatuan * a.qty_oke)) as total_invoice
-                            FROM
-                                warehouse_adjustment_detail a
-                                JOIN dt_trans_po_non_material b On IF(a.id_po_detail IS NOT NULL, b.id = a.id_po_detail, b.id = a.no_ipp)
-                            WHERE
-                                a.kode_trans = '".$item['kode_trans']."'
-                        ")->row();
+                        $total_invoice = 0;
+                        $this->db->select('IF(SUM(b.hargasatuan * a.qty_order) IS NULL, 0, SUM(b.hargasatuan * a.qty_order)) as total_invoice');
+                        $this->db->from('tr_incoming_check_detail a');
+                        $this->db->join('dt_trans_po b', 'b.id = id_po_detail');
+                        $this->db->where('a.kode_trans', $item['kode_trans']);
+                        $get_ttl_invoice = $this->db->get()->row();
                         if (!empty($get_ttl_invoice)) {
                             $total_invoice = $get_ttl_invoice->total_invoice;
                         }
 
                         if ($total_invoice <= 0) {
+                            $this->db->select('IF(SUM(b.hargasatuan * a.qty_oke) IS NULL, 0, SUM(b.hargasatuan * a.qty_oke)) as total_invoice');
+                            $this->db->from('warehouse_adjustment_detail a');
+                            $this->db->join('dt_trans_po b', 'b.id = no_ipp');
+                            $this->db->where('a.kode_trans', $item['kode_trans']);
+                            $get_ttl_invoice = $this->db->get()->row();
+                            if (!empty($get_ttl_invoice)) {
+                                $total_invoice = $get_ttl_invoice->total_invoice;
+                            }
+                        }
+
+                        if($total_invoice <= 0) {
                             $this->db->select('IF(SUM(a.total_harga) IS NULL, 0, SUM(a.total_harga)) AS total_invoice');
                             $this->db->from('tr_pr_detail_kasbon a');
                             $this->db->where('a.id_kasbon', $item['no_ipp']);
+                            $get_ttl_invoice = $this->db->get()->row();
+                            if (!empty($get_ttl_invoice)) {
+                                $total_invoice = $get_ttl_invoice->total_invoice;
+                            }
+                        }
+
+                        if($total_invoice <= 0) {
+                            $this->db->select('IF(SUM(a.harga_total) IS NULL, 0, SUM(a.harga_total)) AS total_invoice');
+                            $this->db->from('dt_trans_po a');
+                            $this->db->join('tr_purchase_order b', 'b.no_po = a.no_po');
+                            $this->db->where('b.no_surat', $item['no_ipp']);
                             $get_ttl_invoice = $this->db->get()->row();
                             if (!empty($get_ttl_invoice)) {
                                 $total_invoice = $get_ttl_invoice->total_invoice;
@@ -300,10 +309,11 @@
                         url: siteurl + active_controller + '/save_invoice',
                         data: formdata,
                         cache: false,
+                        dataType: 'json',
                         processData: false,
                         contentType: false,
                         success: function(result) {
-                            if (result == 1) {
+                            if (result.status == 1) {
                                 swal({
                                     title: 'Success !',
                                     text: 'PO Invoice has been saved !',

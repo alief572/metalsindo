@@ -9,7 +9,7 @@
                 <option value="">- Pilih Supplier -</option>
                 <?php
                 foreach ($list_supplier as $item_supp) {
-                    echo '<option value="' . $item_supp->id_suplier . '">' . $item_supp->name_suplier . '</option>';
+                    echo '<option value="' . $item_supp->kode_supplier . '">' . $item_supp->nama . '</option>';
                 }
                 ?>
             </select>
@@ -50,13 +50,13 @@
                     $nm_supplier = [];
 
                     $no_ipp = [];
-                    // $this->db->select('a.no_ipp');
-                    // $this->db->from('tr_incoming_check a');
-                    // $this->db->where_in('a.kode_trans', $exp_no_po);
-                    // $get_no_ipp = $this->db->get()->result();
-                    // foreach ($get_no_ipp as $item_ipp) {
-                    //     $no_ipp[] = $item_ipp->no_ipp;
-                    // }
+                    $this->db->select('a.no_ipp');
+                    $this->db->from('tr_incoming_check a');
+                    $this->db->where_in('a.kode_trans', $exp_no_po);
+                    $get_no_ipp = $this->db->get()->result();
+                    foreach ($get_no_ipp as $item_ipp) {
+                        $no_ipp[] = $item_ipp->no_ipp;
+                    }
 
                     $this->db->select('a.no_ipp');
                     $this->db->from('warehouse_adjustment a');
@@ -73,7 +73,7 @@
                     }
 
                     $this->db->select('b.name_suplier as nm_supplier');
-                    $this->db->from('tr_purchase_order_non_material a');
+                    $this->db->from('tr_purchase_order a');
                     $this->db->join('master_supplier b', 'b.id_suplier = a.id_suplier', 'left');
                     $this->db->where_in('a.no_po', explode(',', $no_ipp));
                     $this->db->group_by('b.name_suplier');
@@ -108,9 +108,21 @@
                         SELECT
                             c.no_surat
                         FROM
+                            tr_incoming_check_detail a
+                            LEFT JOIN dt_trans_po b ON b.id = a.id_po_detail
+                            LEFT JOIN tr_purchase_order c ON c.no_po = b.no_po
+                        WHERE
+                            a.kode_trans IN ('" . str_replace(', ', ',', str_replace(",", "','", $item['no_po'])) . "')
+                        GROUP BY c.no_surat
+
+                        UNION ALL
+
+                        SELECT
+                            c.no_surat
+                        FROM
                             warehouse_adjustment_detail a
-                            LEFT JOIN dt_trans_po_non_material b ON IF(a.id_po_detail IS NOT NULL, b.id = a.id_po_detail, b.id = a.no_ipp)
-                            LEFT JOIN tr_purchase_order_non_material c ON c.no_po = b.no_po
+                            LEFT JOIN dt_trans_po b ON b.id = a.no_ipp
+                            LEFT JOIN tr_purchase_order c ON c.no_po = b.no_po
                         WHERE
                             a.kode_trans IN ('" . str_replace(', ', ',', str_replace(",", "','", $item['no_po'])) . "')
                         GROUP BY c.no_surat
@@ -140,7 +152,7 @@
                     echo '<td style="text-align: center;">' . $item['invoice_no'] . '</td>';
                     echo '<td style="text-align: center;">' . $no_payment . '</td>';
                     echo '<td style="text-align: center;">' . date('d F Y', strtotime($item['invoice_date'])) . '</td>';
-                    echo '<td>' . $item['nm_supplier'] . '</td>';
+                    echo '<td>' . $nm_supplier . '</td>';
                     echo '<td style="text-align: right">' . number_format($item['total_invoice'], 2) . '</td>';
                     echo '<td style="text-align: center;">' . $status . '</td>';
                     echo '<td style="text-align: center;">' . $view . '</td>';
@@ -168,7 +180,7 @@
             type: "POST",
             url: siteurl + active_controller + "search_inc",
             data: {
-                'kode_supplier': kode_supplier
+                'id_suplier': kode_supplier
             },
             cache: false,
             success: function(result) {

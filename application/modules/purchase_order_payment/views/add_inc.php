@@ -67,19 +67,19 @@ if ($req_payment_po < 1) {
     <div class="col-md-6">
         <div class="form-group">
             <label for="">Nilai Disc</label>
-            <input type="text" name="nilai_disc" id="" class="form-control form-control-sm text-right nilai_disc auto_num" value="<?= $results['nilai_disc'] ?>" readonly>
+            <input type="text" name="nilai_disc" id="" class="form-control form-control-sm text-right nilai_disc auto_num" value="<?= number_format($results['nilai_disc'], 2) ?>" readonly>
         </div>
     </div>
     <div class="col-md-6">
         <div class="form-group">
             <label for="">Nilai PPN</label>
-            <input type="text" name="nilai_ppn" id="" class="form-control form-control-sm text-right nilai_ppn auto_num" value="<?= $results['nilai_ppn'] ?>" readonly>
+            <input type="text" name="nilai_ppn" id="" class="form-control form-control-sm text-right nilai_ppn auto_num" value="<?= number_format($results['nilai_ppn'], 2) ?>" readonly>
         </div>
     </div>
     <div class="col-md-6">
         <div class="form-group">
             <label for="">Total Invoice</label>
-            <input type="text" name="total_invoice" id="" class="form-control form-control-sm text-right total_invoice auto_num" value="<?= $results['total_invoice']?>" required>
+            <input type="text" name="total_invoice" id="" class="form-control form-control-sm text-right total_invoice auto_num" value="<?= number_format($results['total_invoice'], 2) ?>" required>
         </div>
     </div>
     <div class="col-md-6">
@@ -154,25 +154,44 @@ if ($req_payment_po < 1) {
 
                     // $this->db->select('a.*, b.qty as qty_po, b.hargasatuan, c.no_surat');
                     // $this->db->from('tr_incoming_check_detail a');
-                    // $this->db->join('dt_trans_po_non_material b', 'b.id = a.id_po_detail');
-                    // $this->db->join('tr_purchase_order_non_material c', 'c.no_po = b.no_po');
+                    // $this->db->join('dt_trans_po b', 'b.id = a.id_po_detail');
+                    // $this->db->join('tr_purchase_order c', 'c.no_po = b.no_po');
                     // $this->db->where('a.kode_trans', $id_incoming);
                     // $get_detail_inc = $this->db->get()->result();
 
                     $get_detail_inc = $this->db->query("
+                        SELECT
+                            e.qty_oke as qty_order,   
+                            b.qty as qty_po,
+                            b.hargasatuan as hargasatuan,
+                            c.no_surat as no_surat,
+                            d.nama as nm_material
+                        FROM
+                            tr_incoming_check_detail a
+                            LEFT JOIN dt_trans_po b ON b.id = a.id_po_detail
+                            LEFT JOIN tr_purchase_order c ON c.no_po  = b.no_po
+                            LEFT JOIN new_inventory_4 d ON d.code_lv4 = a.id_material 
+                            JOIN tr_checked_incoming_detail e ON e.kode_trans = a.kode_trans AND e.id_material = a.id_material
+                        WHERE
+                            a.kode_trans = '" . $id_incoming . "'
+                        GROUP BY a.id
+                        
+                        UNION ALL
+
                         SELECT 
                             a.qty_oke as qty_order,
                             b.qty as qty_po,
                             b.hargasatuan as hargasatuan,
                             c.no_surat as no_surat,
-                            a.nm_material as nm_material
+                            d.stock_name as nm_material
                         FROM
                             warehouse_adjustment_detail a
-                            JOIN dt_trans_po_non_material b ON IF(a.id_po_detail IS NOT NULL, b.id = a.id_po_detail, b.id = a.no_ipp)
-                            JOIN tr_purchase_order_non_material c ON c.no_po  = b.no_po
-                            JOIN warehouse_adjustment e ON e.kode_trans = a.kode_trans
+                            LEFT JOIN dt_trans_po b ON b.id = a.no_ipp
+                            LEFT JOIN tr_purchase_order c ON c.no_po  = b.no_po
+                            LEFT JOIN accessories d ON d.id = a.id_material 
+                            LEFT JOIN warehouse_adjustment e ON e.kode_trans = a.kode_trans
                         WHERE
-                            a.kode_trans = '" . $id_incoming . "' AND e.category IN ('incoming stok','incoming non rutin')
+                            a.kode_trans = '" . $id_incoming . "' AND e.category = 'incoming stok'
                         GROUP BY a.id
 
                         UNION ALL
@@ -182,14 +201,31 @@ if ($req_payment_po < 1) {
                             a.qty_oke as qty_po,
                             c.harga as hargasatuan,
                             d.no_pr as no_surat,
+                            d.nm_barang as nm_material
+                        FROM
+                            warehouse_adjustment_detail a
+                            LEFT JOIN warehouse_adjustment b ON b.kode_trans = a.kode_trans
+                            LEFT JOIN tr_pr_detail_kasbon c ON c.id_kasbon = b.no_ipp AND c.id_detail = a.id_material
+                            LEFT JOIN rutin_non_planning_detail d ON d.id = a.id_material
+                        WHERE
+                            a.kode_trans = '".$id_incoming."' AND b.category = 'incoming non rutin'
+                        GROUP BY a.id
+
+                        UNION ALL
+
+                        SELECT 
+                            a.qty_oke as qty_order,
+                            b.qty as qty_po,
+                            b.hargasatuan as hargasatuan,
+                            c.no_surat as no_surat,
                             a.nm_material as nm_material
                         FROM
                             warehouse_adjustment_detail a
-                            JOIN warehouse_adjustment b ON b.kode_trans = a.kode_trans
-                            JOIN tr_pr_detail_kasbon c ON c.id_kasbon = b.no_ipp AND c.id_detail = a.id_material
-                            JOIN rutin_non_planning_detail d ON d.id = a.id_material
+                            LEFT JOIN tr_purchase_order c ON c.no_surat = a.no_ipp
+                            LEFT JOIN dt_trans_po b ON b.no_po = c.no_po AND b.namamaterial = a.nm_material
+                            LEFT JOIN warehouse_adjustment e ON e.kode_trans = a.kode_trans
                         WHERE
-                            a.kode_trans = '".$id_incoming."' AND b.category = 'incoming non rutin'
+                            a.kode_trans = '" . $id_incoming . "' AND e.category = 'incoming asset'
                         GROUP BY a.id
                      ")->result();
                     if (!$get_detail_inc) {
@@ -246,11 +282,7 @@ if ($req_payment_po < 1) {
             dropdownParent: $('#dialog-popup')
         });
     });
-    $('.auto_num').autoNumeric('init', {
-        aSep: ',',
-        aDec: '.',
-        mDec: '2'
-    });
+    $('.auto_num').autoNumeric('init');
     $(document).on('change', '.persen_dp', function() {
         var total_pembelian = $('.total_pembelian').val();
         if (total_pembelian == '' || total_pembelian == null) {
