@@ -11,7 +11,7 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="">Nama Supplier</label>
-            <input type="text" name="nm_supplier" id="" class="form-control form-control-sm" value="<?= $get_supplier['nama'] ?>" readonly>
+            <input type="text" name="nm_supplier" id="" class="form-control form-control-sm" value="<?= $get_supplier['name_suplier'] ?>" readonly>
         </div>
     </div>
     <div class="col-md-6">
@@ -90,7 +90,11 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="">Nomor Faktur Pajak</label>
+<<<<<<< HEAD
             <input type="text" name="nomor_faktur_pajak" id="" class="form-control form-control-sm nomor_faktur_pajak" >
+=======
+            <input type="text" name="nomor_faktur_pajak" id="" class="form-control form-control-sm nomor_faktur_pajak">
+>>>>>>> 40e449cb707ddad74b75dc2786496ee82356da3a
         </div>
     </div>
     <div class="col-md-6">

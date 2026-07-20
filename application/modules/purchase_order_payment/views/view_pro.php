@@ -56,7 +56,7 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="">Value Progress</label>
-            <input type="text" name="value_dp" id="" class="form-control form-control-sm text-right value_dp" value="<?= number_format($get_top->nilai) ?>" readonly>
+            <input type="text" name="value_dp" id="" class="form-control form-control-sm text-right value_dp" value="<?= number_format($data_invoice['value_dp']) ?>" readonly>
         </div>
     </div>
     <div class="col-md-6">

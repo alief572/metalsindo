@@ -26,7 +26,7 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="">Invoice Date</label>
-            <input type="date" name="invoice_date_real" id="" class="form-control form-control-sm invoice_date_real" value="<?= $data_invoice['invoice_date_real'] ?>" reaodnly>
+            <input type="date" name="invoice_date_real" id="" class="form-control form-control-sm invoice_date_real" value="<?= $data_invoice['invoice_date_real'] ?>" readonly>
         </div>
     </div>
     <div class="col-md-6">
@@ -56,7 +56,11 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="">Value Retensi</label>
+<<<<<<< HEAD
             <input type="text" name="value_dp" id="" class="form-control form-control-sm text-right value_dp" value="<?= number_format($get_top->nilai) ?>" readonly>
+=======
+            <input type="text" name="value_dp" id="" class="form-control form-control-sm text-right value_dp" value="<?= number_format($data_invoice['total_invoice']) ?>" readonly>
+>>>>>>> 40e449cb707ddad74b75dc2786496ee82356da3a
         </div>
     </div>
     <div class="col-md-6">
@@ -69,10 +73,17 @@
         <div class="form-group">
             <label for="">Upload Invoice</label>
             <input type="file" name="upload_invoice" id="" class="form-control form-control-sm upload_invoice">
+<<<<<<< HEAD
             <?php 
                 if(file_exists($data_invoice['link_doc']) && $data_invoice['link_doc'] !== '' && $data_invoice['link_doc'] !== null){
                     echo '<a href="'.base_url($data_invoice['link_doc']).'" class="btn btn-sm btn-primary" target="_blank"><i class="fa fa-download"></i> Download</a>';
                 }
+=======
+            <?php
+            if (file_exists($data_invoice['link_doc']) && $data_invoice['link_doc'] !== '' && $data_invoice['link_doc'] !== null) {
+                echo '<a href="' . base_url($data_invoice['link_doc']) . '" class="btn btn-sm btn-primary" target="_blank"><i class="fa fa-download"></i> Download</a>';
+            }
+>>>>>>> 40e449cb707ddad74b75dc2786496ee82356da3a
             ?>
         </div>
     </div>
@@ -114,4 +125,8 @@
             <input type="text" name="nm_acc_bank" id="" class="form-control form-control-sm" placeholder="- Nama Acc Bank -" value="<?= $data_invoice['nm_acc_bank'] ?>" readonly>
         </div>
     </div>
+<<<<<<< HEAD
 </div>
+=======
+</div>
+>>>>>>> 40e449cb707ddad74b75dc2786496ee82356da3a
