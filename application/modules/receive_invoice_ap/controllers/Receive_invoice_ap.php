@@ -56,8 +56,9 @@ class Receive_invoice_ap extends Admin_Controller
     $this->db->where('a.id_rec_inv_ap', $id_rec_inv_ap);
     $get_data_header = $this->db->get()->row();
 
-    $this->db->select('a.*');
+    $this->db->select('a.*, b.sj_supplier as no_sj_supplier');
     $this->db->from('tr_receive_invoice_ap_detail a');
+    $this->db->join('tr_incoming b', 'b.id_incoming = a.id_incoming', 'left');
     $this->db->where('a.id_rec_inv_ap', $id_rec_inv_ap);
     $get_data_detail = $this->db->get()->result();
 
@@ -83,8 +84,9 @@ class Receive_invoice_ap extends Admin_Controller
     $this->db->where('a.id_rec_inv_ap', $id_rec_inv_ap);
     $get_data_header = $this->db->get()->row();
 
-    $this->db->select('a.*');
+    $this->db->select('a.*, b.sj_supplier as no_sj_supplier');
     $this->db->from('tr_receive_invoice_ap_detail a');
+    $this->db->join('tr_incoming b', 'b.id_incoming = a.id_incoming', 'left');
     $this->db->where('a.id_rec_inv_ap', $id_rec_inv_ap);
     $get_data_detail = $this->db->get()->result();
 

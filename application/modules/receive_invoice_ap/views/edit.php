@@ -105,6 +105,7 @@
                     <tr class="bg-blue">
                         <th class="text-center">No. Incoming</th>
                         <th class="text-center">No. PO</th>
+                        <th class="text-center">No. SJ Supplier</th>
                         <th class="text-center">Tanggal Incoming</th>
                         <th class="text-center">Nama Supplier</th>
                         <th class="text-center">Nilai</th>
@@ -135,6 +136,11 @@
                         echo '<td class="text-center">';
                         echo $item->no_po;
                         echo '<input type="hidden" name="kp[' . $no . '][no_po]" value="' . $item->no_po . '">';
+                        echo '</td>';
+
+                        echo '<td class="text-center">';
+                        echo $item->no_sj_supplier;
+                        echo '<input type="hidden" name="kp[' . $no . '][no_sj_supplier]" value="' . $item->no_sj_supplier . '">';
                         echo '</td>';
 
                         echo '<td class="text-center">';
@@ -733,6 +739,7 @@
     $(document).on('click', '.add_incoming', function() {
         var id_incoming = $(this).data('id_incoming');
         var no_po = $(this).data('no_po');
+        var sj_supplier = $(this).data('sj_supplier');
         var id_suplier = $(this).data('id_suplier');
         var name_suplier = $(this).data('name_suplier');
         var nilai = $(this).data('nilai');
@@ -749,6 +756,11 @@
         Rows += '<td class="text-center">';
         Rows += no_po;
         Rows += '<input type="hidden" name="kp[' + no_list + '][no_po]" value="' + no_po + '">';
+        Rows += '</td>';
+
+        Rows += '<td class="text-center">';
+        Rows += sj_supplier;
+        Rows += '<input type="hidden" name="kp[' + no_list + '][no_sj_supplier]" value="' + sj_supplier + '">';
         Rows += '</td>';
 
         Rows += '<td class="text-center">';

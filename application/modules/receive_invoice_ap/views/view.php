@@ -106,6 +106,7 @@
                     <tr class="bg-blue">
                         <th class="text-center">No. Incoming</th>
                         <th class="text-center">No. PO</th>
+                        <th class="text-center">No. SJ Supplier</th>
                         <th class="text-center">Tanggal Incoming</th>
                         <th class="text-center">Nama Supplier</th>
                         <th class="text-center">Nilai</th>
@@ -130,6 +131,11 @@
                             echo '<td class="text-center">';
                             echo $item->no_po;
                             echo '<input type="hidden" name="kp['.$no.'][no_po]" value="'.$item->no_po.'">';
+                            echo '</td>';
+
+                            echo '<td class="text-center">';
+                            echo $item->no_sj_supplier;
+                            echo '<input type="hidden" name="kp['.$no.'][no_sj_supplier]" value="'.$item->no_sj_supplier.'">';
                             echo '</td>';
 
                             echo '<td class="text-center">';
