@@ -11,12 +11,12 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="">Nama Supplier</label>
-            <input type="text" name="nm_supplier" id="" class="form-control form-control-sm" value="<?= $get_supplier['nama'] ?>" readonly>
+            <input type="text" name="nm_supplier" id="" class="form-control form-control-sm" value="<?= $get_supplier['name_suplier'] ?>" readonly>
         </div>
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <label for="">Receive Invoice Date</label>
+            <label for="">Receive Invoice Date <span class="text-red">*</span></label>
             <input type="date" name="invoice_date" id="" class="form-control form-control-sm" required>
         </div>
     </div>
@@ -28,19 +28,19 @@
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <label for="">Invoice Date</label>
-            <input type="date" name="invoice_date_real" id="" class="form-control form-control-sm invoice_date_real">
+            <label for="">Invoice Date <span class="text-red">*</span></label>
+            <input type="date" name="invoice_date_real" id="" class="form-control form-control-sm invoice_date_real change_tgl_faktur_pajak" required>
         </div>
     </div>
     <div class="col-md-6">
         <div class="form-group">
             <label for="">DPP</label>
-            <input type="text" name="total_pembelian" id="" class="form-control form-control-sm text-right total_pembelian" value="<?= number_format((($get_total_po['ttl_po'] - $nilai_disc) * $get_top->progress / 100), 2) ?>" readonly>
+            <input type="text" name="total_pembelian" id="" class="form-control form-control-sm text-right total_pembelian" value="<?= number_format($get_total_po['ttl_po'], 2) ?>" readonly>
         </div>
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <label for="">Nomor Invoice</label>
+            <label for="">Nomor Invoice <span class="text-red">*</span></label>
             <input type="text" name="nomor_invoice" id="" class="form-control form-control-sm nomor_invoice" required>
         </div>
     </div>
@@ -70,48 +70,131 @@
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <label for="">Upload Invoice</label>
-            <input type="file" name="upload_invoice" id="" class="form-control form-control-sm upload_invoice">
+            <label for="">Upload Invoice <span class="text-red">*</span></label>
+            <input type="file" name="upload_invoice" id="" class="form-control form-control-sm upload_invoice" required>
         </div>
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <label for="">Kurs</label>
-            <input type="text" name="kurs" id="" class="form-control form-control-sm text-right auto_num">
+            <label for="">Kurs <span class="text-red">*</span></label>
+            <input type="text" name="kurs" id="" class="form-control form-control-sm text-right auto_num" value="1" required>
         </div>
     </div>
     <div class="col-md-6">
         <b>Informasi Bank :</b>
         <div class="form-group">
             <label for="">Bank</label>
-            <input type="text" name="bank" id="" class="form-control form-control-sm" placeholder="- Bank -">
+            <input type="text" name="bank" id="" class="form-control form-control-sm" placeholder="- Bank -" value="<?= $get_supplier['name_bank'] ?>">
         </div>
     </div>
     <div class="col-md-6">
         <div class="form-group">
-            <label for="">Nomor Faktur Pajak</label>
-            <input type="text" name="nomor_faktur_pajak" id="" class="form-control form-control-sm nomor_faktur_pajak" >
+            <label for="">Nomor Faktur Pajak <span class="text-red">*</span></label>
+            <input type="text" name="nomor_faktur_pajak" id="" class="form-control form-control-sm nomor_faktur_pajak" required>
         </div>
     </div>
     <div class="col-md-6">
         <div class="form-group">
             <label for="">No. Bank</label>
-            <input type="text" name="no_bank" id="" class="form-control form-control-sm" placeholder="- No. Bank -">
+            <input type="text" name="no_bank" id="" class="form-control form-control-sm" placeholder="- No. Bank -" value="<?= $get_supplier['no_rekening'] ?>">
         </div>
     </div>
     <div class="col-md-6">
         <div class="form-group">
             <label for="">Tanggal Faktur Pajak</label>
-            <input type="date" name="tanggal_faktur_pajak" id="" class="form-control form-control-sm tanggal_faktur_pajak">
+            <input type="date" name="tanggal_faktur_pajak" id="" class="form-control form-control-sm tanggal_faktur_pajak" readonly>
         </div>
     </div>
     <div class="col-md-6"></div>
     <div class="col-md-6">
         <div class="form-group">
             <label for="">Nama</label>
-            <input type="text" name="nm_acc_bank" id="" class="form-control form-control-sm" placeholder="- Nama Acc Bank -">
+            <input type="text" name="nm_acc_bank" id="" class="form-control form-control-sm" placeholder="- Nama Acc Bank -" value="<?= $get_supplier['nama_rekening'] ?>">
         </div>
     </div>
+    <br>
+    <!-- <div class="col-md-12">
+        <h4>Jurnal Receive Invoice DP</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="text-center">Tanggal Jurnal</th>
+                    <th class="text-center">Company</th>
+                    <th class="text-center">Divisi</th>
+                    <th class="text-center">COA</th>
+                    <th class="text-center">Deskripsi</th>
+                    <th class="text-center">Debit</th>
+                    <th class="text-center">Kredit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                // print_r($hasil_jurnal);
+                // exit;
+                $ttl_debit = 0;
+                $ttl_kredit = 0;
+                if (isset($hasil_jurnal) && !empty($hasil_jurnal)) {
+                    $no_jurnal = 0;
+                    foreach ($hasil_jurnal as $item_jurnal) {
+                        $no_jurnal++;
+
+                        echo '<tr>';
+
+                        echo '<td class="text-center">';
+                        echo date('d F Y', strtotime($item_jurnal['tanggal_jurnal']));
+                        echo '<input type="hidden" name="jurnal[' . $no_jurnal . '][tanggal_jurnal]" value="' . $item_jurnal['tanggal_jurnal'] . '">';
+                        echo '</td>';
+
+                        echo '<td class="text-center">';
+                        echo $item_jurnal['nm_company'];
+                        echo '<input type="hidden" name="jurnal[' . $no_jurnal . '][id_company]" value="' . $item_jurnal['id_company'] . '">';
+                        echo '<input type="hidden" name="jurnal[' . $no_jurnal . '][nm_company]" value="' . $item_jurnal['nm_company'] . '">';
+                        echo '</td>';
+
+                        echo '<td class="text-center">';
+                        echo $item_jurnal['nm_div'];
+                        echo '<input type="hidden" name="jurnal[' . $no_jurnal . '][id_divisi]" value="' . $item_jurnal['id_div'] . '">';
+                        echo '<input type="hidden" name="jurnal[' . $no_jurnal . '][nm_divisi]" value="' . $item_jurnal['nm_div'] . '">';
+                        echo '</td>';
+
+                        echo '<td class="text-left">';
+                        echo $item_jurnal['nm_coa'];
+                        echo '<input type="hidden" name="jurnal[' . $no_jurnal . '][id_coa]" value="' . $item_jurnal['id_coa'] . '">';
+                        echo '<input type="hidden" name="jurnal[' . $no_jurnal . '][nm_coa]" value="' . $item_jurnal['nm_coa'] . '">';
+                        echo '</td>';
+
+                        echo '<td class="text-left">';
+                        echo $item_jurnal['deskripsi'];
+                        echo '<input type="hidden" name="jurnal[' . $no_jurnal . '][deskripsi]" value="' . $item_jurnal['deskripsi'] . '">';
+                        echo '</td>';
+
+                        echo '<td class="text-right">';
+                        echo number_format($item_jurnal['debit']);
+                        echo '<input type="hidden" name="jurnal[' . $no_jurnal . '][debit]" value="' . $item_jurnal['debit'] . '">';
+                        echo '</td>';
+
+                        echo '<td class="text-right">';
+                        echo number_format($item_jurnal['kredit']);
+                        echo '<input type="hidden" name="jurnal[' . $no_jurnal . '][kredit]" value="' . $item_jurnal['kredit'] . '">';
+                        echo '</td>';
+
+                        echo '</tr>';
+
+                        $ttl_debit += $item_jurnal['debit'];
+                        $ttl_kredit += $item_jurnal['kredit'];
+                    }
+                }
+                ?>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th class="text-center" colspan="5">Balancing</th>
+                    <th class="text-right"><?= number_format($ttl_debit) ?></th>
+                    <th class="text-right"><?= number_format($ttl_kredit) ?></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div> -->
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -135,10 +218,16 @@
             total_pembelian = total_pembelian.split(',').join('');
             total_pembelian = parseFloat(total_pembelian);
         }
-
+        var nilai_disc = $('.nilai_disc').val();
+        if (nilai_disc == '' || nilai_disc == null) {
+            nilai_disc = 0;
+        } else {
+            nilai_disc = nilai_disc.split(',').join('');
+            nilai_disc = parseFloat(nilai_disc);
+        }
         var persen_dp = parseFloat($(this).val());
 
-        var value_dp = (total_pembelian * persen_dp / 100);
+        var value_dp = ((total_pembelian - nilai_disc) * persen_dp / 100);
 
         $('.value_dp').val(value_dp.toLocaleString());
     });
@@ -163,5 +252,11 @@
         var persen_dp = parseFloat((value_dp / total_pembelian) * 100);
         $('.value_dp').val(value_dp.toLocaleString());
         $('.persen_dp').val(persen_dp.toFixed(2));
+    });
+
+    $(document).on('change', '.change_tgl_faktur_pajak', function() {
+        var invoice_date = $(this).val();
+
+        $('.tanggal_faktur_pajak').val(invoice_date);
     });
 </script>
