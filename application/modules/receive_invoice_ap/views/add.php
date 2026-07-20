@@ -695,6 +695,7 @@
 
         Rows += '<td class="text-center">';
         Rows += (sj_supplier ? sj_supplier : '-');
+        Rows += '<input type="hidden" name="kp[' + no_list + '][no_sj_supplier]" value="' + sj_supplier + '">';
         Rows += '</td>';
 
         Rows += '<td class="text-center">';
