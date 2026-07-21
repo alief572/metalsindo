@@ -3164,7 +3164,7 @@ class Wt_invoicing extends Admin_Controller
 			$this->db->join('ms_inventory_category3 b', 'b.id_category3 = a.id_category3', 'left');
 			$this->db->join('ms_inventory_category2 c', 'c.id_category2 = b.id_category2', 'left');
 			$this->db->where('a.no_invoice', $item['no_invoice']);
-			$this->db->where('b.id_bentuk', 'B2000002');
+			// $this->db->where('b.id_bentuk', 'B2000002');
 			$get_detail_sheet = $this->db->get()->result();
 
 			$items = [];
