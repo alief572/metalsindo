@@ -3226,7 +3226,7 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
-				$nama_barang = (!empty($tipe_invoice)) ? $nama_barang . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
+				$nama_barang = (!empty($tipe_invoice)) ? $tipe_invoice . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
 				$barang_jasa = 'A';
 				if (!empty($tipe_invoice)) {
 					$satuan = 'UM.0033';
