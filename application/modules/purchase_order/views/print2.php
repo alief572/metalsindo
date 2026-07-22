@@ -402,8 +402,8 @@
                 } else {
                 ?>
                     <tr>
-                        <td align="center" colspan='4'>Total Sebelum PPN</td>
-                        <td align="right"><?= number_format($detailsum[0]->sumtotalwidth, 2) ?></td>
+                        <td align="center" colspan='4'>Total</td>
+                        <td align="right"></td>
                         <td align="right" colspan="1"></td>
                         <td align="right"><?= number_format($detailsum[0]->sumjumlahharga, 2) ?></td>
                         <td align="center"></td>
