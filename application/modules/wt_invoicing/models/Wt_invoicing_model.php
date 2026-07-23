@@ -512,6 +512,7 @@ class Wt_invoicing_model extends BF_Model
       $tipe_sheet = (count($get_detail_sheet) > 0) ? '1' : '0';
 
       if ($tipe_sheet == '1') {
+        $nilai_total = 0;
         $nilai_invoice = 0;
         $nilai_ppn = 0;
         $nilai_dpp = 0;
@@ -536,10 +537,9 @@ class Wt_invoicing_model extends BF_Model
           $dpp_lain_lain = ceil(11 / 12 * $total_awal);
           $ppn = ($dpp_lain_lain * 12 / 100);
 
-          // $nilai_invoice += ($qty_sheet);
+          $nilai_total += ($total_awal);
           $nilai_invoice += ($total_awal + $ppn);
           $nilai_ppn += ($ppn);
-          // $nilai_invoice += ($item_sheet->harga_satuan * $qty_sheet);
         }
       } else {
         $this->db->select('SUM(a.qty_invoice * a.harga_satuan) as ttl_harga');
@@ -553,6 +553,7 @@ class Wt_invoicing_model extends BF_Model
         $ppn = ($dpp_nilai_lain * 12 / 100);
         $grand_total = ($ttl_harga + $ppn);
 
+        $nilai_total = $ttl_harga;
         $nilai_invoice = $grand_total;
         $nilai_ppn = $ppn;
         $nilai_dpp = $dpp_nilai_lain;
@@ -566,6 +567,7 @@ class Wt_invoicing_model extends BF_Model
         'nama_customer' => strtoupper($item['name_customer']),
         'term' => $item['note'],
         'nomor_do' => $item['no_do'],
+        'nilai_total' => number_format($nilai_total),
         'nilai_dpp' => number_format($nilai_dpp),
         'nilai_ppn' => number_format($nilai_ppn),
         'nilai_invoice' => number_format($nilai_invoice),

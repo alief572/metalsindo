@@ -3226,7 +3226,7 @@ class Wt_invoicing extends Admin_Controller
 					$nilai_dpp = $dpp_lain_lain;
 				}
 
-				$nama_barang = (!empty($tipe_invoice)) ? 'Jasa Slitting ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
+				$nama_barang = (!empty($tipe_invoice)) ? $tipe_invoice . ' ' . $item_sheet->nama_barang : $item_sheet->nama_barang;
 				$barang_jasa = 'A';
 				if (!empty($tipe_invoice)) {
 					$satuan = 'UM.0033';
@@ -3235,7 +3235,7 @@ class Wt_invoicing extends Admin_Controller
 
 				$items[] = [
 					'barang_jasa' => $barang_jasa,
-					'nama_barang' =>  $nama_barang . ', ' . $item_sheet->tobe_size,
+					'nama_barang' =>  $nama_barang . ', ' . $item_sheet->tobe_size . ', ',
 					'satuan' => $satuan,
 					'harga_satuan' => $item_sheet->harga_satuan,
 					'qty' => $qty,
