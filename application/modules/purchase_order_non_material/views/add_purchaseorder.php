@@ -729,16 +729,22 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 			var currency = $('#select_curr').val()
 
 			var ttl_persen_top = 0;
+			var is_top_valid = true;
 			$('.input_progress').each(function() {
 				var progress = $(this).val();
 				if (progress !== '') {
 					progress = progress.split(',').join('');
 					progress = parseFloat(progress);
 
-					ttl_persen_top += progress;
+					if (isNaN(progress) || progress <= 0) {
+						is_top_valid = false;
+					} else {
+						ttl_persen_top += progress;
+					}
 				}
 			});
 
+			ttl_persen_top = Math.round(ttl_persen_top * 100) / 100;
 
 			var data, xhr;
 			if (loi == '' || loi == null) {
@@ -759,8 +765,17 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 			} else if (currency == '' || currency == null) {
 				swal("Warning", "Currency tidak boleh kosong  :)", "error");
 				return false;
+			} else if (!is_top_valid) {
+				swal("Warning", "Input TOP harus berupa angka yang valid dan tidak boleh minus/kosong", "error");
+				return false;
+			} else if (ttl_persen_top === 0) {
+				swal("Warning", "Total TOP tidak boleh 0 atau kosong", "error");
+				return false;
 			} else if (ttl_persen_top > 100) {
 				swal("Warning", "Total TOP tidak boleh lebih dari 100%", "error");
+				return false;
+			} else if (ttl_persen_top < 100) {
+				swal("Warning", "Total TOP harus pas 100%", "error");
 				return false;
 			} else {
 				swal({
