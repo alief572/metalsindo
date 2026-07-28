@@ -1246,12 +1246,17 @@ class Spk_marketing extends Admin_Controller
 			'created_on'			=> date('Y-m-d H:i:s'),
 			'created_by'			=> $this->auth->user_id(),
 			'tahun'					=> date('Y-m-d'),
-			'type'					=> $post['tipe']
+			'type'					=> $post['tipe'],
+			'total_discount'		=> isset($post['total_discount']) ? $post['total_discount'] : 0
 		];
 		//Add Data
 		$this->db->insert('tr_spk_marketing', $data);
 		$numb1 = 0;
 		foreach ($_POST['dp'] as $dp) {
+			// Hanya insert item yang di-centang deal
+			if (empty($dp[deal])) {
+				continue;
+			}
 			$numb1++;
 			$stokpakai =  array(
 				'id_spkmarketing'		=> $code,
@@ -1267,6 +1272,7 @@ class Spk_marketing extends Admin_Controller
 				'weight'		    	=> $dp[weight],
 				'total_weight'		    => $dp[twight],
 				'total_harga'		    => $dp[tharga],
+				'nominal_discount'		=> isset($dp['nominal_discount']) ? $dp['nominal_discount'] : 0,
 				'delivery'		        => $dp[ddate],
 				'deal'		    		=> $dp[deal],
 				'created_on'			=> date('Y-m-d H:i:s'),
