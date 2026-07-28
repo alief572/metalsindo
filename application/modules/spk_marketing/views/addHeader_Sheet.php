@@ -161,29 +161,52 @@ $tanggal = date('Y-m-d');
 
                         <div class="col-sm-12">
                             <div class="form-group row">
-                                <table class='table table-bordered table-striped'>
-                                    <thead>
-                                        <tr class='bg-blue'>
-                                            <th width='30%'>Nama Material</th>
-                                            <th width='5%'>Thickness</th>
-                                            <th width='10%'>Width</th>
-                                            <th width='10%'>Length</th>
-                                            <th width='10%'>Part Number</th>
-                                            <th width='10%'>Harga Penawaran</th>
-                                            <th width='10%'>Harga Deal / Kg</th>
-                                            <th width='10%'>Qty (Sheet)</th>
-                                            <th width='10%' hidden>Weight / Coil</th>
-                                            <th width='10%' hidden>Total Wight</th>
-                                            <th width='10%'>Total Harga</th>
-                                            <th width='10%'>Delivery Date</th>
-                                            <th width='10%'>CRCL</th>
-                                            <th>Keterangan</th>
-                                            <th width='5%'>Deal <input type="checkbox" id="check_all"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="list_penawaran_slot">
-                                    </tbody>
-                                </table>
+                                <div style="overflow-x: auto; width: 100%;">
+                                    <table class='table table-bordered table-striped' style='min-width: 1400px; white-space: nowrap;'>
+                                        <thead>
+                                            <tr class='bg-blue'>
+                                                <th style="min-width:250px;">Nama Material</th>
+                                                <th style="min-width:80px;">Thickness</th>
+                                                <th style="min-width:80px;">Width</th>
+                                                <th style="min-width:80px;">Length</th>
+                                                <th style="min-width:100px;">Part Number</th>
+                                                <th style="min-width:120px;">Harga Penawaran</th>
+                                                <th style="min-width:120px;">Harga Deal / Kg</th>
+                                                <th style="min-width:100px;">Disc</th>
+                                                <th style="min-width:80px;">Qty (Sheet)</th>
+                                                <th style="min-width:80px;" hidden>Weight / Coil</th>
+                                                <th style="min-width:80px;" hidden>Total Wight</th>
+                                                <th style="min-width:130px;">Total Harga</th>
+                                                <th style="min-width:120px;">Delivery Date</th>
+                                                <th style="min-width:100px;">CRCL</th>
+                                                <th style="min-width:120px;">Keterangan</th>
+                                                <th style="min-width:50px;">Deal <input type="checkbox" id="check_all"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="list_penawaran_slot">
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="11" style="text-align:right;"><strong>Total Harga</strong></td>
+                                                <td colspan="5">
+                                                    <input type="text" class="form-control" id="sum_total_harga" readonly value="0">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="11" style="text-align:right;"><strong>Discount</strong></td>
+                                                <td colspan="5">
+                                                    <input type="text" class="form-control" id="footer_discount" name="total_discount" value="0" onchange="onFooterDiscountInput()">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="11" style="text-align:right;"><strong>Grand Total</strong></td>
+                                                <td colspan="5">
+                                                    <input type="text" class="form-control" id="grand_total" readonly value="0">
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                         <center>
@@ -264,6 +287,23 @@ $tanggal = date('Y-m-d');
                 return false;
             }
 
+            // Validasi diskon tidak boleh melebihi total harga
+            var sumTotalHarga = 0;
+            $('[id^="dp_tharga_"]').each(function() {
+                var val = parseFloat($(this).val()) || 0;
+                sumTotalHarga += val;
+            });
+            var totalDiscount = unformatNominal($('#footer_discount').val());
+            if (totalDiscount > sumTotalHarga) {
+                swal({
+                    title: "Warning!",
+                    text: "Total discount tidak boleh melebihi total harga!",
+                    type: "warning",
+                    timer: 5000
+                });
+                return false;
+            }
+
             var data, xhr;
             swal({
                     title: "Are you sure?",
@@ -278,6 +318,11 @@ $tanggal = date('Y-m-d');
                 },
                 function(isConfirm) {
                     if (isConfirm) {
+                        // Unformat nominal discount sebelum submit
+                        $('#footer_discount').val(unformatNominal($('#footer_discount').val()));
+                        $('[id^="dp_discount_"]').each(function() {
+                            $(this).val(unformatNominal($(this).val()));
+                        });
                         var formData = new FormData($('#data-form')[0]);
                         var baseurl = siteurl + 'spk_marketing/SaveNewHeader';
                         $.ajax({
@@ -391,6 +436,27 @@ $tanggal = date('Y-m-d');
         });
     }
 
+    var discountMode = ''; // 'per_item' or 'keseluruhan'
+
+    function formatNominal(angka) {
+        var number_string = angka.toString().replace(/[^,\d]/g, ''),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+        if (ribuan) {
+            var separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+        return rupiah;
+    }
+
+    function unformatNominal(str) {
+        if (!str) return 0;
+        return parseFloat(str.toString().replace(/\./g, '').replace(',', '.')) || 0;
+    }
+
     function AksiDetail(id) {
         var hgdeal = $('#dp_hgdeal_' + id).val();
         var qty = $('#dp_qty_' + id).val();
@@ -409,8 +475,56 @@ $tanggal = date('Y-m-d');
             data: "hgdeal=" + hgdeal + "&qty=" + qty + "&weight=" + weight + "&id=" + id,
             success: function(html) {
                 $('#total_harga_' + id).html(html);
+                recalculateFooter();
             }
         });
+    }
+
+    function onItemDiscountInput(id) {
+        // Format input nominal
+        var el = $('#dp_discount_' + id);
+        var raw = el.val().replace(/[^0-9]/g, '');
+        el.val(formatNominal(raw));
+
+        // Saat user input diskon per item, set mode per_item
+        discountMode = 'per_item';
+        // Hitung sum semua diskon per item
+        var totalDiscount = 0;
+        $('[id^="dp_discount_"]').each(function() {
+            var val = unformatNominal($(this).val());
+            totalDiscount += val;
+        });
+        $('#footer_discount').val(formatNominal(totalDiscount.toString()));
+        recalculateFooter();
+    }
+
+    function onFooterDiscountInput() {
+        // Format input nominal footer
+        var el = $('#footer_discount');
+        var raw = el.val().replace(/[^0-9]/g, '');
+        el.val(formatNominal(raw));
+
+        // Saat user input diskon di footer, reset semua diskon per item
+        discountMode = 'keseluruhan';
+        $('[id^="dp_discount_"]').each(function() {
+            $(this).val('0');
+        });
+        recalculateFooter();
+    }
+
+    function recalculateFooter() {
+        // Hitung sum total harga dari semua item
+        var sumTotalHarga = 0;
+        $('[id^="dp_tharga_"]').each(function() {
+            var val = parseFloat($(this).val()) || 0;
+            sumTotalHarga += val;
+        });
+        $('#sum_total_harga').val(formatNominal(sumTotalHarga.toFixed(2).replace('.', ',')));
+
+        // Hitung grand total
+        var discount = unformatNominal($('#footer_discount').val());
+        var grandTotal = sumTotalHarga - discount;
+        $('#grand_total').val(formatNominal(grandTotal.toFixed(2).replace('.', ',')));
     }
 
     function HitungPisau(id) {
