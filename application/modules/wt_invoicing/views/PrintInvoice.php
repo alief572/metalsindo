@@ -430,11 +430,11 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 				$this->db->where('a.id_category3', $detail->id_category3);
 				$get_sheets_detail = $this->db->get()->row_array();
 
-				if ($get_sheets_detail['price_sheet'] > 0) :
-					$satuan = 'Sheets';
-				else :
-					$satuan = 'Kgs';
-				endif;
+				// if ($get_sheets_detail['price_sheet'] > 0) :
+				$satuan = 'Sheets';
+			// else :
+			// 	$satuan = 'Kgs';
+			// endif;
 			else :
 				$satuan = 'Kgs';
 			endif;
