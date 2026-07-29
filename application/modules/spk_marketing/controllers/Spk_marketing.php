@@ -679,6 +679,7 @@ class Spk_marketing extends Admin_Controller
 		foreach ($dt as $dt) {
 			$loop++;
 			$id_category3 = $dt->id_category3;
+			$harga_penawaran_fmt = number_format($dt->harga_penawaran_cust, 2, ',', '.');
 			$crcl	= $this->db->query("SELECT * FROM dt_inquery_transaksi WHERE no_inquery = '$idcr' AND id_category3='$id_category3' ")->result();
 			echo "
 		<tr id='tabel_penawaran_$loop'>
@@ -689,10 +690,11 @@ class Spk_marketing extends Admin_Controller
 			<th><input type='text' class='form-control' value='$dt->width' id='dp_width_$loop' required name='dp[$loop][width]'></th>
 			<th><input type='text' class='form-control' value='$dt->length' id='dp_length_$loop' required name='dp[$loop][length]'></th>
 			<th id='part_number'><input type='text' class='form-control' value='$dt->lotno' readonly id='dp_part_number_$loop' required name='dp[$loop][part_number]'></th>
-			<th><input type='text' class='form-control' value='$dt->harga_penawaran_cust' readonly id='dp_hgpenwaran_$loop' required name='dp[$loop][hgpenaaran]'></th>
-			<th><input type='text' class='form-control' value='$dt->harga_penawaran_cust' onkeyup='return AksiDetail($loop);' id='dp_hgdeal_$loop' required name='dp[$loop][hgdeal]'></th>
-			<th ><input type='text' class='form-control' onkeyup='return AksiDetail($loop);' id='dp_qty_$loop' required name='dp[$loop][qty]'></th>
-			<th hidden><input type='text' class='form-control' onkeyup='return AksiDetail($loop);'id='dp_weight_$loop' required name='dp[$loop][weight]'></th>
+			<th><input type='text' class='form-control nominal-format' value='$harga_penawaran_fmt' readonly id='dp_hgpenwaran_$loop' required name='dp[$loop][hgpenaaran]'></th>
+			<th><input type='text' class='form-control nominal-format' value='$harga_penawaran_fmt' onchange='return AksiDetail($loop);' id='dp_hgdeal_$loop' required name='dp[$loop][hgdeal]'></th>
+			<th><input type='text' class='form-control nominal-format' value='0' onchange='return onItemDiscountInput($loop);' id='dp_discount_$loop' name='dp[$loop][nominal_discount]'></th>
+			<th ><input type='text' class='form-control nominal-format' onchange='return AksiDetail($loop);' id='dp_qty_$loop' required name='dp[$loop][qty]'></th>
+			<th hidden><input type='text' class='form-control' onchange='return AksiDetail($loop);'id='dp_weight_$loop' required name='dp[$loop][weight]'></th>
 			<th id='total_weight_$loop' hidden><input type='text' class='form-control' value='$jcc'  id='dp_twight_$loop' required name='dp[$loop][twight]'></th>
 			<th id='total_harga_$loop'><div hidden><input type='text' class='form-control' value='$th' readonly id='dp_tharga_$id' required name='dp[$id][tharga]'></div>
 			<input type='text' class='form-control' value='$thg' readonly></th>
@@ -727,6 +729,9 @@ class Spk_marketing extends Admin_Controller
 			$harga = $dt->harga_penawaran_cust;
 			$qty = $dt->qty_slitting;
 			$tharga = $harga * $qty;
+			$harga_fmt = number_format($harga, 2, ',', '.');
+			$qty_fmt = number_format($qty, 2, ',', '.');
+			$tharga_fmt = number_format($tharga, 2, ',', '.');
 			$crcl	= $this->db->query("SELECT * FROM dt_inquery_transaksi WHERE no_inquery = '$idcr' AND id_category3='$id_category3' ")->result();
 			echo "
 		<tr id='tabel_penawaran_$loop'>
@@ -737,13 +742,13 @@ class Spk_marketing extends Admin_Controller
 			<th><input type='text' class='form-control' value='$dt->width' id='dp_width_$loop' required name='dp[$loop][width]' readonly></th>
 			<th><input type='text' class='form-control' value='$dt->width_akhir' id='dp_width_akhir_$loop' required name='dp[$loop][width_akhir]' readonly></th>
 			<th id='part_number' hidden><input type='text' class='form-control' value='$dt->lotno' readonly id='dp_part_number_$loop' required name='dp[$loop][part_number]'></th>
-			<th><input type='text' class='form-control' value='$dt->harga_penawaran_cust' readonly id='dp_hgpenwaran_$loop' required name='dp[$loop][hgpenaaran]'></th>
-			<th><input type='text' class='form-control' value='$dt->harga_penawaran_cust' onkeyup='return AksiDetail($loop);' id='dp_hgdeal_$loop' required name='dp[$loop][hgdeal]'></th>
-			<th ><input type='text' class='form-control' onkeyup='return AksiDetail($loop);' id='dp_qty_$loop' required name='dp[$loop][qty]' value='$dt->qty_slitting'></th>
-			<th hidden><input type='text' class='form-control' onkeyup='return AksiDetail($loop);'id='dp_weight_$loop' required name='dp[$loop][weight]'></th>
+			<th><input type='text' class='form-control nominal-format' value='$harga_fmt' readonly id='dp_hgpenwaran_$loop' required name='dp[$loop][hgpenaaran]'></th>
+			<th><input type='text' class='form-control nominal-format' value='$harga_fmt' onchange='return AksiDetail($loop);' id='dp_hgdeal_$loop' required name='dp[$loop][hgdeal]'></th>
+			<th ><input type='text' class='form-control nominal-format' onchange='return AksiDetail($loop);' id='dp_qty_$loop' required name='dp[$loop][qty]' value='$qty_fmt'></th>
+			<th hidden><input type='text' class='form-control' onchange='return AksiDetail($loop);'id='dp_weight_$loop' required name='dp[$loop][weight]'></th>
 			<th id='total_weight_$loop' hidden><input type='text' class='form-control' value='$jcc'  id='dp_twight_$loop' required name='dp[$loop][twight]'></th>
 			<th id='total_harga_$loop'><div hidden><input type='text' class='form-control' value='$tharga' readonly id='dp_tharga_$id' required name='dp[$id][tharga]'></div>
-			<input type='text' class='form-control' value='$tharga' readonly></th>
+			<input type='text' class='form-control' value='$tharga_fmt' readonly></th>
 			<th><input type='date' class='form-control'   id='dp_ddate_$loop' data-role='qtip' required name='dp[$loop][ddate]'></th>
 			<th hidden ><select id='dp_crcl_$loop' name='dp[$loop][crcl]' class='form-control select' required>
 						<option value=''>--Pilih--</option>";
@@ -1154,7 +1159,8 @@ class Spk_marketing extends Admin_Controller
 			'created_on'			=> date('Y-m-d H:i:s'),
 			'created_by'			=> $this->auth->user_id(),
 			'tahun'					=> date('Y-m-d'),
-			'type'					=> $post['tipe']
+			'type'					=> $post['tipe'],
+			'total_discount'		=> isset($post['total_discount']) ? $post['total_discount'] : 0
 		];
 		//Add Data
 		$this->db->insert('tr_spk_marketing', $data);
@@ -1164,6 +1170,10 @@ class Spk_marketing extends Admin_Controller
 		// exit;
 
 		foreach ($_POST['dp'] as $dp) {
+			// Hanya insert item yang di-centang deal
+			if (empty($dp[deal])) {
+				continue;
+			}
 			$numb1++;
 			$stokpakai =  array(
 				'id_spkmarketing'		=> $code,
@@ -1180,6 +1190,7 @@ class Spk_marketing extends Admin_Controller
 				'weight'		    	=> $dp[weight],
 				'total_weight'		    => $dp[twight],
 				'total_harga'		    => $dp[tharga],
+				'nominal_discount'		=> isset($dp['nominal_discount']) ? $dp['nominal_discount'] : 0,
 				'delivery'		        => $dp[ddate],
 				'deal'		    		=> $dp[deal],
 				'created_on'			=> date('Y-m-d H:i:s'),
@@ -1239,12 +1250,17 @@ class Spk_marketing extends Admin_Controller
 			'created_on'			=> date('Y-m-d H:i:s'),
 			'created_by'			=> $this->auth->user_id(),
 			'tahun'					=> date('Y-m-d'),
-			'type'					=> $post['tipe']
+			'type'					=> $post['tipe'],
+			'total_discount'		=> isset($post['total_discount']) ? $post['total_discount'] : 0
 		];
 		//Add Data
 		$this->db->insert('tr_spk_marketing', $data);
 		$numb1 = 0;
 		foreach ($_POST['dp'] as $dp) {
+			// Hanya insert item yang di-centang deal
+			if (empty($dp[deal])) {
+				continue;
+			}
 			$numb1++;
 			$stokpakai =  array(
 				'id_spkmarketing'		=> $code,
@@ -1260,6 +1276,7 @@ class Spk_marketing extends Admin_Controller
 				'weight'		    	=> $dp[weight],
 				'total_weight'		    => $dp[twight],
 				'total_harga'		    => $dp[tharga],
+				'nominal_discount'		=> isset($dp['nominal_discount']) ? $dp['nominal_discount'] : 0,
 				'delivery'		        => $dp[ddate],
 				'deal'		    		=> $dp[deal],
 				'created_on'			=> date('Y-m-d H:i:s'),
@@ -1317,7 +1334,8 @@ class Spk_marketing extends Admin_Controller
 			'tgl_po'			=> date('Y-m-d', strtotime($post['tgl_po'])),
 			'plan_cust'			=> date('Y-m-d', strtotime($post['plan_cust'])),
 			'note'			=> $post['note'],
-			'created_by'			=> $this->auth->user_id()
+			'created_by'			=> $this->auth->user_id(),
+			'total_discount'		=> isset($post['total_discount']) ? $post['total_discount'] : 0
 		];
 		//Add Data
 		$this->db->where('id_spkmarketing', $code)->update("tr_spk_marketing", $data);
@@ -1325,6 +1343,10 @@ class Spk_marketing extends Admin_Controller
 		$this->db->delete('dt_spkmarketing_loading', array('id_spkmarketing' => $code));
 		$numb1 = 0;
 		foreach ($_POST['dp'] as $dp) {
+			// Hanya insert item yang di-centang deal
+			if (empty($dp[deal])) {
+				continue;
+			}
 			$numb1++;
 			$stokpakai =  array(
 				'id_spkmarketing'		=> $code,
@@ -1341,6 +1363,7 @@ class Spk_marketing extends Admin_Controller
 				'weight'		    	=> $dp[weight],
 				'total_weight'		    => $dp[twight],
 				'total_harga'		    => $dp[tharga],
+				'nominal_discount'		=> isset($dp['nominal_discount']) ? $dp['nominal_discount'] : 0,
 				'delivery'		    	=> $dp[ddate],
 				'deal'		    		=> $dp[deal],
 				'crcl'		    		=> $dp[crcl],
