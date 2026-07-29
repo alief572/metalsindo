@@ -317,9 +317,9 @@ $tanggal = date('Y-m-d');
 				},
 				function(isConfirm) {
 					if (isConfirm) {
-						// Unformat nominal discount sebelum submit
+						// Unformat semua nominal sebelum submit
 						$('#footer_discount').val(unformatNominal($('#footer_discount').val()));
-						$('[id^="dp_discount_"]').each(function() {
+						$('.nominal-format').each(function() {
 							$(this).val(unformatNominal($(this).val()));
 						});
 						var formData = new FormData($('#data-form')[0]);
@@ -453,12 +453,33 @@ $tanggal = date('Y-m-d');
 
 	function unformatNominal(str) {
 		if (!str) return 0;
-		return parseFloat(str.toString().replace(/\./g, '').replace(',', '.')) || 0;
+		str = str.toString().trim();
+		// Detect format: jika ada koma DAN titik, tentukan berdasarkan posisi terakhir
+		var hasComma = str.indexOf(',') > -1;
+		var hasDot = str.indexOf('.') > -1;
+		if (hasComma && hasDot) {
+			// Format Indonesia: titik = ribuan, koma = desimal (1.234.567,89)
+			return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+		} else if (hasComma && !hasDot) {
+			// Koma saja: bisa format Indonesia tanpa ribuan (1234,56)
+			return parseFloat(str.replace(',', '.')) || 0;
+		} else if (hasDot && !hasComma) {
+			// Titik saja: cek apakah format English (16000.00) atau ribuan tanpa desimal (1.000.000)
+			var parts = str.split('.');
+			if (parts.length == 2 && parts[1].length <= 2) {
+				// Kemungkinan besar desimal English: 16000.00
+				return parseFloat(str) || 0;
+			} else {
+				// Kemungkinan ribuan tanpa desimal: 1.000.000
+				return parseFloat(str.replace(/\./g, '')) || 0;
+			}
+		}
+		return parseFloat(str) || 0;
 	}
 
 	function AksiDetail(id) {
-		var hgdeal = $('#dp_hgdeal_' + id).val();
-		var qty = $('#dp_qty_' + id).val();
+		var hgdeal = unformatNominal($('#dp_hgdeal_' + id).val());
+		var qty = unformatNominal($('#dp_qty_' + id).val());
 		var weight = $('#dp_weight_' + id).val();
 		$.ajax({
 			type: "GET",
@@ -525,6 +546,14 @@ $tanggal = date('Y-m-d');
 		var grandTotal = sumTotalHarga - discount;
 		$('#grand_total').val(formatNominal(grandTotal.toFixed(2).replace('.', ',')));
 	}
+
+	// Auto-format semua input nominal saat user ketik
+	$(document).on('keyup', '.nominal-format:not([readonly])', function() {
+		var val = this.value.replace(/[^0-9,]/g, '');
+		var parts = val.split(',');
+		parts[0] = parts[0].replace(/\./g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+		this.value = parts.join(',');
+	});
 
 	function HitungPisau(id) {
 		var qty = $('#stok_qty_' + id).val();

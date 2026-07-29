@@ -151,69 +151,105 @@ foreach ($results['tr_spk'] as $tr_spk) {
 
 						<div class="col-sm-12">
 							<div class="form-group row">
-								<table class='table table-bordered table-striped'>
-									<thead>
-										<tr class='bg-blue'>
-											<th width='20%'>Nama Material</th>
-											<th width='5%'>Thickness</th>
-											<th width='10%'>Width</th>
-											<th width='10%'>Length</th>
-											<th width='10%'>Part Number</th>
-											<th width='10%'>Harga <br> Penawaran</th>
-											<th width='10%'>Harga Deal / Kg</th>
-											<th width='5%'>Qty <?= ($results['tipe_sheet'] == 1) ? 'Sheet' : 'Kg' ?></th>
-											<th width='10%' hidden>Weight / Coil</th>
-											<th width='10%' hidden>Total<br>Weight</th>
-											<th width='10%'>Total Harga</th>
-											<th width='10%'>Delivery Date</th>
-											<th width='10%'>CRCL</th>
-											<th>Keterangan</th>
-											<th width='5%'>Deal</th>
-										</tr>
-									</thead>
-									<tbody id="list_penawaran_slot">
-										<?php $loop = 0;
-										foreach ($results['dtspk'] as $dt) {
-											$thg = number_format($dt->total_harga, 2);
-											$loop++;
-											echo "
+								<div style="overflow-x: auto; width: 100%;">
+									<table class='table table-bordered table-striped' style='min-width: 1400px; white-space: nowrap;'>
+										<thead>
+											<tr class='bg-blue'>
+												<th style="min-width:200px;">Nama Material</th>
+												<th style="min-width:80px;">Thickness</th>
+												<th style="min-width:80px;">Width</th>
+												<th style="min-width:80px;">Length</th>
+												<th style="min-width:100px;">Part Number</th>
+												<th style="min-width:120px;">Harga <br> Penawaran</th>
+												<th style="min-width:120px;">Harga Deal / Kg</th>
+												<th style="min-width:100px;">Disc</th>
+												<th style="min-width:80px;">Qty <?= ($results['tipe_sheet'] == 1) ? 'Sheet' : 'Kg' ?></th>
+												<th style="min-width:80px;" hidden>Weight / Coil</th>
+												<th style="min-width:80px;" hidden>Total<br>Weight</th>
+												<th style="min-width:130px;">Total Harga</th>
+												<th style="min-width:120px;">Delivery Date</th>
+												<th style="min-width:100px;">CRCL</th>
+												<th style="min-width:120px;">Keterangan</th>
+												<th style="min-width:50px;">Deal</th>
+											</tr>
+										</thead>
+										<tbody id="list_penawaran_slot">
+											<?php $loop = 0;
+											$sum_total_harga = 0;
+											foreach ($results['dtspk'] as $dt) {
+												$thg = number_format($dt->total_harga, 2, ',', '.');
+												$disc_val = isset($dt->nominal_discount) ? $dt->nominal_discount : 0;
+												$disc_formatted = number_format($disc_val, 0, ',', '.');
+												$harga_penawaran_fmt = number_format($dt->harga_penawaran, 2, ',', '.');
+												$harga_deal_fmt = number_format($dt->harga_deal, 2, ',', '.');
+												$qty_fmt = number_format($dt->qty_produk, 2, ',', '.');
+												$width_fmt = number_format($dt->width, 2, ',', '.');
+												$length_fmt = number_format($dt->length, 2, ',', '.');
+												$sum_total_harga += $dt->total_harga;
+												$loop++;
+												echo "
 			<tr id='tabel_penawaran_$loop'>
 			<th hidden><input type='text' class='form-control' 	value='$dt->id_child_penawaran' readonly id='dp_id_child_penawaran_$loop' required name='dp[$loop][id_child_penawaran]'></th>
 			<th hidden><input type='text' class='form-control' 	value='$dt->id_material' readonly id='dp_idmaterial_$loop' required name='dp[$loop][idmaterial]'></th>
 			<th><input type='text' class='form-control' 		value='$dt->nama|$dt->maker' readonly id='dp_noalloy_$loop' required name='dp[$loop][noalloy]'></th>
 			<th><input type='text' class='form-control' 		value='$dt->thickness' readonly id='dp_thickness_$loop' required name='dp[$loop][thickness]'></th>
-			<th><input type='text' class='form-control' 	value='$dt->width' id='dp_width_$loop' required name='dp[$loop][width]'></th>
-			<th><input type='text' class='form-control' 	value='$dt->length' id='dp_length_$loop' required name='dp[$loop][length]'></th>
+			<th><input type='text' class='form-control nominal-format' value='$width_fmt' id='dp_width_$loop' required name='dp[$loop][width]'></th>
+			<th><input type='text' class='form-control nominal-format' value='$length_fmt' id='dp_length_$loop' required name='dp[$loop][length]'></th>
 			<th><input type='text' class='form-control' 	value='$dt->part_number' id='dp_part_number_$loop' required name='dp[$loop][part_number]'></th>
-			<th><input type='text' class='form-control'	 		value='$dt->harga_penawaran' readonly id='dp_hgpenwaran_$loop' required name='dp[$loop][hgpenaaran]'></th>
-			<th><input type='text' class='form-control' 		value='$dt->harga_deal' onkeyup='return AksiDetail($loop);' id='dp_hgdeal_$loop' required name='dp[$loop][hgdeal]'></th>
-			<th ><input type='text' class='form-control' 		value='$dt->qty_produk' onkeyup='return AksiDetail($loop);' id='dp_qty_$loop' required name='dp[$loop][qty]'></th>
-			<th hidden><input type='text' class='form-control' 	value='$dt->weight' onkeyup='return AksiDetail($loop);'id='dp_weight_$loop' required name='dp[$loop][weight]'></th>
-			<th id='total_weight_$loop' hidden><input type='text' value='$dt->total_weight' class='form-control' value='$jcc'  id='dp_twight_$loop' required name='dp[$loop][twight]'></th>
+			<th><input type='text' class='form-control nominal-format' value='$harga_penawaran_fmt' readonly id='dp_hgpenwaran_$loop' required name='dp[$loop][hgpenaaran]'></th>
+			<th><input type='text' class='form-control nominal-format' value='$harga_deal_fmt' onchange='return AksiDetail($loop);' id='dp_hgdeal_$loop' required name='dp[$loop][hgdeal]'></th>
+			<th><input type='text' class='form-control nominal-format' value='$disc_formatted' onchange='return onItemDiscountInput($loop);' id='dp_discount_$loop' name='dp[$loop][nominal_discount]'></th>
+			<th><input type='text' class='form-control nominal-format' value='$qty_fmt' onchange='return AksiDetail($loop);' id='dp_qty_$loop' required name='dp[$loop][qty]'></th>
+			<th hidden><input type='text' class='form-control' 	value='$dt->weight' onchange='return AksiDetail($loop);'id='dp_weight_$loop' required name='dp[$loop][weight]'></th>
+			<th id='total_weight_$loop' hidden><input type='text' value='$dt->total_weight' class='form-control' id='dp_twight_$loop' required name='dp[$loop][twight]'></th>
 			
-			<th id='total_harga_$loop'><div hidden><input type='text' class='form-control' value='$dt->harga_penawaran' readonly id='dp_tharga_$id' required name='dp[$loop][tharga]'></div>
+			<th id='total_harga_$loop'><div hidden><input type='text' class='form-control' value='$dt->total_harga' readonly id='dp_tharga_$loop' required name='dp[$loop][tharga]'></div>
 			<input type='text' class='form-control' value='" . $thg . "' readonly></th>
 			
 			<th><input type='date' class='form-control'   value='$dt->delivery' id='dp_ddate_$loop' data-role='qtip' required name='dp[$loop][ddate]'></th>
 			
 			<th><select id='dp_crcl_$loop' name='dp[$loop][crcl]' class='form-control select' required>
 						<option value=''>--Pilih--</option>";
-											foreach ($crcl as $crcl) {
-												echo "<option value='$crcl->id_dt_inquery'>$crcl->id_surat_crcl</option>";
-											}
-											echo "</select></th>
+												foreach ($crcl as $crcl) {
+													echo "<option value='$crcl->id_dt_inquery'>$crcl->id_surat_crcl</option>";
+												}
+												echo "</select></th>
 		<th id='total_keterangan_$loop'><textarea class='form-control' id='dp_keterangan_$loop' required name='dp[$loop][keterangan]' rows='2'>$dt->keterangan</textarea> </th>
 		";
 
-											if ($dt->deal == '1') {
-												echo "<th><input type='checkbox' value='1' checked id='dp_deal_$loop' required name='dp[$loop][deal]'></th>";
-											} else {
-												echo "<th><input type='checkbox' value='1' id='dp_deal_$loop' required name='dp[$loop][deal]'></th>";
-											}
-											echo "</tr>";
-										}; ?>
-									</tbody>
-								</table>
+												if ($dt->deal == '1') {
+													echo "<th><input type='checkbox' value='1' checked id='dp_deal_$loop' required name='dp[$loop][deal]'></th>";
+												} else {
+													echo "<th><input type='checkbox' value='1' id='dp_deal_$loop' required name='dp[$loop][deal]'></th>";
+												}
+												echo "</tr>";
+											};
+											$total_discount_val = isset($tr_spk->total_discount) ? $tr_spk->total_discount : 0;
+											$grand_total_val = $sum_total_harga - $total_discount_val;
+											?>
+										</tbody>
+										<tfoot>
+											<tr>
+												<td colspan="11" style="text-align:right;"><strong>Total Harga</strong></td>
+												<td colspan="5">
+													<input type="text" class="form-control" id="sum_total_harga" readonly value="<?= number_format($sum_total_harga, 2, ',', '.') ?>">
+												</td>
+											</tr>
+											<tr>
+												<td colspan="11" style="text-align:right;"><strong>Discount</strong></td>
+												<td colspan="5">
+													<input type="text" class="form-control" id="footer_discount" name="total_discount" value="<?= number_format($total_discount_val, 0, ',', '.') ?>" onchange="onFooterDiscountInput()">
+												</td>
+											</tr>
+											<tr>
+												<td colspan="11" style="text-align:right;"><strong>Grand Total</strong></td>
+												<td colspan="5">
+													<input type="text" class="form-control" id="grand_total" readonly value="<?= number_format($grand_total_val, 2, ',', '.') ?>">
+												</td>
+											</tr>
+										</tfoot>
+									</table>
+								</div>
 							</div>
 						</div>
 						<center>
@@ -303,6 +339,23 @@ foreach ($results['tr_spk'] as $tr_spk) {
 				return false;
 			}
 
+			// Validasi diskon tidak boleh melebihi total harga
+			var sumTotalHarga = 0;
+			$('[id^="dp_tharga_"]').each(function() {
+				var val = parseFloat($(this).val()) || 0;
+				sumTotalHarga += val;
+			});
+			var totalDiscount = unformatNominal($('#footer_discount').val());
+			if (totalDiscount > sumTotalHarga) {
+				swal({
+					title: "Warning!",
+					text: "Total discount tidak boleh melebihi total harga!",
+					type: "warning",
+					timer: 5000
+				});
+				return false;
+			}
+
 			var data, xhr;
 			swal({
 					title: "Are you sure?",
@@ -317,6 +370,11 @@ foreach ($results['tr_spk'] as $tr_spk) {
 				},
 				function(isConfirm) {
 					if (isConfirm) {
+						// Unformat nominal discount sebelum submit
+						$('#footer_discount').val(unformatNominal($('#footer_discount').val()));
+						$('.nominal-format').each(function() {
+							$(this).val(unformatNominal($(this).val()));
+						});
 						var formData = new FormData($('#data-form')[0]);
 						var baseurl = siteurl + 'spk_marketing/SaveEditHeader';
 						$.ajax({
@@ -421,9 +479,45 @@ foreach ($results['tr_spk'] as $tr_spk) {
 		});
 	}
 
+	var discountMode = ''; // 'per_item' or 'keseluruhan'
+
+	function formatNominal(angka) {
+		var number_string = angka.toString().replace(/[^,\d]/g, ''),
+			split = number_string.split(','),
+			sisa = split[0].length % 3,
+			rupiah = split[0].substr(0, sisa),
+			ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+		if (ribuan) {
+			var separator = sisa ? '.' : '';
+			rupiah += separator + ribuan.join('.');
+		}
+		rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+		return rupiah;
+	}
+
+	function unformatNominal(str) {
+		if (!str) return 0;
+		str = str.toString().trim();
+		var hasComma = str.indexOf(',') > -1;
+		var hasDot = str.indexOf('.') > -1;
+		if (hasComma && hasDot) {
+			return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+		} else if (hasComma && !hasDot) {
+			return parseFloat(str.replace(',', '.')) || 0;
+		} else if (hasDot && !hasComma) {
+			var parts = str.split('.');
+			if (parts.length == 2 && parts[1].length <= 2) {
+				return parseFloat(str) || 0;
+			} else {
+				return parseFloat(str.replace(/\./g, '')) || 0;
+			}
+		}
+		return parseFloat(str) || 0;
+	}
+
 	function AksiDetail(id) {
-		var hgdeal = $('#dp_hgdeal_' + id).val();
-		var qty = $('#dp_qty_' + id).val();
+		var hgdeal = unformatNominal($('#dp_hgdeal_' + id).val());
+		var qty = unformatNominal($('#dp_qty_' + id).val());
 		var weight = $('#dp_weight_' + id).val();
 		$.ajax({
 			type: "GET",
@@ -439,9 +533,56 @@ foreach ($results['tr_spk'] as $tr_spk) {
 			data: "hgdeal=" + hgdeal + "&qty=" + qty + "&weight=" + weight + "&id=" + id,
 			success: function(html) {
 				$('#total_harga_' + id).html(html);
+				recalculateFooter();
 			}
 		});
 	}
+
+	function onItemDiscountInput(id) {
+		var el = $('#dp_discount_' + id);
+		var raw = el.val().replace(/[^0-9]/g, '');
+		el.val(formatNominal(raw));
+		discountMode = 'per_item';
+		var totalDiscount = 0;
+		$('[id^="dp_discount_"]').each(function() {
+			var val = unformatNominal($(this).val());
+			totalDiscount += val;
+		});
+		$('#footer_discount').val(formatNominal(totalDiscount.toString()));
+		recalculateFooter();
+	}
+
+	function onFooterDiscountInput() {
+		var el = $('#footer_discount');
+		var raw = el.val().replace(/[^0-9]/g, '');
+		el.val(formatNominal(raw));
+		discountMode = 'keseluruhan';
+		$('[id^="dp_discount_"]').each(function() {
+			$(this).val('0');
+		});
+		recalculateFooter();
+	}
+
+	function recalculateFooter() {
+		var sumTotalHarga = 0;
+		$('[id^="dp_tharga_"]').each(function() {
+			var val = parseFloat($(this).val()) || 0;
+			sumTotalHarga += val;
+		});
+		$('#sum_total_harga').val(formatNominal(sumTotalHarga.toFixed(2).replace('.', ',')));
+		var discount = unformatNominal($('#footer_discount').val());
+		var grandTotal = sumTotalHarga - discount;
+		$('#grand_total').val(formatNominal(grandTotal.toFixed(2).replace('.', ',')));
+	}
+
+	// Auto-format semua input nominal saat user ketik
+	$(document).on('keyup', '.nominal-format:not([readonly])', function() {
+		var val = this.value.replace(/[^0-9,]/g, '');
+		// Hanya format bagian sebelum koma
+		var parts = val.split(',');
+		parts[0] = parts[0].replace(/\./g, '').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+		this.value = parts.join(',');
+	});
 
 	function HitungPisau(id) {
 		var qty = $('#stok_qty_' + id).val();
