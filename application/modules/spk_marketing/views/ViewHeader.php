@@ -82,65 +82,93 @@ foreach ($results['tr_spk'] as $tr_spk) {
 
 						<div class="col-sm-12">
 							<div class="form-group row">
-								<table class='table table-bordered table-striped'>
-									<thead>
-										<tr class='bg-blue'>
-											<th width='10%'>Alloy No</th>
-											<th width='5%'>Thickness</th>
-											<th width='5%'>Width</th>
-											<th width='5%'>Length</th>
-											<th width='10%'>Harga Penawaran</th>
-											<th width='10%'>Harga Deal / Kg</th>
-											<th width='5%'>Qty (<?= ($results['tipe_sheet'] == '1') ? 'Sheet' : 'KG' ?>)</th>
-											<th width='10%' hidden>Weight / Coil</th>
-											<th width='10%' hidden>Total Wight</th>
-											<th width='10%'>Total Harga</th>
-											<th width='10%'>Delivery Date</th>
-											<th width='10%'>CRCL</th>
-											<th width='10%'>Keterangan</th>
-											<th width='5%'>Deal</th>
-										</tr>
-									</thead>
-									<tbody id="list_penawaran_slot">
-										<?php $loop = 0;
-										foreach ($results['dtspk'] as $dt) {
-											$thg = number_format($dt->total_harga, 2);
-											$crcl = $dt->crcl;
-											$inquery = $this->db->query("SELECT * FROM dt_inquery_transaksi WHERE id_dt_inquery='$crcl' ")->result();
-											$nosu = $inquery[0]->id_surat_crcl;
+								<div style="overflow-x: auto; width: 100%;">
+									<table class='table table-bordered table-striped' style='min-width: 1400px; white-space: nowrap;'>
+										<thead>
+											<tr class='bg-blue'>
+												<th style="min-width:200px;">Alloy No</th>
+												<th style="min-width:80px;">Thickness</th>
+												<th style="min-width:80px;">Width</th>
+												<th style="min-width:80px;">Length</th>
+												<th style="min-width:120px;">Harga Penawaran</th>
+												<th style="min-width:120px;">Harga Deal / Kg</th>
+												<th style="min-width:100px;">Disc</th>
+												<th style="min-width:80px;">Qty (<?= ($results['tipe_sheet'] == '1') ? 'Sheet' : 'KG' ?>)</th>
+												<th style="min-width:80px;" hidden>Weight / Coil</th>
+												<th style="min-width:80px;" hidden>Total Wight</th>
+												<th style="min-width:130px;">Total Harga</th>
+												<th style="min-width:110px;">Delivery Date</th>
+												<th style="min-width:100px;">CRCL</th>
+												<th style="min-width:120px;">Keterangan</th>
+												<th style="min-width:50px;">Deal</th>
+											</tr>
+										</thead>
+										<tbody id="list_penawaran_slot">
+											<?php $loop = 0;
+											$sum_total_harga = 0;
+											$sum_discount = 0;
+											foreach ($results['dtspk'] as $dt) {
+												$thg = number_format($dt->total_harga, 2, ',', '.');
+												$disc = isset($dt->nominal_discount) ? $dt->nominal_discount : 0;
+												$disc_formatted = number_format($disc, 0, ',', '.');
+												$sum_total_harga += $dt->total_harga;
+												$sum_discount += $disc;
+												$crcl = $dt->crcl;
+												$inquery = $this->db->query("SELECT * FROM dt_inquery_transaksi WHERE id_dt_inquery='$crcl' ")->result();
+												$nosu = isset($inquery[0]) ? $inquery[0]->id_surat_crcl : '';
 
-											$loop++;
-											echo "
+												$loop++;
+												echo "
 			<tr id='tabel_penawaran_$loop'>
 			<th>" . $dt->no_alloy . "</th>
 			<th>" . $dt->thickness . "</th>
 			<th>" . $dt->width . "</th>
 			<th>" . $dt->length . "</th>
-			<th>" . number_format($dt->harga_penawaran) . "</th>
-			<th>" . number_format($dt->harga_deal) . "</th>
+			<th>" . number_format($dt->harga_penawaran, 0, ',', '.') . "</th>
+			<th>" . number_format($dt->harga_deal, 0, ',', '.') . "</th>
+			<th>" . $disc_formatted . "</th>
 			<th>" . $dt->qty_produk . "</th>
 			<th hidden>" . $dt->weight . "</th>
 			<th>Rp. $thg ,-</th>
 			<th>$dt->delivery</th>
 			<th>";
-											if (empty($nosu)) {
-												echo "CRCL Belum Ada";
-											} else {
-												echo "$nosu";
-											}
-											echo "</th>
+												if (empty($nosu)) {
+													echo "CRCL Belum Ada";
+												} else {
+													echo "$nosu";
+												}
+												echo "</th>
 			<th>$dt->keterangan</th>
 			";
 
-											if ($dt->deal == '1') {
-												echo "<th><input type='checkbox' value='1' checked id='dp_deal_$loop' required name='dp[$loop][deal]'></th>";
-											} else {
-												echo "<th><input type='checkbox' value='1' id='dp_deal_$loop' required name='dp[$loop][deal]'></th>";
-											}
-											echo "</tr>";
-										}; ?>
-									</tbody>
-								</table>
+												if ($dt->deal == '1') {
+													echo "<th><input type='checkbox' value='1' checked id='dp_deal_$loop' required name='dp[$loop][deal]' disabled></th>";
+												} else {
+													echo "<th><input type='checkbox' value='1' id='dp_deal_$loop' required name='dp[$loop][deal]' disabled></th>";
+												}
+												echo "</tr>";
+											};
+											// Gunakan total_discount dari header jika ada, fallback ke sum per item
+											$total_discount_header = isset($tr_spk->total_discount) ? $tr_spk->total_discount : $sum_discount;
+											$grand_total = $sum_total_harga - $total_discount_header;
+											?>
+										</tbody>
+										<tfoot>
+											<tr>
+												<td colspan="10" style="text-align:right;"><strong>Total Harga</strong></td>
+												<td colspan="5"><strong>Rp. <?= number_format($sum_total_harga, 2, ',', '.') ?> ,-</strong></td>
+											</tr>
+											<tr>
+												<td colspan="10" style="text-align:right;"><strong>Discount</strong></td>
+												<td colspan="5"><strong>Rp. <?= number_format($total_discount_header, 0, ',', '.') ?> ,-</strong></td>
+											</tr>
+											<tr>
+												<td colspan="10" style="text-align:right;"><strong>Grand Total</strong></td>
+												<td colspan="5"><strong>Rp. <?= number_format($grand_total, 2, ',', '.') ?> ,-</strong></td>
+											</tr>
+										</tfoot>
+									</table>
+								</div>
 							</div>
 						</div>
 					</div>
