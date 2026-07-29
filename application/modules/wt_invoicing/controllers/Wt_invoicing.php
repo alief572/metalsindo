@@ -3246,7 +3246,7 @@ class Wt_invoicing extends Admin_Controller
 					'ppn' => $ppn,
 					'tarif_ppnbm' => 0,
 					'ppnbm' => 0,
-					'kode_barang' => $item_sheet->kode_coretax
+					'kode_barang' => (!empty($tipe_invoice)) ? '290000' : $item_sheet->kode_coretax
 				];
 			}
 			// echo '<pre>';
