@@ -566,55 +566,143 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 			<th></th>
 			<th align="right" width="110">&nbsp;</th>
 		</tr>
-		<?php if ($header->nilai_ppn > 0) { ?>
-			<tr>
-				<th></th>
-				<th></th>
-				<th></th>
-				<th></th>
-				<th align="center">Total</th>
-				<th align="right" width="110"><?= number_format($totharga, 2) ?></th>
-			</tr>
-			<tr>
-				<th></th>
-				<th></th>
-				<th></th>
-				<th></th>
-				<th align="center">DPP Nilai Lain</th>
-				<th align="right" width="110"><?= number_format(ceil((11 / 12 * $totharga))) ?></th>
-			</tr>
-
-			<tr>
-				<th></th>
-				<th></th>
-				<th></th>
-				<th></th>
-				<th align="center">PPN</th>
-				<th align="right" width="110"><?= number_format(((11 / 12 * $totharga) * 12 / 100)) ?></th>
-			</tr>
-
-			<tr>
-				<th></th>
-				<th align="center"><?= number_format($totqty, 2) ?></th>
-				<th align="center"><?= $satuan ?></th>
-				<th></th>
-				<th align="center">Grand Total</th>
-				<th align="right" width="110"><?= number_format(($totharga + ((11 / 12 * $totharga) * 12 / 100))) ?></th>
-			</tr>
-
-		<?php } else {
-		?>
-
-			<tr>
-				<th></th>
-				<th align="center"><?= number_format($totqty, 2) ?></th>
-				<th align="center"><?= $satuan ?></th>
-				<th></th>
-				<th align="center">Grand Total</th>
-				<th align="right" width="110"><?= number_format($totharga) ?></th>
-			</tr>
-
 		<?php
+		// Ambil sum nominal_discount dari dt_spkmarketing berdasarkan SPK yang terkait invoice ini
+		$this->db->select('SUM(nominal_discount) as total_disc');
+		$this->db->from('dt_spkmarketing');
+		$this->db->where('id_spkmarketing', $header->no_so);
+		$this->db->where('deal', '1');
+		$get_discount = $this->db->get()->row();
+		$total_discount = !empty($get_discount->total_disc) ? $get_discount->total_disc : 0;
+
+		if ($header->nilai_ppn > 0) {
+			if ($total_discount > 0) {
+				// Ada diskon: Total → Discount → Total - Discount → DPP → PPn → Grand Total
+				$total_after_disc = $totharga - $total_discount;
+		?>
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th align="center">Total</th>
+					<th align="right" width="110"><?= number_format($totharga, 2) ?></th>
+				</tr>
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th align="center">Discount</th>
+					<th align="right" width="110"><?= number_format($total_discount, 2) ?></th>
+				</tr>
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th align="center">Total - Discount</th>
+					<th align="right" width="110"><?= number_format($total_after_disc, 2) ?></th>
+				</tr>
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th align="center">DPP Nilai Lain</th>
+					<th align="right" width="110"><?= number_format(ceil((11 / 12 * $total_after_disc))) ?></th>
+				</tr>
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th align="center">PPN</th>
+					<th align="right" width="110"><?= number_format(((11 / 12 * $total_after_disc) * 12 / 100)) ?></th>
+				</tr>
+				<tr>
+					<th></th>
+					<th align="center"><?= number_format($totqty, 2) ?></th>
+					<th align="center"><?= $satuan ?></th>
+					<th></th>
+					<th align="center">Grand Total</th>
+					<th align="right" width="110"><?= number_format(($total_after_disc + ((11 / 12 * $total_after_disc) * 12 / 100))) ?></th>
+				</tr>
+			<?php } else {
+				// Tidak ada diskon: tampil seperti semula
+			?>
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th align="center">Total</th>
+					<th align="right" width="110"><?= number_format($totharga, 2) ?></th>
+				</tr>
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th align="center">DPP Nilai Lain</th>
+					<th align="right" width="110"><?= number_format(ceil((11 / 12 * $totharga))) ?></th>
+				</tr>
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th align="center">PPN</th>
+					<th align="right" width="110"><?= number_format(((11 / 12 * $totharga) * 12 / 100)) ?></th>
+				</tr>
+				<tr>
+					<th></th>
+					<th align="center"><?= number_format($totqty, 2) ?></th>
+					<th align="center"><?= $satuan ?></th>
+					<th></th>
+					<th align="center">Grand Total</th>
+					<th align="right" width="110"><?= number_format(($totharga + ((11 / 12 * $totharga) * 12 / 100))) ?></th>
+				</tr>
+			<?php }
+		} else {
+			// Tidak ada PPN
+			if ($total_discount > 0) {
+				$total_after_disc = $totharga - $total_discount;
+			?>
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th align="center">Total</th>
+					<th align="right" width="110"><?= number_format($totharga, 2) ?></th>
+				</tr>
+				<tr>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th align="center">Discount</th>
+					<th align="right" width="110"><?= number_format($total_discount, 2) ?></th>
+				</tr>
+				<tr>
+					<th></th>
+					<th align="center"><?= number_format($totqty, 2) ?></th>
+					<th align="center"><?= $satuan ?></th>
+					<th></th>
+					<th align="center">Grand Total</th>
+					<th align="right" width="110"><?= number_format($total_after_disc, 2) ?></th>
+				</tr>
+			<?php } else { ?>
+				<tr>
+					<th></th>
+					<th align="center"><?= number_format($totqty, 2) ?></th>
+					<th align="center"><?= $satuan ?></th>
+					<th></th>
+					<th align="center">Grand Total</th>
+					<th align="right" width="110"><?= number_format($totharga) ?></th>
+				</tr>
+		<?php }
 		} ?>
 	</tbody>
 
