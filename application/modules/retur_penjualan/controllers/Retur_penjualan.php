@@ -161,7 +161,7 @@ class Retur_penjualan extends Admin_Controller
 	{
 		$id_do = $_GET['id_delivery_order'];
 
-		// 1. Ambil data material dari DO child (group per lotno agar tidak duplicate)
+		// 1. Ambil data material dari DO child, EXCLUDE item yang sudah pernah diretur (by material+lotno)
 		$materials = $this->db->query("
 			SELECT a.id_material, a.lotno, 
 			       MAX(a.thickness) AS thickness, MAX(a.width) AS width, MAX(a.length) AS length,
@@ -188,7 +188,15 @@ class Retur_penjualan extends Admin_Controller
 			       ) AS ref_penawaran
 			FROM dt_delivery_order_child a
 			JOIN ms_inventory_category3 b ON b.id_category3 = a.id_material
-			WHERE a.id_delivery_order = '$id_do' 
+			WHERE a.id_delivery_order = '$id_do'
+			AND NOT EXISTS (
+			    SELECT 1 FROM dt_returpenjualan dr
+			    INNER JOIN tr_retur_penjualan rp ON rp.id_retur = dr.id_retur
+			    WHERE rp.id_delivery_order = '$id_do'
+			    AND dr.id_material = a.id_material
+			    AND dr.lotno = a.lotno
+			    AND dr.deal = '1'
+			)
 			GROUP BY a.id_material, a.lotno, b.nama, b.id_bentuk
 			ORDER BY a.id_material, a.lotno ASC")->result();
 
