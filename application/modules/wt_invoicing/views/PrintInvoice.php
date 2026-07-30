@@ -567,12 +567,11 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 			<th align="right" width="110">&nbsp;</th>
 		</tr>
 		<?php
-		// Ambil sum nominal_discount dari dt_spkmarketing berdasarkan item yang ada di invoice
-		$this->db->select('SUM(a.nominal_discount) as total_disc');
-		$this->db->from('dt_spkmarketing a');
-		$this->db->join('tr_invoice_detail b', 'b.no_so = a.id_spkmarketing AND b.id_category3 = a.id_material');
-		$this->db->where('b.id_invoice', $header->id_invoice);
-		$this->db->where('a.deal', '1');
+		// Ambil sum nominal_discount dari dt_spkmarketing berdasarkan SPK yang terkait invoice ini
+		$this->db->select('SUM(nominal_discount) as total_disc');
+		$this->db->from('dt_spkmarketing');
+		$this->db->where('id_spkmarketing', $header->no_so);
+		$this->db->where('deal', '1');
 		$get_discount = $this->db->get()->row();
 		$total_discount = !empty($get_discount->total_disc) ? $get_discount->total_disc : 0;
 
