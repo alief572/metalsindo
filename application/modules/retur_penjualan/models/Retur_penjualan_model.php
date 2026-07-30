@@ -459,24 +459,50 @@ class Retur_penjualan_model extends BF_Model
 
 	public function get_do_by_customer($id_customer)
 	{
-		$this->db->select('a.id_delivery_order, a.no_surat');
-		$this->db->from('tr_delivery_order a');
-		$this->db->where('a.id_customer', $id_customer);
-		$this->db->where('a.status_approve', '1');
-		$this->db->where('a.id_delivery_order NOT IN (SELECT id_delivery_order FROM tr_retur_penjualan WHERE id_delivery_order IS NOT NULL)', NULL, FALSE);
-		$this->db->order_by('a.id_delivery_order', 'DESC');
-		return $this->db->get()->result_array();
+		// DO tetap muncul selama masih ada item (material+lotno) yang belum diretur
+		// Exclude DO hanya jika SEMUA item-nya sudah pernah diretur
+		$sql = "SELECT a.id_delivery_order, a.no_surat
+				FROM tr_delivery_order a
+				WHERE a.id_customer = ?
+				AND a.status_approve = '1'
+				AND (
+					SELECT COUNT(DISTINCT doc.id_material, doc.lotno)
+					FROM dt_delivery_order_child doc
+					WHERE doc.id_delivery_order = a.id_delivery_order
+				) > (
+					SELECT COUNT(DISTINCT dr.id_material, dr.lotno)
+					FROM dt_returpenjualan dr
+					INNER JOIN tr_retur_penjualan rp ON rp.id_retur = dr.id_retur
+					WHERE rp.id_delivery_order = a.id_delivery_order
+					AND dr.deal = '1'
+				)
+				ORDER BY a.id_delivery_order DESC";
+		return $this->db->query($sql, array($id_customer))->result_array();
 	}
 
 	public function get_do_by_customer_edit($id_customer, $id_retur)
 	{
-		$this->db->select('a.id_delivery_order, a.no_surat');
-		$this->db->from('tr_delivery_order a');
-		$this->db->where('a.id_customer', $id_customer);
-		$this->db->where('a.status_approve', '1');
-		$this->db->where("a.id_delivery_order NOT IN (SELECT id_delivery_order FROM tr_retur_penjualan WHERE id_delivery_order IS NOT NULL AND id_retur != '$id_retur')", NULL, FALSE);
-		$this->db->order_by('a.id_delivery_order', 'DESC');
-		return $this->db->get()->result_array();
+		// DO tetap muncul selama masih ada item yang belum diretur (exclude retur yang sedang di-edit)
+		$sql = "SELECT a.id_delivery_order, a.no_surat
+				FROM tr_delivery_order a
+				WHERE a.id_customer = ?
+				AND a.status_approve = '1'
+				AND (
+					(
+						SELECT COUNT(DISTINCT doc.id_material, doc.lotno)
+						FROM dt_delivery_order_child doc
+						WHERE doc.id_delivery_order = a.id_delivery_order
+					) > (
+						SELECT COUNT(DISTINCT dr.id_material, dr.lotno)
+						FROM dt_returpenjualan dr
+						INNER JOIN tr_retur_penjualan rp ON rp.id_retur = dr.id_retur
+						WHERE rp.id_delivery_order = a.id_delivery_order
+						AND rp.id_retur != ?
+						AND dr.deal = '1'
+					)
+				)
+				ORDER BY a.id_delivery_order DESC";
+		return $this->db->query($sql, array($id_customer, $id_retur))->result_array();
 	}
 
 	public function get_data_nota_retur($post)
