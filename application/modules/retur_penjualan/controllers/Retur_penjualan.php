@@ -252,10 +252,7 @@ class Retur_penjualan extends Admin_Controller
 			}
 			echo "</select></td>";
 
-			// Harga Deal (editable number, default dari SPK marketing)
-			$harga_val = ($material->harga_deal) ? $material->harga_deal : '';
-			echo "<td><input type='text' class='form-control input-sm autoNumeric text-right' value='" . $harga_val . "' name='dp[" . $no . "][harga_deal]'></td>";
-
+			// Harga Deal dihilangkan berdasarkan PRD
 			// Total Kirim (input number) - default value dari weight_mat
 			echo "<td><input type='text' class='form-control input-sm total_kirim autoNumeric text-right' value='" . $material->weight_mat . "' name='dp[" . $no . "][total_kirim]' id='dp_total_kirim_" . $no . "'></td>";
 
@@ -315,19 +312,14 @@ class Retur_penjualan extends Admin_Controller
 
 						$ppn = $this->db->query("SELECT exclude_vat FROM tr_penawaran WHERE no_penawaran='$ref_penawaran'")->row();
 
-						$hargadeal      = str_replace(',', '', $dp['harga_deal']);
+						$hargadeal      = 0;
 						$totalretur     = str_replace(',', '', $dp['total_kirim']);
-						$totalharga     = $hargadeal * $totalretur;
+						$totalharga     = 0;
 						if (isset($dp['qty_sheet']) && !empty($dp['qty_sheet'])) {
 							$qty_sheet = str_replace(',', '', $dp['qty_sheet']);
-							$totalharga = ($hargadeal * $qty_sheet);
 						}
 
-						if ($ppn && ($ppn->exclude_vat != '' || $ppn->exclude_vat != '0')) {
-							$totalppn   = ($totalharga * $ppn->exclude_vat) / 100;
-						} else {
-							$totalppn   = 0;
-						}
+						$totalppn   = 0;
 
 						$row = array(
 							'id_retur'              => $code,
@@ -500,19 +492,14 @@ class Retur_penjualan extends Admin_Controller
 
 						$ppn = $this->db->query("SELECT exclude_vat FROM tr_penawaran WHERE no_penawaran='$ref_penawaran'")->row();
 
-						$hargadeal      = str_replace(',', '', $dp['harga_deal']);
+						$hargadeal      = 0;
 						$totalretur     = str_replace(',', '', $dp['total_kirim']);
-						$totalharga     = $hargadeal * $totalretur;
+						$totalharga     = 0;
 						if (isset($dp['qty_sheet']) && !empty($dp['qty_sheet'])) {
 							$qty_sheet = str_replace(',', '', $dp['qty_sheet']);
-							$totalharga = ($hargadeal * $qty_sheet);
 						}
 
-						if ($ppn && ($ppn->exclude_vat != '' || $ppn->exclude_vat != '0')) {
-							$totalppn   = ($totalharga * $ppn->exclude_vat) / 100;
-						} else {
-							$totalppn   = 0;
-						}
+						$totalppn   = 0;
 
 						$row = array(
 							'id_retur'              => $id_retur,
@@ -1208,13 +1195,13 @@ class Retur_penjualan extends Admin_Controller
 		foreach ($fetch['data'] as $item) {
 			$no++;
 
-			// Formatting HTML tetep di Controller/Private Function
 			$arr_data[] = [
 				'no'            => $no,
 				'no_retur'      => $item->no_retur,
+				'no_cn'         => isset($item->no_cn) ? $item->no_cn : '-',
 				'tanggal_retur' => $item->tgl_retur,
 				'customer'      => $item->name_customer,
-				'nilai_retur'   => number_format($item->total_nilai_retur), // Hasil dari View
+				'status_cn'     => isset($item->status_cn) ? $item->status_cn : 'PENDING',
 				'action'        => $this->_render_get_nota_retur_action($item)
 			];
 		}
@@ -1233,16 +1220,14 @@ class Retur_penjualan extends Admin_Controller
 	{
 		$return = '';
 
-		if (has_permission($this->viewPermission)) {
-			$return .= ' <a class="btn btn-success btn-sm" href="' . base_url('/retur_penjualan/PrintH2/' . $item->id_retur) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
+		if (has_permission('CN_Retur_Penjualan.Manage') && (!isset($item->status_cn) || $item->status_cn !== 'CLOSED')) {
+			$return .= ' <a class="btn btn-info btn-sm" href="' . base_url('/retur_penjualan/detail_cn/' . $item->id_retur) . '" title="Input Harga CN"><i class="fa fa-edit">&nbsp;</i></a>';
+		} else if (has_permission('CN_Retur_Penjualan.View') && isset($item->status_cn) && $item->status_cn === 'CLOSED') {
+			$return .= ' <a class="btn btn-info btn-sm" href="' . base_url('/retur_penjualan/detail_cn/' . $item->id_retur) . '" title="View CN"><i class="fa fa-eye">&nbsp;</i></a>';
 		}
 
-		if (has_permission($this->managePermission)) {
-			$return .= ' <a class="btn btn-info btn-sm" href="' . base_url('/retur_penjualan/editHeader/' . $item->id_retur) . '" title="Create SPK Marketing"><i class="fa fa-edit">&nbsp;</i></i></a></a>';
-		}
-
-		if (has_permission($this->viewPermission)) {
-			$return .= ' <a class="btn btn-primary btn-sm" href="javascript:void(0);" title="Print CN"><i class="fa fa-print"></i></a>';
+		if (has_permission('CN_Retur_Penjualan.View') && isset($item->status_cn) && $item->status_cn === 'CLOSED') {
+			$return .= ' <a class="btn btn-success btn-sm" href="' . base_url('/retur_penjualan/PrintH2/' . $item->id_retur) . '" target="_blank" title="Print CN"><i class="fa fa-print">&nbsp;</i></a>';
 		}
 
 		return $return;
@@ -1350,6 +1335,115 @@ class Retur_penjualan extends Admin_Controller
 				'status'  => 0,
 				'message' => 'Update Gagal: ' . $e->getMessage()
 			]);
+		}
+	}
+
+	public function detail_cn($id_retur)
+	{
+		$this->auth->restrict('CN_Retur_Penjualan.View');
+		$this->template->page_icon('fa fa-list');
+
+		$retur = $this->db->get_where('tr_retur_penjualan', ['id_retur' => $id_retur])->row();
+		if (!$retur) {
+			$this->session->set_flashdata('error', 'Data tidak ditemukan!');
+			redirect('retur_penjualan/list_retur_penjualan');
+		}
+
+		$detail = $this->db->select('a.*, b.nama')
+			->from('dt_returpenjualan a')
+			->join('ms_inventory_category3 b', 'b.id_category3=a.id_material')
+			->where('a.id_retur', $id_retur)
+			->where('a.deal', '1')
+			->get()
+			->result();
+
+		$data = [
+			'retur' => $retur,
+			'detail' => $detail
+		];
+
+		$this->template->set('results', $data);
+		$this->template->title('Detail Credit Note');
+		$this->template->render('detail_cn');
+	}
+
+	public function save_cn_price()
+	{
+		$this->auth->restrict('CN_Retur_Penjualan.Manage');
+		$post = $this->input->post();
+		$id_retur = $post['id_retur'];
+
+		$this->db->trans_begin();
+		try {
+			if (isset($post['dt']) && is_array($post['dt'])) {
+				foreach ($post['dt'] as $id => $dt) {
+					$harga_deal = str_replace(',', '', $dt['harga_deal']);
+					$ppn        = str_replace(',', '', $dt['ppn']);
+					$total_kirim = $dt['total_kirim'];
+					$qty_sheet  = $dt['qty_sheet'];
+
+					// Hitung total harga
+					$total_harga = ($qty_sheet > 0) ? ($harga_deal * $qty_sheet) : ($harga_deal * $total_kirim);
+
+					$update_detail = [
+						'harga_deal'  => $harga_deal,
+						'total_harga' => $total_harga,
+						'total_ppn'   => $ppn
+					];
+
+					$this->db->where('id', $id)->update('dt_returpenjualan', $update_detail);
+				}
+			}
+
+			// Update header status ke COMPLETED jika masih PENDING
+			$retur = $this->db->get_where('tr_retur_penjualan', ['id_retur' => $id_retur])->row();
+			if ($retur && $retur->status_cn == 'PENDING') {
+				$this->db->where('id_retur', $id_retur)->update('tr_retur_penjualan', ['status_cn' => 'COMPLETED']);
+			}
+
+			if ($this->db->trans_status() === FALSE) {
+				throw new Exception('Database Error saat menyimpan harga!');
+			}
+
+			$this->db->trans_commit();
+			echo json_encode(['status' => 1, 'pesan' => 'Berhasil menyimpan harga CN.']);
+		} catch (Exception $e) {
+			$this->db->trans_rollback();
+			echo json_encode(['status' => 0, 'pesan' => 'Gagal: ' . $e->getMessage()]);
+		}
+	}
+
+	public function confirm_cn()
+	{
+		$this->auth->restrict('CN_Retur_Penjualan.Manage');
+		$id_retur = $this->input->post('id_retur');
+
+		$this->db->trans_begin();
+		try {
+			$details = $this->db->get_where('dt_returpenjualan', ['id_retur' => $id_retur, 'deal' => '1'])->result();
+			foreach ($details as $dt) {
+				if ($dt->harga_deal <= 0) {
+					throw new Exception('Semua item harus memiliki Harga Deal > 0 sebelum Confirm!');
+				}
+			}
+
+			$update_data = [
+				'status_cn' => 'CLOSED',
+				'confirmed_by' => $this->auth->user_id(),
+				'confirmed_on' => date('Y-m-d H:i:s')
+			];
+
+			$this->db->where('id_retur', $id_retur)->update('tr_retur_penjualan', $update_data);
+
+			if ($this->db->trans_status() === FALSE) {
+				throw new Exception('Database Error saat Confirm CN!');
+			}
+
+			$this->db->trans_commit();
+			echo json_encode(['status' => 1, 'pesan' => 'Berhasil Confirm CN. Data telah terkunci.']);
+		} catch (Exception $e) {
+			$this->db->trans_rollback();
+			echo json_encode(['status' => 0, 'pesan' => 'Gagal: ' . $e->getMessage()]);
 		}
 	}
 }

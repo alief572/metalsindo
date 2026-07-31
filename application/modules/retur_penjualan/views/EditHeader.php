@@ -127,7 +127,6 @@ $tanggal = date('Y-m-d');
 									<th width='10%'>Lot Number</th>
 									<th width='10%'>Gudang</th>
 									<th width='10%'>Customer Titipan</th>
-									<th width='10%'>Harga Deal</th>
 									<th width='10%'>Total Kirim (Kg)</th>
 									<th width='10%'>Qty Sheet</th>
 									<th width='5%'>Retur<br><input type='checkbox' id='chk_retur_all' onclick='checkAllRetur()' checked></th>
@@ -184,8 +183,6 @@ $tanggal = date('Y-m-d');
 												<?php } ?>
 											</select>
 										</td>
-										<!-- Harga Deal -->
-										<td><input type="text" class="form-control input-sm autoNumeric text-right" value="<?= $dt->harga_deal ?>" name="dp[<?= $no ?>][harga_deal]"></td>
 										<!-- Total Kirim -->
 										<td><input type="text" class="form-control input-sm total_kirim autoNumeric text-right" value="<?= $dt->weight ?>" name="dp[<?= $no ?>][total_kirim]" id="dp_total_kirim_<?= $no ?>"></td>
 										<!-- Qty Sheet -->
@@ -298,7 +295,7 @@ $tanggal = date('Y-m-d');
 			// Reset DO and table
 			$("#id_do").html('<option value="">--Pilih--</option>');
 			$('#no_do').val('');
-			$('#data_material').html('<tr><td colspan="11" class="text-center">Silakan pilih DO terlebih dahulu.</td></tr>');
+			$('#data_material').html('<tr><td colspan="10" class="text-center">Silakan pilih DO terlebih dahulu.</td></tr>');
 			hitungTotalRetur();
 
 			if (id_customer) {
@@ -335,7 +332,7 @@ $tanggal = date('Y-m-d');
 				TambahMaterialRetur(id_do, text_do);
 			} else {
 				$('#no_do').val('');
-				$('#data_material').html('<tr><td colspan="11" class="text-center">Silakan pilih DO terlebih dahulu.</td></tr>');
+				$('#data_material').html('<tr><td colspan="10" class="text-center">Silakan pilih DO terlebih dahulu.</td></tr>');
 				hitungTotalRetur();
 			}
 		});
@@ -491,7 +488,7 @@ $tanggal = date('Y-m-d');
 			},
 			success: function(html) {
 				if (html.trim() == '') {
-					$('#data_material').html('<tr><td colspan="11" class="text-center">Tidak ada material untuk diretur.</td></tr>');
+					$('#data_material').html('<tr><td colspan="10" class="text-center">Tidak ada material untuk diretur.</td></tr>');
 				} else {
 					$('#data_material').html(html);
 					// Set No DO text for all loaded rows
