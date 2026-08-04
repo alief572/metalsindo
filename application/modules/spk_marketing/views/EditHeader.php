@@ -225,7 +225,9 @@ foreach ($results['tr_spk'] as $tr_spk) {
 												echo "</tr>";
 											};
 											$total_discount_val = isset($tr_spk->total_discount) ? $tr_spk->total_discount : 0;
-											$grand_total_val = $sum_total_harga - $total_discount_val;
+											$ppn_val = isset($tr_spk->ppn) ? $tr_spk->ppn : 0;
+											$nilai_ppn_val = isset($tr_spk->nilai_ppn) ? $tr_spk->nilai_ppn : 0;
+											$grand_total_val = ($sum_total_harga - $total_discount_val) + $nilai_ppn_val;
 											?>
 										</tbody>
 										<tfoot>
@@ -238,7 +240,14 @@ foreach ($results['tr_spk'] as $tr_spk) {
 											<tr>
 												<td colspan="11" style="text-align:right;"><strong>Discount</strong></td>
 												<td colspan="5">
-													<input type="text" class="form-control" id="footer_discount" name="total_discount" value="<?= number_format($total_discount_val, 0, ',', '.') ?>" onchange="onFooterDiscountInput()">
+													<input type="text" class="form-control nominal-format" id="footer_discount" name="total_discount" value="<?= number_format($total_discount_val, 0, ',', '.') ?>" onchange="onFooterDiscountInput()">
+												</td>
+											</tr>
+											<tr>
+												<td colspan="11" style="text-align:right;"><strong>PPN (%)</strong></td>
+												<td colspan="5">
+													<input type="text" class="form-control nominal-format" id="ppn" name="ppn" value="<?= number_format($ppn_val, 2, ',', '.') ?>" onchange="recalculateFooter()" placeholder="PPN (%)">
+													<input type="text" class="form-control nominal-format" id="nilai_ppn" name="nilai_ppn" value="<?= number_format($nilai_ppn_val, 2, ',', '.') ?>" readonly placeholder="Nilai PPN">
 												</td>
 											</tr>
 											<tr>
@@ -571,7 +580,14 @@ foreach ($results['tr_spk'] as $tr_spk) {
 		});
 		$('#sum_total_harga').val(formatNominal(sumTotalHarga.toFixed(2).replace('.', ',')));
 		var discount = unformatNominal($('#footer_discount').val());
-		var grandTotal = sumTotalHarga - discount;
+		
+		var total_setelah_diskon = sumTotalHarga - discount;
+		
+		var ppn_persen = unformatNominal($('#ppn').val());
+		var nilai_ppn = total_setelah_diskon * (ppn_persen / 100);
+		$('#nilai_ppn').val(formatNominal(nilai_ppn.toFixed(2).replace('.', ',')));
+
+		var grandTotal = total_setelah_diskon + nilai_ppn;
 		$('#grand_total').val(formatNominal(grandTotal.toFixed(2).replace('.', ',')));
 	}
 

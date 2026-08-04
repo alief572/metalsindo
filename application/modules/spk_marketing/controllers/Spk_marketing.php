@@ -1160,7 +1160,9 @@ class Spk_marketing extends Admin_Controller
 			'created_by'			=> $this->auth->user_id(),
 			'tahun'					=> date('Y-m-d'),
 			'type'					=> $post['tipe'],
-			'total_discount'		=> isset($post['total_discount']) ? $post['total_discount'] : 0
+			'total_discount'		=> isset($post['total_discount']) ? $post['total_discount'] : 0,
+			'ppn'					=> isset($post['ppn']) ? $post['ppn'] : 0,
+			'nilai_ppn'				=> isset($post['nilai_ppn']) ? $post['nilai_ppn'] : 0
 		];
 		//Add Data
 		$this->db->insert('tr_spk_marketing', $data);
@@ -1251,7 +1253,9 @@ class Spk_marketing extends Admin_Controller
 			'created_by'			=> $this->auth->user_id(),
 			'tahun'					=> date('Y-m-d'),
 			'type'					=> $post['tipe'],
-			'total_discount'		=> isset($post['total_discount']) ? $post['total_discount'] : 0
+			'total_discount'		=> isset($post['total_discount']) ? $post['total_discount'] : 0,
+			'ppn'					=> isset($post['ppn']) ? $post['ppn'] : 0,
+			'nilai_ppn'				=> isset($post['nilai_ppn']) ? $post['nilai_ppn'] : 0
 		];
 		//Add Data
 		$this->db->insert('tr_spk_marketing', $data);
@@ -1335,7 +1339,9 @@ class Spk_marketing extends Admin_Controller
 			'plan_cust'			=> date('Y-m-d', strtotime($post['plan_cust'])),
 			'note'			=> $post['note'],
 			'created_by'			=> $this->auth->user_id(),
-			'total_discount'		=> isset($post['total_discount']) ? $post['total_discount'] : 0
+			'total_discount'		=> isset($post['total_discount']) ? $post['total_discount'] : 0,
+			'ppn'					=> isset($post['ppn']) ? $post['ppn'] : 0,
+			'nilai_ppn'				=> isset($post['nilai_ppn']) ? $post['nilai_ppn'] : 0
 		];
 		//Add Data
 		$this->db->where('id_spkmarketing', $code)->update("tr_spk_marketing", $data);
