@@ -11,7 +11,7 @@ $ENABLE_DELETE  = has_permission('SPK_marketing.Delete');
 	}
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
-<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/3.0.1/css/dataTables.dataTables.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" integrity="sha512-yVvxUQV0QESBt1SyZbNJMAwyKvFTLMyXSyBHDO4BG5t7k/Lw34tyqlSDlKIrIENIzCl+RVUNjmCPG+V/GMesRw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 <div class="box">
@@ -118,7 +118,7 @@ $ENABLE_DELETE  = has_permission('SPK_marketing.Delete');
 </div>
 
 <!-- DataTables -->
-<script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/3.0.1/js/dataTables.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
 
 <!-- page script -->

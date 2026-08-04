@@ -150,7 +150,9 @@ foreach ($results['tr_spk'] as $tr_spk) {
 											};
 											// Gunakan total_discount dari header jika ada, fallback ke sum per item
 											$total_discount_header = isset($tr_spk->total_discount) ? $tr_spk->total_discount : $sum_discount;
-											$grand_total = $sum_total_harga - $total_discount_header;
+											$ppn_val = isset($tr_spk->ppn) ? $tr_spk->ppn : 0;
+											$nilai_ppn_val = isset($tr_spk->nilai_ppn) ? $tr_spk->nilai_ppn : 0;
+											$grand_total = ($sum_total_harga - $total_discount_header) + $nilai_ppn_val;
 											?>
 										</tbody>
 										<tfoot>
@@ -161,6 +163,10 @@ foreach ($results['tr_spk'] as $tr_spk) {
 											<tr>
 												<td colspan="10" style="text-align:right;"><strong>Discount</strong></td>
 												<td colspan="5"><strong>Rp. <?= number_format($total_discount_header, 0, ',', '.') ?> ,-</strong></td>
+											</tr>
+											<tr>
+												<td colspan="10" style="text-align:right;"><strong>PPN (<?= number_format($ppn_val, 2, ',', '.') ?> %)</strong></td>
+												<td colspan="5"><strong>Rp. <?= number_format($nilai_ppn_val, 2, ',', '.') ?> ,-</strong></td>
 											</tr>
 											<tr>
 												<td colspan="10" style="text-align:right;"><strong>Grand Total</strong></td>

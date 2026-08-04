@@ -195,7 +195,14 @@ $tanggal = date('Y-m-d');
 											<tr>
 												<td colspan="11" style="text-align:right;"><strong>Discount</strong></td>
 												<td colspan="5">
-													<input type="text" class="form-control" id="footer_discount" name="total_discount" value="0" onchange="onFooterDiscountInput()">
+													<input type="text" class="form-control nominal-format" id="footer_discount" name="total_discount" value="0" onchange="onFooterDiscountInput()">
+												</td>
+											</tr>
+											<tr>
+												<td colspan="11" style="text-align:right;"><strong>PPN (%)</strong></td>
+												<td colspan="5">
+													<input type="text" class="form-control nominal-format" id="ppn" name="ppn" value="0" onchange="recalculateFooter()" placeholder="PPN (%)">
+													<input type="text" class="form-control nominal-format" id="nilai_ppn" name="nilai_ppn" value="0" readonly placeholder="Nilai PPN">
 												</td>
 											</tr>
 											<tr>
@@ -543,7 +550,14 @@ $tanggal = date('Y-m-d');
 
 		// Hitung grand total
 		var discount = unformatNominal($('#footer_discount').val());
-		var grandTotal = sumTotalHarga - discount;
+		
+		var total_setelah_diskon = sumTotalHarga - discount;
+		
+		var ppn_persen = unformatNominal($('#ppn').val());
+		var nilai_ppn = total_setelah_diskon * (ppn_persen / 100);
+		$('#nilai_ppn').val(formatNominal(nilai_ppn.toFixed(2).replace('.', ',')));
+
+		var grandTotal = total_setelah_diskon + nilai_ppn;
 		$('#grand_total').val(formatNominal(grandTotal.toFixed(2).replace('.', ',')));
 	}
 
