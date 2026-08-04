@@ -445,7 +445,7 @@ class Wt_invoicing_model extends BF_Model
     $length = $this->input->post('length');
     $search = $this->input->post('search');
 
-    $this->db->select('a.*, b.name_customer as name_customer');
+    $this->db->select('a.*, b.name_customer as name_customer, b.facility as facility');
     $this->db->from('tr_invoice a');
     $this->db->join('master_customers b', 'b.id_customer=a.id_customer');
 
@@ -477,6 +477,8 @@ class Wt_invoicing_model extends BF_Model
 
     foreach ($get_data->result_array() as $item) {
       $no++;
+
+      $is_kawasan_berikat = (!empty($item['facility']) && stripos($item['facility'], 'Kawasan Berikat') !== false) || (isset($item['nilai_ppn']) && $item['nilai_ppn'] == 0 && isset($item['ppn']) && $item['ppn'] == 0);
 
       $action = '';
 
@@ -537,6 +539,10 @@ class Wt_invoicing_model extends BF_Model
           $dpp_lain_lain = ceil(11 / 12 * $total_awal);
           $ppn = ($dpp_lain_lain * 12 / 100);
 
+          if ($is_kawasan_berikat) {
+            $ppn = 0;
+          }
+
           $nilai_total += ($total_awal);
           $nilai_invoice += ($total_awal + $ppn);
           $nilai_ppn += ($ppn);
@@ -551,6 +557,11 @@ class Wt_invoicing_model extends BF_Model
 
         $dpp_nilai_lain = ceil(11 / 12 * $ttl_harga);
         $ppn = ($dpp_nilai_lain * 12 / 100);
+
+        if ($is_kawasan_berikat) {
+          $ppn = 0;
+        }
+
         $grand_total = ($ttl_harga + $ppn);
 
         $nilai_total = $ttl_harga;
