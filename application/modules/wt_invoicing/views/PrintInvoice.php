@@ -545,7 +545,7 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 				<td align="right"><?= number_format($harga_satuan, 2) ?></td>
 				<td align="right"><?= number_format(($harga_satuan * $qty_invoice), 2) ?></td>
 			</tr>
-		<? } ?>
+		<?php } ?>
 
 
 		<!-- footer -->
@@ -575,7 +575,12 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 		$get_discount = $this->db->get()->row();
 		$total_discount = !empty($get_discount->total_disc) ? $get_discount->total_disc : 0;
 
-		if ($header->nilai_ppn > 0) {
+		$nilai_ppn = $header->nilai_ppn;
+		if (!empty($customer->facility) && stripos($customer->facility, 'Kawasan Berikat') !== false) {
+			$nilai_ppn = 0;
+		}
+
+		if ($nilai_ppn > 0) {
 			if ($total_discount > 0) {
 				// Ada diskon: Total → Discount → Total - Discount → DPP → PPn → Grand Total
 				$total_after_disc = $totharga - $total_discount;
