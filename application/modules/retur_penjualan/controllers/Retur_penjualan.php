@@ -676,7 +676,8 @@ class Retur_penjualan extends Admin_Controller
 		$html2pdf->pdf->SetDisplayMode('fullpage');
 		$html2pdf->WriteHTML($html);
 		ob_end_clean();
-		$html2pdf->Output('Nota Retur.pdf', 'I');
+		$no_doc = !empty($data['header'][0]->no_cn) ? str_replace('/', '_', $data['header'][0]->no_cn) : (!empty($data['header'][0]->no_retur) ? str_replace('/', '_', $data['header'][0]->no_retur) : 'Credit_Note');
+		$html2pdf->Output('Credit Note - ' . $no_doc . '.pdf', 'I');
 	}
 
 	public function ViewHeader($id)
@@ -1357,9 +1358,76 @@ class Retur_penjualan extends Admin_Controller
 			->get()
 			->result();
 
+		// Penarikan harga deal dari Invoice (atau SPK Marketing sebagai fallback)
+		$subtotal_existing = 0;
+		$ppn_existing = 0;
+
+		foreach ($detail as &$dt) {
+			$harga_invoice = 0;
+
+			// 1. Coba cari dari tr_invoice & tr_invoice_detail
+			if (!empty($retur->id_delivery_order) || !empty($retur->no_do)) {
+				$q_inv = $this->db->query("
+					SELECT d.harga_satuan
+					FROM tr_invoice_detail d
+					JOIN tr_invoice h ON (h.no_invoice = d.no_invoice OR h.id_invoice = d.id_invoice)
+					WHERE (h.id_do = ? OR h.no_do = ?)
+					  AND d.id_category3 = ?
+					ORDER BY d.id DESC LIMIT 1
+				", [$retur->id_delivery_order, $retur->no_do, $dt->id_material])->row();
+
+				if ($q_inv && (float)$q_inv->harga_satuan > 0) {
+					$harga_invoice = (float)$q_inv->harga_satuan;
+				}
+			}
+
+			// 2. Fallback cari dari dt_spkmarketing
+			if ($harga_invoice == 0 && (!empty($retur->id_delivery_order) || !empty($retur->no_do))) {
+				$q_spk = $this->db->query("
+					SELECT sp.harga_deal
+					FROM dt_spkmarketing sp
+					JOIN tr_spk_marketing sm ON sm.id_spkmarketing = sp.id_spkmarketing
+					JOIN tr_delivery_order doh ON doh.no_spk_marketing = sm.no_surat
+					WHERE (doh.id_delivery_order = ? OR doh.no_surat = ?)
+					  AND sp.id_material = ?
+					ORDER BY sp.id DESC LIMIT 1
+				", [$retur->id_delivery_order, $retur->no_do, $dt->id_material])->row();
+
+				if ($q_spk && (float)$q_spk->harga_deal > 0) {
+					$harga_invoice = (float)$q_spk->harga_deal;
+				}
+			}
+
+			$dt->harga_invoice = $harga_invoice;
+
+			// Jika harga_deal di retur masih 0, jadikan harga_invoice sebagai default
+			if ((float)$dt->harga_deal <= 0 && $harga_invoice > 0) {
+				$dt->harga_deal = $harga_invoice;
+			}
+
+			$subtotal_existing += ((float)$dt->total_sheet > 0 ? (float)$dt->total_sheet : (float)$dt->weight) * (float)$dt->harga_deal;
+			$ppn_existing += (float)$dt->total_ppn;
+		}
+		unset($dt);
+
+		// Default persentase PPN (default 11, atau dihitung jika sudah ada data PPN tersimpan)
+		$persen_ppn = 11;
+		if ($subtotal_existing > 0 && $ppn_existing > 0) {
+			$persen_ppn = round(($ppn_existing / $subtotal_existing) * 100, 2);
+		}
+
+		// Pastikan default nomor CN jika belum pernah diisi
+		$no_cn = $retur->no_cn;
+		if (empty($no_cn)) {
+			$tgl_ref = !empty($retur->tgl_retur) ? $retur->tgl_retur : date('Y-m-d');
+			$no_cn = $this->Retur_penjualan_model->generate_cn_number($tgl_ref);
+		}
+
 		$data = [
-			'retur' => $retur,
-			'detail' => $detail
+			'retur'      => $retur,
+			'detail'     => $detail,
+			'no_cn'      => $no_cn,
+			'persen_ppn' => $persen_ppn
 		];
 
 		$this->template->set('results', $data);
@@ -1372,33 +1440,54 @@ class Retur_penjualan extends Admin_Controller
 		$this->auth->restrict('CN_Retur_Penjualan.Manage');
 		$post = $this->input->post();
 		$id_retur = $post['id_retur'];
+		$no_cn = isset($post['no_cn']) ? trim($post['no_cn']) : '';
+		$persen_ppn = isset($post['persen_ppn']) ? (float)str_replace(',', '', $post['persen_ppn']) : 0;
 
 		$this->db->trans_begin();
 		try {
+			$total_subtotal = 0;
+			$arr_detail_calc = [];
+
 			if (isset($post['dt']) && is_array($post['dt'])) {
 				foreach ($post['dt'] as $id => $dt) {
-					$harga_deal = str_replace(',', '', $dt['harga_deal']);
-					$ppn        = str_replace(',', '', $dt['ppn']);
-					$total_kirim = $dt['total_kirim'];
-					$qty_sheet  = $dt['qty_sheet'];
+					$harga_deal  = (float)str_replace(',', '', $dt['harga_deal']);
+					$total_kirim = (float)$dt['total_kirim'];
+					$qty_sheet   = (float)$dt['qty_sheet'];
 
-					// Hitung total harga
+					// Hitung total harga item
 					$total_harga = ($qty_sheet > 0) ? ($harga_deal * $qty_sheet) : ($harga_deal * $total_kirim);
+					$total_subtotal += $total_harga;
 
-					$update_detail = [
+					$arr_detail_calc[$id] = [
 						'harga_deal'  => $harga_deal,
-						'total_harga' => $total_harga,
-						'total_ppn'   => $ppn
+						'total_harga' => $total_harga
 					];
-
-					$this->db->where('id', $id)->update('dt_returpenjualan', $update_detail);
 				}
 			}
 
-			// Update header status ke COMPLETED jika masih PENDING
+			// Update masing-masing detail baris beserta PPN proporsionalnya
+			foreach ($arr_detail_calc as $id => $val) {
+				$item_ppn = ($persen_ppn > 0) ? round(($val['total_harga'] * $persen_ppn) / 100, 2) : 0;
+				$update_detail = [
+					'harga_deal'  => $val['harga_deal'],
+					'total_harga' => $val['total_harga'],
+					'total_ppn'   => $item_ppn
+				];
+				$this->db->where('id', $id)->update('dt_returpenjualan', $update_detail);
+			}
+
+			// Update header (No. CN dan status)
 			$retur = $this->db->get_where('tr_retur_penjualan', ['id_retur' => $id_retur])->row();
+			$update_header = [];
+			if (!empty($no_cn)) {
+				$update_header['no_cn'] = $no_cn;
+			}
 			if ($retur && $retur->status_cn == 'PENDING') {
-				$this->db->where('id_retur', $id_retur)->update('tr_retur_penjualan', ['status_cn' => 'COMPLETED']);
+				$update_header['status_cn'] = 'COMPLETED';
+			}
+
+			if (!empty($update_header)) {
+				$this->db->where('id_retur', $id_retur)->update('tr_retur_penjualan', $update_header);
 			}
 
 			if ($this->db->trans_status() === FALSE) {
@@ -1417,21 +1506,25 @@ class Retur_penjualan extends Admin_Controller
 	{
 		$this->auth->restrict('CN_Retur_Penjualan.Manage');
 		$id_retur = $this->input->post('id_retur');
+		$no_cn = $this->input->post('no_cn');
 
 		$this->db->trans_begin();
 		try {
 			$details = $this->db->get_where('dt_returpenjualan', ['id_retur' => $id_retur, 'deal' => '1'])->result();
 			foreach ($details as $dt) {
-				if ($dt->harga_deal <= 0) {
+				if ((float)$dt->harga_deal <= 0) {
 					throw new Exception('Semua item harus memiliki Harga Deal > 0 sebelum Confirm!');
 				}
 			}
 
 			$update_data = [
-				'status_cn' => 'CLOSED',
+				'status_cn'    => 'CLOSED',
 				'confirmed_by' => $this->auth->user_id(),
 				'confirmed_on' => date('Y-m-d H:i:s')
 			];
+			if (!empty($no_cn)) {
+				$update_data['no_cn'] = trim($no_cn);
+			}
 
 			$this->db->where('id_retur', $id_retur)->update('tr_retur_penjualan', $update_data);
 
