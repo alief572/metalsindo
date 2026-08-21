@@ -209,9 +209,9 @@ class Penerimaan extends Admin_Controller
 						return;
 					}
 
-					// Calculate CN Balance server-side: SUM(total_harga) - SUM(amount_crossed)
+					// Calculate CN Balance server-side: SUM(total_harga + total_ppn) - SUM(amount_crossed)
 					$cn_total_query = $this->db->query(
-						"SELECT COALESCE(SUM(total_harga), 0) as total_cn FROM dt_returpenjualan WHERE id_retur = ?",
+						"SELECT COALESCE(SUM(COALESCE(total_harga, 0) + COALESCE(total_ppn, 0)), 0) as total_cn FROM dt_returpenjualan WHERE id_retur = ?",
 						array($id_retur_val)
 					)->row();
 					$cn_total = floatval($cn_total_query->total_cn);
@@ -1181,7 +1181,7 @@ class Penerimaan extends Admin_Controller
 			       (cn_total.total_cn - COALESCE(crossed.total_crossed, 0)) as sisa
 			FROM tr_retur_penjualan r
 			INNER JOIN (
-			    SELECT id_retur, SUM(total_harga) as total_cn FROM dt_returpenjualan GROUP BY id_retur
+			    SELECT id_retur, SUM(COALESCE(total_harga, 0) + COALESCE(total_ppn, 0)) as total_cn FROM dt_returpenjualan GROUP BY id_retur
 			) cn_total ON cn_total.id_retur = r.id_retur
 			LEFT JOIN (
 			    SELECT id_retur, SUM(amount_crossed) as total_crossed FROM tr_cn_cross GROUP BY id_retur
