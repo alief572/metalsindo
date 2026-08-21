@@ -169,7 +169,7 @@
         </tr>
     </table>
     <div style='display:block; border-color:none; background-color:#c2c2c2;' align='center'>
-        <h3>TANDA TERIMA RETUR PENJUALAN<br>NO : <?= $header[0]->no_retur; ?></h3>
+        <h3>CREDIT NOTE<br>NO : <?= !empty($header[0]->no_cn) ? $header[0]->no_cn : $header[0]->no_retur; ?></h3>
     </div>
     <table class='gridtableX' width='100%' cellpadding='0' cellspacing='0' border='0'>
         <tbody>
@@ -177,6 +177,11 @@
                 <td>Customer</td>
                 <td>:</td>
                 <td><?= strtoupper($header[0]->nama_customer); ?></td>
+            </tr>
+            <tr>
+                <td>No. Retur</td>
+                <td>:</td>
+                <td><?= strtoupper($header[0]->no_retur); ?></td>
             </tr>
             <tr>
                 <td>No Delivery Order</td>
@@ -192,6 +197,7 @@
                 <td>Kompensasi</td>
                 <td>:</td>
                 <?php
+                $komp = '-';
                 if ($header[0]->kompensasi == 'brg') {
                     $komp = 'Ganti Barang';
                 } elseif ($header[0]->kompensasi == 'htg') {

@@ -1,6 +1,8 @@
 <?php
 $retur = $results['retur'];
 $detail = $results['detail'];
+$no_cn = isset($results['no_cn']) ? $results['no_cn'] : ($retur->no_cn ?: '');
+$persen_ppn = isset($results['persen_ppn']) ? $results['persen_ppn'] : 11;
 $tanggal = date('Y-m-d');
 $is_closed = ($retur->status_cn == 'CLOSED');
 ?>
@@ -17,7 +19,7 @@ $is_closed = ($retur->status_cn == 'CLOSED');
 						</label>
 					</center>
 
-					<!-- Header Info (Read-only) -->
+					<!-- Header Info -->
 					<div class="col-sm-12" style="margin-bottom: 20px;">
 						<div class="row">
 							<div class="col-sm-6">
@@ -27,8 +29,17 @@ $is_closed = ($retur->status_cn == 'CLOSED');
 										<td>: <?= $retur->no_retur ?></td>
 									</tr>
 									<tr>
-										<th>No. CN</th>
-										<td>: <?= $retur->no_cn ?: '-' ?></td>
+										<th style="vertical-align: middle;">No. Credit Note</th>
+										<td>
+											<div class="input-group input-group-sm" style="max-width: 250px;">
+												<input type="text" class="form-control" name="no_cn" id="no_cn" value="<?= $no_cn ?>" <?= $is_closed ? 'readonly' : '' ?> style="font-weight: bold;">
+												<?php if (!$is_closed) { ?>
+													<span class="input-group-btn">
+														<button type="button" class="btn btn-default" title="Default System" onclick="resetDefaultCN('<?= $no_cn ?>')"><i class="fa fa-refresh"></i></button>
+													</span>
+												<?php } ?>
+											</div>
+										</td>
 									</tr>
 									<tr>
 										<th>Tanggal Retur</th>
@@ -76,26 +87,21 @@ $is_closed = ($retur->status_cn == 'CLOSED');
 									<th>Length</th>
 									<th>Total Kirim (Kg)</th>
 									<th>Qty Sheet</th>
-									<th width="12%">Harga Deal</th>
-									<th width="12%">PPN (Nominal)</th>
-									<th>Total Harga</th>
-									<th>Total + PPN</th>
+									<th width="12%">Harga Invoice (Ref)</th>
+									<th width="12%">Harga Deal CN</th>
+									<th width="14%">Total Harga</th>
 								</tr>
 							</thead>
 							<tbody id='data_material'>
 								<?php
 								$grand_total = 0;
 								$grand_ppn = 0;
-								$grand_all = 0;
 
 								foreach ($detail as $dt) {
 									$is_sheet = ($dt->total_sheet > 0);
 									$qty_used = $is_sheet ? $dt->total_sheet : $dt->weight;
 									$total_harga = $qty_used * $dt->harga_deal;
-									
 									$grand_total += $total_harga;
-									$grand_ppn += $dt->total_ppn;
-									$grand_all += ($total_harga + $dt->total_ppn);
 								?>
 									<tr>
 										<td><?= $dt->id_material ?></td>
@@ -106,43 +112,50 @@ $is_closed = ($retur->status_cn == 'CLOSED');
 										<td><?= $dt->length ?></td>
 										<td>
 											<span class="val_total_kirim"><?= number_format($dt->weight, 2) ?></span>
-											<input type="hidden" class="input_total_kirim" value="<?= $dt->weight ?>">
+											<input type="hidden" class="input_total_kirim" name="dt[<?= $dt->id ?>][total_kirim]" value="<?= $dt->weight ?>">
 										</td>
 										<td>
 											<span class="val_qty_sheet"><?= $is_sheet ? number_format($dt->total_sheet) : '-' ?></span>
-											<input type="hidden" class="input_qty_sheet" value="<?= $dt->total_sheet ?>">
+											<input type="hidden" class="input_qty_sheet" name="dt[<?= $dt->id ?>][qty_sheet]" value="<?= $dt->total_sheet ?>">
 											<input type="hidden" class="is_sheet" value="<?= $is_sheet ? 1 : 0 ?>">
+										</td>
+										<td class="text-right">
+											<span class="lbl_harga_invoice" style="color: #666; font-weight: 500;">
+												<?= ((float)$dt->harga_invoice > 0) ? number_format($dt->harga_invoice, 2) : '-' ?>
+											</span>
 										</td>
 										<td>
 											<input type="text" class="form-control input-sm autoNumeric text-right input_harga_deal" name="dt[<?= $dt->id ?>][harga_deal]" value="<?= $dt->harga_deal ?>" <?= $is_closed ? 'readonly' : '' ?>>
 										</td>
-										<td>
-											<input type="text" class="form-control input-sm autoNumeric text-right input_ppn" name="dt[<?= $dt->id ?>][ppn]" value="<?= $dt->total_ppn ?>" <?= $is_closed ? 'readonly' : '' ?>>
-										</td>
 										<td class="text-right">
-											<span class="lbl_total_harga"><?= number_format($total_harga, 2) ?></span>
-										</td>
-										<td class="text-right">
-											<span class="lbl_total_all"><?= number_format($total_harga + $dt->total_ppn, 2) ?></span>
+											<span class="lbl_total_harga" style="font-weight: bold;"><?= number_format($total_harga, 2) ?></span>
 										</td>
 									</tr>
-								<?php } ?>
+								<?php } 
+								$grand_ppn = ($grand_total * $persen_ppn) / 100;
+								$grand_all = $grand_total + $grand_ppn;
+								?>
 							</tbody>
 							<tfoot>
 								<tr>
-									<th colspan="10" class="text-right">Grand Total:</th>
+									<th colspan="10" class="text-right">Subtotal / Total Retur:</th>
 									<th class="text-right" id="grand_total"><?= number_format($grand_total, 2) ?></th>
-									<th></th>
 								</tr>
 								<tr>
-									<th colspan="10" class="text-right">Grand Total PPN:</th>
-									<th class="text-right" id="grand_ppn"><?= number_format($grand_ppn, 2) ?></th>
-									<th></th>
+									<th colspan="10" class="text-right" style="vertical-align: middle;">
+										<div class="form-inline pull-right">
+											<label style="margin-right: 8px;">PPN (%):</label>
+											<div class="input-group input-group-sm" style="width: 100px;">
+												<input type="text" class="form-control text-right" id="input_persen_ppn" name="persen_ppn" value="<?= $persen_ppn ?>" <?= $is_closed ? 'readonly' : '' ?>>
+												<span class="input-group-addon">%</span>
+											</div>
+										</div>
+									</th>
+									<th class="text-right" style="vertical-align: middle;" id="grand_ppn"><?= number_format($grand_ppn, 2) ?></th>
 								</tr>
 								<tr>
-									<th colspan="10" class="text-right">Grand Total Keseluruhan:</th>
-									<th class="text-right" id="grand_all"><?= number_format($grand_all, 2) ?></th>
-									<th></th>
+									<th colspan="10" class="text-right" style="font-size: 14px;">Grand Total Keseluruhan:</th>
+									<th class="text-right" style="font-size: 14px;" id="grand_all"><?= number_format($grand_all, 2) ?></th>
 								</tr>
 							</tfoot>
 						</table>
@@ -176,19 +189,33 @@ $is_closed = ($retur->status_cn == 'CLOSED');
 			aPad: false
 		});
 
-		// Trigger kalkulasi saat input harga atau PPN berubah
-		$(document).on('keyup change', '.input_harga_deal, .input_ppn', function() {
+		// Trigger kalkulasi saat input harga atau persentase PPN berubah
+		$(document).on('keyup change', '.input_harga_deal', function() {
 			hitungBaris($(this).closest('tr'));
+			hitungTotal();
+		});
+
+		$(document).on('keyup change', '#input_persen_ppn', function() {
 			hitungTotal();
 		});
 
 		$('#btn-simpan').click(function(e) {
 			e.preventDefault();
+			var no_cn = $('#no_cn').val().trim();
+			if (no_cn == '') {
+				swal("Warning!", "No. Credit Note tidak boleh kosong!", "warning");
+				return false;
+			}
 			saveData('save_cn_price', 'menyimpan data harga');
 		});
 
 		$('#btn-confirm').click(function(e) {
 			e.preventDefault();
+			var no_cn = $('#no_cn').val().trim();
+			if (no_cn == '') {
+				swal("Warning!", "No. Credit Note tidak boleh kosong!", "warning");
+				return false;
+			}
 
 			// Validasi sebelum confirm
 			var valid = true;
@@ -221,9 +248,12 @@ $is_closed = ($retur->status_cn == 'CLOSED');
 		});
 	});
 
+	function resetDefaultCN(val) {
+		$('#no_cn').val(val);
+	}
+
 	function hitungBaris(tr) {
 		var harga_deal = parseFloat(tr.find('.input_harga_deal').val().replace(/,/g, '')) || 0;
-		var ppn = parseFloat(tr.find('.input_ppn').val().replace(/,/g, '')) || 0;
 		var is_sheet = parseInt(tr.find('.is_sheet').val()) || 0;
 		
 		var qty = 0;
@@ -234,21 +264,17 @@ $is_closed = ($retur->status_cn == 'CLOSED');
 		}
 
 		var total_harga = qty * harga_deal;
-		var total_all = total_harga + ppn;
-
 		tr.find('.lbl_total_harga').text(number_format(total_harga, 2));
-		tr.find('.lbl_total_all').text(number_format(total_all, 2));
 	}
 
 	function hitungTotal() {
 		var grand_total = 0;
-		var grand_ppn = 0;
+		var persen_ppn = parseFloat($('#input_persen_ppn').val().replace(/,/g, '')) || 0;
 		
 		$('#data_material tr').each(function() {
 			var $tr = $(this);
 			if($tr.find('.input_harga_deal').length > 0) {
 				var harga_deal = parseFloat($tr.find('.input_harga_deal').val().replace(/,/g, '')) || 0;
-				var ppn = parseFloat($tr.find('.input_ppn').val().replace(/,/g, '')) || 0;
 				var is_sheet = parseInt($tr.find('.is_sheet').val()) || 0;
 				
 				var qty = 0;
@@ -259,10 +285,10 @@ $is_closed = ($retur->status_cn == 'CLOSED');
 				}
 
 				grand_total += (qty * harga_deal);
-				grand_ppn += ppn;
 			}
 		});
 
+		var grand_ppn = (grand_total * persen_ppn) / 100;
 		var grand_all = grand_total + grand_ppn;
 
 		$('#grand_total').text(number_format(grand_total, 2));
