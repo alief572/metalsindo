@@ -575,6 +575,7 @@ class Wt_invoicing_model extends BF_Model
         'no' => $no,
         'no_faktur' => '',
         'no_invoice' => $item['no_surat'],
+        'no_po' => $item['no_po'],
         'nama_customer' => strtoupper($item['name_customer']),
         'term' => $item['note'],
         'nomor_do' => $item['no_do'],
