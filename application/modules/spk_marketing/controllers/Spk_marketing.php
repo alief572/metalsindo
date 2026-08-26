@@ -243,6 +243,15 @@ class Spk_marketing extends Admin_Controller
 		INNER JOIN ms_inventory_category3 b ON b.id_category3 = a.id_material
 		WHERE a.id_spkmarketing ='$id' AND a.deal='1'")->result();
 
+		$check_sheet = $this->db->query("SELECT a.*, b.nama, b.maker FROM dt_spkmarketing a
+		JOIN ms_inventory_category3 b ON b.id_category3 = a.id_material
+		WHERE a.id_spkmarketing ='$id' AND a.deal='1' AND b.id_bentuk = 'B2000002'")->result();
+
+		$tipe_sheet = 0;
+		if (count($check_sheet) > 0) {
+			$tipe_sheet = 1;
+		}
+
 		$spk = $this->db->query("SELECT a.* FROM tr_spk_marketing a WHERE a.id_spkmarketing='$id'")->row();
 		$nomorpnwr = $spk->no_penawaran;
 		$dtpnwr = $this->db->query("SELECT a.* FROM child_penawaran a WHERE a.no_penawaran='$nomorpnwr'")->result();
@@ -273,6 +282,7 @@ class Spk_marketing extends Admin_Controller
 			'customer' => $customer,
 			'karyawan' => $karyawan,
 			'mata_uang' => $mata_uang,
+			'tipe_sheet' => $tipe_sheet
 		];
 		$this->template->set('results', $data);
 		$this->template->title('Revisi SPK Marketing');
@@ -1411,14 +1421,17 @@ class Spk_marketing extends Admin_Controller
 			'nama_customer'			=> $post['nama_customer'],
 			'no_penawaran'			=> $post['no_penawaran'],
 			'created_on'			=> date('Y-m-d H:i:s'),
-			'no_po'			=> $post['no_po'],
-			'sample'			=> $post['sample'],
-			'tgl_po'			=> date('Y-m-d', strtotime($post['tgl_po'])),
-			'plan_cust'			=> date('Y-m-d', strtotime($post['plan_cust'])),
-			'note'			=> $post['note'],
+			'no_po'					=> $post['no_po'],
+			'sample'				=> $post['sample'],
+			'tgl_po'				=> date('Y-m-d', strtotime($post['tgl_po'])),
+			'plan_cust'				=> date('Y-m-d', strtotime($post['plan_cust'])),
+			'note'					=> $post['note'],
 			'created_by'			=> $this->auth->user_id(),
 			'status_revisi'			=> 3,
-			'status_approve'			=> 0
+			'status_approve'		=> 0,
+			'total_discount'		=> isset($post['total_discount']) ? $post['total_discount'] : 0,
+			'ppn'					=> isset($post['ppn']) ? $post['ppn'] : 0,
+			'nilai_ppn'				=> isset($post['nilai_ppn']) ? $post['nilai_ppn'] : 0
 		];
 		//Add Data
 		$this->db->where('id_spkmarketing', $code)->update("tr_spk_marketing", $data);
@@ -1426,25 +1439,36 @@ class Spk_marketing extends Admin_Controller
 		$this->db->delete('dt_spkmarketing_loading', array('id_spkmarketing' => $code));
 		$numb1 = 0;
 		foreach ($_POST['dp'] as $dp) {
+			// Hanya insert item yang di-centang deal
+			if (empty($dp['deal'])) {
+				continue;
+			}
 			$numb1++;
 			$stokpakai =  array(
 				'id_spkmarketing'		=> $code,
 				'id_dt_spkmarketing'	=> $code . '-' . $numb1,
-				'id_child_penawaran'	=> $dp[id_child_penawaran],
-				'id_material'		    => $dp[idmaterial],
-				'no_alloy'		        => $dp[noalloy],
-				'thickness'		        => $dp[thickness],
-				'width'		        	=> $dp[width],
-				'harga_penawaran'		=> $dp[hgpenaaran],
-				'harga_deal'		    => $dp[hgdeal],
-				'qty_produk'			=> $dp[qty],
-				'weight'		    	=> $dp[weight],
-				'total_weight'		    => $dp[twight],
-				'total_harga'		    => $dp[tharga],
-				'delivery'		    	=> $dp[ddate],
-				'deal'		    		=> $dp[deal],
-				'crcl'		    		=> $dp[crcl],
-				'keterangan'		    => $dp[keterangan],
+				'id_child_penawaran'	=> $dp['id_child_penawaran'],
+				'id_material'		    => $dp['idmaterial'],
+				'no_alloy'		        => $dp['noalloy'],
+				'thickness'		        => $dp['thickness'],
+				'width'		        	=> round($dp['width'], 2),
+				'length'		        => $dp['length'],
+				'harga_penawaran'		=> $dp['hgpenaaran'],
+				'harga_deal'		    => $dp['hgdeal'],
+				'qty_produk'			=> $dp['qty'],
+				'weight'		    	=> $dp['weight'],
+				'total_weight'		    => $dp['twight'],
+				'total_harga'		    => $dp['tharga'],
+				'nominal_discount'		=> isset($dp['nominal_discount']) ? $dp['nominal_discount'] : 0,
+				'delivery'		    	=> $dp['ddate'],
+				'deal'		    		=> $dp['deal'],
+				'created_on'			=> date('Y-m-d H:i:s'),
+				'created_by'			=> $this->auth->user_id(),
+				'status_lanjutan'		=> '1',
+				'crcl'		    		=> $dp['crcl'],
+				'keterangan'		    => $dp['keterangan'],
+				'part_number'		    => isset($dp['part_number']) ? $dp['part_number'] : '',
+				'type'					=> isset($post['tipe']) ? $post['tipe'] : 'reguler'
 			);
 			$this->db->insert('dt_spkmarketing', $stokpakai);
 			$this->db->insert('dt_spkmarketing_loading', $stokpakai);
