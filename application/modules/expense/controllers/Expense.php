@@ -1328,6 +1328,8 @@ class Expense extends Admin_Controller
 			foreach ($detail_id as $keys => $val) {
 				// Skip jika row kasbon (sudah punya file dari kasbon)
 				if (!empty($id_kasbon[$keys])) continue;
+				if (isset($post['kasbon_pr_non_po_' . $val])) continue;
+				if (isset($post['pengembalian_expense_' . $val])) continue;
 
 				// Cek apakah sudah ada file sebelumnya (edit mode)
 				$existing_file = (!empty($filename[$keys])) ? $filename[$keys] : '';
@@ -1345,6 +1347,11 @@ class Expense extends Admin_Controller
 				echo json_encode($param);
 				return;
 			}
+		}
+
+		$uploadDirectory = './assets/expense/';
+		if (!is_dir($uploadDirectory)) {
+			@mkdir($uploadDirectory, 0777, true);
 		}
 
 		//proses utama update tr_expense
@@ -1408,7 +1415,7 @@ class Expense extends Admin_Controller
 							}
 
 							// Validasi: untuk petty cash, file harus ada setelah proses upload
-							if (!empty($pettycash) && empty($filenames) && empty($id_kasbon[$keys])) {
+							if (!empty($pettycash) && empty($filenames) && empty($id_kasbon[$keys]) && !isset($post['kasbon_pr_non_po_' . $val]) && !isset($post['pengembalian_expense_' . $val])) {
 								$upload_failed = true;
 								$upload_failed_msg = 'Bon Bukti pada baris ' . ($keys + 1) . ' wajib diupload';
 								break;
@@ -1525,7 +1532,7 @@ class Expense extends Admin_Controller
 							}
 
 							// Validasi: untuk petty cash, file harus ada setelah proses upload
-							if (!empty($pettycash) && empty($filenames) && empty($id_kasbon[$keys])) {
+							if (!empty($pettycash) && empty($filenames) && empty($id_kasbon[$keys]) && !isset($post['kasbon_pr_non_po_' . $val]) && !isset($post['pengembalian_expense_' . $val])) {
 								$upload_failed = true;
 								$upload_failed_msg = 'Bon Bukti pada baris ' . ($keys + 1) . ' wajib diupload';
 								break;
@@ -1639,8 +1646,16 @@ class Expense extends Admin_Controller
 		// proses utama insert tr_expense
 		else {
 			$no_doc = $this->All_model->GetAutoGenerate('format_expense');
+			if (empty($no_doc)) {
+				$this->db->trans_rollback();
+				$param = array(
+					'save' => false,
+					'message' => 'Gagal generate nomor dokumen otomatis (format_expense)'
+				);
+				echo json_encode($param);
+				return;
+			}
 
-			$uploadDirectory = "./assets/expense/";
 			$pathBonBukti = [];
 			$pathBuktiPengembalian = [];
 
@@ -1651,8 +1666,6 @@ class Expense extends Admin_Controller
 
 					if (move_uploaded_file($tmpName, $filePath)) {
 						$pathBonBukti[] = $filePath;
-					} else {
-						echo "Gagal mengunggah file: $name<br>";
 					}
 				}
 			}
@@ -1665,8 +1678,6 @@ class Expense extends Admin_Controller
 
 					if (move_uploaded_file($tmpName, $filePath)) {
 						$pathBuktiPengembalian[] = $filePath;
-					} else {
-						echo "Gagal mengunggah file: $name<br>";
 					}
 				}
 			}
@@ -1713,8 +1724,14 @@ class Expense extends Admin_Controller
 			$insert_expense = $this->db->insert('tr_expense', $data);
 
 			if (!$insert_expense) {
-				print_r($this->db->error($insert_expense));
-				exit;
+				$db_error = $this->db->error();
+				$this->db->trans_rollback();
+				$param = array(
+					'save' => false,
+					'message' => 'Gagal menyimpan header expense: ' . (isset($db_error['message']) ? $db_error['message'] : 'Database error')
+				);
+				echo json_encode($param);
+				return;
 			}
 
 			$this->db->delete('tr_expense_detail', ['no_doc' => $this->auth->user_id()]);
@@ -1753,7 +1770,7 @@ class Expense extends Admin_Controller
 						}
 
 						// Validasi: untuk petty cash, file harus ada setelah proses upload
-						if (!empty($pettycash) && empty($filenames) && empty($id_kasbon[$keys])) {
+						if (!empty($pettycash) && empty($filenames) && empty($id_kasbon[$keys]) && !isset($post['kasbon_pr_non_po_' . $val]) && !isset($post['pengembalian_expense_' . $val])) {
 							$upload_failed = true;
 							$upload_failed_msg = 'Bon Bukti pada baris ' . ($keys + 1) . ' wajib diupload';
 							break;
@@ -1802,8 +1819,14 @@ class Expense extends Admin_Controller
 
 							$update_expense_kembalian = $this->db->update('tr_expense', ['expense_id_kembalian' => $no_doc], ['no_doc' => $post['pengembalian_expense_' . $detail_id[$keys]]]);
 							if (!$update_expense_kembalian) {
-								print_r($this->db->error($update_expense_kembalian));
-								exit;
+								$db_error = $this->db->error();
+								$this->db->trans_rollback();
+								$param = array(
+									'save' => false,
+									'message' => 'Gagal update expense kembalian: ' . (isset($db_error['message']) ? $db_error['message'] : 'Database error')
+								);
+								echo json_encode($param);
+								return;
 							}
 
 							$insert_log_kembalian = $this->db->insert('tr_pengembalian_expense', [
@@ -1817,8 +1840,14 @@ class Expense extends Admin_Controller
 								'created_date' => date('Y-m-d H:i:s')
 							]);
 							if (!$insert_log_kembalian) {
-								print_r($this->db->error($insert_log_kembalian));
-								exit;
+								$db_error = $this->db->error();
+								$this->db->trans_rollback();
+								$param = array(
+									'save' => false,
+									'message' => 'Gagal mencatat pengembalian expense: ' . (isset($db_error['message']) ? $db_error['message'] : 'Database error')
+								);
+								echo json_encode($param);
+								return;
 							}
 						}
 
@@ -1846,8 +1875,14 @@ class Expense extends Admin_Controller
 
 						$insert_detail_expense = $this->db->insert('tr_expense_detail', $data_detail);
 						if (!$insert_detail_expense) {
-							print_r($this->db->error($insert_detail_expense));
-							exit;
+							$db_error = $this->db->error();
+							$this->db->trans_rollback();
+							$param = array(
+								'save' => false,
+								'message' => 'Gagal menyimpan detail expense baris ' . ($keys + 1) . ': ' . (isset($db_error['message']) ? $db_error['message'] : 'Database error')
+							);
+							echo json_encode($param);
+							return;
 						}
 					}
 				}
