@@ -465,17 +465,27 @@ foreach($data_budget as $keys=>$val){
 			$('input[name="detail_id[]"]').each(function() {
 				lops++;
 				var iddtl = $(this).val();
-				if ($("#filename_" + iddtl).val() == "") {
-					if ($('#doc_file_' + iddtl).get(0).files.length === 0) {
-						errors = "Bon Bukti wajib diupload untuk semua detail";
+				var is_kasbon_pr = $('input[name="kasbon_pr_non_po_' + iddtl + '"]').length > 0;
+				var is_kembalian = $('input[name="pengembalian_expense_' + iddtl + '"]').length > 0;
+				var id_kasbon_val = $(this).closest('tr').find('input[name="id_kasbon[]"]').val();
+
+				if (!is_kasbon_pr && !is_kembalian && (!id_kasbon_val || id_kasbon_val === '')) {
+					if ($("#filename_" + iddtl).val() == "") {
+						var fileInput = $('#doc_file_' + iddtl);
+						if (fileInput.length > 0 && fileInput.get(0).files.length === 0) {
+							errors = "Bon Bukti wajib diupload untuk semua detail";
+						}
 					}
 				}
 			});
 			if (lops == 0) errors = "Detail harus diisi";
+			if ($("#pettycash").val() == "") errors = "Petty Cash harus dipilih";
 			if ($("#informasi").val() == "") errors = "Keterangan tidak boleh kosong";
-			if ($("#coa").val() == "0") errors = "Jenis Expense tidak boleh kosong";
 			if ($("#tgl_doc").val() == "") errors = "Tanggal Transaksi tidak boleh kosong";
-			if (parseFloat($("#grand_total").val()) > parseFloat($("#budgets").val())) errors = "Saldo lebih dari budget";
+
+			var grandTotalVal = parseFloat(String($("#grand_total").val()).replace(/,/g, '')) || 0;
+			var budgetsVal = parseFloat(String($("#budgets").val()).replace(/,/g, '')) || 0;
+			if (budgetsVal > 0 && grandTotalVal > budgetsVal) errors = "Saldo lebih dari budget";
 			if (errors == "") {
 
 				Swal.fire({
