@@ -29,6 +29,7 @@
         $('#list_item_stokk').DataTable({
             "processing": true,
             "serverSide": true,
+            "searchDelay": 500,
             "ajax": {
                 "url": siteurl + active_controller + 'server_side_request',
                 "type": "POST",
