@@ -422,12 +422,12 @@ class Receive_invoice_ap extends Admin_Controller
       $this->db->like('a.id_incoming', $search['value'], 'both');
       $this->db->or_like('a.sj_supplier', $search['value'], 'both');
       $this->db->or_like('b.name_suplier', $search['value'], 'both');
-      $this->db->or_where("a.id_incoming IN (
-        SELECT a1.id_incoming 
+      $this->db->or_where("EXISTS (
+        SELECT 1 
         FROM dt_incoming a1 
         JOIN dt_trans_po b1 ON b1.id_dt_po = a1.id_dt_po 
         JOIN tr_purchase_order c1 ON c1.no_po = b1.no_po 
-        WHERE c1.no_surat LIKE '%" . $search_value . "%'
+        WHERE a1.id_incoming = a.id_incoming AND c1.no_surat LIKE '%" . $search_value . "%'
       )", NULL, FALSE);
       $this->db->group_end();
     }
@@ -453,48 +453,72 @@ class Receive_invoice_ap extends Admin_Controller
     $data = [];
     $no   = $start + 1;
 
-    foreach ($get_data_supplier as $item) {
-      $this->db->select('c.no_surat');
-      $this->db->from('dt_incoming a');
-      $this->db->join('dt_trans_po b', 'b.id_dt_po = a.id_dt_po', 'left');
-      $this->db->join('tr_purchase_order c', 'c.no_po = b.no_po', 'left');
-      $this->db->where('a.id_incoming', $item->id_incoming);
-      $this->db->group_by('c.no_surat');
-      $get_no_po = $this->db->get()->result_array();
+    if (!empty($get_data_supplier)) {
+      $incoming_ids = [];
+      foreach ($get_data_supplier as $item) {
+        $incoming_ids[] = $item->id_incoming;
+      }
 
-      $list_no_po = array_column($get_no_po, 'no_surat');
-      $no_po = implode(',', array_filter($list_no_po));
+      // Batch query 1: Get PO numbers for all current page incoming IDs
+      $map_no_po = [];
+      if (!empty($incoming_ids)) {
+        $this->db->select('a.id_incoming, c.no_surat');
+        $this->db->from('dt_incoming a');
+        $this->db->join('dt_trans_po b', 'b.id_dt_po = a.id_dt_po', 'left');
+        $this->db->join('tr_purchase_order c', 'c.no_po = b.no_po', 'left');
+        $this->db->where_in('a.id_incoming', $incoming_ids);
+        $this->db->group_by(['a.id_incoming', 'c.no_surat']);
+        $res_no_po = $this->db->get()->result_array();
 
-      $total_incoming = 0;
-      $this->db->select('b.width_recive, b.qty_sheet, a.hargasatuan, mic.id_bentuk, mic.total_weight');
-      $this->db->from('dt_trans_po a');
-      $this->db->join('dt_incoming b', 'b.id_dt_po = a.id_dt_po AND b.id_material = a.idmaterial');
-      $this->db->join('ms_inventory_category3 mic', 'mic.id_category3 = a.idmaterial', 'left');
-      $this->db->where('b.id_incoming', $item->id_incoming);
-      $get_total_incoming = $this->db->get()->result();
-
-      foreach ($get_total_incoming as $item_incoming) {
-        if ($item_incoming->id_bentuk == 'B2000002') { // Material Sheet
-          // Formula ikut PO Print: qty_sheet × hargasatuan (per kg) × total_weight (berat per lembar)
-          $harga_per_sheet = $item_incoming->hargasatuan * $item_incoming->total_weight;
-          $total_incoming += ($item_incoming->qty_sheet * $harga_per_sheet);
-        } else { // Material Coil
-          $total_incoming += ($item_incoming->hargasatuan * $item_incoming->width_recive);
+        foreach ($res_no_po as $r) {
+          if (!empty($r['no_surat'])) {
+            $map_no_po[$r['id_incoming']][] = $r['no_surat'];
+          }
         }
       }
 
-      $action = '<button type="button" class="btn btn-sm btn-warning add_incoming add_incoming_' . $no . '" data-id_incoming="' . $item->id_incoming . '" data-no_po="' . $no_po . '" data-sj_supplier="' . (isset($item->sj_supplier) ? $item->sj_supplier : '') . '" data-id_suplier="' . $item->id_suplier . '" data-name_suplier="' . $item->name_suplier . '" data-nilai="' . $total_incoming . '" data-tanggal_incoming="' . $item->tanggal . '" data-no="' . $no . '"><i class="fa fa-plus"></i> Add</button>';
+      // Batch query 2: Get total incoming for all current page incoming IDs
+      $map_total_incoming = [];
+      if (!empty($incoming_ids)) {
+        $this->db->select('b.id_incoming, b.width_recive, b.qty_sheet, a.hargasatuan, mic.id_bentuk, mic.total_weight');
+        $this->db->from('dt_trans_po a');
+        $this->db->join('dt_incoming b', 'b.id_dt_po = a.id_dt_po AND b.id_material = a.idmaterial');
+        $this->db->join('ms_inventory_category3 mic', 'mic.id_category3 = a.idmaterial', 'left');
+        $this->db->where_in('b.id_incoming', $incoming_ids);
+        $res_total_incoming = $this->db->get()->result();
 
-      $data[] = [
-        '<div class="text-center">' . htmlspecialchars($item->id_incoming) . '</div>',
-        '<div class="text-center">' . htmlspecialchars($no_po) . '</div>',
-        '<div class="text-center">' . htmlspecialchars(isset($item->sj_supplier) ? $item->sj_supplier : '') . '</div>',
-        '<div class="text-center">' . date('d F Y', strtotime($item->tanggal)) . '</div>',
-        '<div class="text-center">' . htmlspecialchars($item->name_suplier) . '</div>',
-        '<div class="text-right">' . number_format($total_incoming, 2) . '</div>',
-        '<div class="text-center">' . $action . '</div>'
-      ];
-      $no++;
+        foreach ($res_total_incoming as $item_incoming) {
+          $inc_id = $item_incoming->id_incoming;
+          if (!isset($map_total_incoming[$inc_id])) {
+            $map_total_incoming[$inc_id] = 0;
+          }
+          if ($item_incoming->id_bentuk == 'B2000002') { // Material Sheet
+            $harga_per_sheet = $item_incoming->hargasatuan * $item_incoming->total_weight;
+            $map_total_incoming[$inc_id] += ($item_incoming->qty_sheet * $harga_per_sheet);
+          } else { // Material Coil
+            $map_total_incoming[$inc_id] += ($item_incoming->hargasatuan * $item_incoming->width_recive);
+          }
+        }
+      }
+
+      foreach ($get_data_supplier as $item) {
+        $list_no_po = isset($map_no_po[$item->id_incoming]) ? $map_no_po[$item->id_incoming] : [];
+        $no_po = implode(',', array_filter(array_unique($list_no_po)));
+        $total_incoming = isset($map_total_incoming[$item->id_incoming]) ? $map_total_incoming[$item->id_incoming] : 0;
+
+        $action = '<button type="button" class="btn btn-sm btn-warning add_incoming add_incoming_' . $no . '" data-id_incoming="' . $item->id_incoming . '" data-no_po="' . $no_po . '" data-sj_supplier="' . (isset($item->sj_supplier) ? $item->sj_supplier : '') . '" data-id_suplier="' . $item->id_suplier . '" data-name_suplier="' . $item->name_suplier . '" data-nilai="' . $total_incoming . '" data-tanggal_incoming="' . $item->tanggal . '" data-no="' . $no . '"><i class="fa fa-plus"></i> Add</button>';
+
+        $data[] = [
+          '<div class="text-center">' . htmlspecialchars($item->id_incoming) . '</div>',
+          '<div class="text-center">' . htmlspecialchars($no_po) . '</div>',
+          '<div class="text-center">' . htmlspecialchars(isset($item->sj_supplier) ? $item->sj_supplier : '') . '</div>',
+          '<div class="text-center">' . date('d F Y', strtotime($item->tanggal)) . '</div>',
+          '<div class="text-center">' . htmlspecialchars($item->name_suplier) . '</div>',
+          '<div class="text-right">' . number_format($total_incoming, 2) . '</div>',
+          '<div class="text-center">' . $action . '</div>'
+        ];
+        $no++;
+      }
     }
 
     echo json_encode([
