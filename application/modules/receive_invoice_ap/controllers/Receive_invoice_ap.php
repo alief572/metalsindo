@@ -406,6 +406,37 @@ class Receive_invoice_ap extends Admin_Controller
     $length     = (int) $this->input->post('length');
     $search     = $this->input->post('search');
 
+    $list_id_incoming = [];
+    if (!empty($search['value'])) {
+      $search_value = $this->db->escape_like_str($search['value']);
+
+      // Step 1: Cari no_po yang nomor suratnya cocok di tr_purchase_order
+      $this->db->select('no_po');
+      $this->db->from('tr_purchase_order');
+      $this->db->like('no_surat', $search_value, 'both');
+      $get_pos = $this->db->get()->result_array();
+      $po_numbers = array_filter(array_unique(array_column($get_pos, 'no_po')));
+
+      if (!empty($po_numbers)) {
+        // Step 2: Cari id_dt_po di dt_trans_po berdasarkan no_po
+        $this->db->select('id_dt_po');
+        $this->db->from('dt_trans_po');
+        $this->db->where_in('no_po', $po_numbers);
+        $get_dt_pos = $this->db->get()->result_array();
+        $dt_po_ids = array_filter(array_unique(array_column($get_dt_pos, 'id_dt_po')));
+
+        if (!empty($dt_po_ids)) {
+          // Step 3: Cari id_incoming di dt_incoming berdasarkan id_dt_po
+          $this->db->select('id_incoming');
+          $this->db->from('dt_incoming');
+          $this->db->where_in('id_dt_po', $dt_po_ids);
+          $this->db->group_by('id_incoming');
+          $get_inc = $this->db->get()->result_array();
+          $list_id_incoming = array_filter(array_unique(array_column($get_inc, 'id_incoming')));
+        }
+      }
+    }
+
     // Build the query to get total filtered records
     $this->db->select('a.*, b.name_suplier');
     $this->db->from('tr_incoming a');
@@ -417,20 +448,6 @@ class Receive_invoice_ap extends Admin_Controller
     $this->db->group_end();
 
     if (!empty($search['value'])) {
-      $search_value = $this->db->escape_like_str($search['value']);
-
-      // Pre-fetching: Cari ID incoming yang PO surat-nya cocok (dipisah agar tidak jadi subquery berat)
-      $this->db->select('a1.id_incoming');
-      $this->db->from('dt_incoming a1');
-      $this->db->join('dt_trans_po b1', 'b1.id_dt_po = a1.id_dt_po', 'left');
-      $this->db->join('tr_purchase_order c1', 'c1.no_po = b1.no_po', 'left');
-      $this->db->like('c1.no_surat', $search_value, 'both');
-      // Hanya butuh unik ID
-      $this->db->group_by('a1.id_incoming');
-      $matched_po_query = $this->db->get()->result_array();
-      
-      $list_id_incoming = array_filter(array_unique(array_column($matched_po_query, 'id_incoming')));
-
       // Main Query filtering
       $this->db->group_start();
       $this->db->like('a.id_incoming', $search['value'], 'both');
@@ -438,7 +455,6 @@ class Receive_invoice_ap extends Admin_Controller
       $this->db->or_like('b.name_suplier', $search['value'], 'both');
       
       if (!empty($list_id_incoming)) {
-        // Karena CodeIgniter query builder butuh array list untuk where_in
         $this->db->or_where_in('a.id_incoming', $list_id_incoming);
       }
       $this->db->group_end();
