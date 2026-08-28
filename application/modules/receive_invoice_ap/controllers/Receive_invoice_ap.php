@@ -611,8 +611,12 @@ class Receive_invoice_ap extends Admin_Controller
         if (!$update_incoming) {
           $this->db->trans_rollback();
 
-          print_r($this->db->error($update_incoming));
-          exit;
+          $db_error = $this->db->error();
+          echo json_encode([
+            'status' => 0,
+            'pesan' => 'Gagal update data incoming: ' . (isset($db_error['message']) ? $db_error['message'] : '')
+          ]);
+          return;
         }
       }
     }
@@ -621,16 +625,26 @@ class Receive_invoice_ap extends Admin_Controller
     if (!$insert_header) {
       $this->db->trans_rollback();
 
-      print_r($this->db->error($insert_header));
-      exit;
+      $db_error = $this->db->error();
+      echo json_encode([
+        'status' => 0,
+        'pesan' => 'Gagal simpan header invoice: ' . (isset($db_error['message']) ? $db_error['message'] : '')
+      ]);
+      return;
     }
 
-    $insert_detail = $this->db->insert_batch('tr_receive_invoice_ap_detail', $data_detail);
-    if (!$insert_detail) {
-      $this->db->trans_rollback();
+    if (!empty($data_detail)) {
+      $insert_detail = $this->db->insert_batch('tr_receive_invoice_ap_detail', $data_detail);
+      if (!$insert_detail) {
+        $this->db->trans_rollback();
 
-      print_r($this->db->error($insert_detail));
-      exit;
+        $db_error = $this->db->error();
+        echo json_encode([
+          'status' => 0,
+          'pesan' => 'Gagal simpan detail invoice: ' . (isset($db_error['message']) ? $db_error['message'] : '')
+        ]);
+        return;
+      }
     }
 
     if ($this->db->trans_status() === false) {
@@ -722,8 +736,12 @@ class Receive_invoice_ap extends Admin_Controller
         if (!$update_incoming) {
           $this->db->trans_rollback();
 
-          print_r($this->db->error($update_incoming));
-          exit;
+          $db_error = $this->db->error();
+          echo json_encode([
+            'status' => 0,
+            'pesan' => 'Gagal update data incoming: ' . (isset($db_error['message']) ? $db_error['message'] : '')
+          ]);
+          return;
         }
       }
     }
@@ -732,16 +750,26 @@ class Receive_invoice_ap extends Admin_Controller
     if (!$insert_header) {
       $this->db->trans_rollback();
 
-      print_r($this->db->error($insert_header));
-      exit;
+      $db_error = $this->db->error();
+      echo json_encode([
+        'status' => 0,
+        'pesan' => 'Gagal update header invoice: ' . (isset($db_error['message']) ? $db_error['message'] : '')
+      ]);
+      return;
     }
 
-    $insert_detail = $this->db->insert_batch('tr_receive_invoice_ap_detail', $data_detail);
-    if (!$insert_detail) {
-      $this->db->trans_rollback();
+    if (!empty($data_detail)) {
+      $insert_detail = $this->db->insert_batch('tr_receive_invoice_ap_detail', $data_detail);
+      if (!$insert_detail) {
+        $this->db->trans_rollback();
 
-      print_r($this->db->error($insert_detail));
-      exit;
+        $db_error = $this->db->error();
+        echo json_encode([
+          'status' => 0,
+          'pesan' => 'Gagal simpan detail invoice: ' . (isset($db_error['message']) ? $db_error['message'] : '')
+        ]);
+        return;
+      }
     }
 
     if ($this->db->trans_status() === false) {
