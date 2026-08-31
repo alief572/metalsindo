@@ -130,20 +130,25 @@ class Retur_pembelian extends Admin_Controller
 				return;
 			}
 
-			$return = '';
+			$matauang = (!empty($list_detail[0]->matauang)) ? $list_detail[0]->matauang : 'IDR';
+			$curr_label = (strtoupper(trim($matauang)) === 'USD') ? 'USD' : ((strtoupper(trim($matauang)) === 'IDR' || strtoupper(trim($matauang)) === 'RP') ? 'Rp' : strtoupper(trim($matauang)));
 
-			$return .= '<table class="table table-striped table-bordered">';
-			$return .= '<thead>';
+			$return = '';
+			$return .= '<input type="hidden" name="matauang" id="matauang" value="' . $matauang . '">';
+
+			$return .= '<div class="table-responsive">';
+			$return .= '<table class="table table-striped table-bordered table-hover table-detail-retur" style="font-size: 13px;">';
+			$return .= '<thead style="background-color: #2c3e50; color: #fff;">';
 			$return .= '<tr>';
-			$return .= '<th class="text-center">Tanggal Incoming</th>';
-			$return .= '<th class="text-center">Lot Number</th>';
-			$return .= '<th class="text-center">Nama Material</th>';
-			$return .= '<th class="text-center">Width</th>';
-			$return .= '<th class="text-center">Qty Order</th>';
-			$return .= '<th class="text-center">Qty Rec (Kg)</th>';
-			$return .= '<th class="text-center">Qty Rec (Sheet)</th>';
-			$return .= '<th class="text-center">Retur (Kg)</th>';
-			$return .= '<th class="text-center">Retur (Sheet)</th>';
+			$return .= '<th class="text-center" style="width: 10%; vertical-align: middle;">Tgl Incoming</th>';
+			$return .= '<th class="text-center" style="width: 12%; vertical-align: middle;">Lot Number</th>';
+			$return .= '<th class="text-center" style="width: 18%; vertical-align: middle;">Nama Material</th>';
+			$return .= '<th class="text-center" style="width: 7%; vertical-align: middle;">Width</th>';
+			$return .= '<th class="text-center" style="width: 8%; vertical-align: middle;">Qty Order</th>';
+			$return .= '<th class="text-center" style="width: 12%; vertical-align: middle;">Qty Rec</th>';
+			$return .= '<th class="text-center" style="width: 12%; vertical-align: middle;">Qty Retur</th>';
+			$return .= '<th class="text-center" style="width: 11%; vertical-align: middle;">Harga Satuan</th>';
+			$return .= '<th class="text-center" style="width: 10%; vertical-align: middle;">Total Harga</th>';
 			$return .= '</tr>';
 			$return .= '</thead>';
 			$return .= '<tbody>';
@@ -153,11 +158,15 @@ class Retur_pembelian extends Admin_Controller
 				$no_detail++;
 
 				$is_sheet = ($item->id_bentuk == 'B2000002');
-				$readonly_sheet = $is_sheet ? '' : 'readonly';
-				$val_sheet_retur = $is_sheet ? $item->qty_sheet : 0;
+				$unit_label = $is_sheet ? 'Sheet' : 'KGS';
+				$price_label = $is_sheet ? '/Sheet' : '/Kg';
+				$qty_rec_val = $is_sheet ? $item->qty_sheet : $item->width_recive;
+				$qty_retur_val = $is_sheet ? $item->qty_sheet : $item->width_recive;
+				$harga = (float) $item->hargasatuan;
+				$total_harga_item = $qty_retur_val * $harga;
 
 				$return .= '<tr>';
-				$return .= '<td class="text-center">';
+				$return .= '<td class="text-center" style="vertical-align: middle;">';
 				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][id]" value="' . $item->id_dt_po . '">';
 				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][no_po]" value="' . $item->no_po . '">';
 				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][id_pr]" value="' . $item->idpr . '">';
@@ -166,39 +175,106 @@ class Retur_pembelian extends Admin_Controller
 				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][width]" value="' . $item->width . '">';
 				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][qty_order]" value="' . $item->totalwidth . '">';
 				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][lotno]" value="' . $item->lotno . '">';
-				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][harga]" value="' . $item->hargasatuan . '">';
-				$return .= date('d F Y', strtotime($item->tanggal_incoming));
+				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][is_sheet]" value="' . ($is_sheet ? '1' : '0') . '">';
+				$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][matauang]" value="' . $matauang . '">';
+				$return .= date('d/m/Y', strtotime($item->tanggal_incoming));
 				$return .= '</td>';
-				$return .= '<td>' . $item->lotno . '</td>';
-				$return .= '<td>' . $item->namamaterial . '</td>';
-				$return .= '<td class="text-center">' . $item->width . '</td>';
-				$return .= '<td class="text-center">' . $item->totalwidth . '</td>';
-				$return .= '<td>';
-				$return .= '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item->no_po . '[' . $no_detail . '][qty_receive]" value="' . $item->width_recive . '" readonly>';
+				$return .= '<td class="text-center" style="vertical-align: middle;"><span class="badge bg-gray text-bold" style="font-size: 11px;">' . $item->lotno . '</span></td>';
+				$return .= '<td style="vertical-align: middle;"><b>' . $item->namamaterial . '</b></td>';
+				$return .= '<td class="text-right" style="vertical-align: middle;">' . number_format($item->width, 2) . '</td>';
+				$return .= '<td class="text-right" style="vertical-align: middle;">' . number_format($item->totalwidth, 2) . '</td>';
+				
+				// Qty Receive with input-group
+				$return .= '<td style="vertical-align: middle;">';
+				$return .= '<div class="input-group input-group-sm">';
+				if ($is_sheet) {
+					$return .= '<input type="text" class="form-control text-right auto_num" name="dt_' . $item->no_po . '[' . $no_detail . '][qty_sheet]" value="' . $item->qty_sheet . '" readonly style="background-color: #f9f9f9; font-weight: 500;">';
+					$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][qty_receive]" value="' . $item->width_recive . '">';
+				} else {
+					$return .= '<input type="text" class="form-control text-right auto_num" name="dt_' . $item->no_po . '[' . $no_detail . '][qty_receive]" value="' . $item->width_recive . '" readonly style="background-color: #f9f9f9; font-weight: 500;">';
+					$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][qty_sheet]" value="' . $item->qty_sheet . '">';
+				}
+				$return .= '<span class="input-group-addon" style="font-size: 10px; font-weight: bold; background: #eee; min-width: 45px;">' . $unit_label . '</span>';
+				$return .= '</div>';
 				$return .= '</td>';
-				$return .= '<td>';
-				$return .= '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item->no_po . '[' . $no_detail . '][qty_sheet]" value="' . $item->qty_sheet . '" readonly>';
+
+				// Qty Retur with input-group
+				$return .= '<td style="vertical-align: middle;">';
+				$return .= '<div class="input-group input-group-sm">';
+				if ($is_sheet) {
+					$return .= '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item->no_po . '[' . $no_detail . '][retur_sheet]" value="' . $item->qty_sheet . '" data-no_po="' . $item->no_po . '" data-no="' . $no_detail . '" data-is_sheet="1" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
+					$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][retur]" value="' . $item->width_recive . '">';
+				} else {
+					$return .= '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item->no_po . '[' . $no_detail . '][retur]" value="' . $item->width_recive . '" data-no_po="' . $item->no_po . '" data-no="' . $no_detail . '" data-is_sheet="0" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
+					$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][retur_sheet]" value="0">';
+				}
+				$return .= '<span class="input-group-addon" style="font-size: 10px; font-weight: bold; background: #3c8dbc; color: #fff; min-width: 45px;">' . $unit_label . '</span>';
+				$return .= '</div>';
 				$return .= '</td>';
-				$return .= '<td>';
-				$return .= '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item->no_po . '[' . $no_detail . '][retur]" value="' . $item->width_recive . '" data-no_po="' . $item->no_po . '" data-no="' . $no_detail . '">';
+
+				// Harga Satuan with input-group
+				$return .= '<td style="vertical-align: middle;">';
+				$return .= '<div class="input-group input-group-sm">';
+				$return .= '<span class="input-group-addon" style="font-size: 10px; background: #eee; min-width: 32px;">' . $curr_label . '</span>';
+				$return .= '<input type="text" class="form-control text-right auto_num" name="dt_' . $item->no_po . '[' . $no_detail . '][harga]" value="' . $harga . '" readonly style="background-color: #f9f9f9;">';
+				$return .= '<span class="input-group-addon" style="font-size: 10px; background: #eee; min-width: 45px;">' . $price_label . '</span>';
+				$return .= '</div>';
 				$return .= '</td>';
-				$return .= '<td>';
-				$return .= '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item->no_po . '[' . $no_detail . '][retur_sheet]" value="' . $val_sheet_retur . '" data-no_po="' . $item->no_po . '" data-no="' . $no_detail . '" ' . $readonly_sheet . '>';
+
+				// Total Harga with input-group
+				$return .= '<td style="vertical-align: middle;">';
+				$return .= '<div class="input-group input-group-sm">';
+				$return .= '<span class="input-group-addon" style="font-size: 10px; background: #eee; min-width: 32px;">' . $curr_label . '</span>';
+				$return .= '<input type="text" class="form-control text-right auto_num row_total_harga" name="dt_' . $item->no_po . '[' . $no_detail . '][total_harga]" value="' . $total_harga_item . '" readonly style="background-color: #f9f9f9; font-weight: bold;">';
+				$return .= '</div>';
 				$return .= '</td>';
+
 				$return .= '</tr>';
 			}
 
 			$return .= '</tbody>';
-			$return .= '<tfoot>';
+			$return .= '<tfoot style="background-color: #fcfcfc;">';
 			$return .= '<tr>';
-			$return .= '<td colspan="5" class="text-right text-bold">Grand Total</td>';
-			$return .= '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_qty_receive" readonly></td>';
-			$return .= '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_qty_receive_sheet" readonly></td>';
-			$return .= '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_retur" readonly></td>';
-			$return .= '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_retur_sheet" readonly></td>';
+			$return .= '<td colspan="5" class="text-right text-bold" style="vertical-align: middle;">Total Qty</td>';
+			$return .= '<td style="vertical-align: middle;"><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_qty_receive" readonly style="background: transparent; border: none; font-weight: bold;"></td>';
+			$return .= '<td style="vertical-align: middle;"><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_retur" readonly style="background: transparent; border: none; font-weight: bold; color: #3c8dbc;"></td>';
+			$return .= '<td class="text-right text-bold" style="vertical-align: middle;">Subtotal</td>';
+			$return .= '<td style="vertical-align: middle;">';
+			$return .= '<div class="input-group input-group-sm">';
+			$return .= '<span class="input-group-addon" style="font-size: 10px; background: #eee; min-width: 32px;">' . $curr_label . '</span>';
+			$return .= '<input type="text" class="form-control text-right auto_num text-bold" id="footer_subtotal" name="subtotal" readonly style="background-color: #f9f9f9;">';
+			$return .= '</div>';
+			$return .= '</td>';
+			$return .= '</tr>';
+			$return .= '<tr>';
+			$return .= '<td colspan="8" class="text-right text-bold" style="vertical-align: middle;">';
+			$return .= '<div style="display: flex; justify-content: flex-end; align-items: center;">';
+			$return .= '<span style="margin-right: 10px;">PPN</span>';
+			$return .= '<div class="input-group input-group-sm" style="width: 100px;">';
+			$return .= '<input type="number" step="any" min="0" max="100" class="form-control text-right" id="footer_ppn_persen" name="ppn_persen" value="11" style="font-weight: bold;">';
+			$return .= '<span class="input-group-addon">%</span>';
+			$return .= '</div>';
+			$return .= '</div>';
+			$return .= '</td>';
+			$return .= '<td style="vertical-align: middle;">';
+			$return .= '<div class="input-group input-group-sm">';
+			$return .= '<span class="input-group-addon" style="font-size: 10px; background: #eee; min-width: 32px;">' . $curr_label . '</span>';
+			$return .= '<input type="text" class="form-control text-right auto_num" id="footer_nilai_ppn" name="nilai_ppn" readonly style="background-color: #f9f9f9;">';
+			$return .= '</div>';
+			$return .= '</td>';
+			$return .= '</tr>';
+			$return .= '<tr style="background-color: #f0f7fd; border-top: 2px solid #3c8dbc;">';
+			$return .= '<td colspan="8" class="text-right text-bold" style="font-size: 15px; vertical-align: middle; color: #2c3e50;">Grand Total</td>';
+			$return .= '<td style="vertical-align: middle;">';
+			$return .= '<div class="input-group input-group-sm">';
+			$return .= '<span class="input-group-addon" style="font-size: 11px; background: #3c8dbc; color: #fff; font-weight: bold; min-width: 32px;">' . $curr_label . '</span>';
+			$return .= '<input type="text" class="form-control text-right auto_num text-bold" style="font-size: 15px; color: #2c3e50; background: #fff;" id="footer_grand_total" name="grand_total" readonly>';
+			$return .= '</div>';
+			$return .= '</td>';
 			$return .= '</tr>';
 			$return .= '</tfoot>';
 			$return .= '</table>';
+			$return .= '</div>';
 
 			http_response_code(200);
 			echo json_encode(['hasil' => $return]);
@@ -222,21 +298,26 @@ class Retur_pembelian extends Admin_Controller
 
 			foreach ($list_po as $item_po) {
 
+				$matauang = (!empty($item_po->matauang)) ? $item_po->matauang : 'IDR';
+				$curr_label = (strtoupper(trim($matauang)) === 'USD') ? 'USD' : ((strtoupper(trim($matauang)) === 'IDR' || strtoupper(trim($matauang)) === 'RP') ? 'Rp' : strtoupper(trim($matauang)));
+
 				$po_detail = $this->Retur_pembelian_model->get_po_detail($item_po->no_po);
 
-				$return .= '<h4>No. PO: ' . $item_po->no_surat . '</h4>';
-				$return .= '<table class="table table-striped table-bordered">';
-				$return .= '<thead>';
+				$return .= '<h4>No. PO: ' . $item_po->no_surat . ' <span class="badge bg-blue">' . $matauang . '</span></h4>';
+				$return .= '<input type="hidden" name="matauang" value="' . $matauang . '">';
+				$return .= '<div class="table-responsive">';
+				$return .= '<table class="table table-striped table-bordered table-hover table-detail-retur" style="font-size: 13px;">';
+				$return .= '<thead style="background-color: #2c3e50; color: #fff;">';
 				$return .= '<tr>';
-				$return .= '<th class="text-center">Tanggal PO</th>';
-				$return .= '<th class="text-center">Lot Number</th>';
-				$return .= '<th class="text-center">Nama Material</th>';
-				$return .= '<th class="text-center">Width</th>';
-				$return .= '<th class="text-center">Qty Order</th>';
-				$return .= '<th class="text-center">Qty Rec (Kg)</th>';
-				$return .= '<th class="text-center">Qty Rec (Sheet)</th>';
-				$return .= '<th class="text-center">Retur (Kg)</th>';
-				$return .= '<th class="text-center">Retur (Sheet)</th>';
+				$return .= '<th class="text-center" style="width: 10%; vertical-align: middle;">Tanggal PO</th>';
+				$return .= '<th class="text-center" style="width: 12%; vertical-align: middle;">Lot Number</th>';
+				$return .= '<th class="text-center" style="width: 18%; vertical-align: middle;">Nama Material</th>';
+				$return .= '<th class="text-center" style="width: 7%; vertical-align: middle;">Width</th>';
+				$return .= '<th class="text-center" style="width: 8%; vertical-align: middle;">Qty Order</th>';
+				$return .= '<th class="text-center" style="width: 12%; vertical-align: middle;">Qty Rec</th>';
+				$return .= '<th class="text-center" style="width: 12%; vertical-align: middle;">Qty Retur</th>';
+				$return .= '<th class="text-center" style="width: 11%; vertical-align: middle;">Harga Satuan</th>';
+				$return .= '<th class="text-center" style="width: 10%; vertical-align: middle;">Total Harga</th>';
 				$return .= '</tr>';
 				$return .= '</thead>';
 				$return .= '<tbody>';
@@ -251,13 +332,18 @@ class Retur_pembelian extends Admin_Controller
 					$incoming_detail = $this->db->get_where('dt_incoming', ['id_dt_po' => $item_po_detail->id])->row();
 					$lotno = !empty($incoming_detail) ? $incoming_detail->lotno : '';
 					$qty_sheet = !empty($incoming_detail) ? $incoming_detail->qty_sheet : 0;
+					$berat_terima = !empty($item_po_detail->berat_terima) ? $item_po_detail->berat_terima : 0;
 
 					$is_sheet = ($id_bentuk == 'B2000002');
-					$readonly_sheet = $is_sheet ? '' : 'readonly';
-					$val_sheet_retur = $is_sheet ? $qty_sheet : 0;
+					$unit_label = $is_sheet ? 'Sheet' : 'KGS';
+					$price_label = $is_sheet ? '/Sheet' : '/Kg';
+					$qty_rec_val = $is_sheet ? $qty_sheet : $berat_terima;
+					$qty_retur_val = $is_sheet ? $qty_sheet : $berat_terima;
+					$harga = (float) $item_po_detail->hargasatuan;
+					$total_harga_item = $qty_retur_val * $harga;
 
 					$return .= '<tr>';
-					$return .= '<td class="text-center">';
+					$return .= '<td class="text-center" style="vertical-align: middle;">';
 					$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][id]" value="' . $item_po_detail->id . '">';
 					$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][no_po]" value="' . $item_po_detail->no_po . '">';
 					$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][id_pr]" value="' . $item_po_detail->idpr . '">';
@@ -266,39 +352,106 @@ class Retur_pembelian extends Admin_Controller
 					$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][width]" value="' . $item_po_detail->width . '">';
 					$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_order]" value="' . $item_po_detail->totalwidth . '">';
 					$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][lotno]" value="' . $lotno . '">';
-					$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][harga]" value="' . $item_po_detail->hargasatuan . '">';
-					$return .= date('d F Y', strtotime($item_po->tanggal));
+					$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][is_sheet]" value="' . ($is_sheet ? '1' : '0') . '">';
+					$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][matauang]" value="' . $matauang . '">';
+					$return .= date('d/m/Y', strtotime($item_po->tanggal));
 					$return .= '</td>';
-					$return .= '<td>' . $lotno . '</td>';
-					$return .= '<td>' . $item_po_detail->namamaterial . '</td>';
-					$return .= '<td class="text-center">' . $item_po_detail->width . '</td>';
-					$return .= '<td class="text-center">' . $item_po_detail->totalwidth . '</td>';
-					$return .= '<td>';
-					$return .= '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_receive]" value="' . $item_po_detail->berat_terima . '" readonly>';
+					$return .= '<td class="text-center" style="vertical-align: middle;"><span class="badge bg-gray text-bold" style="font-size: 11px;">' . $lotno . '</span></td>';
+					$return .= '<td style="vertical-align: middle;"><b>' . $item_po_detail->namamaterial . '</b></td>';
+					$return .= '<td class="text-right" style="vertical-align: middle;">' . number_format($item_po_detail->width, 2) . '</td>';
+					$return .= '<td class="text-right" style="vertical-align: middle;">' . number_format($item_po_detail->totalwidth, 2) . '</td>';
+					
+					// Qty Receive with input-group
+					$return .= '<td style="vertical-align: middle;">';
+					$return .= '<div class="input-group input-group-sm">';
+					if ($is_sheet) {
+						$return .= '<input type="text" class="form-control text-right auto_num" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_sheet]" value="' . $qty_sheet . '" readonly style="background-color: #f9f9f9; font-weight: 500;">';
+						$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_receive]" value="' . $berat_terima . '">';
+					} else {
+						$return .= '<input type="text" class="form-control text-right auto_num" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_receive]" value="' . $berat_terima . '" readonly style="background-color: #f9f9f9; font-weight: 500;">';
+						$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_sheet]" value="' . $qty_sheet . '">';
+					}
+					$return .= '<span class="input-group-addon" style="font-size: 10px; font-weight: bold; background: #eee; min-width: 45px;">' . $unit_label . '</span>';
+					$return .= '</div>';
 					$return .= '</td>';
-					$return .= '<td>';
-					$return .= '<input type="text" class="form-control form-control-sm text-right auto_num" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_sheet]" value="' . $qty_sheet . '" readonly>';
+
+					// Qty Retur with input-group
+					$return .= '<td style="vertical-align: middle;">';
+					$return .= '<div class="input-group input-group-sm">';
+					if ($is_sheet) {
+						$return .= '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur_sheet]" value="' . $qty_sheet . '" data-no_po="' . $item_po_detail->no_po . '" data-no="' . $no_detail . '" data-is_sheet="1" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
+						$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur]" value="' . $berat_terima . '">';
+					} else {
+						$return .= '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur]" value="' . $berat_terima . '" data-no_po="' . $item_po_detail->no_po . '" data-no="' . $no_detail . '" data-is_sheet="0" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
+						$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur_sheet]" value="0">';
+					}
+					$return .= '<span class="input-group-addon" style="font-size: 10px; font-weight: bold; background: #3c8dbc; color: #fff; min-width: 45px;">' . $unit_label . '</span>';
+					$return .= '</div>';
 					$return .= '</td>';
-					$return .= '<td>';
-					$return .= '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur]" value="' . $item_po_detail->berat_terima . '" data-no_po="' . $item_po_detail->no_po . '" data-no="' . $no_detail . '">';
+
+					// Harga Satuan with input-group
+					$return .= '<td style="vertical-align: middle;">';
+					$return .= '<div class="input-group input-group-sm">';
+					$return .= '<span class="input-group-addon" style="font-size: 10px; background: #eee; min-width: 32px;">' . $curr_label . '</span>';
+					$return .= '<input type="text" class="form-control text-right auto_num" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][harga]" value="' . $harga . '" readonly style="background-color: #f9f9f9;">';
+					$return .= '<span class="input-group-addon" style="font-size: 10px; background: #eee; min-width: 45px;">' . $price_label . '</span>';
+					$return .= '</div>';
 					$return .= '</td>';
-					$return .= '<td>';
-					$return .= '<input type="text" class="form-control form-control-sm text-right auto_num hitung_detail_total" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur_sheet]" value="' . $val_sheet_retur . '" data-no_po="' . $item_po_detail->no_po . '" data-no="' . $no_detail . '" ' . $readonly_sheet . '>';
+
+					// Total Harga with input-group
+					$return .= '<td style="vertical-align: middle;">';
+					$return .= '<div class="input-group input-group-sm">';
+					$return .= '<span class="input-group-addon" style="font-size: 10px; background: #eee; min-width: 32px;">' . $curr_label . '</span>';
+					$return .= '<input type="text" class="form-control text-right auto_num row_total_harga" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][total_harga]" value="' . $total_harga_item . '" readonly style="background-color: #f9f9f9; font-weight: bold;">';
+					$return .= '</div>';
 					$return .= '</td>';
+
 					$return .= '</tr>';
 				}
 
 				$return .= '</tbody>';
-				$return .= '<tfoot>';
+				$return .= '<tfoot style="background-color: #fcfcfc;">';
 				$return .= '<tr>';
-				$return .= '<td colspan="5" class="text-right text-bold">Grand Total</td>';
-				$return .= '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_qty_receive" readonly></td>';
-				$return .= '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_qty_receive_sheet" readonly></td>';
-				$return .= '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_retur" readonly></td>';
-				$return .= '<td><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_retur_sheet" readonly></td>';
+				$return .= '<td colspan="5" class="text-right text-bold" style="vertical-align: middle;">Total Qty</td>';
+				$return .= '<td style="vertical-align: middle;"><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_qty_receive" readonly style="background: transparent; border: none; font-weight: bold;"></td>';
+				$return .= '<td style="vertical-align: middle;"><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_retur" readonly style="background: transparent; border: none; font-weight: bold; color: #3c8dbc;"></td>';
+				$return .= '<td class="text-right text-bold" style="vertical-align: middle;">Subtotal</td>';
+				$return .= '<td style="vertical-align: middle;">';
+				$return .= '<div class="input-group input-group-sm">';
+				$return .= '<span class="input-group-addon" style="font-size: 10px; background: #eee; min-width: 32px;">' . $curr_label . '</span>';
+				$return .= '<input type="text" class="form-control text-right auto_num text-bold" id="footer_subtotal" name="subtotal" readonly style="background-color: #f9f9f9;">';
+				$return .= '</div>';
+				$return .= '</td>';
+				$return .= '</tr>';
+				$return .= '<tr>';
+				$return .= '<td colspan="8" class="text-right text-bold" style="vertical-align: middle;">';
+				$return .= '<div style="display: flex; justify-content: flex-end; align-items: center;">';
+				$return .= '<span style="margin-right: 10px;">PPN</span>';
+				$return .= '<div class="input-group input-group-sm" style="width: 100px;">';
+				$return .= '<input type="number" step="any" min="0" max="100" class="form-control text-right" id="footer_ppn_persen" name="ppn_persen" value="11" style="font-weight: bold;">';
+				$return .= '<span class="input-group-addon">%</span>';
+				$return .= '</div>';
+				$return .= '</div>';
+				$return .= '</td>';
+				$return .= '<td style="vertical-align: middle;">';
+				$return .= '<div class="input-group input-group-sm">';
+				$return .= '<span class="input-group-addon" style="font-size: 10px; background: #eee; min-width: 32px;">' . $curr_label . '</span>';
+				$return .= '<input type="text" class="form-control text-right auto_num" id="footer_nilai_ppn" name="nilai_ppn" readonly style="background-color: #f9f9f9;">';
+				$return .= '</div>';
+				$return .= '</td>';
+				$return .= '</tr>';
+				$return .= '<tr style="background-color: #f0f7fd; border-top: 2px solid #3c8dbc;">';
+				$return .= '<td colspan="8" class="text-right text-bold" style="font-size: 15px; vertical-align: middle; color: #2c3e50;">Grand Total</td>';
+				$return .= '<td style="vertical-align: middle;">';
+				$return .= '<div class="input-group input-group-sm">';
+				$return .= '<span class="input-group-addon" style="font-size: 11px; background: #3c8dbc; color: #fff; font-weight: bold; min-width: 32px;">' . $curr_label . '</span>';
+				$return .= '<input type="text" class="form-control text-right auto_num text-bold" style="font-size: 15px; color: #2c3e50; background: #fff;" id="footer_grand_total" name="grand_total" readonly>';
+				$return .= '</div>';
+				$return .= '</td>';
 				$return .= '</tr>';
 				$return .= '</tfoot>';
 				$return .= '</table>';
+				$return .= '</div>';
 			}
 
 			http_response_code(200);
@@ -326,22 +479,33 @@ class Retur_pembelian extends Admin_Controller
 				throw new Exception('Receive Invoice AP harus dipilih');
 			}
 
-			$fileName = $_FILES['file_ba']['name'];
-			$this->load->library(array('PHPExcel'));
-			$config['upload_path'] = './assets/file_ba/';
-			$config['file_name'] = $fileName;
-			$config['allowed_types'] = '*';
-			$config['max_size'] = 10000;
-			$config['remove_spaces'] = TRUE;
-			$config['encrypt_name'] = TRUE;
+			$target_dir = './assets/file_ba/';
+			if (!is_dir($target_dir)) {
+				mkdir($target_dir, 0777, true);
+				chmod($target_dir, 0777);
+			} elseif (!is_writable($target_dir)) {
+				@chmod($target_dir, 0777);
+			}
 
-			$this->load->library('upload', $config);
-			$this->upload->initialize($config);
-			if ($this->upload->do_upload('file_ba')) {
-				$uploadData = $this->upload->data();
-				$filenames = $uploadData['file_name'];
-			} else {
-				throw new Exception('Maaf, File BA gagal terupload !');
+			$filenames = '';
+			if (!empty($_FILES['file_ba']['name'])) {
+				$fileName = $_FILES['file_ba']['name'];
+				$this->load->library(array('PHPExcel'));
+				$config['upload_path'] = $target_dir;
+				$config['file_name'] = $fileName;
+				$config['allowed_types'] = '*';
+				$config['max_size'] = 10000;
+				$config['remove_spaces'] = TRUE;
+				$config['encrypt_name'] = TRUE;
+
+				$this->load->library('upload', $config);
+				$this->upload->initialize($config);
+				if ($this->upload->do_upload('file_ba')) {
+					$uploadData = $this->upload->data();
+					$filenames = $uploadData['file_name'];
+				} else {
+					throw new Exception('Maaf, File BA gagal terupload: ' . $this->upload->display_errors('', ''));
+				}
 			}
 
 			$get_supplier = $this->Retur_pembelian_model->get_supplier($this->input->post('supplier', true));
@@ -362,34 +526,33 @@ class Retur_pembelian extends Admin_Controller
 			foreach (array_keys($arr_no_po_unique) as $detail_po) {
 				if (isset($_POST['dt_' . $detail_po])) {
 					foreach ($_POST['dt_' . $detail_po] as $item_detail) {
-						$jumlah_retur = (float) str_replace(',', '', $item_detail['retur']);
-						$qty_receive  = (float) str_replace(',', '', $item_detail['qty_receive']);
-						$qty_sheet = (int) str_replace(',', '', $item_detail['qty_sheet']);
-						$qty_sheet_retur = (int) str_replace(',', '', $item_detail['retur_sheet']);
+						$jumlah_retur = (float) str_replace(',', '', (isset($item_detail['retur']) ? $item_detail['retur'] : 0));
+						$qty_receive  = (float) str_replace(',', '', (isset($item_detail['qty_receive']) ? $item_detail['qty_receive'] : 0));
+						$qty_sheet = (int) str_replace(',', '', (isset($item_detail['qty_sheet']) ? $item_detail['qty_sheet'] : 0));
+						$qty_sheet_retur = (int) str_replace(',', '', (isset($item_detail['retur_sheet']) ? $item_detail['retur_sheet'] : 0));
 						$nama_material = isset($item_detail['namamaterial']) ? $item_detail['namamaterial'] : '';
+						$harga_satuan = isset($item_detail['harga']) ? (float) str_replace(',', '', $item_detail['harga']) : 0;
 
-						// Validasi: jumlah_retur harus lebih dari 0
-						if ($jumlah_retur <= 0) {
-							throw new Exception('Jumlah retur (Kg) harus lebih dari 0');
-						}
+						$material_check = $this->db->select('id_bentuk')->get_where('ms_inventory_category3', ['id_category3' => $item_detail['idmaterial']])->row();
+						$is_sheet = (!empty($material_check) && $material_check->id_bentuk == 'B2000002');
 
-						// Validasi: jumlah_retur tidak boleh melebihi qty_receive
-						if ($jumlah_retur > $qty_receive) {
-							throw new Exception('Jumlah retur (Kg) ' . $nama_material . ' melebihi qty receive');
-						}
-
-						// Validasi sheet: jika qty_sheet > 0 (artinya barang bentuk sheet), maka qty_sheet_retur harus > 0 dan <= qty_sheet
-						if ($qty_sheet > 0) {
+						if ($is_sheet) {
 							if ($qty_sheet_retur <= 0) {
-								throw new Exception('Jumlah retur (Sheet) harus lebih dari 0');
+								throw new Exception('Jumlah retur (Sheet) ' . $nama_material . ' harus lebih dari 0');
 							}
-							if ($qty_sheet_retur > $qty_sheet) {
+							if ($qty_sheet > 0 && $qty_sheet_retur > $qty_sheet) {
 								throw new Exception('Jumlah retur (Sheet) ' . $nama_material . ' melebihi qty receive');
 							}
+							$grand_total_item = $qty_sheet_retur * $harga_satuan;
+						} else {
+							if ($jumlah_retur <= 0) {
+								throw new Exception('Jumlah retur (Kg) ' . $nama_material . ' harus lebih dari 0');
+							}
+							if ($qty_receive > 0 && $jumlah_retur > $qty_receive) {
+								throw new Exception('Jumlah retur (Kg) ' . $nama_material . ' melebihi qty receive');
+							}
+							$grand_total_item = $jumlah_retur * $harga_satuan;
 						}
-
-						$harga_satuan = isset($item_detail['harga']) ? (float) str_replace(',', '', $item_detail['harga']) : 0;
-						$grand_total = $jumlah_retur * $harga_satuan;
 
 						$arr_insert_detail[] = [
 							'id_header' => $no_surat,
@@ -406,7 +569,8 @@ class Retur_pembelian extends Admin_Controller
 							'jumlah_retur' => $jumlah_retur,
 							'qty_sheet_retur' => $qty_sheet_retur,
 							'harga_satuan' => $harga_satuan,
-							'grand_total' => $grand_total,
+							'grand_total' => $grand_total_item,
+							'matauang' => (!empty($item_detail['matauang'])) ? $item_detail['matauang'] : ($this->input->post('matauang', true) ? $this->input->post('matauang', true) : 'IDR'),
 							'input_by' => $this->auth->user_id(),
 							'input_date' => date('Y-m-d H:i:s')
 						];
@@ -424,18 +588,44 @@ class Retur_pembelian extends Admin_Controller
 				$arr_no_po_header[$detail_item['no_po']] = true;
 			}
 
+			$subtotal = isset($_POST['subtotal']) ? (float) str_replace(',', '', $_POST['subtotal']) : 0;
+			$ppn_persen = isset($_POST['ppn_persen']) ? (float) str_replace(',', '', $_POST['ppn_persen']) : 0;
+			$nilai_ppn = isset($_POST['nilai_ppn']) ? (float) str_replace(',', '', $_POST['nilai_ppn']) : 0;
+			$grand_total = isset($_POST['grand_total']) ? (float) str_replace(',', '', $_POST['grand_total']) : 0;
+
+			if ($subtotal <= 0 && !empty($arr_insert_detail)) {
+				$subtotal = array_sum(array_column($arr_insert_detail, 'grand_total'));
+				$nilai_ppn = ($subtotal * $ppn_persen) / 100;
+				$grand_total = $subtotal + $nilai_ppn;
+			}
+
+			$id_rec_inv_ap = $this->input->post('id_rec_inv_ap', true);
+			$no_ref_invoice = !empty($id_rec_inv_ap) ? $id_rec_inv_ap : $this->input->post('no_ref_invoice', true);
+			$matauang = $this->input->post('matauang', true);
+			if (empty($matauang) && !empty($arr_insert_detail[0]['matauang'])) {
+				$matauang = $arr_insert_detail[0]['matauang'];
+			}
+			if (empty($matauang)) {
+				$matauang = 'IDR';
+			}
+
 			$arr_insert_header = [
 				'no_surat' => $no_surat,
 				'id_supplier' => $this->input->post('supplier', true),
 				'nm_supplier' => $nm_supplier,
 				'no_po' => implode(',', array_keys($arr_no_po_header)),
-				'id_rec_inv_ap' => $this->input->post('id_rec_inv_ap', true),
+				'id_rec_inv_ap' => $id_rec_inv_ap,
 				'tgl_retur' => $this->input->post('tanggal_retur', true),
 				'no_ng_report' => $this->input->post('no_ng_report', true),
 				'alasan_retur' => $this->input->post('alasan_retur', true),
 				'file_ba' => 'assets/file_ba/' . $filenames,
-				'no_ref_invoice' => $this->input->post('no_ref_invoice', true),
+				'no_ref_invoice' => $no_ref_invoice,
 				'tgl_invoice' => $this->input->post('tanggal_invoice', true),
+				'matauang' => $matauang,
+				'subtotal' => $subtotal,
+				'ppn_persen' => $ppn_persen,
+				'nilai_ppn' => $nilai_ppn,
+				'grand_total' => $grand_total,
 				'input_by' => $this->auth->user_id(),
 				'input_date' => date('Y-m-d H:i:s')
 			];
@@ -495,34 +685,37 @@ class Retur_pembelian extends Admin_Controller
 		try {
 			$reset_detail = $this->db->delete('dt_retur_pembelian', ['id_header' => $no_surat]);
 
-			$fileName = $_FILES['file_ba']['name'];
-			$this->load->library(array('PHPExcel'));
-			$config['upload_path'] = './assets/file_ba/';
-			$config['file_name'] = $fileName;
-			$config['allowed_types'] = '*';
-			$config['max_size'] = 10000;
-			$config['remove_spaces'] = TRUE;
-			$config['encrypt_name'] = TRUE;
-
-			$this->load->library('upload', $config);
-			$this->upload->initialize($config);
-			if ($this->upload->do_upload('file_ba')) {
-				$uploadData = $this->upload->data();
-				$filenames = $uploadData['file_name'];
+			$target_dir = './assets/file_ba/';
+			if (!is_dir($target_dir)) {
+				mkdir($target_dir, 0777, true);
+				chmod($target_dir, 0777);
+			} elseif (!is_writable($target_dir)) {
+				@chmod($target_dir, 0777);
 			}
 
-			$arr_insert_header = [
-				'tgl_retur' => $this->input->post('tanggal_retur', true),
-				'no_ng_report' => $this->input->post('no_ng_report', true),
-				'alasan_retur' => $this->input->post('alasan_retur', true),
-				'no_ref_invoice' => $this->input->post('no_ref_invoice', true),
-				'tgl_invoice' => $this->input->post('tanggal_invoice', true),
-				'updated_by' => $this->auth->user_id(),
-				'updated_date' => date('Y-m-d H:i:s')
-			];
-			if (!empty($filenames)) {
-				$arr_insert_header['file_ba'] = 'assets/file_ba/' . $filenames;
+			$filenames = '';
+			if (!empty($_FILES['file_ba']['name'])) {
+				$fileName = $_FILES['file_ba']['name'];
+				$this->load->library(array('PHPExcel'));
+				$config['upload_path'] = $target_dir;
+				$config['file_name'] = $fileName;
+				$config['allowed_types'] = '*';
+				$config['max_size'] = 10000;
+				$config['remove_spaces'] = TRUE;
+				$config['encrypt_name'] = TRUE;
+
+				$this->load->library('upload', $config);
+				$this->upload->initialize($config);
+				if ($this->upload->do_upload('file_ba')) {
+					$uploadData = $this->upload->data();
+					$filenames = $uploadData['file_name'];
+				} else {
+					throw new Exception('Maaf, File BA gagal terupload: ' . $this->upload->display_errors('', ''));
+				}
 			}
+
+			$id_rec_inv_ap = $this->input->post('id_rec_inv_ap', true);
+			$no_ref_invoice = !empty($id_rec_inv_ap) ? $id_rec_inv_ap : $this->input->post('no_ref_invoice', true);
 
 			$arr_insert_detail = [];
 
@@ -531,34 +724,33 @@ class Retur_pembelian extends Admin_Controller
 				foreach (explode(',', $no_poooo) as $detail_po) {
 					if (isset($_POST['dt_' . $detail_po])) {
 						foreach ($_POST['dt_' . $detail_po] as $item_detail) {
-							$jumlah_retur = (float) str_replace(',', '', $item_detail['retur']);
-							$qty_receive  = (float) str_replace(',', '', $item_detail['qty_receive']);
-							$qty_sheet = (int) str_replace(',', '', $item_detail['qty_sheet']);
-							$qty_sheet_retur = (int) str_replace(',', '', $item_detail['retur_sheet']);
+							$jumlah_retur = (float) str_replace(',', '', (isset($item_detail['retur']) ? $item_detail['retur'] : 0));
+							$qty_receive  = (float) str_replace(',', '', (isset($item_detail['qty_receive']) ? $item_detail['qty_receive'] : 0));
+							$qty_sheet = (int) str_replace(',', '', (isset($item_detail['qty_sheet']) ? $item_detail['qty_sheet'] : 0));
+							$qty_sheet_retur = (int) str_replace(',', '', (isset($item_detail['retur_sheet']) ? $item_detail['retur_sheet'] : 0));
 							$nama_material = isset($item_detail['namamaterial']) ? $item_detail['namamaterial'] : '';
+							$harga_satuan = isset($item_detail['harga']) ? (float) str_replace(',', '', $item_detail['harga']) : 0;
 
-							// Validasi: jumlah_retur harus lebih dari 0
-							if ($jumlah_retur <= 0) {
-								throw new Exception('Jumlah retur (Kg) harus lebih dari 0');
-							}
+							$material_check = $this->db->select('id_bentuk')->get_where('ms_inventory_category3', ['id_category3' => $item_detail['idmaterial']])->row();
+							$is_sheet = (!empty($material_check) && $material_check->id_bentuk == 'B2000002');
 
-							// Validasi: jumlah_retur tidak boleh melebihi qty_receive
-							if ($jumlah_retur > $qty_receive) {
-								throw new Exception('Jumlah retur (Kg) ' . $nama_material . ' melebihi qty receive');
-							}
-
-							// Validasi sheet: jika qty_sheet > 0 (artinya barang bentuk sheet), maka qty_sheet_retur harus > 0 dan <= qty_sheet
-							if ($qty_sheet > 0) {
+							if ($is_sheet) {
 								if ($qty_sheet_retur <= 0) {
-									throw new Exception('Jumlah retur (Sheet) harus lebih dari 0');
+									throw new Exception('Jumlah retur (Sheet) ' . $nama_material . ' harus lebih dari 0');
 								}
-								if ($qty_sheet_retur > $qty_sheet) {
+								if ($qty_sheet > 0 && $qty_sheet_retur > $qty_sheet) {
 									throw new Exception('Jumlah retur (Sheet) ' . $nama_material . ' melebihi qty receive');
 								}
+								$grand_total_item = $qty_sheet_retur * $harga_satuan;
+							} else {
+								if ($jumlah_retur <= 0) {
+									throw new Exception('Jumlah retur (Kg) ' . $nama_material . ' harus lebih dari 0');
+								}
+								if ($qty_receive > 0 && $jumlah_retur > $qty_receive) {
+									throw new Exception('Jumlah retur (Kg) ' . $nama_material . ' melebihi qty receive');
+								}
+								$grand_total_item = $jumlah_retur * $harga_satuan;
 							}
-
-							$harga_satuan = isset($item_detail['harga']) ? (float) str_replace(',', '', $item_detail['harga']) : 0;
-							$grand_total = $jumlah_retur * $harga_satuan;
 
 							$arr_insert_detail[] = [
 								'id_header' => $no_surat,
@@ -575,7 +767,8 @@ class Retur_pembelian extends Admin_Controller
 								'jumlah_retur' => $jumlah_retur,
 								'qty_sheet_retur' => $qty_sheet_retur,
 								'harga_satuan' => $harga_satuan,
-								'grand_total' => $grand_total,
+								'grand_total' => $grand_total_item,
+								'matauang' => (!empty($item_detail['matauang'])) ? $item_detail['matauang'] : ($this->input->post('matauang', true) ? $this->input->post('matauang', true) : 'IDR'),
 								'input_by' => $this->auth->user_id(),
 								'input_date' => date('Y-m-d H:i:s')
 							];
@@ -584,6 +777,43 @@ class Retur_pembelian extends Admin_Controller
 				}
 			} else {
 				throw new Exception('Maaf, data barang yang di akan di retur tidak sesuai !');
+			}
+
+			$subtotal = isset($_POST['subtotal']) ? (float) str_replace(',', '', $_POST['subtotal']) : 0;
+			$ppn_persen = isset($_POST['ppn_persen']) ? (float) str_replace(',', '', $_POST['ppn_persen']) : 0;
+			$nilai_ppn = isset($_POST['nilai_ppn']) ? (float) str_replace(',', '', $_POST['nilai_ppn']) : 0;
+			$grand_total = isset($_POST['grand_total']) ? (float) str_replace(',', '', $_POST['grand_total']) : 0;
+
+			if ($subtotal <= 0 && !empty($arr_insert_detail)) {
+				$subtotal = array_sum(array_column($arr_insert_detail, 'grand_total'));
+				$nilai_ppn = ($subtotal * $ppn_persen) / 100;
+				$grand_total = $subtotal + $nilai_ppn;
+			}
+
+			$matauang = $this->input->post('matauang', true);
+			if (empty($matauang) && !empty($arr_insert_detail[0]['matauang'])) {
+				$matauang = $arr_insert_detail[0]['matauang'];
+			}
+			if (empty($matauang)) {
+				$matauang = 'IDR';
+			}
+
+			$arr_insert_header = [
+				'tgl_retur' => $this->input->post('tanggal_retur', true),
+				'no_ng_report' => $this->input->post('no_ng_report', true),
+				'alasan_retur' => $this->input->post('alasan_retur', true),
+				'no_ref_invoice' => $no_ref_invoice,
+				'tgl_invoice' => $this->input->post('tanggal_invoice', true),
+				'matauang' => $matauang,
+				'subtotal' => $subtotal,
+				'ppn_persen' => $ppn_persen,
+				'nilai_ppn' => $nilai_ppn,
+				'grand_total' => $grand_total,
+				'updated_by' => $this->auth->user_id(),
+				'updated_date' => date('Y-m-d H:i:s')
+			];
+			if (!empty($filenames)) {
+				$arr_insert_header['file_ba'] = 'assets/file_ba/' . $filenames;
 			}
 
 			$insert_header = $this->db->update('tr_retur_pembelian', $arr_insert_header, ['id' => $id]);
@@ -653,6 +883,7 @@ class Retur_pembelian extends Admin_Controller
 			$this->db->or_like('a.nm_supplier', $search['value'], 'both');
 			$this->db->or_like('DATE_FORMAT(a.tgl_retur, "%d %M %Y")', $search['value'], 'both');
 			$this->db->or_like('a.no_ref_invoice', $search['value'], 'both');
+			$this->db->or_like('a.id_rec_inv_ap', $search['value'], 'both');
 			$this->db->or_like('DATE_FORMAT(a.tgl_invoice, "%d %M %Y")', $search['value'], 'both');
 			$this->db->group_end();
 		}
@@ -670,8 +901,6 @@ class Retur_pembelian extends Admin_Controller
 		foreach ($get_data as $item) {
 			$no++;
 
-			// Requirement 4.2: if id_rec_inv_ap is set, use no_invoice from Receive Invoice AP header
-			// Requirement 4.3: if id_rec_inv_ap is null, fallback to no_surat from tr_purchase_order
 			if (!empty($item->id_rec_inv_ap)) {
 				$no_surat_po = $item->no_invoice;
 			} else {
@@ -700,9 +929,6 @@ class Retur_pembelian extends Admin_Controller
 			}
 
 			$status = $this->_render_dn_status($item);
-
-			$status = $this->_render_dn_status($item);
-
 			$action = $this->_render_action_retur_pembelian($item);
 
 			$arr_data[] = [
@@ -711,7 +937,7 @@ class Retur_pembelian extends Admin_Controller
 				'no_po' => $no_surat_po,
 				'nama_supplier' => $item->nm_supplier,
 				'tanggal_retur' => date('d F Y', strtotime($item->tgl_retur)),
-				'no_ref_invoice' => $item->no_ref_invoice,
+				'no_ref_invoice' => (!empty($item->id_rec_inv_ap) ? $item->id_rec_inv_ap : $item->no_ref_invoice),
 				'tanggal_invoice' => date('d F Y', strtotime($item->tgl_invoice)),
 				'status' => $status,
 				'action' => $action
@@ -734,20 +960,20 @@ class Retur_pembelian extends Admin_Controller
 
 		$btn_view = '';
 		if (has_permission($this->viewPermission)) {
-			$btn_view = '<a href="' . base_url('retur_pembelian/view_retur/' . $item->id) . '" class="btn btn-sm btn-info" title="View Retur"><i class="fa fa-eye"></i></a>';
-		}
-
-		$btn_delete = '';
-		if (has_permission($this->deletePermission) && $item->deleted_by == null && count($get_dn) < 1) {
-			$btn_delete = '<button type="button" class="btn btn-sm btn-danger del_retur" title="Delete Retur" data-id="' . $item->id . '"><i class="fa fa-trash"></i></button>';
+			$btn_view = '<a href="' . base_url('retur_pembelian/view_retur/' . $item->id) . '" class="btn btn-sm btn-info" data-toggle="tooltip" title="Lihat Detail"><i class="fa fa-eye"></i></a>';
 		}
 
 		$btn_edit = '';
 		if (has_permission($this->deletePermission) && $item->deleted_by == null && count($get_dn) < 1) {
-			$btn_edit = '<a href="' . base_url('retur_pembelian/edit_retur/' . $item->id) . '" class="btn btn-sm btn-warning" title="Edit Retur"><i class="fa fa-pencil"></i></a>';
+			$btn_edit = '<a href="' . base_url('retur_pembelian/edit_retur/' . $item->id) . '" class="btn btn-sm btn-warning" data-toggle="tooltip" title="Edit Retur"><i class="fa fa-pencil"></i></a>';
 		}
 
-		$action = $btn_view . ' ' . $btn_delete . ' ' . $btn_edit;
+		$btn_delete = '';
+		if (has_permission($this->deletePermission) && $item->deleted_by == null && count($get_dn) < 1) {
+			$btn_delete = '<button type="button" class="btn btn-sm btn-danger del_retur" data-toggle="tooltip" title="Hapus Retur" data-id="' . $item->id . '"><i class="fa fa-trash"></i></button>';
+		}
+
+		$action = $btn_view . ' ' . $btn_edit . ' ' . $btn_delete;
 
 		return $action;
 	}
@@ -756,9 +982,9 @@ class Retur_pembelian extends Admin_Controller
 	{
 		$get_dn = $this->db->get_where('tr_dn_retur_pmb', ['id_retur' => $item->id])->result();
 
-		$status = '<span class="badge bg-blue">Waiting DN</span>';
+		$status = '<span class="badge bg-yellow badge-status"><i class="fa fa-clock-o"></i> Waiting DN</span>';
 		if (count($get_dn) > 0) {
-			$status = '<span class="badge bg-green">DN Created</span>';
+			$status = '<span class="badge bg-green badge-status"><i class="fa fa-check"></i> DN Created</span>';
 		}
 
 		return $status;
