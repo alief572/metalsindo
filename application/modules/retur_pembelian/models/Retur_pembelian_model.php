@@ -12,10 +12,10 @@ class Retur_pembelian_model extends BF_Model
 	/**
 	 * @var string  User Table Name
 	 */
-	protected $viewPermission 	= 'Input Retur Pembelian.View';
-	protected $addPermission  	= 'Input Retur Pembelian.Add';
-	protected $managePermission = 'Input Retur Pembelian.Manage';
-	protected $deletePermission = 'Input Retur Pembelian.Delete';
+	protected $viewPermission 	= 'Retur_pembelian.View';
+	protected $addPermission  	= 'Retur_pembelian.Add';
+	protected $managePermission = 'Retur_pembelian.Manage';
+	protected $deletePermission = 'Retur_pembelian.Delete';
 
 	protected $table_name = 'ms_inventory_category3';
 	protected $key        = 'id';
