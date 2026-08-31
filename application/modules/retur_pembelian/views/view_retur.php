@@ -157,7 +157,7 @@
                                 $calc_subtotal = 0;
 
                                 foreach ($detail as $item_detail) {
-                                    $material = $this->db->select('id_shapes, id_bentuk')->get_where('ms_inventory_category3', ['id_category3' => $item_detail->id_material])->row();
+                                    $material = !empty($item_detail->id_material) ? $this->db->select('id_bentuk')->get_where('ms_inventory_category3', ['id_category3' => $item_detail->id_material])->row() : null;
                                     $is_sheet = (!empty($material) && $material->id_bentuk == 'B2000002');
                                     $unit_label = $is_sheet ? 'Sheet' : 'KGS';
                                     $price_label = $is_sheet ? '/Sheet' : '/Kg';
@@ -223,8 +223,11 @@
                         <?php
                         // Backward compatibility
                         foreach (explode(',', $header->no_po) as $item_po) {
-                            $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $item_po])->row();
+                            if (empty(trim($item_po))) continue;
+                            $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => trim($item_po)])->row();
+                            if (empty($get_po)) continue;
                             $po_detail = $this->Retur_pembelian_model->get_po_detail($get_po->no_po);
+                            if (empty($po_detail)) continue;
 
                             $po_matauang = (!empty($get_po->matauang)) ? $get_po->matauang : 'IDR';
                             $po_curr_label = (strtoupper(trim($po_matauang)) === 'USD') ? 'USD' : ((strtoupper(trim($po_matauang)) === 'IDR' || strtoupper(trim($po_matauang)) === 'RP') ? 'Rp' : strtoupper(trim($po_matauang)));
@@ -261,7 +264,7 @@
                                         $lotno = (!empty($arr_detail[$item_po_detail->id]->lotno)) ? $arr_detail[$item_po_detail->id]->lotno : '';
                                         $harga = (!empty($arr_detail[$item_po_detail->id]->harga_satuan)) ? $arr_detail[$item_po_detail->id]->harga_satuan : (float) $item_po_detail->hargasatuan;
 
-                                        $material = $this->db->select('id_shapes, id_bentuk')->get_where('ms_inventory_category3', ['id_category3' => $item_po_detail->idmaterial])->row();
+                                        $material = !empty($item_po_detail->idmaterial) ? $this->db->select('id_bentuk')->get_where('ms_inventory_category3', ['id_category3' => $item_po_detail->idmaterial])->row() : null;
                                         $is_sheet = (!empty($material) && $material->id_bentuk == 'B2000002');
                                         $unit_label = $is_sheet ? 'Sheet' : 'KGS';
                                         $price_label = $is_sheet ? '/Sheet' : '/Kg';
