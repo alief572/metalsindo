@@ -719,11 +719,24 @@ class Retur_pembelian extends Admin_Controller
 
 			$arr_insert_detail = [];
 
-			if (!empty($this->input->post('no_po', true))) {
-				$no_poooo = $this->input->post('no_po', true);
-				foreach (explode(',', $no_poooo) as $detail_po) {
-					if (isset($_POST['dt_' . $detail_po])) {
-						foreach ($_POST['dt_' . $detail_po] as $item_detail) {
+			// Kumpulkan no_po unik dari $_POST keys yang dimulai dengan 'dt_'
+			$arr_no_po_unique = [];
+			foreach (array_keys($_POST) as $post_key) {
+				if (strpos($post_key, 'dt_') === 0) {
+					$no_po_from_key = substr($post_key, 3); // hapus prefix 'dt_'
+					$arr_no_po_unique[$no_po_from_key] = true;
+				}
+			}
+
+			if (empty($arr_no_po_unique) && !empty($this->input->post('no_po', true))) {
+				foreach (explode(',', $this->input->post('no_po', true)) as $detail_po) {
+					$arr_no_po_unique[$detail_po] = true;
+				}
+			}
+
+			foreach (array_keys($arr_no_po_unique) as $detail_po) {
+				if (isset($_POST['dt_' . $detail_po])) {
+					foreach ($_POST['dt_' . $detail_po] as $item_detail) {
 							$jumlah_retur = (float) str_replace(',', '', (isset($item_detail['retur']) ? $item_detail['retur'] : 0));
 							$qty_receive  = (float) str_replace(',', '', (isset($item_detail['qty_receive']) ? $item_detail['qty_receive'] : 0));
 							$qty_sheet = (int) str_replace(',', '', (isset($item_detail['qty_sheet']) ? $item_detail['qty_sheet'] : 0));
@@ -772,10 +785,11 @@ class Retur_pembelian extends Admin_Controller
 								'input_by' => $this->auth->user_id(),
 								'input_date' => date('Y-m-d H:i:s')
 							];
-						}
 					}
 				}
-			} else {
+			}
+
+			if (empty($arr_insert_detail)) {
 				throw new Exception('Maaf, data barang yang di akan di retur tidak sesuai !');
 			}
 
