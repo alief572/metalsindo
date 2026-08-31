@@ -12,10 +12,10 @@ class Retur_pembelian_model extends BF_Model
 	/**
 	 * @var string  User Table Name
 	 */
-	protected $viewPermission 	= 'Retur_pembelian.View';
-	protected $addPermission  	= 'Retur_pembelian.Add';
-	protected $managePermission = 'Retur_pembelian.Manage';
-	protected $deletePermission = 'Retur_pembelian.Delete';
+	protected $viewPermission 	= 'Input Retur Pembelian.View';
+	protected $addPermission  	= 'Input Retur Pembelian.Add';
+	protected $managePermission = 'Input Retur Pembelian.Manage';
+	protected $deletePermission = 'Input Retur Pembelian.Delete';
 
 	protected $table_name = 'ms_inventory_category3';
 	protected $key        = 'id';
@@ -66,6 +66,35 @@ class Retur_pembelian_model extends BF_Model
 	public function __construct()
 	{
 		parent::__construct();
+		$this->check_table_columns();
+	}
+
+	public function check_table_columns()
+	{
+		if ($this->db->table_exists('tr_retur_pembelian')) {
+			$fields = $this->db->list_fields('tr_retur_pembelian');
+			if (!in_array('subtotal', $fields)) {
+				$this->db->query("ALTER TABLE tr_retur_pembelian ADD COLUMN subtotal DOUBLE DEFAULT 0");
+			}
+			if (!in_array('ppn_persen', $fields)) {
+				$this->db->query("ALTER TABLE tr_retur_pembelian ADD COLUMN ppn_persen DOUBLE DEFAULT 0");
+			}
+			if (!in_array('nilai_ppn', $fields)) {
+				$this->db->query("ALTER TABLE tr_retur_pembelian ADD COLUMN nilai_ppn DOUBLE DEFAULT 0");
+			}
+			if (!in_array('grand_total', $fields)) {
+				$this->db->query("ALTER TABLE tr_retur_pembelian ADD COLUMN grand_total DOUBLE DEFAULT 0");
+			}
+			if (!in_array('matauang', $fields)) {
+				$this->db->query("ALTER TABLE tr_retur_pembelian ADD COLUMN matauang VARCHAR(20) DEFAULT 'IDR'");
+			}
+		}
+		if ($this->db->table_exists('dt_retur_pembelian')) {
+			$dt_fields = $this->db->list_fields('dt_retur_pembelian');
+			if (!in_array('matauang', $dt_fields)) {
+				$this->db->query("ALTER TABLE dt_retur_pembelian ADD COLUMN matauang VARCHAR(20) DEFAULT 'IDR'");
+			}
+		}
 	}
 
 	public function get_supplier($id_supplier = null)
@@ -224,13 +253,19 @@ class Retur_pembelian_model extends BF_Model
 			dtp.hargasatuan,
 			dtp.idpr,
 			di.width_recive,
+			di.lotno,
+			di.qty_sheet,
+			mic3.id_bentuk,
 			ti.tanggal AS tanggal_incoming,
-			riad.id_rec_inv_ap
+			riad.id_rec_inv_ap,
+			tpo.matauang
 		', FALSE);
 		$this->db->from('tr_receive_invoice_ap_detail riad');
 		$this->db->join('tr_incoming ti', 'ti.id_incoming = riad.id_incoming');
 		$this->db->join('dt_incoming di', 'di.id_incoming = ti.id_incoming');
 		$this->db->join('dt_trans_po dtp', 'dtp.id_dt_po = di.id_dt_po');
+		$this->db->join('ms_inventory_category3 mic3', 'mic3.id_category3 = dtp.idmaterial', 'left');
+		$this->db->join('tr_purchase_order tpo', 'tpo.no_po = dtp.no_po', 'left');
 		$this->db->where('riad.id_rec_inv_ap', $id_rec_inv_ap);
 		return $this->db->get()->result();
 	}

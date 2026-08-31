@@ -1,391 +1,334 @@
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
-    input,
-    textarea,
-    select {
-        margin: 0.5vh;
+    .panel-form {
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        border: 1px solid #e3e6f0;
+        margin-bottom: 20px;
     }
-
-    .form-control {
-        border-radius: 10px;
+    .panel-form .panel-heading {
+        background-color: #f8f9fc;
+        border-bottom: 1px solid #e3e6f0;
+        font-weight: bold;
+        color: #31708f;
+        padding: 10px 15px;
+    }
+    .panel-form .panel-body {
+        padding: 15px;
+    }
+    .table-detail-retur thead th {
+        background-color: #3c8dbc;
+        color: #ffffff;
+        font-weight: 600;
+        vertical-align: middle !important;
+    }
+    .table-detail-retur tbody td {
+        vertical-align: middle !important;
+    }
+    .table-info-view {
+        margin-bottom: 0;
+    }
+    .table-info-view tr td {
+        padding: 7px 10px !important;
+        border-top: 1px solid #f4f4f4 !important;
+    }
+    .table-info-view tr td:first-child {
+        width: 35%;
+        font-weight: 600;
+        color: #555;
     }
 </style>
-<div class="box">
+
+<div class="box box-info">
+    <div class="box-header with-border">
+        <h3 class="box-title">
+            <i class="fa fa-info-circle text-info"></i> Detail Retur Pembelian: 
+            <span class="badge bg-aqua" style="font-size: 14px; font-weight: bold;"><?= $header->no_surat ?></span>
+        </h3>
+        <div class="box-tools pull-right">
+            <a href="<?= base_url('retur_pembelian') ?>" class="btn btn-sm btn-default"><i class="fa fa-arrow-left"></i> Kembali</a>
+        </div>
+    </div>
     <div class="box-body">
         <div class="row">
-            <div class="col-md-2">
-                <span class="text-bold">Nama Supplier <span class="text-red">*</span></span>
-            </div>
-            <div class="col-md-4">
-                <select name="supplier" id="" class="form-control select2 supplier" disabled>
-                    <!-- <option value="">- Select Supplier -</option> -->
-                    <?php
-                    if (!empty($list_supplier)) {
-                        foreach ($list_supplier as $item_supplier) {
-                            if ($header->id_supplier == $item_supplier->id_suplier) {
-                                echo '<option value="' . $item_supplier->id_suplier . '">' . $item_supplier->name_suplier . '</option>';
-                            }
-                        }
-                    }
-                    ?>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <span class="text-bold">No. Ref Invoice</span>
-            </div>
-            <div class="col-md-4">
-                <input type="text" class="form-control" name="no_ref_invoice" placeholder="No. Reference Invoice" value="<?= $header->no_ref_invoice ?>" readonly>
+            <!-- Panel Kiri: Informasi Supplier & Invoice Referensi -->
+            <div class="col-md-6">
+                <div class="panel panel-default panel-form">
+                    <div class="panel-heading">
+                        <i class="fa fa-building-o"></i> Informasi Supplier & Referensi
+                    </div>
+                    <div class="panel-body" style="padding: 0;">
+                        <table class="table table-info-view">
+                            <tr>
+                                <td>Nama Supplier</td>
+                                <td>: <b><?= $header->nm_supplier ?></b></td>
+                            </tr>
+                            <?php if (!empty($id_rec_inv_ap)) : ?>
+                                <tr>
+                                    <td>No. Receive Invoice AP</td>
+                                    <td>: <span class="label label-primary" style="font-size: 12px;"><?= isset($no_invoice_rec_inv_ap) ? $no_invoice_rec_inv_ap : $id_rec_inv_ap ?></span></td>
+                                </tr>
+                            <?php else : ?>
+                                <tr>
+                                    <td>No. PO</td>
+                                    <td>: <?= $header->no_po ?></td>
+                                </tr>
+                            <?php endif; ?>
+                            <tr>
+                                <td>No. Ref Invoice</td>
+                                <td>: <?= (!empty($header->id_rec_inv_ap) ? $header->id_rec_inv_ap : $header->no_ref_invoice) ?></td>
+                            </tr>
+                            <tr>
+                                <td>Tanggal Invoice</td>
+                                <td>: <?= date('d F Y', strtotime($header->tgl_invoice)) ?></td>
+                            </tr>
+                            <tr>
+                                <td>Tanggal Retur</td>
+                                <td>: <?= date('d F Y', strtotime($header->tgl_retur)) ?></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            <?php if (!empty($id_rec_inv_ap)) : ?>
-            <div class="col-md-2">
-                <span class="text-bold">No. Receive Invoice AP</span>
+            <!-- Panel Kanan: Informasi Retur & Dokumen NCR -->
+            <div class="col-md-6">
+                <div class="panel panel-default panel-form">
+                    <div class="panel-heading">
+                        <i class="fa fa-file-text-o"></i> Informasi Retur & Dokumen NCR
+                    </div>
+                    <div class="panel-body" style="padding: 0;">
+                        <table class="table table-info-view">
+                            <tr>
+                                <td>No. NG Report</td>
+                                <td>: <span class="label label-warning" style="font-size: 12px;"><?= $header->no_ng_report ?></span></td>
+                            </tr>
+                            <tr>
+                                <td>Alasan Retur</td>
+                                <td>: <?= nl2br(htmlspecialchars($header->alasan_retur)) ?></td>
+                            </tr>
+                            <tr>
+                                <td>Dokumen NCR</td>
+                                <td>: 
+                                    <?php if (!empty($header->file_ba) && file_exists($header->file_ba)) : ?>
+                                        <a href="<?= base_url($header->file_ba) ?>" class="btn btn-sm btn-primary" title="Download file NCR" target="_blank" download>
+                                            <i class="fa fa-download"></i> Unduh Berkas NCR
+                                        </a>
+                                    <?php else : ?>
+                                        <span class="text-muted"><i class="fa fa-times-circle text-danger"></i> Tidak ada file lampiran</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-4">
-                <input type="text" class="form-control" value="<?= isset($no_invoice_rec_inv_ap) ? $no_invoice_rec_inv_ap : '' ?>" readonly>
+        </div>
+
+        <!-- Bagian Rincian Item Material -->
+        <div class="panel panel-default panel-form">
+            <div class="panel-heading">
+                <i class="fa fa-list"></i> Rincian Material yang Diretur
             </div>
-            <?php else : ?>
-            <div class="col-md-2">
-                <span class="text-bold">No. PO</span>
-            </div>
-            <div class="col-md-4">
-                <select class="form-control no_po select2" multiple="multiple" disabled>
+            <div class="panel-body">
+                <div class="table-responsive">
                     <?php
-                    if (strpos($header->no_po, ',') !== false) {
+                    $matauang = (!empty($header->matauang)) ? $header->matauang : 'IDR';
+                    $curr_label = (strtoupper(trim($matauang)) === 'USD') ? 'USD' : ((strtoupper(trim($matauang)) === 'IDR' || strtoupper(trim($matauang)) === 'RP') ? 'Rp' : strtoupper(trim($matauang)));
+                    ?>
+                    <?php if (!empty($id_rec_inv_ap)) : ?>
+                        <table class="table table-striped table-bordered table-hover table-detail-retur" style="font-size: 13px;">
+                            <thead style="background-color: #2c3e50; color: #fff;">
+                                <tr>
+                                    <th class="text-center" style="width: 10%; vertical-align: middle;">Tgl Incoming</th>
+                                    <th class="text-center" style="width: 12%; vertical-align: middle;">Lot Number</th>
+                                    <th class="text-center" style="width: 18%; vertical-align: middle;">Nama Material</th>
+                                    <th class="text-center" style="width: 7%; vertical-align: middle;">Width</th>
+                                    <th class="text-center" style="width: 8%; vertical-align: middle;">Qty Order</th>
+                                    <th class="text-center" style="width: 12%; vertical-align: middle;">Qty Rec</th>
+                                    <th class="text-center" style="width: 12%; vertical-align: middle;">Qty Retur</th>
+                                    <th class="text-center" style="width: 11%; vertical-align: middle;">Harga Satuan</th>
+                                    <th class="text-center" style="width: 10%; vertical-align: middle;">Total Harga</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                $total_rec_kg = 0;
+                                $total_ret_kg = 0;
+                                $calc_subtotal = 0;
+
+                                foreach ($detail as $item_detail) {
+                                    $material = $this->db->select('id_shapes, id_bentuk')->get_where('ms_inventory_category3', ['id_category3' => $item_detail->id_material])->row();
+                                    $is_sheet = (!empty($material) && $material->id_bentuk == 'B2000002');
+                                    $unit_label = $is_sheet ? 'Sheet' : 'KGS';
+                                    $price_label = $is_sheet ? '/Sheet' : '/Kg';
+                                    $qty_rec_val = $is_sheet ? $item_detail->qty_sheet : $item_detail->qty_receive;
+                                    $qty_retur_val = $is_sheet ? $item_detail->qty_sheet_retur : $item_detail->jumlah_retur;
+                                    $harga = (float) $item_detail->harga_satuan;
+                                    $total_harga_item = !empty($item_detail->grand_total) ? (float) $item_detail->grand_total : ($qty_retur_val * $harga);
+
+                                    $total_rec_kg += $qty_rec_val;
+                                    $total_ret_kg += $qty_retur_val;
+                                    $calc_subtotal += $total_harga_item;
+                                ?>
+                                    <tr>
+                                        <td class="text-center" style="vertical-align: middle;"><?= date('d/m/Y', strtotime($header->tgl_retur)) ?></td>
+                                        <td class="text-center" style="vertical-align: middle;"><span class="badge bg-gray text-bold" style="font-size: 11px;"><?= $item_detail->lotno ?></span></td>
+                                        <td style="vertical-align: middle;"><b><?= $item_detail->nama_material ?></b></td>
+                                        <td class="text-right" style="vertical-align: middle;"><?= number_format($item_detail->width, 2) ?></td>
+                                        <td class="text-right" style="vertical-align: middle;"><?= number_format($item_detail->qty_order, 2) ?></td>
+                                        <td class="text-right" style="vertical-align: middle;">
+                                            <span class="badge bg-gray" style="font-size: 11px; font-weight: 500;">
+                                                <?= ($is_sheet ? number_format($qty_rec_val) : number_format($qty_rec_val, 2)) ?> <?= $unit_label ?>
+                                            </span>
+                                        </td>
+                                        <td class="text-right" style="vertical-align: middle;">
+                                            <span class="badge bg-blue" style="font-size: 12px; font-weight: bold;">
+                                                <?= ($is_sheet ? number_format($qty_retur_val) : number_format($qty_retur_val, 2)) ?> <?= $unit_label ?>
+                                            </span>
+                                        </td>
+                                        <td class="text-right" style="vertical-align: middle;">
+                                            <?= $curr_label ?> <?= number_format($harga, 2) ?>
+                                            <small class="text-muted"><?= $price_label ?></small>
+                                        </td>
+                                        <td class="text-right text-bold" style="vertical-align: middle;"><?= $curr_label ?> <?= number_format($total_harga_item, 2) ?></td>
+                                    </tr>
+                                <?php
+                                }
+
+                                $subtotal_val = (!empty($header->subtotal)) ? (float) $header->subtotal : $calc_subtotal;
+                                $ppn_persen_val = isset($header->ppn_persen) ? (float) $header->ppn_persen : 11;
+                                $nilai_ppn_val = (!empty($header->nilai_ppn)) ? (float) $header->nilai_ppn : (($subtotal_val * $ppn_persen_val) / 100);
+                                $grand_total_val = (!empty($header->grand_total)) ? (float) $header->grand_total : ($subtotal_val + $nilai_ppn_val);
+                                ?>
+                            </tbody>
+                            <tfoot style="background-color: #fcfcfc;">
+                                <tr>
+                                    <td colspan="5" class="text-right text-bold" style="vertical-align: middle;">Total Qty</td>
+                                    <td class="text-right text-bold" style="vertical-align: middle;"><?= number_format($total_rec_kg, 2) ?></td>
+                                    <td class="text-right text-bold text-primary" style="vertical-align: middle;"><?= number_format($total_ret_kg, 2) ?></td>
+                                    <td class="text-right text-bold" style="vertical-align: middle;">Subtotal</td>
+                                    <td class="text-right text-bold" style="vertical-align: middle;"><?= $curr_label ?> <?= number_format($subtotal_val, 2) ?></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="8" class="text-right text-bold" style="vertical-align: middle;">PPN (<?= $ppn_persen_val ?>%)</td>
+                                    <td class="text-right text-bold" style="vertical-align: middle;"><?= $curr_label ?> <?= number_format($nilai_ppn_val, 2) ?></td>
+                                </tr>
+                                <tr style="background-color: #f0f7fd; border-top: 2px solid #3c8dbc;">
+                                    <td colspan="8" class="text-right text-bold" style="font-size: 15px; vertical-align: middle; color: #2c3e50;">Grand Total</td>
+                                    <td class="text-right text-bold" style="font-size: 15px; vertical-align: middle; color: #2c3e50;"><?= $curr_label ?> <?= number_format($grand_total_val, 2) ?></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    <?php else : ?>
+                        <?php
+                        // Backward compatibility
                         foreach (explode(',', $header->no_po) as $item_po) {
                             $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $item_po])->row();
+                            $po_detail = $this->Retur_pembelian_model->get_po_detail($get_po->no_po);
 
-                            $no_poo = (!empty($get_po)) ? $get_po->no_surat : '';
-                            echo '<option value="' . $no_poo . '" selected>' . $no_poo . '</option>';
-                        }
-                    }
-                    ?>
-                    <!-- <option value="">- No. PO -</option> -->
-                </select>
-            </div>
-            <?php endif; ?>
+                            $po_matauang = (!empty($get_po->matauang)) ? $get_po->matauang : 'IDR';
+                            $po_curr_label = (strtoupper(trim($po_matauang)) === 'USD') ? 'USD' : ((strtoupper(trim($po_matauang)) === 'IDR' || strtoupper(trim($po_matauang)) === 'RP') ? 'Rp' : strtoupper(trim($po_matauang)));
+                        ?>
+                            <h4>No. PO: <?= $get_po->no_surat ?> <span class="badge bg-blue"><?= $po_matauang ?></span></h4>
+                            <table class="table table-striped table-bordered table-hover table-detail-retur" style="font-size: 13px;">
+                                <thead style="background-color: #2c3e50; color: #fff;">
+                                    <tr>
+                                        <th class="text-center" style="width: 10%; vertical-align: middle;">Tanggal PO</th>
+                                        <th class="text-center" style="width: 12%; vertical-align: middle;">Lot Number</th>
+                                        <th class="text-center" style="width: 18%; vertical-align: middle;">Nama Material</th>
+                                        <th class="text-center" style="width: 7%; vertical-align: middle;">Width</th>
+                                        <th class="text-center" style="width: 8%; vertical-align: middle;">Qty Order</th>
+                                        <th class="text-center" style="width: 12%; vertical-align: middle;">Qty Rec</th>
+                                        <th class="text-center" style="width: 12%; vertical-align: middle;">Qty Retur</th>
+                                        <th class="text-center" style="width: 11%; vertical-align: middle;">Harga Satuan</th>
+                                        <th class="text-center" style="width: 10%; vertical-align: middle;">Total Harga</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $total_rec_kg = 0;
+                                    $total_ret_kg = 0;
+                                    $calc_subtotal = 0;
 
-            <div class="col-md-2">
-                <span class="text-bold">Tanggal Invoice</span>
-            </div>
-            <div class="col-md-4">
-                <input type="date" class="form-control" name="tanggal_invoice" value="<?= date('Y-m-d', strtotime($header->tgl_invoice)) ?>" readonly>
-            </div>
-            <div class="col-md-2">
-                <span class="text-bold">Tanggal Retur</span>
-            </div>
-            <div class="col-md-4">
-                <input type="date" class="form-control" name="tanggal_retur" value="<?= date('Y-m-d', strtotime($header->tgl_retur)) ?>" readonly>
+                                    $no_detail = 0;
+                                    foreach ($po_detail as $item_po_detail) {
+                                        $no_detail++;
+
+                                        $qty_receive = (!empty($arr_detail[$item_po_detail->id]->qty_receive)) ? $arr_detail[$item_po_detail->id]->qty_receive : 0;
+                                        $qty_sheet = (!empty($arr_detail[$item_po_detail->id]->qty_sheet)) ? $arr_detail[$item_po_detail->id]->qty_sheet : 0;
+                                        $jumlah_retur = (!empty($arr_detail[$item_po_detail->id]->jumlah_retur)) ? $arr_detail[$item_po_detail->id]->jumlah_retur : 0;
+                                        $qty_sheet_retur = (!empty($arr_detail[$item_po_detail->id]->qty_sheet_retur)) ? $arr_detail[$item_po_detail->id]->qty_sheet_retur : 0;
+                                        $lotno = (!empty($arr_detail[$item_po_detail->id]->lotno)) ? $arr_detail[$item_po_detail->id]->lotno : '';
+                                        $harga = (!empty($arr_detail[$item_po_detail->id]->harga_satuan)) ? $arr_detail[$item_po_detail->id]->harga_satuan : (float) $item_po_detail->hargasatuan;
+
+                                        $material = $this->db->select('id_shapes, id_bentuk')->get_where('ms_inventory_category3', ['id_category3' => $item_po_detail->idmaterial])->row();
+                                        $is_sheet = (!empty($material) && $material->id_bentuk == 'B2000002');
+                                        $unit_label = $is_sheet ? 'Sheet' : 'KGS';
+                                        $price_label = $is_sheet ? '/Sheet' : '/Kg';
+                                        $qty_rec_val = $is_sheet ? $qty_sheet : $qty_receive;
+                                        $qty_retur_val = $is_sheet ? $qty_sheet_retur : $jumlah_retur;
+                                        $total_harga_item = $qty_retur_val * $harga;
+
+                                        $total_rec_kg += $qty_rec_val;
+                                        $total_ret_kg += $qty_retur_val;
+                                        $calc_subtotal += $total_harga_item;
+                                    ?>
+                                        <tr>
+                                            <td class="text-center" style="vertical-align: middle;"><?= date('d/m/Y', strtotime($get_po->tanggal)) ?></td>
+                                            <td class="text-center" style="vertical-align: middle;"><span class="badge bg-gray text-bold" style="font-size: 11px;"><?= $lotno ?></span></td>
+                                            <td style="vertical-align: middle;"><b><?= $item_po_detail->namamaterial ?></b></td>
+                                            <td class="text-right" style="vertical-align: middle;"><?= number_format($item_po_detail->width, 2) ?></td>
+                                            <td class="text-right" style="vertical-align: middle;"><?= number_format($item_po_detail->totalwidth, 2) ?></td>
+                                            <td class="text-right" style="vertical-align: middle;">
+                                                <span class="badge bg-gray" style="font-size: 11px; font-weight: 500;">
+                                                    <?= ($is_sheet ? number_format($qty_rec_val) : number_format($qty_rec_val, 2)) ?> <?= $unit_label ?>
+                                                </span>
+                                            </td>
+                                            <td class="text-right" style="vertical-align: middle;">
+                                                <span class="badge bg-blue" style="font-size: 12px; font-weight: bold;">
+                                                    <?= ($is_sheet ? number_format($qty_retur_val) : number_format($qty_retur_val, 2)) ?> <?= $unit_label ?>
+                                                </span>
+                                            </td>
+                                            <td class="text-right" style="vertical-align: middle;">
+                                                <?= $po_curr_label ?> <?= number_format($harga, 2) ?>
+                                                <small class="text-muted"><?= $price_label ?></small>
+                                            </td>
+                                            <td class="text-right text-bold" style="vertical-align: middle;"><?= $po_curr_label ?> <?= number_format($total_harga_item, 2) ?></td>
+                                        </tr>
+                                    <?php
+                                    }
+
+                                    $subtotal_val = (!empty($header->subtotal)) ? (float) $header->subtotal : $calc_subtotal;
+                                    $ppn_persen_val = isset($header->ppn_persen) ? (float) $header->ppn_persen : 11;
+                                    $nilai_ppn_val = (!empty($header->nilai_ppn)) ? (float) $header->nilai_ppn : (($subtotal_val * $ppn_persen_val) / 100);
+                                    $grand_total_val = (!empty($header->grand_total)) ? (float) $header->grand_total : ($subtotal_val + $nilai_ppn_val);
+                                    ?>
+                                </tbody>
+                                <tfoot style="background-color: #fcfcfc;">
+                                    <tr>
+                                        <td colspan="5" class="text-right text-bold" style="vertical-align: middle;">Total Qty</td>
+                                        <td class="text-right text-bold" style="vertical-align: middle;"><?= number_format($total_rec_kg, 2) ?></td>
+                                        <td class="text-right text-bold text-primary" style="vertical-align: middle;"><?= number_format($total_ret_kg, 2) ?></td>
+                                        <td class="text-right text-bold" style="vertical-align: middle;">Subtotal</td>
+                                        <td class="text-right text-bold" style="vertical-align: middle;"><?= $po_curr_label ?> <?= number_format($subtotal_val, 2) ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="8" class="text-right text-bold" style="vertical-align: middle;">PPN (<?= $ppn_persen_val ?>%)</td>
+                                        <td class="text-right text-bold" style="vertical-align: middle;"><?= $po_curr_label ?> <?= number_format($nilai_ppn_val, 2) ?></td>
+                                    </tr>
+                                    <tr style="background-color: #f0f7fd; border-top: 2px solid #3c8dbc;">
+                                        <td colspan="8" class="text-right text-bold" style="font-size: 15px; vertical-align: middle; color: #2c3e50;">Grand Total</td>
+                                        <td class="text-right text-bold" style="font-size: 15px; vertical-align: middle; color: #2c3e50;"><?= $po_curr_label ?> <?= number_format($grand_total_val, 2) ?></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        <?php } ?>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-2">
-                <span class="text-bold">No. NG Report</span>
-            </div>
-            <div class="col-md-4">
-                <input type="text" class="form-control" name="no_ng_report" placeholder="No. NG Report" value="<?= $header->no_ng_report ?>" readonly>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-2">
-                <span class="text-bold">Alasan Retur</span>
-            </div>
-            <div class="col-md-4">
-                <textarea name="alasan_retur" id="" class="form-control" readonly><?= $header->alasan_retur ?></textarea>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-2">
-                <span class="text-bold">File BA</span>
-            </div>
-            <div class="col-md-4">
-                <input type="file" class="form-control" name="file_ba" readonly>
-                <?php
-                if (file_exists($header->file_ba)) {
-                    echo '<a href="' . base_url($header->file_ba) . '" class="btn btn-sm btn-primary" title="Download file BA" target="_blank" download><i class="fa fa-download"></i> Download BA</a>';
-                }
-                ?>
-            </div>
-        </div>
-
-        <div class="col-12-md list_detail_po">
-            <?php if (!empty($id_rec_inv_ap)) : ?>
-            <?php
-            // Requirement 5.2: render detail from dt_retur_pembelian (already stored), read-only
-            echo '<table class="table table-striped table-bordered">';
-            echo '<thead>';
-            echo '<tr>';
-            echo '<th class="text-center">Tanggal Incoming</th>';
-            echo '<th class="text-center">Nama Material</th>';
-            echo '<th class="text-center">Width</th>';
-            echo '<th class="text-center">Qty Order</th>';
-            echo '<th class="text-center">Qty Receive</th>';
-            echo '<th class="text-center">Jumlah Retur</th>';
-            echo '<th class="text-center">Harga Satuan</th>';
-            echo '<th class="text-center">Total</th>';
-            echo '</tr>';
-            echo '</thead>';
-            echo '<tbody>';
-
-            foreach ($detail as $item_detail) {
-                echo '<tr>';
-                echo '<td class="text-center">';
-                // tanggal_incoming is not stored in dt_retur_pembelian; use tgl_retur as fallback
-                echo date('d F Y', strtotime($header->tgl_retur));
-                echo '</td>';
-                echo '<td>' . $item_detail->nama_material . '</td>';
-                echo '<td class="text-right">' . $item_detail->width . '</td>';
-                echo '<td class="text-right">' . $item_detail->qty_order . '</td>';
-                echo '<td class="text-right">' . number_format($item_detail->qty_receive, 2) . '</td>';
-                echo '<td class="text-right">' . number_format($item_detail->jumlah_retur, 2) . '</td>';
-                echo '<td class="text-right">' . number_format($item_detail->harga_satuan, 2) . '</td>';
-                echo '<td class="text-right">' . number_format($item_detail->grand_total, 2) . '</td>';
-                echo '</tr>';
-            }
-
-            echo '</tbody>';
-            echo '</table>';
-            ?>
-            <?php else : ?>
-            <?php
-            // Requirement 5.3: backward compatibility — render from tr_purchase_order (old logic)
-            foreach (explode(',', $header->no_po) as $item_po) {
-                $get_po = $this->db->get_where('tr_purchase_order', ['no_po' => $item_po])->row();
-
-                $po_detail = $this->Retur_pembelian_model->get_po_detail($get_po->no_po);
-
-                $type_sheet = $this->Retur_pembelian_model->get_po_check_sheet($get_po->no_po);
-
-                $satuan = ($type_sheet > 0) ? '(Sheet)' : '(Kg)';
-
-                echo  '<h4>No. PO: ' . $get_po->no_surat . '</h4>';
-                echo  '<table class="table table-striped table-bordered">';
-                echo  '<thead>';
-                echo  '<tr>';
-                echo  '<th class="text-center">Tanggal PO</th>';
-                echo  '<th class="text-center">Nama Material</th>';
-                echo  '<th class="text-center">Width</th>';
-                echo  '<th class="text-center">Qty Order ' . $satuan . '</th>';
-                echo  '<th class="text-center">Qty Receive ' . $satuan . '</th>';
-                echo  '<th class="text-center">Retur ' . $satuan . '</th>';
-                echo  '<th class="text-center">Harga</th>';
-                echo  '<th class="text-center">Total</th>';
-                echo  '</tr>';
-                echo  '</thead>';
-                echo  '<tbody>';
-
-                $no_detail = 0;
-                foreach ($po_detail as $item_po_detail) {
-                    $no_detail++;
-
-                    echo '<tr>';
-                    echo '<td class="text-center">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][id]" value="' . $item_po_detail->id . '">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][no_po]" value="' . $item_po_detail->no_po . '">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][id_pr]" value="' . $item_po_detail->idpr . '">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][idmaterial]" value="' . $item_po_detail->idmaterial . '">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][namamaterial]" value="' . $item_po_detail->namamaterial . '">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][width]" value="' . $item_po_detail->width . '">';
-                    echo '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][qty_order]" value="' . $item_po_detail->totalwidth . '">';
-                    echo date('d F Y', strtotime($get_po->tanggal));
-                    echo '</td>';
-                    echo '<td>' . $item_po_detail->namamaterial . '</td>';
-                    echo '<td class="text-right">' . $item_po_detail->width . '</td>';
-                    echo '<td class="text-right">' . $item_po_detail->totalwidth . '</td>';
-                    echo '<td class="text-right">';
-                    echo number_format($arr_detail[$item_po_detail->id]->qty_receive, 2);
-                    echo '</td>';
-                    echo '<td class="text-right">';
-                    echo number_format($arr_detail[$item_po_detail->id]->jumlah_retur, 2);
-                    echo '</td>';
-                    echo '<td class="text-right">';
-                    echo number_format($arr_detail[$item_po_detail->id]->harga_satuan, 2);
-                    echo '</td>';
-                    echo '<td class="text-right">';
-                    echo number_format($arr_detail[$item_po_detail->id]->grand_total, 2);
-                    echo '</td>';
-                    echo '</tr>';
-                }
-
-                echo '</tbody>';
-                echo '</table>';
-            }
-            ?>
-            <?php endif; ?>
-        </div>
-
-        <a href="<?= base_url('retur_pembelian') ?>" class="btn btn-sm btn-danger"><i class="fa fa-arrow-left"></i> Back</a>
     </div>
-
-
+    <div class="box-footer">
+        <a href="<?= base_url('retur_pembelian') ?>" class="btn btn-default"><i class="fa fa-arrow-left"></i> Kembali</a>
+    </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="<?= base_url('assets/js/autoNumeric.js') ?>"></script>
-
-<script>
-    $(document).ready(function() {
-        $('.select2').select2({
-            width: '100%'
-        });
-
-        auto_num();
-    });
-
-    $(document).on('change', '.supplier', function() {
-        var supplier = $(this).val();
-        var $elNoPo = $('.no_po'); // Simpan selector ke variabel agar lebih ringan
-
-        // Reset dropdown PO setiap kali supplier berubah
-        $elNoPo.html('<option value="">-- Pilih PO --</option>').trigger('change');
-
-        if (!supplier) return; // Jangan tembak AJAX kalau supplier kosong
-
-        $.ajax({
-            type: 'get',
-            url: siteurl + active_controller + 'getPO',
-            data: {
-                'supplier': supplier
-            },
-            dataType: 'json', // Pastikan jQuery tahu kita ekspek JSON
-            cache: false,
-            success: function(response) {
-                let html = '<option value="">-- Pilih PO --</option>';
-
-                // Pastikan response adalah array dan tidak kosong
-                if (Array.isArray(response) && response.length > 0) {
-                    response.forEach(item => {
-                        html += `<option value="${item.no_po}">${item.no_surat}</option>`;
-                    });
-                } else {
-                    html = '<option value="">-- Tidak ada PO --</option>';
-                }
-
-                $elNoPo.html(html);
-                $elNoPo.trigger('change');
-            },
-            error: function(xhr, status, error) {
-                // Ambil pesan error dari server jika ada
-                let errorMsg = xhr.responseJSON ? xhr.responseJSON.message : error;
-
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error !',
-                    text: 'Gagal mengambil data PO: ' + errorMsg,
-                    showCancelButton: false,
-                });
-            }
-        });
-    });
-
-    $(document).on('change', '.no_po', function() {
-        var no_po = $(this).val();
-
-        if (no_po !== '' && no_po !== null) {
-            $.ajax({
-                type: 'get',
-                url: siteurl + active_controller + 'getDetailPO',
-                data: {
-                    'no_po': no_po
-                },
-                cache: false,
-                dataType: 'json',
-                success: function(result) {
-                    $('.list_detail_po').html(result.hasil);
-                    auto_num();
-                },
-                error: function(xhr, status, error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error !',
-                        text: 'Oops! ' + error,
-                        showCancelButton: false,
-                        allowEscapeKey: false,
-                        allowOutsideClick: false
-                    });
-                }
-            });
-        }
-    });
-
-    $(document).on('change', '.hitung_detail_total', function() {
-        var no_po = $(this).data('no_po');
-        var no = $(this).data('no');
-
-        var qty_retur = $('input[name="dt_' + no_po + '[' + no + '][retur]"]').val();
-        if (qty_retur.length > 0) {
-            qty_retur = qty_retur.split(',').join('');
-            qty_retur = parseFloat(qty_retur);
-        } else {
-            qty_retur = 0;
-        }
-
-        var harga = $('input[name="dt_' + no_po + '[' + no + '][harga]"]').val();
-        if (harga.length > 0) {
-            harga = harga.split(',').join('');
-            harga = parseFloat(harga);
-        } else {
-            harga = 0;
-        }
-
-        var total_harga = (qty_retur * harga);
-
-        $('input[name="dt_' + no_po + '[' + no + '][total_harga]"]').autoNumeric('set', total_harga);
-    });
-
-    $(document).on('submit', '#frm-data', function(e) {
-        e.preventDefault();
-
-        Swal.fire({
-            icon: 'warning',
-            title: 'Anda yakin ?',
-            text: 'Pastikan data yang anda input sudah sesuai sebelum menyimpan !',
-            showConfirmButton: true,
-            showCancelButton: true,
-            allowEscapeKey: false,
-            allowOutsideClick: false
-        }).then((next) => {
-            if (next.isConfirmed) {
-                var formdata = new FormData($('#frm-data')[0]);
-
-                $.ajax({
-                    type: 'post',
-                    url: siteurl + active_controller + 'save_retur_pembelian',
-                    data: formdata,
-                    cache: false,
-                    dataType: 'json',
-                    contentType: false,
-                    processData: false,
-                    beforeSend: function(result) {
-                        $('.save_btn').attr('disabled', true);
-                    },
-                    success: function(result) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success !',
-                            text: 'Data Retur telah tersimpan !',
-                            showConfirmButton: false,
-                            showCancelButton: false,
-                            allowEscapeKey: false,
-                            allowOutsideClick: false,
-                            timer: 3000
-                        }).then(() => {
-                            window.location.href = siteurl + active_controller;
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error !',
-                            text: 'Oops ! ' + error
-                        });
-                    }
-                });
-            }
-        });
-    });
-
-    function auto_num() {
-        $('.auto_num').autoNumeric('init');
-    }
-</script>
