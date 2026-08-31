@@ -73,6 +73,9 @@ class Retur_pembelian_model extends BF_Model
 	{
 		if ($this->db->table_exists('tr_retur_pembelian')) {
 			$fields = $this->db->list_fields('tr_retur_pembelian');
+			if (!in_array('id_rec_inv_ap', $fields)) {
+				$this->db->query("ALTER TABLE tr_retur_pembelian ADD COLUMN id_rec_inv_ap VARCHAR(50) NULL AFTER no_po");
+			}
 			if (!in_array('subtotal', $fields)) {
 				$this->db->query("ALTER TABLE tr_retur_pembelian ADD COLUMN subtotal DOUBLE DEFAULT 0");
 			}
@@ -91,6 +94,15 @@ class Retur_pembelian_model extends BF_Model
 		}
 		if ($this->db->table_exists('dt_retur_pembelian')) {
 			$dt_fields = $this->db->list_fields('dt_retur_pembelian');
+			if (!in_array('lotno', $dt_fields)) {
+				$this->db->query("ALTER TABLE dt_retur_pembelian ADD COLUMN lotno VARCHAR(100) NULL AFTER id_material");
+			}
+			if (!in_array('qty_sheet', $dt_fields)) {
+				$this->db->query("ALTER TABLE dt_retur_pembelian ADD COLUMN qty_sheet DOUBLE DEFAULT 0 AFTER qty_receive");
+			}
+			if (!in_array('qty_sheet_retur', $dt_fields)) {
+				$this->db->query("ALTER TABLE dt_retur_pembelian ADD COLUMN qty_sheet_retur DOUBLE DEFAULT 0 AFTER jumlah_retur");
+			}
 			if (!in_array('matauang', $dt_fields)) {
 				$this->db->query("ALTER TABLE dt_retur_pembelian ADD COLUMN matauang VARCHAR(20) DEFAULT 'IDR'");
 			}
