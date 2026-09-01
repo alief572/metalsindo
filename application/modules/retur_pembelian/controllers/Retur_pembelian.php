@@ -165,7 +165,8 @@ class Retur_pembelian extends Admin_Controller
 				// Harga sheet = hargasatuan (per kg) x total_weight (berat per lembar). Non-sheet tetap per kg.
 				$total_weight = isset($item->total_weight) ? (float) $item->total_weight : 0;
 				$harga = $is_sheet ? ((float) $item->hargasatuan * $total_weight) : (float) $item->hargasatuan;
-				$total_harga_item = $qty_retur_val * $harga;
+				// Qty retur default 0, jadi total harga awal 0 (dihitung ulang oleh JS saat user input).
+				$total_harga_item = 0;
 
 				$return .= '<tr>';
 				$return .= '<td class="text-center" style="vertical-align: middle;">';
@@ -204,10 +205,10 @@ class Retur_pembelian extends Admin_Controller
 				$return .= '<td style="vertical-align: middle;">';
 				$return .= '<div class="input-group input-group-sm">';
 				if ($is_sheet) {
-					$return .= '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item->no_po . '[' . $no_detail . '][retur_sheet]" value="' . $item->qty_sheet . '" data-no_po="' . $item->no_po . '" data-no="' . $no_detail . '" data-is_sheet="1" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
-					$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][retur]" value="' . $item->width_recive . '">';
+					$return .= '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item->no_po . '[' . $no_detail . '][retur_sheet]" value="0" data-no_po="' . $item->no_po . '" data-no="' . $no_detail . '" data-is_sheet="1" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
+					$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][retur]" value="0">';
 				} else {
-					$return .= '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item->no_po . '[' . $no_detail . '][retur]" value="' . $item->width_recive . '" data-no_po="' . $item->no_po . '" data-no="' . $no_detail . '" data-is_sheet="0" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
+					$return .= '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item->no_po . '[' . $no_detail . '][retur]" value="0" data-no_po="' . $item->no_po . '" data-no="' . $no_detail . '" data-is_sheet="0" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
 					$return .= '<input type="hidden" name="dt_' . $item->no_po . '[' . $no_detail . '][retur_sheet]" value="0">';
 				}
 				$return .= '<span class="input-group-addon" style="font-size: 10px; font-weight: bold; background: #3c8dbc; color: #fff; min-width: 45px;">' . $unit_label . '</span>';
@@ -344,7 +345,8 @@ class Retur_pembelian extends Admin_Controller
 					$qty_retur_val = $is_sheet ? $qty_sheet : $berat_terima;
 					// Harga sheet = hargasatuan (per kg) x total_weight (berat per lembar). Non-sheet tetap per kg.
 					$harga = $is_sheet ? ((float) $item_po_detail->hargasatuan * $total_weight) : (float) $item_po_detail->hargasatuan;
-					$total_harga_item = $qty_retur_val * $harga;
+					// Qty retur default 0, jadi total harga awal 0 (dihitung ulang oleh JS saat user input).
+					$total_harga_item = 0;
 
 					$return .= '<tr>';
 					$return .= '<td class="text-center" style="vertical-align: middle;">';
@@ -383,10 +385,10 @@ class Retur_pembelian extends Admin_Controller
 					$return .= '<td style="vertical-align: middle;">';
 					$return .= '<div class="input-group input-group-sm">';
 					if ($is_sheet) {
-						$return .= '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur_sheet]" value="' . $qty_sheet . '" data-no_po="' . $item_po_detail->no_po . '" data-no="' . $no_detail . '" data-is_sheet="1" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
-						$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur]" value="' . $berat_terima . '">';
+						$return .= '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur_sheet]" value="0" data-no_po="' . $item_po_detail->no_po . '" data-no="' . $no_detail . '" data-is_sheet="1" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
+						$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur]" value="0">';
 					} else {
-						$return .= '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur]" value="' . $berat_terima . '" data-no_po="' . $item_po_detail->no_po . '" data-no="' . $no_detail . '" data-is_sheet="0" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
+						$return .= '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur]" value="0" data-no_po="' . $item_po_detail->no_po . '" data-no="' . $no_detail . '" data-is_sheet="0" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
 						$return .= '<input type="hidden" name="dt_' . $item_po_detail->no_po . '[' . $no_detail . '][retur_sheet]" value="0">';
 					}
 					$return .= '<span class="input-group-addon" style="font-size: 10px; font-weight: bold; background: #3c8dbc; color: #fff; min-width: 45px;">' . $unit_label . '</span>';
