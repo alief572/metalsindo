@@ -162,7 +162,9 @@ class Retur_pembelian extends Admin_Controller
 				$price_label = $is_sheet ? '/Sheet' : '/Kg';
 				$qty_rec_val = $is_sheet ? $item->qty_sheet : $item->width_recive;
 				$qty_retur_val = $is_sheet ? $item->qty_sheet : $item->width_recive;
-				$harga = (float) $item->hargasatuan;
+				// Harga sheet = hargasatuan (per kg) x total_weight (berat per lembar). Non-sheet tetap per kg.
+				$total_weight = isset($item->total_weight) ? (float) $item->total_weight : 0;
+				$harga = $is_sheet ? ((float) $item->hargasatuan * $total_weight) : (float) $item->hargasatuan;
 				$total_harga_item = $qty_retur_val * $harga;
 
 				$return .= '<tr>';
@@ -326,8 +328,9 @@ class Retur_pembelian extends Admin_Controller
 				foreach ($po_detail as $item_po_detail) {
 					$no_detail++;
 
-					$material = $this->db->select('id_bentuk')->get_where('ms_inventory_category3', ['id_category3' => $item_po_detail->idmaterial])->row();
+					$material = $this->db->select('id_bentuk, total_weight')->get_where('ms_inventory_category3', ['id_category3' => $item_po_detail->idmaterial])->row();
 					$id_bentuk = !empty($material) ? $material->id_bentuk : '';
+					$total_weight = !empty($material) ? (float) $material->total_weight : 0;
 
 					$incoming_detail = $this->db->get_where('dt_incoming', ['id_dt_po' => $item_po_detail->id])->row();
 					$lotno = !empty($incoming_detail) ? $incoming_detail->lotno : '';
@@ -339,7 +342,8 @@ class Retur_pembelian extends Admin_Controller
 					$price_label = $is_sheet ? '/Sheet' : '/Kg';
 					$qty_rec_val = $is_sheet ? $qty_sheet : $berat_terima;
 					$qty_retur_val = $is_sheet ? $qty_sheet : $berat_terima;
-					$harga = (float) $item_po_detail->hargasatuan;
+					// Harga sheet = hargasatuan (per kg) x total_weight (berat per lembar). Non-sheet tetap per kg.
+					$harga = $is_sheet ? ((float) $item_po_detail->hargasatuan * $total_weight) : (float) $item_po_detail->hargasatuan;
 					$total_harga_item = $qty_retur_val * $harga;
 
 					$return .= '<tr>';

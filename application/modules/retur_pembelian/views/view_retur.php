@@ -262,10 +262,15 @@
                                         $jumlah_retur = (!empty($arr_detail[$item_po_detail->id]->jumlah_retur)) ? $arr_detail[$item_po_detail->id]->jumlah_retur : 0;
                                         $qty_sheet_retur = (!empty($arr_detail[$item_po_detail->id]->qty_sheet_retur)) ? $arr_detail[$item_po_detail->id]->qty_sheet_retur : 0;
                                         $lotno = (!empty($arr_detail[$item_po_detail->id]->lotno)) ? $arr_detail[$item_po_detail->id]->lotno : '';
-                                        $harga = (!empty($arr_detail[$item_po_detail->id]->harga_satuan)) ? $arr_detail[$item_po_detail->id]->harga_satuan : (float) $item_po_detail->hargasatuan;
 
-                                        $material = !empty($item_po_detail->idmaterial) ? $this->db->select('id_bentuk')->get_where('ms_inventory_category3', ['id_category3' => $item_po_detail->idmaterial])->row() : null;
+                                        $material = !empty($item_po_detail->idmaterial) ? $this->db->select('id_bentuk, total_weight')->get_where('ms_inventory_category3', ['id_category3' => $item_po_detail->idmaterial])->row() : null;
                                         $is_sheet = (!empty($material) && $material->id_bentuk == 'B2000002');
+                                        $total_weight = (!empty($material)) ? (float) $material->total_weight : 0;
+                                        // Data tersimpan pakai harga_satuan apa adanya (data lama dibiarkan). Fallback (belum tersimpan): sheet = hargasatuan x total_weight.
+                                        $harga = (!empty($arr_detail[$item_po_detail->id]->harga_satuan))
+                                            ? $arr_detail[$item_po_detail->id]->harga_satuan
+                                            : ($is_sheet ? ((float) $item_po_detail->hargasatuan * $total_weight) : (float) $item_po_detail->hargasatuan);
+
                                         $unit_label = $is_sheet ? 'Sheet' : 'KGS';
                                         $price_label = $is_sheet ? '/Sheet' : '/Kg';
                                         $qty_rec_val = $is_sheet ? $qty_sheet : $qty_receive;

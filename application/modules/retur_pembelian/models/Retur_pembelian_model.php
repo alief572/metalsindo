@@ -268,6 +268,7 @@ class Retur_pembelian_model extends BF_Model
 			di.lotno,
 			di.qty_sheet,
 			mic3.id_bentuk,
+			mic3.total_weight,
 			ti.tanggal AS tanggal_incoming,
 			riad.id_rec_inv_ap,
 			tpo.matauang
