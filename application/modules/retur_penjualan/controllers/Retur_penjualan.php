@@ -1373,7 +1373,7 @@ class Retur_penjualan extends Admin_Controller
 					JOIN tr_invoice h ON (h.no_invoice = d.no_invoice OR h.id_invoice = d.id_invoice)
 					WHERE (h.id_do = ? OR h.no_do = ?)
 					  AND d.id_category3 = ?
-					ORDER BY d.id DESC LIMIT 1
+					ORDER BY d.id_invoice_detail DESC LIMIT 1
 				", [$retur->id_delivery_order, $retur->no_do, $dt->id_material])->row();
 
 				if ($q_inv && (float)$q_inv->harga_satuan > 0) {
