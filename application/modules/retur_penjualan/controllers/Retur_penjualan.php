@@ -1506,25 +1506,42 @@ class Retur_penjualan extends Admin_Controller
 	{
 		$this->auth->restrict('CN_Retur_Penjualan.Manage');
 		$id_retur = $this->input->post('id_retur');
-		$no_cn = $this->input->post('no_cn');
+		$no_cn = trim($this->input->post('no_cn'));
 
 		$this->db->trans_begin();
 		try {
+			$retur = $this->db->get_where('tr_retur_penjualan', ['id_retur' => $id_retur])->row();
+			if (!$retur) {
+				throw new Exception('Data retur tidak ditemukan!');
+			}
+
+			// Fallback jika no_cn kosong
+			if (empty($no_cn)) {
+				$no_cn = !empty($retur->no_cn) ? trim($retur->no_cn) : '';
+			}
+			if (empty($no_cn)) {
+				$tgl_ref = !empty($retur->tgl_retur) ? $retur->tgl_retur : date('Y-m-d');
+				$no_cn = $this->Retur_penjualan_model->generate_cn_number($tgl_ref);
+			}
+
 			$details = $this->db->get_where('dt_returpenjualan', ['id_retur' => $id_retur, 'deal' => '1'])->result();
 			foreach ($details as $dt) {
 				if ((float)$dt->harga_deal <= 0) {
 					throw new Exception('Semua item harus memiliki Harga Deal > 0 sebelum Confirm!');
 				}
+				// Pastikan total_harga terhitung dengan benar jika tersimpan 0
+				if ((float)$dt->total_harga <= 0) {
+					$calc_total = ((float)$dt->total_sheet > 0) ? ((float)$dt->total_sheet * (float)$dt->harga_deal) : ((float)$dt->weight * (float)$dt->harga_deal);
+					$this->db->where('id', $dt->id)->update('dt_returpenjualan', ['total_harga' => $calc_total]);
+				}
 			}
 
 			$update_data = [
 				'status_cn'    => 'CLOSED',
+				'no_cn'        => $no_cn,
 				'confirmed_by' => $this->auth->user_id(),
 				'confirmed_on' => date('Y-m-d H:i:s')
 			];
-			if (!empty($no_cn)) {
-				$update_data['no_cn'] = trim($no_cn);
-			}
 
 			$this->db->where('id_retur', $id_retur)->update('tr_retur_penjualan', $update_data);
 
