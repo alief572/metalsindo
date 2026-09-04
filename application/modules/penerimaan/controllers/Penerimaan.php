@@ -1187,7 +1187,7 @@ class Penerimaan extends Admin_Controller
 			    SELECT id_retur, SUM(amount_crossed) as total_crossed FROM tr_cn_cross GROUP BY id_retur
 			) crossed ON crossed.id_retur = r.id_retur
 			WHERE r.id_customer = " . $this->db->escape($id_customer) . "
-			  AND r.no_cn IS NOT NULL
+			  AND r.no_cn IS NOT NULL AND TRIM(r.no_cn) != ''
 			  AND (cn_total.total_cn - COALESCE(crossed.total_crossed, 0)) > 0
 		";
 
