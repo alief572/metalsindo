@@ -2,386 +2,444 @@
 $tanggal = date('Y-m-d');
 ?>
 
-<div class="box box-primary">
-    <div class="box-body">
-        <form id="data-form" method="post" autocomplete='off'>
-            <div class="col-sm-12">
-                <div class="input_fields_wrap2">
-                    <div class="row">
-                        <center><label for="customer">
-                                <h3>Purchase Order</h3>
-                            </label></center>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Supplier</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <select id="id_suplier" name="id_suplier" class='form-control input-md chosen-select' onchange="get_lokasi()" required>
-                                            <option value="">--Pilih--</option>
-                                            <?php foreach ($results['supplier'] as $supplier) { ?>
-                                                <option value="<?= $supplier->id_suplier ?>"><?= strtoupper(strtolower($supplier->name_suplier)) ?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Local / Import</label>
-                                    </div>
-                                    <div class="col-md-8" id="ubahloi">
-                                        <select id="loi" name="loi" class="form-control select" onchange="get_kurs()" required>
-                                            <option value="">--Pilih--</option>
-                                            <option value="Import">Import</option>
-                                            <option value="Lokal">Lokal</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="customer">NO.PO</label>
-                                    </div>
+<style type="text/css">
+	.po-form-banner {
+		background: #ffffff;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		padding: 16px 20px;
+		margin-bottom: 20px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+	}
+	.po-form-banner h3 {
+		margin: 0;
+		font-size: 18px;
+		font-weight: 700;
+		color: #205072;
+	}
+	.po-form-banner p {
+		margin: 3px 0 0 0;
+		font-size: 12px;
+		color: #64748b;
+	}
+	.po-section-card {
+		background: #ffffff;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		margin-bottom: 20px;
+		box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+		overflow: hidden;
+	}
+	.po-section-header {
+		background: #f8fafc;
+		border-bottom: 1px solid #e2e8f0;
+		padding: 12px 20px;
+	}
+	.po-section-header h4 {
+		margin: 0;
+		font-size: 13px;
+		font-weight: 700;
+		color: #205072;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+	.po-section-body {
+		padding: 20px;
+	}
+	.form-group label {
+		font-weight: 600;
+		color: #334155;
+		font-size: 12px;
+	}
+	.table-custom thead th {
+		background: #205072 !important;
+		color: #ffffff !important;
+		font-size: 11px !important;
+		font-weight: 600 !important;
+		text-transform: uppercase !important;
+		padding: 10px 8px !important;
+		border: none !important;
+		vertical-align: middle !important;
+	}
+	.table-custom tbody td {
+		padding: 8px !important;
+		vertical-align: middle !important;
+	}
+	.po-summary-box {
+		background: #f8fafc;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		padding: 18px;
+	}
+	.po-summary-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 10px;
+		font-size: 13px;
+		color: #475569;
+	}
+	.po-summary-item label {
+		margin: 0;
+		font-weight: 500;
+	}
+	.po-summary-item.total {
+		border-top: 2px dashed #cbd5e1;
+		margin-top: 12px;
+		padding-top: 12px;
+		font-size: 15px;
+		font-weight: 700;
+		color: #205072;
+	}
+	.po-form-actions {
+		background: #ffffff;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		padding: 16px 20px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+		margin-bottom: 30px;
+	}
+</style>
 
-                                    <div class="col-md-8">
-                                        <input type="hidden" class="form-control" id="no_po" required name="no_po" readonly placeholder="ID PO">
-                                        <input type="text" class="form-control" id="no_surat" required name="no_surat" readonly placeholder="No.PO">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6" id="input_kurs">
-
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="customer">Tanggal PO</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control" id="tanggal" value="<?= $tanggal ?>" onkeyup required name="tanggal">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Mata Uang</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <select id="matauang" name="matauang" class='form-control input-md chosen-select' required>
-                                            <?php foreach ($results['matauang'] as $supplier) {
-                                                $selected = '';
-                                            ?>
-                                                <option value="<?= $supplier->kode ?>" <?= $selected; ?>><?= strtoupper(strtolower($supplier->kode)) ?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="customer">Expect Date</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control" id="expect_tanggal" required name="expect_tanggal">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="customer">Payment Term</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control" id="term" onkeyup required name="term">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">PR</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <select id="no_pr" name="no_pr" class='form-control input-md chosen-select' required>
-                                            <option value="0">List Empty</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Price Method</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <select id="cif" name="cif" class="form-control select" required>
-                                            <option value="">--Pilih--</option>
-                                            <option value="CIF">CIF</option>
-                                            <option value="FOB">FOB</option>
-                                            <option value="LOCO">LOCO</option>
-                                            <option value="DDU">DDU</option>
-                                            <option value="FRANCO">FRANCO</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Delivery Date</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="date" name="delivery_date" id="" class="form-control">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">PIC</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" name="receiving_person" id="" class="form-control">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="form-group row" id='kurs_place'>
-                                <?php
-                                $hariini = date('Y-m-d');
-                                $sepuluh_hari = mktime(0, 0, 0, date('n'), date('j') - 10, date('Y'));
-                                $tendays = date("Y-m-d", $sepuluh_hari);
-                                $tglnow = date('d');
-                                $blnnow = date('m');
-                                if ($blnnow != '1') {
-                                    $blnkmrn = $blnnow - 1;
-                                    $yearkemaren = date('Y');
-                                } else {
-                                    $blnkmrn = "12";
-                                    $yearnow = date('Y');
-                                    $yearkemaren = $yearnow - 1;
-                                }
-                                $kurs    = $this->db->query("SELECT * FROM mata_uang WHERE kode = 'IDR' ")->result();
-                                $kurs10hari    = $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE tanggal_ubah BETWEEN  '$tendays' AND '$hariini' AND kode_kurs='IDR' ")->result();
-                                $kurs30hari    = $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE MONTH(tanggal_ubah) =  '$blnkmrn' AND YEAR(tanggal_ubah) = '$yearkemaren' AND kode_kurs='IDR' ")->result();
-                                $nomkurs = $kurs[0]->kurs;
-                                $nomkurs10 = $kurs10hari[0]->nominal;
-                                $nomkurs30 = $kurs30hari[0]->nominal;
-                                $k =  number_format($nomkurs, 2);
-                                $k10 =  number_format($nomkurs10, 2);
-                                $k30 =  number_format($nomkurs30, 2);
-                                ?>
-                                <table class='table table-bordered table-striped'>
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <center>Kurs On The Spot</center>
-                                            </th>
-                                            <th>
-                                                <center>Kurs 10 Hari</center>
-                                            </th>
-                                            <th>
-                                                <center>Kurs 30 Hari</center>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <center>Rp. <?= $k ?> ,-</center>
-                                            </td>
-                                            <td>
-                                                <center>Rp. <?= $k10 ?> ,-</center>
-                                            </td>
-                                            <td>
-                                                <center>Rp. <?= $k30 ?> ,-</center>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="form-group row" id='lme_place'>
-                                <table class='table table-bordered table-striped'>
-                                    <thead>
-                                        <tr>
-                                            <th width="5">#</th>
-                                            <th width="13%">Kompisisi</th>
-                                            <th>Rate H-30</th>
-                                            <th>Rate H-10</th>
-                                            <th>Rate Saat Ini</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        <?php if (empty($results['comp'])) {
-                                        } else {
-                                            $hariini         = date('Y-m-d');
-                                            $satu_hari         = mktime(0, 0, 0, date('n'), date('j') - 1, date('Y'));
-                                            $kemarin         = date("Y-m-d", $satu_hari);
-                                            $sepuluh_hari     = mktime(0, 0, 0, date('n'), date('j') - 14, date('Y'));
-                                            $tendays         = date("Y-m-d", $sepuluh_hari);
-                                            $tglnow         = date('d');
-                                            $blnnow         = date('m');
-                                            if ($blnnow     != '1') {
-                                                $blnkmrn         = $blnnow - 1;
-                                                $yearkemaren     = date('Y');
-                                            } else {
-                                                $blnkmrn         = "12";
-                                                $yearnow         = date('Y');
-                                                $yearkemaren     = $yearnow - 1;
-                                            }
-                                            $numb3 = 0;
-                                            foreach ($results['comp'] as $comp) {
-                                                $numb3++;
-                                                $id_comp = $comp->id_compotition;
-                                                $lme_10hari    = $this->db->query("SELECT AVG(nominal) as nominal FROM child_history_lme WHERE tanggal_update BETWEEN  '$tendays' AND '$kemarin' AND id_compotition='$id_comp' ")->result();
-                                                $lme_30hari    = $this->db->query("SELECT AVG(nominal) as nominal FROM child_history_lme WHERE MONTH(tanggal_update) =  '$blnkmrn' AND YEAR(tanggal_update) = '$yearkemaren' AND id_compotition='$id_comp' ")->result();
-                                        ?>
-                                                <tr>
-                                                    <td><?= $numbc; ?></td>
-                                                    <td><?= $comp->name_compotition ?></td>
-                                                    <td>$ <?= number_format($lme_30hari[0]->nominal, 2); ?></td>
-                                                    <td>$ <?= number_format($lme_10hari[0]->nominal, 2); ?></td>
-                                                    <td>$ <?= number_format($comp->nominal_harga, 2); ?></td>
-                                                </tr>
-
-                                        <?php }
-                                        }  ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="form-group row">
-                                <!-- <button type='button' class='btn btn-sm btn-success' title='Ambil' id='tbh_ata' data-role='qtip' onClick='addmaterial();'><i class='fa fa-plus'></i>Add</button> -->
-
-                            </div>
-                            <div class="form-group row">
-                                <table class='table table-bordered table-striped'>
-                                    <thead>
-                                        <tr class='bg-blue'>
-                                            <th>Item</th>
-                                            <th width='8%'>Description</th>
-                                            <th width='7%'>Width</th>
-                                            <th width='7%'>Length</th>
-                                            <th width='7%'>Total Weight</th>
-                                            <th width='7%'>Unit Price</th>
-                                            <th width='6%'>Disc %</th>
-                                            <th width='6%'>Tax</th>
-                                            <th width='9%'>Amount</th>
-                                            <th width='8%'>Note</th>
-                                            <th width='5%'>#</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="data_request">
-                                        <tr>
-                                            <td colspan='14'>Tidak ada daftar material</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="customer">Note</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control" id="note_ket" name="note_ket">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-2">
-                                        <label for="customer"></label>
-                                    </div>
-                                    <div class="col-md-10">
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Sub Total</label>
-                                    </div>
-                                    <div class="col-md-8" id="ForHarga">
-                                        <input readonly type="text" class="form-control" id="hargatotal" onkeyup required name="hargatotal">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Discount</label>
-                                    </div>
-                                    <div class="col-md-8" id="ForDiskon">
-                                        <input readonly type="text" class="form-control" id="diskontotal" onkeyup required name="diskontotal">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">TAX</label>
-                                    </div>
-                                    <div class="col-md-8" id="ForTax">
-                                        <input readonly type="text" class="form-control" id="taxtotal" onkeyup required name="taxtotal">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Total Order</label>
-                                    </div>
-                                    <div class="col-md-8" id="ForSum">
-                                        <input readonly type="text" class="form-control" id="subtotal" onkeyup required name="subtotal">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <center>
-                            <button type="submit" class="btn btn-success btn-sm" name="save" id="simpan-com"><i class="fa fa-save"></i>Simpan</button>
-                        </center>
-                    </div>
-                </div>
-        </form>
-    </div>
+<div class="po-form-banner">
+	<div class="po-form-banner-title">
+		<h3><i class="fa fa-pencil-square-o" style="margin-right: 8px;"></i>Buat Purchase Order (Sheet)</h3>
+		<p>Silakan isi informasi supplier, detail material sheet, dan ketentuan PO di bawah ini.</p>
+	</div>
+	<div>
+		<a href="<?= base_url('purchase_order') ?>" class="btn btn-default btn-sm" style="border-radius: 4px; font-weight: 600;">
+			<i class="fa fa-arrow-left"></i>&nbsp; Kembali ke Daftar PO
+		</a>
+	</div>
 </div>
 
+<form id="data-form" method="post" autocomplete='off'>
+	<div class="input_fields_wrap2">
+		<!-- Section 1: Informasi Header & Supplier -->
+		<div class="po-section-card">
+			<div class="po-section-header">
+				<h4><i class="fa fa-building-o" style="margin-right: 6px;"></i>Informasi Supplier & Dokumen PO</h4>
+			</div>
+			<div class="po-section-body">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="id_suplier">Supplier <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<select id="id_suplier" name="id_suplier" class='form-control input-md chosen-select' onchange="get_lokasi()" required>
+									<option value="">-- Pilih Supplier --</option>
+									<?php foreach ($results['supplier'] as $supplier) { ?>
+										<option value="<?= $supplier->id_suplier ?>"><?= strtoupper(strtolower($supplier->name_suplier)) ?></option>
+									<?php } ?>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="no_pr">Pilih PR <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<select id="no_pr" name="no_pr" class='form-control input-md chosen-select' required>
+									<option value="0">Pilih Supplier Terlebih Dahulu</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="no_surat">No. PO</label>
+							</div>
+							<div class="col-md-8">
+								<input type="hidden" class="form-control" id="no_po" required name="no_po" readonly placeholder="ID PO">
+								<input type="text" class="form-control" id="no_surat" required name="no_surat" readonly placeholder="Auto Generated saat Simpan" style="background:#f1f5f9;">
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="tanggal">Tanggal PO <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<input type="text" class="form-control datepicker" id="tanggal" value="<?= $tanggal ?>" required name="tanggal">
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="expect_tanggal">Expect Date <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<input type="text" class="form-control datepicker" id="expect_tanggal" required name="expect_tanggal" placeholder="YYYY-MM-DD">
+							</div>
+						</div>
+					</div>
 
+					<div class="col-md-6">
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="loi">Kategori (Lokal/Import) <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8" id="ubahloi">
+								<select id="loi" name="loi" class="form-control select" onchange="get_kurs()" required>
+									<option value="">-- Pilih --</option>
+									<option value="Import">Import</option>
+									<option value="Lokal">Lokal</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="matauang">Mata Uang <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<select id="matauang" name="matauang" class='form-control input-md chosen-select' required>
+									<?php foreach ($results['matauang'] as $supplier) { ?>
+										<option value="<?= $supplier->kode ?>"><?= strtoupper(strtolower($supplier->kode)) ?></option>
+									<?php } ?>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="term">Payment Term <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<input type="text" class="form-control" id="term" required name="term" placeholder="Contoh: COD / 30 Days">
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="cif">Price Method <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<select id="cif" name="cif" class="form-control select" required>
+									<option value="">-- Pilih --</option>
+									<option value="CIF">CIF</option>
+									<option value="FOB">FOB</option>
+									<option value="LOCO">LOCO</option>
+									<option value="DDU">DDU</option>
+									<option value="FRANCO">FRANCO</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="delivery_date">Delivery Date</label>
+							</div>
+							<div class="col-md-8">
+								<input type="date" name="delivery_date" id="delivery_date" class="form-control">
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="receiving_person">PIC Penerima</label>
+							</div>
+							<div class="col-md-8">
+								<input type="text" name="receiving_person" id="receiving_person" class="form-control" placeholder="Nama PIC">
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-12" id="input_kurs"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Section 2: Referensi Kurs & LME -->
+		<div class="po-section-card">
+			<div class="po-section-header">
+				<h4><i class="fa fa-line-chart" style="margin-right: 6px;"></i>Referensi Kurs & Harga LME</h4>
+			</div>
+			<div class="po-section-body">
+				<div class="row">
+					<div class="col-md-6" id="kurs_place">
+						<?php
+						$hariini = date('Y-m-d');
+						$sepuluh_hari = mktime(0, 0, 0, date('n'), date('j') - 10, date('Y'));
+						$tendays = date("Y-m-d", $sepuluh_hari);
+						$blnnow = date('m');
+						$yearnow = date('Y');
+						if ($blnnow != '1') {
+							$blnkmrn = $blnnow - 1;
+							$yearkemaren = $yearnow;
+						} else {
+							$blnkmrn = "12";
+							$yearnow = date('Y');
+							$yearkemaren = $yearnow - 1;
+						}
+						$kurs = $this->db->query("SELECT * FROM mata_uang WHERE kode = 'IDR'")->result();
+						$kurs10hari = $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE tanggal_ubah BETWEEN '$tendays' AND '$hariini' AND kode_kurs='IDR'")->result();
+						$kurs30hari = $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE MONTH(tanggal_ubah) = '$blnkmrn' AND YEAR(tanggal_ubah) = '$yearkemaren' AND kode_kurs='IDR'")->result();
+						$nomkurs = isset($kurs[0]->kurs) ? $kurs[0]->kurs : 0;
+						$nomkurs10 = isset($kurs10hari[0]->nominal) ? $kurs10hari[0]->nominal : 0;
+						$nomkurs30 = isset($kurs30hari[0]->nominal) ? $kurs30hari[0]->nominal : 0;
+						?>
+						<label style="margin-bottom: 8px; font-weight: 600;">Data Kurs IDR</label>
+						<table class='table table-bordered table-striped'>
+							<thead>
+								<tr>
+									<th class="text-center">Kurs On The Spot</th>
+									<th class="text-center">Kurs 10 Hari</th>
+									<th class="text-center">Kurs 30 Hari</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="text-center"><strong>Rp. <?= number_format($nomkurs, 2) ?></strong></td>
+									<td class="text-center"><strong>Rp. <?= number_format($nomkurs10, 2) ?></strong></td>
+									<td class="text-center"><strong>Rp. <?= number_format($nomkurs30, 2) ?></strong></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="col-md-6" id="lme_place">
+						<label style="margin-bottom: 8px; font-weight: 600;">Data Harga LME</label>
+						<table class='table table-bordered table-striped'>
+							<thead>
+								<tr>
+									<th width="30">#</th>
+									<th>Komposisi</th>
+									<th class="text-right">Rate H-30</th>
+									<th class="text-right">Rate H-10</th>
+									<th class="text-right">Rate Saat Ini</th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php if (!empty($results['comp'])) {
+									$numb3 = 0;
+									foreach ($results['comp'] as $comp) {
+										$numb3++;
+										$id_comp = $comp->id_compotition;
+										$lme_10hari = $this->db->query("SELECT AVG(nominal) as nominal FROM child_history_lme WHERE tanggal_update BETWEEN '$tendays' AND '$kemarin' AND id_compotition='$id_comp'")->result();
+										$lme_30hari = $this->db->query("SELECT AVG(nominal) as nominal FROM child_history_lme WHERE MONTH(tanggal_update) = '$blnkmrn' AND YEAR(tanggal_update) = '$yearkemaren' AND id_compotition='$id_comp'")->result();
+								?>
+										<tr>
+											<td><?= $numb3 ?></td>
+											<td><?= $comp->name_compotition ?></td>
+											<td class="text-right">$ <?= number_format(isset($lme_30hari[0]->nominal) ? $lme_30hari[0]->nominal : 0, 2) ?></td>
+											<td class="text-right">$ <?= number_format(isset($lme_10hari[0]->nominal) ? $lme_10hari[0]->nominal : 0, 2) ?></td>
+											<td class="text-right"><strong>$ <?= number_format($comp->nominal_harga, 2) ?></strong></td>
+										</tr>
+								<?php }
+								} else { ?>
+									<tr>
+										<td colspan="5" class="text-center" style="color: #94a3b8;">Tidak ada data LME</td>
+									</tr>
+								<?php } ?>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Section 3: Daftar Material PO (Sheet) -->
+		<div class="po-section-card">
+			<div class="po-section-header">
+				<h4><i class="fa fa-cubes" style="margin-right: 6px;"></i>Daftar Item Material Purchase Order (Sheet)</h4>
+			</div>
+			<div class="po-section-body" style="padding: 0;">
+				<div class="table-responsive">
+					<table class='table table-bordered table-striped table-custom' style="margin-bottom: 0;">
+						<thead>
+							<tr>
+								<th>Item Material</th>
+								<th width='8%'>Description</th>
+								<th width='7%' class="text-right">Width</th>
+								<th width='7%' class="text-right">Length</th>
+								<th width='7%' class="text-right">Total Weight</th>
+								<th width='7%' class="text-right">Unit Price</th>
+								<th width='6%' class="text-center">Disc %</th>
+								<th width='6%' class="text-center">Tax %</th>
+								<th width='9%' class="text-right">Amount</th>
+								<th width='8%'>Note</th>
+								<th width='40' class="text-center">#</th>
+							</tr>
+						</thead>
+						<tbody id="data_request">
+							<tr>
+								<td colspan='11' class="text-center" style="padding: 24px; color: #94a3b8;">
+									<i class="fa fa-info-circle"></i> Silakan pilih supplier dan PR di atas untuk memuat daftar material sheet.
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<!-- Section 4: Catatan & Ringkasan Total Biaya -->
+		<div class="row">
+			<div class="col-md-7">
+				<div class="po-section-card">
+					<div class="po-section-header">
+						<h4><i class="fa fa-sticky-note-o" style="margin-right: 6px;"></i>Catatan Khusus PO</h4>
+					</div>
+					<div class="po-section-body">
+						<div class="form-group" style="margin-bottom: 0;">
+							<label for="note_ket">Keterangan / Instruksi Tambahan</label>
+							<textarea class="form-control" id="note_ket" name="note_ket" rows="4" placeholder="Tuliskan catatan khusus untuk supplier di sini jika ada..."></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-5">
+				<div class="po-section-card">
+					<div class="po-section-header">
+						<h4><i class="fa fa-calculator" style="margin-right: 6px;"></i>Ringkasan Biaya PO</h4>
+					</div>
+					<div class="po-section-body">
+						<div class="po-summary-box">
+							<div class="po-summary-item">
+								<label for="hargatotal">Sub Total</label>
+								<div id="ForHarga" style="width: 170px;">
+									<input readonly type="text" class="form-control text-right" id="hargatotal" required name="hargatotal" style="background:#fff; font-weight:600;">
+								</div>
+							</div>
+							<div class="po-summary-item">
+								<label for="diskontotal">Total Diskon</label>
+								<div id="ForDiskon" style="width: 170px;">
+									<input readonly type="text" class="form-control text-right" id="diskontotal" required name="diskontotal" style="background:#fff; color:#dc2626;">
+								</div>
+							</div>
+							<div class="po-summary-item">
+								<label for="taxtotal">Total Pajak (PPN)</label>
+								<div id="ForTax" style="width: 170px;">
+									<input readonly type="text" class="form-control text-right" id="taxtotal" required name="taxtotal" style="background:#fff;">
+								</div>
+							</div>
+							<div class="po-summary-item total">
+								<label for="subtotal">TOTAL ORDER</label>
+								<div id="ForSum" style="width: 170px;">
+									<input readonly type="text" class="form-control text-right" id="subtotal" required name="subtotal" style="background:#e0f2fe; color:#0369a1; font-weight:700; font-size:15px;">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Action Buttons Footer -->
+		<div class="po-form-actions">
+			<a href="<?= base_url('purchase_order') ?>" class="btn btn-default" style="border-radius: 4px; font-weight: 600;">
+				<i class="fa fa-arrow-left"></i>&nbsp; Batal & Kembali
+			</a>
+			<button type="submit" class="btn btn-success" name="save" id="simpan-com" style="border-radius: 4px; font-weight: 600; padding: 8px 24px;">
+				<i class="fa fa-save"></i>&nbsp; Simpan Purchase Order
+			</button>
+		</div>
+	</div>
+</form>
 
 <script type="text/javascript">
     //$('#input-kendaraan').hide();
