@@ -4,465 +4,484 @@ foreach ($results['head'] as $head) {
 }
 ?>
 
-<div class="box box-primary">
-    <div class="box-body">
-        <form id="data-form" method="post">
-            <div class="col-sm-12">
-                <div class="input_fields_wrap2">
-                    <div class="row">
-                        <center><label for="customer">
-                                <h3>Purchase Order</h3>
-                            </label></center>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Supplier</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <select id="id_suplier" name="id_suplier" class='form-control input-md chosen-select' required>
-                                            <option value="">--Pilih--</option>
-                                            <?php foreach ($results['supplier'] as $supplier) {
-                                                $selected = ($supplier->id_suplier == $head->id_suplier) ? 'selected' : '';
-                                            ?>
-                                                <option value="<?= $supplier->id_suplier ?>" <?= $selected; ?>><?= strtoupper(strtolower($supplier->name_suplier)) ?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Local / Import</label>
-                                    </div>
-                                    <div class="col-md-8" id='ubahloi'>
-                                        <select id="loi" name="loi" class="form-control select" onchange="get_kurs()" required>
-                                            <option value="">--Pilih--</option>
-                                            <?php
-                                            if ($head->loi == "Import") {
-                                                echo "
-						<option value='Import' selected>Import</option>
-						<option value='Lokal'>Lokal</option>
-						";
-                                            } elseif ($head->loi == "Lokal") {
-                                                echo "
-						<option value='Import'>Import</option>
-						<option value='Lokal' selected>Lokal</option>
-						";
-                                            } else {
-                                                echo "
-						<option value='Import'>Import</option>
-						<option value='Lokal'>Lokal</option>
-						";
-                                            }
+<style type="text/css">
+	.po-form-banner {
+		background: #ffffff;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		padding: 16px 20px;
+		margin-bottom: 20px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+	}
+	.po-form-banner h3 {
+		margin: 0;
+		font-size: 18px;
+		font-weight: 700;
+		color: #205072;
+	}
+	.po-form-banner p {
+		margin: 3px 0 0 0;
+		font-size: 12px;
+		color: #64748b;
+	}
+	.po-section-card {
+		background: #ffffff;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		margin-bottom: 20px;
+		box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+		overflow: hidden;
+	}
+	.po-section-header {
+		background: #f8fafc;
+		border-bottom: 1px solid #e2e8f0;
+		padding: 12px 20px;
+	}
+	.po-section-header h4 {
+		margin: 0;
+		font-size: 13px;
+		font-weight: 700;
+		color: #205072;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+	.po-section-body {
+		padding: 20px;
+	}
+	.form-group label {
+		font-weight: 600;
+		color: #334155;
+		font-size: 12px;
+	}
+	.table-custom thead th {
+		background: #205072 !important;
+		color: #ffffff !important;
+		font-size: 11px !important;
+		font-weight: 600 !important;
+		text-transform: uppercase !important;
+		padding: 10px 8px !important;
+		border: none !important;
+		vertical-align: middle !important;
+	}
+	.table-custom tbody td {
+		padding: 8px !important;
+		vertical-align: middle !important;
+	}
+	.po-summary-box {
+		background: #f8fafc;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		padding: 18px;
+	}
+	.po-summary-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 10px;
+		font-size: 13px;
+		color: #475569;
+	}
+	.po-summary-item label {
+		margin: 0;
+		font-weight: 500;
+	}
+	.po-summary-item.total {
+		border-top: 2px dashed #cbd5e1;
+		margin-top: 12px;
+		padding-top: 12px;
+		font-size: 15px;
+		font-weight: 700;
+		color: #205072;
+	}
+	.po-form-actions {
+		background: #ffffff;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		padding: 16px 20px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+		margin-bottom: 30px;
+	}
+</style>
 
-                                            ?>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="customer">NO.PO</label>
-                                    </div>
-                                    <div class="col-md-8" hidden>
-                                        <input type="text" class="form-control" id="no_po" value="<?= $head->no_po  ?>" required name="no_po" readonly placeholder="ID PO">
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control" id="no_surat" value="<?= $head->no_surat  ?>" required name="no_surat" readonly placeholder="No.PR">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6" id="input_kurs">
-
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="customer">Tanggal PO</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="date" class="form-control" id="tanggal" value="<?= $head->tanggal ?>" onkeyup required name="tanggal" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Mata Uang</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <select id="matauang" name="matauang" class='form-control input-md chosen-select' required>
-                                            <?php foreach ($results['matauang'] as $supplier) {
-                                                $trkurs = $head->matauang;
-                                                $mtuang = $supplier->kode;
-                                                if ($trkurs == $mtuang) {
-                                                    $selected = 'selected';
-                                                } else {
-                                                    $selected = '';
-                                                }
-
-
-                                            ?>
-                                                <option value="<?= $supplier->kode ?>" <?= $selected; ?>><?= strtoupper(strtolower($supplier->kode)) ?></option>
-                                            <?php } ?>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="customer">Payment Term</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control" id="term" value="<?= $head->term  ?>" onkeyup required name="term">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">PR</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <select id="no_pr" name="no_pr" class='form-control input-md chosen-select' required>
-                                            <option value="0">List Empty</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Price Method</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <?php
-                                        $sel_cif = ($head->cif == 'CIF') ? 'selected' : '';
-                                        $sel_fob = ($head->cif == 'FOB') ? 'selected' : '';
-                                        $sel_loco = ($head->cif == 'LOCO') ? 'selected' : '';
-                                        $sel_ddu = ($head->cif == 'DDU') ? 'selected' : '';
-                                        $sel_fran = ($head->cif == 'FRANCO') ? 'selected' : '';
-                                        ?>
-                                        <select id="cif" name="cif" class="form-control select" required>
-                                            <option value="">--Pilih--</option>
-                                            <option value="CIF" <?= $sel_cif; ?>>CIF</option>
-                                            <option value="FOB" <?= $sel_fob; ?>>FOB</option>
-                                            <option value="LOCO" <?= $sel_loco; ?>>LOCO</option>
-                                            <option value="DDU" <?= $sel_ddu; ?>>DDU</option>
-                                            <option value="FRANCO" <?= $sel_fran; ?>>FRANCO</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Delivery Date</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="date" name="delivery_date" id="" class="form-control" value="<?= $head->delivery_date ?>">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">PIC</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" name="receiving_person" id="" class="form-control" value="<?= $head->receiving_person ?>">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="form-group row" id='kurs_place'>
-                                <?php
-                                $hariini = date('Y-m-d');
-                                $sepuluh_hari = mktime(0, 0, 0, date('n'), date('j') - 10, date('Y'));
-                                $tendays = date("Y-m-d", $sepuluh_hari);
-                                $tglnow = date('d');
-                                $blnnow = date('m');
-                                if ($blnnow != '1') {
-                                    $blnkmrn = $blnnow - 1;
-                                    $yearkemaren = date('Y');
-                                } else {
-                                    $blnkmrn = "12";
-                                    $yearnow = date('Y');
-                                    $yearkemaren = $yearnow - 1;
-                                }
-                                $kurs    = $this->db->query("SELECT * FROM mata_uang WHERE kode = 'IDR' ")->result();
-                                $kurs10hari    = $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE tanggal_ubah BETWEEN  '$tendays' AND '$hariini' AND kode_kurs='IDR' ")->result();
-                                $kurs30hari    = $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE MONTH(tanggal_ubah) =  '$blnkmrn' AND YEAR(tanggal_ubah) = '$yearkemaren' AND kode_kurs='IDR' ")->result();
-                                $nomkurs = $kurs[0]->kurs;
-                                $nomkurs10 = $kurs10hari[0]->nominal;
-                                $nomkurs30 = $kurs30hari[0]->nominal;
-                                $k =  number_format($nomkurs, 2);
-                                $k10 =  number_format($nomkurs10, 2);
-                                $k30 =  number_format($nomkurs30, 2);
-                                if ($head->loi == 'Import') {
-                                    echo "
-				<table class='col-sm-12' border='1' cellspacing='0'>
-					<tr>
-						<th><center>Kurs On The Spot</center></th>
-						<th><center>Kurs 10 Hari</center></th>
-						<th><center>Kurs 30 Hari</center></th>
-					</tr>
-					<tr>
-						<td><center>Rp. $k  ,-</center></td>
-						<td><center>Rp. $k10  ,-</center></td>
-						<td><center>Rp. $k30  ,-</center></td>
-					</tr>
-				<table>
-		";
-                                } else {
-                                };
-                                ?>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="form-group row" id='lme_place'>
-                                <table class='table table-bordered table-striped'>
-                                    <thead>
-                                        <tr>
-                                            <th width="5">#</th>
-                                            <th width="13%">Kompisisi</th>
-                                            <th>Rate H-30</th>
-                                            <th>Rate H-10</th>
-                                            <th>Rate Saat Ini</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        <?php if (empty($results['comp'])) {
-                                        } else {
-                                            $hariini         = date('Y-m-d');
-                                            $satu_hari         = mktime(0, 0, 0, date('n'), date('j') - 1, date('Y'));
-                                            $kemarin         = date("Y-m-d", $satu_hari);
-                                            $sepuluh_hari     = mktime(0, 0, 0, date('n'), date('j') - 14, date('Y'));
-                                            $tendays         = date("Y-m-d", $sepuluh_hari);
-                                            $tglnow         = date('d');
-                                            $blnnow         = date('m');
-                                            if ($blnnow     != '1') {
-                                                $blnkmrn         = $blnnow - 1;
-                                                $yearkemaren     = date('Y');
-                                            } else {
-                                                $blnkmrn         = "12";
-                                                $yearnow         = date('Y');
-                                                $yearkemaren     = $yearnow - 1;
-                                            }
-                                            $numb3 = 0;
-                                            foreach ($results['comp'] as $comp) {
-                                                $numb3++;
-                                                $id_comp = $comp->id_compotition;
-                                                $lme_10hari    = $this->db->query("SELECT AVG(nominal) as nominal FROM child_history_lme WHERE tanggal_update BETWEEN  '$tendays' AND '$kemarin' AND id_compotition='$id_comp' ")->result();
-                                                $lme_30hari    = $this->db->query("SELECT AVG(nominal) as nominal FROM child_history_lme WHERE MONTH(tanggal_update) =  '$blnkmrn' AND YEAR(tanggal_update) = '$yearkemaren' AND id_compotition='$id_comp' ")->result();
-                                        ?>
-                                                <tr>
-                                                    <td><?= $numbc; ?></td>
-                                                    <td><?= $comp->name_compotition ?></td>
-                                                    <td>$ <?= number_format($lme_30hari[0]->nominal, 2); ?></td>
-                                                    <td>$ <?= number_format($lme_10hari[0]->nominal, 2); ?></td>
-                                                    <td>$ <?= number_format($comp->nominal_harga, 2); ?></td>
-                                                </tr>
-
-                                        <?php }
-                                        }  ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="form-group row">
-                                <!-- <button type='button' class='btn btn-sm btn-success' title='Ambil' id='tbh_ata' data-role='qtip' onClick='addmaterial();'><i class='fa fa-plus'></i>Add</button> -->
-
-                            </div>
-                            <div class="form-group row">
-                                <table class='table table-bordered table-striped'>
-                                    <thead>
-                                        <tr class='bg-blue'>
-                                            <th>Item</th>
-                                            <th width='8%'>Description</th>
-                                            <th width='7%'>Width</th>
-                                            <th width='7%'>Length</th>
-                                            <th width='7%'>Total Weight</th>
-                                            <th width='7%'>Unit Price</th>
-                                            <th width='6%'>Disc %</th>
-                                            <th width='6%'>Tax</th>
-                                            <th width='9%'>Amount</th>
-                                            <th width='8%'>Note</th>
-                                            <th width='5%'>#</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="data_request">
-                                        <?php
-                                        $key = 0;
-                                        foreach ($results['detail'] as $val => $value) {
-                                            $key++;
-
-                                            $disabled = ($head->loi == 'Import') ? '' : 'readonly';
-                                            $disabled2 = ($head->loi == 'Import') ? 'readonly' : '';
-
-                                            $selected1 = ($value['rate_lme'] == 'Hari Ini') ? 'selected' : '';
-                                            $selected2 = ($value['rate_lme'] == 'H-10') ? 'selected' : '';
-                                            $selected3 = ($value['rate_lme'] == 'H-30') ? 'selected' : '';
-
-                                            echo "<tr>";
-                                            echo     "<td>" . $value['namamaterial'] . "
-							<input type='hidden' class='form-control input-sm' id='dt_idpr_" . $key . "' name='dt[" . $key . "][idpr]' value='" . $value['idpr'] . "'>
-							<input type='hidden' class='form-control input-sm' id='dt_idmaterial_" . $key . "' name='dt[" . $key . "][idmaterial]' value='" . $value['idmaterial'] . "'>
-							<input type='hidden' class='form-control input-sm' id='dt_namamaterial_" . $key . "' name='dt[" . $key . "][namamaterial]' value='" . $value['namamaterial'] . "'>
-							<input type='hidden' class='form-control input-sm' id='dt_qty_" . $key . "' name='dt[" . $key . "][qty]' value='" . $value['qty'] . "'>
-							<input type='hidden' class='form-control input-sm' id='dt_panjang_" . $key . "' name='dt[" . $key . "][panjang]' value='" . $value['panjang'] . "'>
-							<input type='hidden' class='form-control input-sm' id='dt_lebar_" . $key . "' name='dt[" . $key . "][lebar]' value='" . $value['lebar'] . "'>
-
-							<input type='hidden' class='form-control input-sm ch_diskon' id='dt_ch_diskon_" . $key . "'>
-							<input type='hidden' class='form-control input-sm ch_pajak' id='dt_ch_pajak_" . $key . "'>
-							<input type='hidden' class='form-control input-sm ch_jumlah' id='dt_ch_jumlah_" . $key . "'>
-
-						</td>";
-                                            echo     "<td><input type='text' class='form-control input-sm' name='dt[" . $key . "][description]' id='dt_description_" . $key . "' value='" . $value['description'] . "'></td>";
-                                            echo     "<td><input type='text' class='form-control text-right input-sm autoNumeric' name='dt[" . $key . "][width]' id='dt_width_" . $key . "'  value='" . $value['width'] . "'></td>";
-                                            echo     "<td><input type='text' class='form-control text-right input-sm autoNumeric' name='dt[" . $key . "][length]' id='dt_length_" . $key . "'  value='" . $value['panjang'] . "'></td>";
-                                            echo     "<td><input type='text' class='form-control text-right input-sm autoNumeric' name='dt[" . $key . "][totalweight]' id='dt_totalweight_" . $key . "' value='" . $value['totalwidth'] . "'  onkeyup='HitAmmount(" . $key . ")'></td>";
-                                            echo     "<td><input type='text' class='form-control text-right input-sm autoNumeric3' id='dt_hargasatuan_" . $key . "' name='dt[" . $key . "][hargasatuan]' value='" . number_format($value['hargasatuan'], 3) . "' onkeyup='HitAmmount(" . $key . ")'></td>";
-                                            echo     "<td><input type='text' class='form-control text-right input-sm autoNumeric' id='dt_diskon_" . $key . "' name='dt[" . $key . "][diskon]' value='" . number_format($value['diskon'], 2) . "' onkeyup='HitAmmount(" . $key . ")'></td>";
-                                            echo     "<td><input type='text' class='form-control text-right input-sm autoNumeric' id='dt_pajak_" . $key . "' name='dt[" . $key . "][pajak]' value='" . number_format($value['pajak'], 2) . "' onkeyup='HitAmmount(" . $key . ")'></td>";
-                                            echo     "<td><input type='text' class='form-control text-right input-sm ch_jumlah_ex' id='dt_jumlahharga_" . $key . "' readonly name='dt[" . $key . "][jumlahharga]' value='" . number_format($value['jumlahharga'], 2) . "'></td>";
-                                            echo     "<td><input type='text' class='form-control input-sm' id='dt_note_" . $key . "' name='dt[" . $key . "][note]' value='" . $value['note'] . "'></td>";
-                                            echo     "<td>
-						<button type='button' class='btn btn-sm btn-danger hapus_baris' title='Hapus Data' data-role='qtip'><i class='fa fa-close'></i></button>
-					</td>";
-                                            echo "</tr>";
-
-                                            // 	$alloyprice=number_format($detail->alloyprice);
-                                            // 	$fabcost=number_format($detail->fabcost);
-                                            // 	$hargasatuan=number_format($detail->hargasatuan,3);
-                                            // 	$jumlahharga=number_format($detail->jumlahharga);
-                                            // 	echo"
-                                            // 	<tr id='trmaterial_$loop'>
-
-                                            // 		<td hidden><input style='font-size:90%' readonly 	type='text' 	value='".$detail->idpr."'		class='form-control' id='dt_idpr_".$loop."' 	required name='dt[".$loop."][idpr]' ></td>
-                                            // <td hidden><input style='font-size:90%' readonly 	type='text' 	value='".$detail->idmaterial."'		class='form-control' id='dt_idmaterial_".$loop."' 	required name='dt[".$loop."][idmaterial]' ></td>
-                                            // <td ><input	style='font-size:90%' readonly  	type='text' 	value='".$detail->namamaterial."' class='form-control' id='dt_namamaterial_".$loop."' required name='dt[".$loop."][namamaterial]' ></td>
-                                            // <td ><input	style='font-size:90%' readonly  	type='text' 	value='".$detail->description."'	class='form-control' id='dt_description_".$loop."' 	required name='dt[".$loop."][description]' ></td>
-                                            // <td ><input	style='font-size:90%' readonly  	type='text' 	value='".$detail->width."'			class='form-control' id='dt_width_".$loop."' 			required name='dt[".$loop."][width]'  ></td>
-                                            // <td ><input	style='font-size:90%' readonly  	type='text' 	value='".$detail->totalwidth."'			class='form-control' id='dt_totalwidth_".$loop."' 			required name='dt[".$loop."][totalwidth]'  ></td>
-                                            // <td hidden ><input	style='font-size:90%'	readonly  	type='number' 	value='".$detail->qty."'			class='form-control' id='dt_qty_".$loop."' 			required name='dt[".$loop."][qty]'  ></td>
-                                            // <td ><input	style='font-size:90%'	readonly  	type='text' 	value='".$detail->rate_lme."'			class='form-control' id='dt_ratelme_".$loop."' 			required name='dt[".$loop."][ratelme]'  ></td>
-                                            // <td ><input	style='font-size:90%'	readonly  	type='text' 	value='".$alloyprice."'			class='form-control' id='dt_alloyprice_".$loop."' 			required name='dt[".$loop."][alloyprice]'  ></td>
-                                            // <td ><input	style='font-size:90%'	readonly  	type='text' 	value='".$fabcost."'			class='form-control' id='dt_fabcost_".$loop."' 			required name='dt[".$loop."][fabcost]'  ></td>
-                                            // <td hidden><input	style='font-size:90%'	readonly  	type='number' 	value='".$detail->panjang."'			class='form-control' id='dt_panjang_".$loop."' 			required name='dt[".$loop."][panjang]'  ></td>
-                                            // <td hidden><input	style='font-size:90%'	readonly  	type='number' 	value='".$detail->lebar."'			class='form-control' id='dt_lebar_".$loop."' 			required name='dt[".$loop."][lebar]'  ></td>
-                                            // <td	><input	style='font-size:90%'	readonly  	type='text' 	value='".$hargasatuan."'	class='form-control' id='dt_hargasatuan_".$loop."' 	required name='dt[".$loop."][hargasatuan]' ></td>
-                                            // <td	><input	style='font-size:90%'	readonly 	type='text' 	value='".$detail->diskon."'			class='form-control' id='dt_diskon_".$loop."' 		required name='dt[".$loop."][diskon]' ></td>
-                                            // <td	><input	style='font-size:90%'	readonly	type='text' 	value='".$detail->pajak."'			class='form-control' id='dt_pajak_".$loop."' 		required name='dt[".$loop."][pajak]' ></td>
-                                            // <td ><input	style='font-size:90%'	readonly 	type='text' 	value='".$jumlahharga."'	class='form-control' id='dt_jumlahharga_".$loop."' 	required name='dt[".$loop."][jumlahharga]' ></td>
-                                            // <td	><input	style='font-size:90%'	readonly  	type='text' 	value='".$detail->note."'			class='form-control' id='dt_note_".$loop."' 		required name='dt[".$loop."][note]' ></td>
-                                            // <td><button type='button' class='btn btn-sm btn-danger' title='Hapus Data' data-role='qtip' onClick='return CancelItem($loop);'><i class='fa fa-close'></i></button></td>
-
-                                            // </tr>
-                                            // ";
-                                        }
-                                        ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="customer">Expect Date</label>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control" value="<?= date('Y-m-d', strtotime($head->expect_tanggal))  ?>" id="expect_tanggal" required name="expect_tanggal">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-2">
-                                        <label for="customer">Note</label>
-                                    </div>
-                                    <div class="col-md-10">
-                                        <input type="text" class="form-control" id="note_ket" name="note_ket" value="<?= $head->note  ?>">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Sub Total</label>
-                                    </div>
-                                    <div class="col-md-8" id="ForHarga">
-                                        <input readonly type="text" class="form-control" value="<?= number_format($head->hargatotal)  ?>" id="hargatotal" onkeyup required name="hargatotal">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Discount</label>
-                                    </div>
-                                    <div class="col-md-8" id="ForDiskon">
-                                        <input readonly type="text" class="form-control" value="<?= number_format($head->diskontotal)  ?>" id="diskontotal" onkeyup required name="diskontotal">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">TAX</label>
-                                    </div>
-                                    <div class="col-md-8" id="ForTax">
-                                        <input readonly type="text" class="form-control" value="<?= number_format($head->taxtotal)  ?>" id="taxtotal" onkeyup required name="taxtotal">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="col-sm-6">
-                                <div class="form-group row">
-                                    <div class="col-md-4">
-                                        <label for="id_customer">Total Order</label>
-                                    </div>
-                                    <div class="col-md-8" id="ForSum">
-                                        <input readonly type="text" class="form-control" value="<?= number_format($head->subtotal)  ?>" id="subtotal" onkeyup required name="subtotal">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <center>
-                            <button type="submit" class="btn btn-success btn-sm" name="save" id="simpan-com"><i class="fa fa-save"></i>Simpan</button>
-                        </center>
-                    </div>
-                </div>
-        </form>
-    </div>
+<div class="po-form-banner">
+	<div class="po-form-banner-title">
+		<h3><i class="fa fa-pencil-square-o" style="margin-right: 8px;"></i>Edit Purchase Order (Sheet): <?= $head->no_surat ?></h3>
+		<p>Ubah informasi PO Sheet, spesifikasi dimensi, atau ketentuan order di bawah ini.</p>
+	</div>
+	<div>
+		<a href="<?= base_url('purchase_order') ?>" class="btn btn-default btn-sm" style="border-radius: 4px; font-weight: 600;">
+			<i class="fa fa-arrow-left"></i>&nbsp; Kembali ke Daftar PO
+		</a>
+	</div>
 </div>
+
+<form id="data-form" method="post" autocomplete='off'>
+	<div class="input_fields_wrap2">
+		<!-- Section 1: Informasi Header & Supplier -->
+		<div class="po-section-card">
+			<div class="po-section-header">
+				<h4><i class="fa fa-building-o" style="margin-right: 6px;"></i>Informasi Supplier & Dokumen PO</h4>
+			</div>
+			<div class="po-section-body">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="id_suplier">Supplier <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<select id="id_suplier" name="id_suplier" class='form-control input-md chosen-select' required>
+									<option value="">-- Pilih Supplier --</option>
+									<?php foreach ($results['supplier'] as $supplier) {
+										$selected = ($supplier->id_suplier == $head->id_suplier) ? 'selected' : '';
+									?>
+										<option value="<?= $supplier->id_suplier ?>" <?= $selected; ?>><?= strtoupper(strtolower($supplier->name_suplier)) ?></option>
+									<?php } ?>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="no_pr">Nomor PR <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<select id="no_pr" name="no_pr" class='form-control input-md chosen-select' required>
+									<option value="0">List Empty</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="no_surat">No. PO</label>
+							</div>
+							<div class="col-md-8">
+								<input type="hidden" class="form-control" id="no_po" value="<?= $head->no_po ?>" required name="no_po" readonly placeholder="ID PO">
+								<input type="text" class="form-control" id="no_surat" value="<?= $head->no_surat ?>" required name="no_surat" readonly style="background:#f1f5f9;">
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="tanggal">Tanggal PO <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<input type="text" class="form-control datepicker" id="tanggal" value="<?= $head->tanggal ?>" required name="tanggal">
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="expect_tanggal">Expect Date <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<input type="text" class="form-control datepicker" value="<?= date('Y-m-d', strtotime($head->expect_tanggal)) ?>" id="expect_tanggal" required name="expect_tanggal">
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-6">
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="loi">Kategori (Lokal/Import) <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8" id='ubahloi'>
+								<select id="loi" name="loi" class="form-control select" onchange="get_kurs()" required>
+									<option value="">-- Pilih --</option>
+									<option value='Import' <?= ($head->loi == "Import") ? 'selected' : '' ?>>Import</option>
+									<option value='Lokal' <?= ($head->loi == "Lokal") ? 'selected' : '' ?>>Lokal</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="matauang">Mata Uang <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<select id="matauang" name="matauang" class='form-control input-md chosen-select' required>
+									<?php foreach ($results['matauang'] as $supplier) {
+										$selected = ($supplier->kode == $head->matauang) ? 'selected' : '';
+									?>
+										<option value="<?= $supplier->kode ?>" <?= $selected ?>><?= strtoupper(strtolower($supplier->kode)) ?></option>
+									<?php } ?>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="term">Payment Term <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<input type="text" class="form-control" id="term" value="<?= $head->term ?>" required name="term">
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="cif">Price Method <span class="text-danger">*</span></label>
+							</div>
+							<div class="col-md-8">
+								<select id="cif" name="cif" class="form-control select" required>
+									<option value="">-- Pilih --</option>
+									<option value="CIF" <?= ($head->cif == 'CIF') ? 'selected' : '' ?>>CIF</option>
+									<option value="FOB" <?= ($head->cif == 'FOB') ? 'selected' : '' ?>>FOB</option>
+									<option value="LOCO" <?= ($head->cif == 'LOCO') ? 'selected' : '' ?>>LOCO</option>
+									<option value="DDU" <?= ($head->cif == 'DDU') ? 'selected' : '' ?>>DDU</option>
+									<option value="FRANCO" <?= ($head->cif == 'FRANCO') ? 'selected' : '' ?>>FRANCO</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="delivery_date">Delivery Date</label>
+							</div>
+							<div class="col-md-8">
+								<input type="date" name="delivery_date" id="delivery_date" value="<?= $head->delivery_date ?>" class="form-control">
+							</div>
+						</div>
+						<div class="form-group row">
+							<div class="col-md-4">
+								<label for="receiving_person">PIC Penerima</label>
+							</div>
+							<div class="col-md-8">
+								<input type="text" name="receiving_person" id="receiving_person" value="<?= $head->receiving_person ?>" class="form-control">
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-12" id="input_kurs"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Section 2: Referensi Kurs & LME -->
+		<div class="po-section-card">
+			<div class="po-section-header">
+				<h4><i class="fa fa-line-chart" style="margin-right: 6px;"></i>Referensi Kurs & Harga LME</h4>
+			</div>
+			<div class="po-section-body">
+				<div class="row">
+					<div class="col-md-6" id='kurs_place'>
+						<?php
+						$hariini = date('Y-m-d');
+						$sepuluh_hari = mktime(0, 0, 0, date('n'), date('j') - 10, date('Y'));
+						$tendays = date("Y-m-d", $sepuluh_hari);
+						$blnnow = date('m');
+						$yearnow = date('Y');
+						if ($blnnow != '1') {
+							$blnkmrn = $blnnow - 1;
+							$yearkemaren = $yearnow;
+						} else {
+							$blnkmrn = "12";
+							$yearkemaren = $yearnow - 1;
+						}
+						$kurs = $this->db->query("SELECT * FROM mata_uang WHERE kode = 'IDR'")->result();
+						$kurs10hari = $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE tanggal_ubah BETWEEN '$tendays' AND '$hariini' AND kode_kurs='IDR'")->result();
+						$kurs30hari = $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE MONTH(tanggal_ubah) = '$blnkmrn' AND YEAR(tanggal_ubah) = '$yearkemaren' AND kode_kurs='IDR'")->result();
+						$nomkurs = isset($kurs[0]->kurs) ? $kurs[0]->kurs : 0;
+						$nomkurs10 = isset($kurs10hari[0]->nominal) ? $kurs10hari[0]->nominal : 0;
+						$nomkurs30 = isset($kurs30hari[0]->nominal) ? $kurs30hari[0]->nominal : 0;
+						?>
+						<label style="margin-bottom: 8px; font-weight: 600;">Data Kurs IDR</label>
+						<table class='table table-bordered table-striped'>
+							<thead>
+								<tr>
+									<th class="text-center">Kurs On The Spot</th>
+									<th class="text-center">Kurs 10 Hari</th>
+									<th class="text-center">Kurs 30 Hari</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="text-center"><strong>Rp. <?= number_format($nomkurs, 2) ?></strong></td>
+									<td class="text-center"><strong>Rp. <?= number_format($nomkurs10, 2) ?></strong></td>
+									<td class="text-center"><strong>Rp. <?= number_format($nomkurs30, 2) ?></strong></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="col-md-6" id='lme_place'>
+						<label style="margin-bottom: 8px; font-weight: 600;">Data Harga LME</label>
+						<table class='table table-bordered table-striped'>
+							<thead>
+								<tr>
+									<th width="30">#</th>
+									<th>Komposisi</th>
+									<th class="text-right">Rate H-30</th>
+									<th class="text-right">Rate H-10</th>
+									<th class="text-right">Rate Saat Ini</th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php if (!empty($results['comp'])) {
+									$numb3 = 0;
+									foreach ($results['comp'] as $comp) {
+										$numb3++;
+										$id_comp = $comp->id_compotition;
+										$lme_10hari = $this->db->query("SELECT AVG(nominal) as nominal FROM child_history_lme WHERE tanggal_update BETWEEN '$tendays' AND '$kemarin' AND id_compotition='$id_comp'")->result();
+										$lme_30hari = $this->db->query("SELECT AVG(nominal) as nominal FROM child_history_lme WHERE MONTH(tanggal_update) = '$blnkmrn' AND YEAR(tanggal_update) = '$yearkemaren' AND id_compotition='$id_comp'")->result();
+								?>
+										<tr>
+											<td><?= $numb3 ?></td>
+											<td><?= $comp->name_compotition ?></td>
+											<td class="text-right">$ <?= number_format(isset($lme_30hari[0]->nominal) ? $lme_30hari[0]->nominal : 0, 2) ?></td>
+											<td class="text-right">$ <?= number_format(isset($lme_10hari[0]->nominal) ? $lme_10hari[0]->nominal : 0, 2) ?></td>
+											<td class="text-right"><strong>$ <?= number_format($comp->nominal_harga, 2) ?></strong></td>
+										</tr>
+								<?php }
+								} else { ?>
+									<tr>
+										<td colspan="5" class="text-center" style="color: #94a3b8;">Tidak ada data LME</td>
+									</tr>
+								<?php } ?>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Section 3: Daftar Material PO (Sheet) -->
+		<div class="po-section-card">
+			<div class="po-section-header">
+				<h4><i class="fa fa-cubes" style="margin-right: 6px;"></i>Daftar Item Material Purchase Order (Sheet)</h4>
+			</div>
+			<div class="po-section-body" style="padding: 0;">
+				<div class="table-responsive">
+					<table class='table table-bordered table-striped table-custom' style="margin-bottom: 0;">
+						<thead>
+							<tr>
+								<th>Item</th>
+								<th width='8%'>Description</th>
+								<th width='7%' class="text-right">Width</th>
+								<th width='7%' class="text-right">Length</th>
+								<th width='7%' class="text-right">Total Weight</th>
+								<th width='7%' class="text-right">Unit Price</th>
+								<th width='6%' class="text-center">Disc %</th>
+								<th width='6%' class="text-center">Tax</th>
+								<th width='9%' class="text-right">Amount</th>
+								<th width='8%'>Note</th>
+								<th width='40' class="text-center">#</th>
+							</tr>
+						</thead>
+						<tbody id="data_request">
+							<?php
+							$key = 0;
+							foreach ($results['detail'] as $val => $value) {
+								$key++;
+
+								$disabled = ($head->loi == 'Import') ? '' : 'readonly';
+								$disabled2 = ($head->loi == 'Import') ? 'readonly' : '';
+
+								$selected1 = ($value['rate_lme'] == 'Hari Ini') ? 'selected' : '';
+								$selected2 = ($value['rate_lme'] == 'H-10') ? 'selected' : '';
+								$selected3 = ($value['rate_lme'] == 'H-30') ? 'selected' : '';
+
+								echo "<tr>";
+								echo     "<td>" . $value['namamaterial'] . "
+									<input type='hidden' class='form-control input-sm' id='dt_idpr_" . $key . "' name='dt[" . $key . "][idpr]' value='" . $value['idpr'] . "'>
+									<input type='hidden' class='form-control input-sm' id='dt_idmaterial_" . $key . "' name='dt[" . $key . "][idmaterial]' value='" . $value['idmaterial'] . "'>
+									<input type='hidden' class='form-control input-sm' id='dt_namamaterial_" . $key . "' name='dt[" . $key . "][namamaterial]' value='" . $value['namamaterial'] . "'>
+									<input type='hidden' class='form-control input-sm' id='dt_qty_" . $key . "' name='dt[" . $key . "][qty]' value='" . $value['qty'] . "'>
+									<input type='hidden' class='form-control input-sm' id='dt_panjang_" . $key . "' name='dt[" . $key . "][panjang]' value='" . $value['panjang'] . "'>
+									<input type='hidden' class='form-control input-sm' id='dt_lebar_" . $key . "' name='dt[" . $key . "][lebar]' value='" . $value['lebar'] . "'>
+
+									<input type='hidden' class='form-control input-sm ch_diskon' id='dt_ch_diskon_" . $key . "'>
+									<input type='hidden' class='form-control input-sm ch_pajak' id='dt_ch_pajak_" . $key . "'>
+									<input type='hidden' class='form-control input-sm ch_jumlah' id='dt_ch_jumlah_" . $key . "'>
+								</td>";
+								echo     "<td><input type='text' class='form-control input-sm' name='dt[" . $key . "][description]' id='dt_description_" . $key . "' value='" . $value['description'] . "'></td>";
+								echo     "<td><input type='text' class='form-control text-right input-sm autoNumeric' name='dt[" . $key . "][width]' id='dt_width_" . $key . "'  value='" . $value['width'] . "'></td>";
+								echo     "<td><input type='text' class='form-control text-right input-sm autoNumeric' name='dt[" . $key . "][length]' id='dt_length_" . $key . "'  value='" . $value['panjang'] . "'></td>";
+								echo     "<td><input type='text' class='form-control text-right input-sm autoNumeric' name='dt[" . $key . "][totalweight]' id='dt_totalweight_" . $key . "' value='" . $value['totalwidth'] . "'  onkeyup='HitAmmount(" . $key . ")'></td>";
+								echo     "<td><input type='text' class='form-control text-right input-sm autoNumeric3' id='dt_hargasatuan_" . $key . "' name='dt[" . $key . "][hargasatuan]' value='" . number_format($value['hargasatuan'], 3) . "' onkeyup='HitAmmount(" . $key . ")'></td>";
+								echo     "<td><input type='text' class='form-control text-right input-sm autoNumeric' id='dt_diskon_" . $key . "' name='dt[" . $key . "][diskon]' value='" . number_format($value['diskon'], 2) . "' onkeyup='HitAmmount(" . $key . ")'></td>";
+								echo     "<td><input type='text' class='form-control text-right input-sm autoNumeric' id='dt_pajak_" . $key . "' name='dt[" . $key . "][pajak]' value='" . number_format($value['pajak'], 2) . "' onkeyup='HitAmmount(" . $key . ")'></td>";
+								echo     "<td><input type='text' class='form-control text-right input-sm ch_jumlah_ex' id='dt_jumlahharga_" . $key . "' readonly name='dt[" . $key . "][jumlahharga]' value='" . number_format($value['jumlahharga'], 2) . "'></td>";
+								echo     "<td><input type='text' class='form-control input-sm' id='dt_note_" . $key . "' name='dt[" . $key . "][note]' value='" . $value['note'] . "'></td>";
+								echo     "<td class='text-center'>
+									<button type='button' class='btn btn-sm btn-danger hapus_baris' title='Hapus Data' data-role='qtip'><i class='fa fa-close'></i></button>
+								</td>";
+								echo "</tr>";
+							}
+							?>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<!-- Section 4: Catatan & Ringkasan Total Biaya -->
+		<div class="row">
+			<div class="col-md-7">
+				<div class="po-section-card">
+					<div class="po-section-header">
+						<h4><i class="fa fa-sticky-note-o" style="margin-right: 6px;"></i>Catatan Khusus PO</h4>
+					</div>
+					<div class="po-section-body">
+						<div class="form-group" style="margin-bottom: 0;">
+							<label for="note_ket">Keterangan / Instruksi Tambahan</label>
+							<textarea class="form-control" id="note_ket" name="note_ket" rows="4"><?= $head->note ?></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-5">
+				<div class="po-section-card">
+					<div class="po-section-header">
+						<h4><i class="fa fa-calculator" style="margin-right: 6px;"></i>Ringkasan Biaya PO</h4>
+					</div>
+					<div class="po-section-body">
+						<div class="po-summary-box">
+							<div class="po-summary-item">
+								<label for="hargatotal">Sub Total</label>
+								<div id="ForHarga" style="width: 170px;">
+									<input readonly type="text" class="form-control text-right" value="<?= number_format($head->hargatotal) ?>" id="hargatotal" required name="hargatotal" style="background:#fff; font-weight:600;">
+								</div>
+							</div>
+							<div class="po-summary-item">
+								<label for="diskontotal">Total Diskon</label>
+								<div id="ForDiskon" style="width: 170px;">
+									<input readonly type="text" class="form-control text-right" value="<?= number_format($head->diskontotal) ?>" id="diskontotal" required name="diskontotal" style="background:#fff; color:#dc2626;">
+								</div>
+							</div>
+							<div class="po-summary-item">
+								<label for="taxtotal">Total Pajak (PPN)</label>
+								<div id="ForTax" style="width: 170px;">
+									<input readonly type="text" class="form-control text-right" value="<?= number_format($head->taxtotal) ?>" id="taxtotal" required name="taxtotal" style="background:#fff;">
+								</div>
+							</div>
+							<div class="po-summary-item total">
+								<label for="subtotal">TOTAL ORDER</label>
+								<div id="ForSum" style="width: 170px;">
+									<input readonly type="text" class="form-control text-right" value="<?= number_format($head->subtotal) ?>" id="subtotal" required name="subtotal" style="background:#e0f2fe; color:#0369a1; font-weight:700; font-size:15px;">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Action Buttons Footer -->
+		<div class="po-form-actions">
+			<a href="<?= base_url('purchase_order') ?>" class="btn btn-default" style="font-weight: 600;">
+				<i class="fa fa-arrow-left"></i>&nbsp; Batal / Kembali
+			</a>
+			<div>
+				<button type="submit" class="btn btn-success btn-lg" name="save" id="simpan-com" style="padding: 10px 30px; font-weight: 700; border-radius: 6px; box-shadow: 0 4px 10px rgba(16,185,129,0.25);">
+					<i class="fa fa-save"></i>&nbsp; SIMPAN PERUBAHAN PO
+				</button>
+			</div>
+		</div>
+	</div>
+</form>
 
 
 

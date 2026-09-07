@@ -43,6 +43,20 @@ class Purchase_order extends Admin_Controller
 		$this->db->where('a.deleted', '0');
 		$get_bentuk = $this->db->get()->result_array();
 
+		// Statistik Ringkasan PO
+		$total_po       = $this->db->count_all_results('tr_purchase_order');
+		$count_waiting  = $this->db->where('status', '1')->count_all_results('tr_purchase_order');
+		$count_approved = $this->db->where('status', '2')->count_all_results('tr_purchase_order');
+		$count_closed   = $this->db->where_not_in('status', array('1', '2'))->count_all_results('tr_purchase_order');
+
+		$stats = array(
+			'total_po'       => $total_po,
+			'count_waiting'  => $count_waiting,
+			'count_approved' => $count_approved,
+			'count_closed'   => $count_closed
+		);
+
+		$this->template->set('stats', $stats);
 		$this->template->set('list_bentuk', $get_bentuk);
 		$this->template->title('Purchase Order');
 		$this->template->render('index');

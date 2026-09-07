@@ -349,19 +349,19 @@ class Pr_model extends BF_Model
 			$no++;
 
 			if ($item['status'] == '1') {
-				$status = '<span class="badge bg-blue">Waiting</span>';
+				$status = '<span class="label-status label-waiting"><i class="fa fa-clock-o"></i> Waiting</span>';
 			} else if ($item['status'] == '2') {
-				$status = '<span class="badge bg-green">Approved</span>';
+				$status = '<span class="label-status label-approved"><i class="fa fa-check-circle"></i> Approved</span>';
 			} else {
-				$status = '<span class="badge bg-red">Closed</span>';
+				$status = '<span class="label-status label-closed"><i class="fa fa-archive"></i> Closed</span>';
 			}
 
-			$option = '';
+			$option = '<div class="btn-group-action">';
 			// if ($ENABLE_MANAGE) {
 			if ($ENABLE_VIEW) {
-				$option .= ' <a class="btn btn-warning btn-sm view" href="javascript:void(0)" title="View" data-no_po="' . $item['no_po'] . '"><i class="fa fa-eye"></i></a>';
+				$option .= ' <a class="btn btn-warning btn-sm btn-action view" href="javascript:void(0)" title="View Detail" data-toggle="tooltip" data-no_po="' . $item['no_po'] . '"><i class="fa fa-eye"></i></a>';
 
-				$option .= ' <a class="btn btn-primary btn-sm" href="' . base_url('/purchase_order/PrintH2/' . $item['no_po']) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
+				$option .= ' <a class="btn btn-primary btn-sm btn-action" href="' . base_url('/purchase_order/PrintH2/' . $item['no_po']) . '" target="_blank" title="Print PO" data-toggle="tooltip"><i class="fa fa-print"></i></a>';
 			}
 
 			if ($ENABLE_MANAGE && $item['status'] == '1') {
@@ -378,17 +378,18 @@ class Pr_model extends BF_Model
 				}
 
 				if ($tipe_sheet == 1) {
-					$option .= ' <a class="btn btn-info btn-sm" href="' . base_url('/purchase_order/edit_sheet/' . $item['no_po']) . '" title="Edit"><i class="fa fa-edit"></i></a>';
+					$option .= ' <a class="btn btn-info btn-sm btn-action" href="' . base_url('/purchase_order/edit_sheet/' . $item['no_po']) . '" title="Edit PO" data-toggle="tooltip"><i class="fa fa-pencil"></i></a>';
 				} else {
-					$option .= ' <a class="btn btn-info btn-sm" href="' . base_url('/purchase_order/edit/' . $item['no_po']) . '" title="Edit"><i class="fa fa-edit"></i></a>';
+					$option .= ' <a class="btn btn-info btn-sm btn-action" href="' . base_url('/purchase_order/edit/' . $item['no_po']) . '" title="Edit PO" data-toggle="tooltip"><i class="fa fa-pencil"></i></a>';
 				}
 
-				$option .= ' <a class="btn btn-success btn-sm Approve" href="javascript:void(0)" title="Approval PO" data-no_po="' . $item['no_po'] . '"><i class="fa fa-check"></i></a>';
+				$option .= ' <a class="btn btn-success btn-sm btn-action Approve" href="javascript:void(0)" title="Approval PO" data-toggle="tooltip" data-no_po="' . $item['no_po'] . '"><i class="fa fa-check"></i></a>';
 			}
 
 			if ($ENABLE_DELETE && $item['status'] == '1') {
-				$option .= ' <a class="btn btn-danger btn-sm delete" href="javascript:void(0)" title="Delete PO" data-no_po="' . $item['no_po'] . '"><i class="fa fa-trash"></i></a>';
+				$option .= ' <a class="btn btn-danger btn-sm btn-action delete" href="javascript:void(0)" title="Delete PO" data-toggle="tooltip" data-no_po="' . $item['no_po'] . '"><i class="fa fa-trash"></i></a>';
 			}
+			$option .= '</div>';
 			// }
 
 			$hasil[] = [

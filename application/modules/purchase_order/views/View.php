@@ -1,649 +1,412 @@
 <?php
 $tanggal = date('Y-m-d');
-foreach ($results['head'] as $head) {
-}
+$head = isset($results['head'][0]) ? $results['head'][0] : (object) array();
+$detail = isset($results['detail']) ? $results['detail'] : array();
+$comp = isset($results['comp']) ? $results['comp'] : array();
+$tipe_sheet = isset($results['tipe_sheet']) ? $results['tipe_sheet'] : 0;
+
+$curr = !empty($head->matauang) ? strtoupper($head->matauang) : 'IDR';
 ?>
-<style>
-	.modal-dialog {
-		width: 90%
+
+<style type="text/css">
+	.po-view-wrapper {
+		background: #ffffff;
+		padding: 24px;
+		color: #1e293b;
+		font-family: inherit;
+	}
+	.po-view-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-bottom: 20px;
+		border-bottom: 2px solid #e2e8f0;
+		margin-bottom: 20px;
+	}
+	.po-view-title h3 {
+		margin: 0;
+		font-size: 20px;
+		font-weight: 700;
+		color: #205072;
+	}
+	.po-view-title span {
+		font-size: 13px;
+		color: #64748b;
+	}
+	.po-info-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 16px;
+		margin-bottom: 20px;
+	}
+	.po-info-box {
+		background: #f8fafc;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		padding: 16px;
+	}
+	.po-info-box h4 {
+		margin: 0 0 12px 0;
+		font-size: 13px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: #205072;
+		border-bottom: 1px solid #cbd5e1;
+		padding-bottom: 6px;
+	}
+	.po-info-item {
+		display: flex;
+		justify-content: space-between;
+		font-size: 12px;
+		margin-bottom: 8px;
+		line-height: 1.4;
+	}
+	.po-info-item:last-child {
+		margin-bottom: 0;
+	}
+	.po-info-label {
+		color: #64748b;
+		font-weight: 500;
+		width: 40%;
+	}
+	.po-info-val {
+		color: #0f172a;
+		font-weight: 600;
+		width: 60%;
+		text-align: right;
+		word-break: break-word;
+	}
+	.po-table-wrapper {
+		margin-top: 20px;
+		margin-bottom: 20px;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		overflow: hidden;
+	}
+	.po-table-wrapper table {
+		margin-bottom: 0 !important;
+	}
+	.po-table-wrapper thead th {
+		background: #205072 !important;
+		color: #ffffff !important;
+		font-size: 11px !important;
+		font-weight: 600 !important;
+		text-transform: uppercase !important;
+		padding: 10px 8px !important;
+		border: none !important;
+		vertical-align: middle !important;
+	}
+	.po-table-wrapper tbody td {
+		padding: 9px 8px !important;
+		font-size: 12px !important;
+		vertical-align: middle !important;
+		border-color: #f1f5f9 !important;
+	}
+	.po-summary-section {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 20px;
+		margin-top: 15px;
+		flex-wrap: wrap;
+	}
+	.po-notes-card {
+		flex: 1;
+		min-width: 280px;
+		background: #f8fafc;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		padding: 16px;
+	}
+	.po-notes-card h5 {
+		margin: 0 0 8px 0;
+		font-size: 12px;
+		font-weight: 700;
+		color: #334155;
+		text-transform: uppercase;
+	}
+	.po-notes-card p {
+		margin: 0;
+		font-size: 13px;
+		color: #475569;
+		font-style: italic;
+	}
+	.po-totals-card {
+		width: 340px;
+		background: #ffffff;
+		border: 1px solid #e2e8f0;
+		border-radius: 8px;
+		padding: 16px;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+	}
+	.po-total-row {
+		display: flex;
+		justify-content: space-between;
+		font-size: 13px;
+		padding: 6px 0;
+		color: #475569;
+	}
+	.po-total-row.grand-total {
+		border-top: 2px dashed #cbd5e1;
+		margin-top: 8px;
+		padding-top: 12px;
+		font-size: 15px;
+		font-weight: 700;
+		color: #205072;
+	}
+	.po-view-footer {
+		display: flex;
+		justify-content: flex-end;
+		gap: 10px;
+		padding-top: 20px;
+		border-top: 1px solid #e2e8f0;
+		margin-top: 25px;
+	}
+	.kurs-badge {
+		background: #eff6ff;
+		border: 1px solid #bfdbfe;
+		border-radius: 6px;
+		padding: 10px 14px;
+		text-align: center;
+		flex: 1;
+	}
+	.kurs-badge span {
+		font-size: 11px;
+		color: #1e40af;
+		display: block;
+		font-weight: 600;
+		text-transform: uppercase;
+	}
+	.kurs-badge strong {
+		font-size: 14px;
+		color: #1e3a8a;
 	}
 </style>
-<div class="box box-primary">
-	<div class="box-body">
-		<form id="data-form" method="post">
-			<div class="col-sm-12">
-				<div class="input_fields_wrap2">
-					<div class="row">
-						<center><label for="customer">
-								<h3>Purchase Order</h3>
-							</label></center>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="id_customer">Supplier</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" readonly id="suplier" value="<?= $head->suplier  ?>" onkeyup required name="suplier">
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="id_customer">Local / Import</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" readonly id="loi" value="<?= $head->loi  ?>" onkeyup required name="loi">
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="customer">NO.PO</label>
-									</div>
-									<div class="col-md-8" hidden>
-										<input type="text" class="form-control" id="no_po" value="<?= $head->no_po  ?>" required name="no_po" readonly placeholder="ID PO">
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="no_surat" value="<?= $head->no_surat  ?>" required name="no_surat" readonly placeholder="No.PR">
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6" id="input_kurs">
 
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="customer">Tanggal PO</label>
-									</div>
-									<div class="col-md-8">
-										<input type="date" class="form-control" id="tanggal" value="<?= $head->tanggal ?>" onkeyup required name="tanggal" readonly>
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="id_customer">Mata Uang</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="matauang" value="<?= strtoupper(strtolower($head->matauang))  ?>" required name="matauang" readonly>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="customer">Expect Date</label>
-									</div>
-									<div class="col-md-8">
-										<input type="date" class="form-control" readonly value="<?= $head->expect_tanggal  ?>" id="expect_tanggal" required name="expect_tanggal">
-									</div>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="id_customer">PR</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" id="no_pr" value="<?= $head->no_pr  ?>" required name="no_pr" readonly>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="customer">Term</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" readonly id="term" value="<?= $head->term  ?>" onkeyup required name="term">
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="id_customer">CIF</label>
-									</div>
-									<div class="col-md-8">
-										<input type="text" class="form-control" readonly id="cif" value="<?= $head->cif  ?>" onkeyup required name="cif">
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="form-group row" id='kurs_place'>
-								<?php
-								$hariini = date('Y-m-d');
-								$sepuluh_hari = mktime(0, 0, 0, date('n'), date('j') - 10, date('Y'));
-								$tendays = date("Y-m-d", $sepuluh_hari);
-								$tglnow = date('d');
-								$blnnow = date('m');
-								if ($blnnow != '1') {
-									$blnkmrn = $blnnow - 1;
-									$yearkemaren = date('Y');
-								} else {
-									$blnkmrn = "12";
-									$yearnow = date('Y');
-									$yearkemaren = $yearnow - 1;
-								}
-								$kurs	= $this->db->query("SELECT * FROM mata_uang WHERE kode = 'IDR' ")->result();
-								$kurs10hari	= $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE tanggal_ubah BETWEEN  '$tendays' AND '$hariini' AND kode_kurs='IDR' ")->result();
-								$kurs30hari	= $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE MONTH(tanggal_ubah) =  '$blnkmrn' AND YEAR(tanggal_ubah) = '$yearkemaren' AND kode_kurs='IDR' ")->result();
-								$nomkurs = $kurs[0]->kurs;
-								$nomkurs10 = $kurs10hari[0]->nominal;
-								$nomkurs30 = $kurs30hari[0]->nominal;
-								$k =  number_format($nomkurs, 2);
-								$k10 =  number_format($nomkurs10, 2);
-								$k30 =  number_format($nomkurs30, 2);
-								if ($head->loi == 'Import') {
-									echo "
-				<table class='col-sm-12' border='1' cellspacing='0'>
+<div class="po-view-wrapper">
+	<!-- 1. Header Ringkasan & Tombol Cetak -->
+	<div class="po-view-header">
+		<div class="po-view-title">
+			<h3><?= !empty($head->no_surat) ? $head->no_surat : $head->no_po ?></h3>
+			<span>Kode Internal: <strong><?= $head->no_po ?></strong> &bull; Tgl: <?= date('d M Y', strtotime($head->tanggal)) ?></span>
+		</div>
+		<div>
+			<?php
+			if ($head->status == '1') {
+				echo '<span class="label-status label-waiting" style="font-size: 12px; padding: 6px 14px;"><i class="fa fa-clock-o"></i> Menunggu Approval</span>';
+			} elseif ($head->status == '2') {
+				echo '<span class="label-status label-approved" style="font-size: 12px; padding: 6px 14px;"><i class="fa fa-check-circle"></i> Approved</span>';
+			} else {
+				echo '<span class="label-status label-closed" style="font-size: 12px; padding: 6px 14px;"><i class="fa fa-archive"></i> Closed</span>';
+			}
+			?>
+		</div>
+	</div>
+
+	<!-- 2. Grid Informasi Utama (3 Kolom) -->
+	<div class="po-info-grid">
+		<!-- Box 1: Supplier Info -->
+		<div class="po-info-box">
+			<h4><i class="fa fa-building-o" style="margin-right: 6px;"></i>Data Supplier</h4>
+			<div class="po-info-item">
+				<span class="po-info-label">Supplier</span>
+				<span class="po-info-val" style="color: #205072;"><?= strtoupper($head->suplier) ?></span>
+			</div>
+			<div class="po-info-item">
+				<span class="po-info-label">Kategori</span>
+				<span class="po-info-val"><?= !empty($head->loi) ? $head->loi : '-' ?></span>
+			</div>
+			<div class="po-info-item">
+				<span class="po-info-label">Mata Uang</span>
+				<span class="po-info-val"><strong><?= $curr ?></strong></span>
+			</div>
+			<div class="po-info-item">
+				<span class="po-info-label">Metode Harga</span>
+				<span class="po-info-val"><?= !empty($head->cif) ? $head->cif : '-' ?></span>
+			</div>
+		</div>
+
+		<!-- Box 2: Dokumen & Referensi -->
+		<div class="po-info-box">
+			<h4><i class="fa fa-file-text-o" style="margin-right: 6px;"></i>Referensi Dokumen</h4>
+			<div class="po-info-item">
+				<span class="po-info-label">Nomor PO</span>
+				<span class="po-info-val"><?= $head->no_surat ?></span>
+			</div>
+			<div class="po-info-item">
+				<span class="po-info-label">Tanggal PO</span>
+				<span class="po-info-val"><?= date('d-M-Y', strtotime($head->tanggal)) ?></span>
+			</div>
+			<div class="po-info-item">
+				<span class="po-info-label">Nomor PR</span>
+				<span class="po-info-val" style="color: #0284c7;"><?= !empty($head->no_pr) ? $head->no_pr : '-' ?></span>
+			</div>
+			<div class="po-info-item">
+				<span class="po-info-label">Term Pembayaran</span>
+				<span class="po-info-val"><?= !empty($head->term) ? $head->term : '-' ?></span>
+			</div>
+		</div>
+
+		<!-- Box 3: Pengiriman & Logistik -->
+		<div class="po-info-box">
+			<h4><i class="fa fa-truck" style="margin-right: 6px;"></i>Pengiriman & Logistik</h4>
+			<div class="po-info-item">
+				<span class="po-info-label">Expect Date</span>
+				<span class="po-info-val"><?= !empty($head->expect_tanggal) ? date('d-M-Y', strtotime($head->expect_tanggal)) : '-' ?></span>
+			</div>
+			<div class="po-info-item">
+				<span class="po-info-label">Delivery Date</span>
+				<span class="po-info-val"><?= !empty($head->delivery_date) ? date('d-M-Y', strtotime($head->delivery_date)) : '-' ?></span>
+			</div>
+			<div class="po-info-item">
+				<span class="po-info-label">PIC Penerima</span>
+				<span class="po-info-val"><?= !empty($head->receiving_person) ? $head->receiving_person : '-' ?></span>
+			</div>
+			<div class="po-info-item">
+				<span class="po-info-label">Tipe Material</span>
+				<span class="po-info-val"><?= ($tipe_sheet == 1) ? '<span class="badge bg-purple">Sheet</span>' : '<span class="badge bg-blue">Coil / Slitting</span>' ?></span>
+			</div>
+		</div>
+	</div>
+
+	<!-- 3. Nilai Kurs (Jika Import) -->
+	<?php if (!empty($head->loi) && strtolower($head->loi) == 'import'): ?>
+		<?php
+		$hariini = date('Y-m-d');
+		$sepuluh_hari = mktime(0, 0, 0, date('n'), date('j') - 10, date('Y'));
+		$tendays = date("Y-m-d", $sepuluh_hari);
+		$blnnow = date('m');
+		$yearnow = date('Y');
+		if ($blnnow != '1') {
+			$blnkmrn = $blnnow - 1;
+			$yearkemaren = $yearnow;
+		} else {
+			$blnkmrn = "12";
+			$yearkemaren = $yearnow - 1;
+		}
+		$kurs = $this->db->query("SELECT * FROM mata_uang WHERE kode = 'IDR'")->row();
+		$kurs10hari = $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE tanggal_ubah BETWEEN '$tendays' AND '$hariini' AND kode_kurs='IDR'")->row();
+		$kurs30hari = $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE MONTH(tanggal_ubah) = '$blnkmrn' AND YEAR(tanggal_ubah) = '$yearkemaren' AND kode_kurs='IDR'")->row();
+
+		$nomkurs = isset($kurs->kurs) ? $kurs->kurs : 0;
+		$nomkurs10 = isset($kurs10hari->nominal) ? $kurs10hari->nominal : 0;
+		$nomkurs30 = isset($kurs30hari->nominal) ? $kurs30hari->nominal : 0;
+		?>
+		<div style="display: flex; gap: 12px; margin-bottom: 20px;">
+			<div class="kurs-badge">
+				<span>Kurs On The Spot</span>
+				<strong>Rp <?= number_format($nomkurs, 2) ?></strong>
+			</div>
+			<div class="kurs-badge">
+				<span>Kurs Rata-Rata 10 Hari</span>
+				<strong>Rp <?= number_format($nomkurs10, 2) ?></strong>
+			</div>
+			<div class="kurs-badge">
+				<span>Kurs Rata-Rata 30 Hari</span>
+				<strong>Rp <?= number_format($nomkurs30, 2) ?></strong>
+			</div>
+		</div>
+	<?php endif; ?>
+
+	<!-- 4. Tabel Detail Material PO -->
+	<div class="po-table-wrapper">
+		<table class="table table-striped table-hover" width="100%">
+			<thead>
+				<tr>
+					<th width="35" class="text-center">#</th>
+					<th>Item Material</th>
+					<th>Deskripsi</th>
+					<?php if ($tipe_sheet == 1): ?>
+						<th class="text-right">Width (mm)</th>
+						<th class="text-right">Length (mm)</th>
+						<th class="text-right">Qty (Sheet)</th>
+						<th class="text-right">Total Berat (Kg)</th>
+					<?php else: ?>
+						<th class="text-right">Width (mm)</th>
+						<th class="text-right">Total Length</th>
+						<th class="text-right">Total Weight (Kg)</th>
+					<?php endif; ?>
+					<th class="text-right">Harga Satuan</th>
+					<th class="text-center" width="70">Diskon %</th>
+					<th class="text-center" width="70">Pajak %</th>
+					<th class="text-right" width="120">Jumlah Harga</th>
+					<th>Catatan</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php
+				if (!empty($detail)):
+					$no = 0;
+					foreach ($detail as $item):
+						$no++;
+				?>
+						<tr>
+							<td class="text-center"><?= $no ?></td>
+							<td><strong><?= $item->nama ?></strong></td>
+							<td><?= !empty($item->description) ? $item->description : '-' ?></td>
+							<?php if ($tipe_sheet == 1): ?>
+								<td class="text-right"><?= number_format($item->width, 2) ?></td>
+								<td class="text-right"><?= number_format($item->panjang, 2) ?></td>
+								<td class="text-right"><?= number_format($item->qty, 0) ?></td>
+								<td class="text-right"><?= number_format($item->totalwidth, 2) ?></td>
+							<?php else: ?>
+								<td class="text-right"><?= number_format($item->width, 2) ?></td>
+								<td class="text-right"><?= number_format($item->panjang, 2) ?></td>
+								<td class="text-right"><?= number_format($item->totalwidth, 2) ?></td>
+							<?php endif; ?>
+							<td class="text-right"><?= number_format($item->hargasatuan, 2) ?></td>
+							<td class="text-center"><?= number_format($item->diskon, 0) ?>%</td>
+							<td class="text-center"><?= number_format($item->pajak, 0) ?>%</td>
+							<td class="text-right"><strong><?= number_format($item->jumlahharga, 2) ?></strong></td>
+							<td><?= !empty($item->note) ? $item->note : '-' ?></td>
+						</tr>
+					<?php
+					endforeach;
+				else:
+					?>
 					<tr>
-						<th><center>Kurs On The Spot</center></th>
-						<th><center>Kurs 10 Hari</center></th>
-						<th><center>Kurs 30 Hari</center></th>
+						<td colspan="11" class="text-center" style="padding: 20px; color: #94a3b8;">Tidak ada data item material pada Purchase Order ini.</td>
 					</tr>
-					<tr>
-						<td><center>Rp. $k  ,-</center></td>
-						<td><center>Rp. $k10  ,-</center></td>
-						<td><center>Rp. $k30  ,-</center></td>
-					</tr>
-				<table>
-		";
-								} else {
-								};
-								?>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="form-group row" id='lme_place'>
-								<table class='table table-bordered table-striped'>
-									<thead>
-										<tr>
-											<th width="5">#</th>
-											<th width="13%">Kompisisi</th>
-											<th>Rate H-30</th>
-											<th>Rate H-10</th>
-											<th>Rate Saat Ini</th>
-										</tr>
-									</thead>
+				<?php endif; ?>
+			</tbody>
+		</table>
+	</div>
 
-									<tbody>
-										<?php if (empty($results['comp'])) {
-										} else {
-											$hariini 		= date('Y-m-d');
-											$satu_hari 		= mktime(0, 0, 0, date('n'), date('j') - 1, date('Y'));
-											$kemarin 		= date("Y-m-d", $satu_hari);
-											$sepuluh_hari 	= mktime(0, 0, 0, date('n'), date('j') - 14, date('Y'));
-											$tendays 		= date("Y-m-d", $sepuluh_hari);
-											$tglnow 		= date('d');
-											$blnnow 		= date('m');
-											if ($blnnow 	!= '1') {
-												$blnkmrn	 	= $blnnow - 1;
-												$yearkemaren 	= date('Y');
-											} else {
-												$blnkmrn 		= "12";
-												$yearnow 		= date('Y');
-												$yearkemaren 	= $yearnow - 1;
-											}
-											$numb3 = 0;
-											foreach ($results['comp'] as $comp) {
-												$numb3++;
-												$id_comp = $comp->id_compotition;
-												$lme_10hari	= $this->db->query("SELECT AVG(nominal) as nominal FROM child_history_lme WHERE tanggal_update BETWEEN  '$tendays' AND '$kemarin' AND id_compotition='$id_comp' ")->result();
-												$lme_30hari	= $this->db->query("SELECT AVG(nominal) as nominal FROM child_history_lme WHERE MONTH(tanggal_update) =  '$blnkmrn' AND YEAR(tanggal_update) = '$yearkemaren' AND id_compotition='$id_comp' ")->result();
-										?>
-												<tr>
-													<td><?= $numbc; ?></td>
-													<td><?= $comp->name_compotition ?></td>
-													<td>$ <?= number_format($lme_30hari[0]->nominal, 2); ?></td>
-													<td>$ <?= number_format($lme_10hari[0]->nominal, 2); ?></td>
-													<td>$ <?= number_format($comp->nominal_harga, 2); ?></td>
-												</tr>
+	<!-- 5. Catatan & Ringkasan Keuangan -->
+	<div class="po-summary-section">
+		<div class="po-notes-card">
+			<h5><i class="fa fa-sticky-note-o" style="margin-right: 5px;"></i>Catatan PO</h5>
+			<p><?= !empty($head->note) ? nl2br(htmlspecialchars($head->note)) : 'Tidak ada catatan khusus untuk Purchase Order ini.' ?></p>
+		</div>
 
-										<?php }
-										}  ?>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="form-group row">
-								<table class='table table-bordered table-striped'>
-									<thead>
-										<tr class='bg-blue'>
-											<th width='15%'>Item</th>
-											<th width='7%'>Description</th>
-											<th hidden width='7%'>Width</th>
-											<th hidden width='7%'>Qty (Unit)</th>
-											<th width='7%'>Total Weight</th>
-											<th width='7%'>Total Length</th>
-											<th hidden width='10%'>Rate LME</th>
-											<th hidden width='7%'>Alloy Price</th>
-											<th hidden width='7%'>Fab Cost</th>
-											<th width='10%'>Unit Price</th>
-											<th width='7%'>Discount %</th>
-											<th width='7%'>Tax</th>
-											<th width='10%'>Amount</th>
-											<th width='10%'>Note</th>
-										</tr>
-									</thead>
-									<tbody id="data_request">
-										<?php
-										$loop = 0;
-										foreach ($results['detail'] as $detail) {
-											$loop++;
-											echo "
-			<tr id='trmaterial_$loop'>
-				<td hidden><input readonly 	type='text' 	value='" . $detail->idpr . "'			class='form-control input-sm' id='dt_idpr_" . $loop . "' 		required name='dt[" . $loop . "][idpr]' ></td>
-				<td hidden><input readonly 	type='text' 	value='" . $detail->idmaterial . "'		class='form-control input-sm' id='dt_idmaterial_" . $loop . "' 	required name='dt[" . $loop . "][idmaterial]' ></td>
-				<td ><input		readonly  	type='text' 	value='" . $detail->nama . "'	class='form-control input-sm' id='dt_namamaterial_" . $loop . "' required name='dt[" . $loop . "][namamaterial]' ></td>
-				<td ><input		readonly  	type='text' 	value='" . $detail->description . "'	class='form-control input-sm' id='dt_description_" . $loop . "' 	required name='dt[" . $loop . "][description]' ></td>
-				<td hidden ><input		readonly  	type='text' 	value='" . number_format($detail->width, 2) . "'	class='form-control text-right input-sm' id='dt_width_" . $loop . "' 		required name='dt[" . $loop . "][width]'  ></td>
-				<td hidden ><input		readonly  	type='text' 	value='" . number_format($detail->qty, 2) . "'	class='form-control text-right input-sm' id='dt_qty_" . $loop . "' 			required name='dt[" . $loop . "][qty]'  ></td>
-				<td ><input		readonly  	type='text' 	value='" . number_format($detail->totalwidth, 2) . "'		class='form-control text-right input-sm' id='dt_totalwidth_" . $loop . "' 	required name='dt[" . $loop . "][totalwidth]'  ></td>
-				<td ><input		readonly  	type='text' 	value='" . number_format($detail->panjang, 2) . "'		class='form-control text-right input-sm' id='dt_panjang_" . $loop . "' 	required name='dt[" . $loop . "][panjang]'  ></td>
-				<td	><input		readonly  	type='text' 	value='" . number_format($detail->hargasatuan, 2) . "'	class='form-control text-right input-sm' id='dt_hargasatuan_" . $loop . "' 	required name='dt[" . $loop . "][hargasatuan]' ></td>
-				<td	><input		readonly 	type='text' 	value='" . number_format($detail->diskon, 2) . "'			class='form-control text-right input-sm' id='dt_diskon_" . $loop . "' 		required name='dt[" . $loop . "][diskon]' ></td>
-				<td	><input		readonly	type='text' 	value='" . number_format($detail->pajak, 2) . "'			class='form-control text-right input-sm' id='dt_pajak_" . $loop . "' 		required name='dt[" . $loop . "][pajak]' ></td>
-				<td ><input		readonly 	type='text' 	value='" . number_format($detail->jumlahharga, 2) . "'	class='form-control text-right input-sm' id='dt_jumlahharga_" . $loop . "' 	required name='dt[" . $loop . "][jumlahharga]' ></td>
-				<td	><input		readonly  	type='text' 	value='" . $detail->note . "'			class='form-control input-sm' id='dt_note_" . $loop . "' 		required name='dt[" . $loop . "][note]' ></td>
-			</tr>
-			";
-										}
-										?>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="id_customer">Sub Total</label>
-									</div>
-									<div class="col-md-8" id="ForHarga">
-										<input readonly type="text" class="form-control" value="<?= number_format($head->hargatotal, 2)  ?>" id="hargatotal" onkeyup required name="hargatotal">
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="id_customer">Discount</label>
-									</div>
-									<div class="col-md-8" id="ForDiskon">
-										<input readonly type="text" class="form-control" value="<?= number_format($head->diskontotal, 2)  ?>" id="diskontotal" onkeyup required name="diskontotal">
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="id_customer">TAX</label>
-									</div>
-									<div class="col-md-8" id="ForTax">
-										<input readonly type="text" class="form-control" value="<?= number_format($head->taxtotal, 2)  ?>" id="taxtotal" onkeyup required name="taxtotal">
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-12">
-							<div class="col-sm-6">
-								<div class="form-group row">
-									<div class="col-md-4">
-										<label for="id_customer">Total Order</label>
-									</div>
-									<div class="col-md-8" id="ForSum">
-										<input readonly type="text" class="form-control" value="<?= number_format($head->subtotal, 2)  ?>" id="subtotal" onkeyup required name="subtotal">
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-		</form>
+		<div class="po-totals-card">
+			<div class="po-total-row">
+				<span>Sub Total:</span>
+				<span><?= $curr ?> <?= number_format($head->hargatotal, 2) ?></span>
+			</div>
+			<div class="po-total-row">
+				<span>Total Diskon:</span>
+				<span style="color: #dc2626;">- <?= $curr ?> <?= number_format($head->diskontotal, 2) ?></span>
+			</div>
+			<div class="po-total-row">
+				<span>Total Pajak / PPN:</span>
+				<span><?= $curr ?> <?= number_format($head->taxtotal, 2) ?></span>
+			</div>
+			<div class="po-total-row grand-total">
+				<span>Total Order:</span>
+				<span><?= $curr ?> <?= number_format($head->subtotal, 2) ?></span>
+			</div>
+		</div>
+	</div>
+
+	<!-- 6. Footer Modal Aksi -->
+	<div class="po-view-footer">
+		<a class="btn btn-primary" href="<?= base_url('/purchase_order/PrintH2/' . $head->no_po) ?>" target="_blank" style="border-radius: 4px; font-weight: 600;">
+			<i class="fa fa-print"></i>&nbsp; Cetak PO
+		</a>
+		<button type="button" class="btn btn-default" data-dismiss="modal" style="border-radius: 4px;">
+			<i class="fa fa-times"></i>&nbsp; Tutup
+		</button>
 	</div>
 </div>
-
-
-
-
-<script type="text/javascript">
-	//$('#input-kendaraan').hide();
-	var base_url = '<?php echo base_url(); ?>';
-	var active_controller = '<?php echo ($this->uri->segment(1)); ?>';
-	$(document).ready(function() {
-		var max_fields2 = 10; //maximum input boxes allowed
-		var wrapper2 = $(".input_fields_wrap2"); //Fields wrapper
-		var add_button2 = $(".add_field_button2"); //Add button ID			
-		$('#simpan-com').click(function(e) {
-			e.preventDefault();
-			var deskripsi = $('#deskripsi').val();
-			var image = $('#image').val();
-			var idtype = $('#inventory_1').val();
-
-			var data, xhr;
-			swal({
-					title: "Are you sure?",
-					text: "You will not be able to process again this data!",
-					type: "warning",
-					showCancelButton: true,
-					confirmButtonClass: "btn-danger",
-					confirmButtonText: "Yes, Process it!",
-					cancelButtonText: "No, cancel process!",
-					closeOnConfirm: true,
-					closeOnCancel: false
-				},
-				function(isConfirm) {
-					if (isConfirm) {
-						var formData = new FormData($('#data-form')[0]);
-						var baseurl = siteurl + 'purchase_order/SaveEdit';
-						$.ajax({
-							url: baseurl,
-							type: "POST",
-							data: formData,
-							cache: false,
-							dataType: 'json',
-							processData: false,
-							contentType: false,
-							success: function(data) {
-								if (data.status == 1) {
-									swal({
-										title: "Save Success!",
-										text: data.pesan,
-										type: "success",
-										timer: 7000,
-										showCancelButton: false,
-										showConfirmButton: false,
-										allowOutsideClick: false
-									});
-									window.location.href = base_url + active_controller;
-								} else {
-
-									if (data.status == 2) {
-										swal({
-											title: "Save Failed!",
-											text: data.pesan,
-											type: "warning",
-											timer: 7000,
-											showCancelButton: false,
-											showConfirmButton: false,
-											allowOutsideClick: false
-										});
-									} else {
-										swal({
-											title: "Save Failed!",
-											text: data.pesan,
-											type: "warning",
-											timer: 7000,
-											showCancelButton: false,
-											showConfirmButton: false,
-											allowOutsideClick: false
-										});
-									}
-
-								}
-							},
-							error: function() {
-
-								swal({
-									title: "Error Message !",
-									text: 'An Error Occured During Process. Please try again..',
-									type: "warning",
-									timer: 7000,
-									showCancelButton: false,
-									showConfirmButton: false,
-									allowOutsideClick: false
-								});
-							}
-						});
-					} else {
-						swal("Cancelled", "Data can be process again :)", "error");
-						return false;
-					}
-				});
-		});
-
-	});
-
-	function addmaterial() {
-		var jumlah = $('#data_request').find('tr').length;
-		var id_suplier = $("#id_suplier").val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/AddMaterial',
-			data: "jumlah=" + jumlah + "&id_suplier=" + id_suplier,
-			success: function(html) {
-				$("#data_request").append(html);
-			}
-		});
-	}
-
-	function HitungHarga(id) {
-		var dt_qty = $("#dt_qty_" + id).val();
-		var dt_width = $("#dt_width_" + id).val();
-		var dt_hargasatuan = $("#dt_hargasatuan_" + id).val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/HitungHarga',
-			data: "dt_hargasatuan=" + dt_hargasatuan + "&dt_qty=" + dt_qty + "&id=" + id,
-			success: function(html) {
-				$("#jumlahharga_" + id).html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/TotalWeight',
-			data: "dt_width=" + dt_width + "&dt_qty=" + dt_qty + "&id=" + id,
-			success: function(html) {
-				$("#totalwidth_" + id).html(html);
-			}
-		});
-	}
-
-	function get_kurs() {
-		var loi = $("#loi").val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariKurs',
-			data: "loi=" + loi,
-			success: function(html) {
-				$("#kurs_place").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/FormInputKurs',
-			data: "loi=" + loi,
-			success: function(html) {
-				$("#input_kurs").html(html);
-			}
-		});
-	}
-
-	function CariProperties(id) {
-		var idpr = $("#dt_idpr_" + id).val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariIdMaterial',
-			data: "idpr=" + idpr + "&id=" + id,
-			success: function(html) {
-				$("#idmaterial_" + id).html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariNamaMaterial',
-			data: "idpr=" + idpr + "&id=" + id,
-			success: function(html) {
-				$("#namaterial_" + id).html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariDescripitionMaterial',
-			data: "idpr=" + idpr + "&id=" + id,
-			success: function(html) {
-				$("#description_" + id).html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariQtyMaterial',
-			data: "idpr=" + idpr + "&id=" + id,
-			success: function(html) {
-				$("#qty_" + id).html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariweightMaterial',
-			data: "idpr=" + idpr + "&id=" + id,
-			success: function(html) {
-				$("#width_" + id).html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariTweightMaterial',
-			data: "idpr=" + idpr + "&id=" + id,
-			success: function(html) {
-				$("#totalwidth_" + id).html(html);
-			}
-		});
-	}
-
-	function LockMaterial(id) {
-		var idpr = $("#dt_idpr_" + id).val();
-		var idmaterial = $("#dt_idmaterial_" + id).val();
-		var namaterial = $("#dt_namamaterial_" + id).val();
-		var description = $("#dt_description_" + id).val();
-		var qty = $("#dt_qty_" + id).val();
-		var width = $("#dt_width_" + id).val();
-		var totalwidth = $("#dt_totalwidth_" + id).val();
-		var hargasatuan = $("#dt_hargasatuan_" + id).val();
-		var diskon = $("#dt_diskon_" + id).val();
-		var pajak = $("#dt_pajak_" + id).val();
-		var jumlahharga = $("#dt_jumlahharga_" + id).val();
-		var note = $("#dt_note_" + id).val();
-		var subtotal = $("#subtotal").val();
-		var hargatotal = $("#hargatotal").val();
-		var diskontotal = $("#diskontotal").val();
-		var taxtotal = $("#taxtotal").val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/LockMatrial',
-			data: "idpr=" + idpr + "&id=" + id + "&idmaterial=" + idmaterial + "&width=" + width + "&totalwidth=" + totalwidth + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-			success: function(html) {
-				$("#trmaterial_" + id).html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariTHarga',
-			data: "idpr=" + idpr + "&id=" + id + "&hargatotal=" + hargatotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-			success: function(html) {
-				$("#ForHarga").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariTDiskon',
-			data: "idpr=" + idpr + "&id=" + id + "&diskontotal=" + diskontotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-			success: function(html) {
-				$("#ForDiskon").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariTPajak',
-			data: "idpr=" + idpr + "&id=" + id + "&taxtotal=" + taxtotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-			success: function(html) {
-				$("#ForTax").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariTSum',
-			data: "idpr=" + idpr + "&id=" + id + "&hargatotal=" + hargatotal + "&diskontotal=" + diskontotal + "&taxtotal=" + taxtotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-			success: function(html) {
-				$("#ForSum").html(html);
-			}
-		});
-	}
-
-	function CancelItem(id) {
-		var idpr = $("#dt_idpr_" + id).val();
-		var idmaterial = $("#dt_idmaterial_" + id).val();
-		var namaterial = $("#dt_namamaterial_" + id).val();
-		var description = $("#dt_description_" + id).val();
-		var qty = $("#dt_qty_" + id).val();
-		var hargasatuan = $("#dt_hargasatuan_" + id).val();
-		var diskon = $("#dt_diskon_" + id).val();
-		var pajak = $("#dt_pajak_" + id).val();
-		var jumlahharga = $("#dt_jumlahharga_" + id).val();
-		var note = $("#dt_note_" + id).val();
-		var subtotal = $("#subtotal").val();
-		var hargatotal = $("#hargatotal").val();
-		var diskontotal = $("#diskontotal").val();
-		var taxtotal = $("#taxtotal").val();
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariMinHarga',
-			data: "idpr=" + idpr + "&id=" + id + "&hargatotal=" + hargatotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-			success: function(html) {
-				$("#ForHarga").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariMinDiskon',
-			data: "idpr=" + idpr + "&id=" + id + "&diskontotal=" + diskontotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-			success: function(html) {
-				$("#ForDiskon").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariMinPajak',
-			data: "idpr=" + idpr + "&id=" + id + "&taxtotal=" + taxtotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-			success: function(html) {
-				$("#ForTax").html(html);
-			}
-		});
-		$.ajax({
-			type: "GET",
-			url: siteurl + 'purchase_order/CariMinSum',
-			data: "idpr=" + idpr + "&id=" + id + "&hargatotal=" + hargatotal + "&diskontotal=" + diskontotal + "&taxtotal=" + taxtotal + "&idmaterial=" + idmaterial + "&namaterial=" + namaterial + "&description=" + description + "&qty=" + qty + "&hargasatuan=" + hargasatuan + "&diskon=" + diskon + "&pajak=" + pajak + "&jumlahharga=" + jumlahharga + "&note=" + note,
-			success: function(html) {
-				$("#ForSum").html(html);
-			}
-		});
-		$('#data_request #trmaterial_' + id).remove();
-	}
-
-	function HapusItem(id) {
-		$('#data_request #trmaterial_' + id).remove();
-
-	}
-</script>
