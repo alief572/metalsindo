@@ -385,6 +385,10 @@ class Pr_model extends BF_Model
 
 				$option .= ' <a class="btn btn-success btn-sm Approve" href="javascript:void(0)" title="Approval PO" data-no_po="' . $item['no_po'] . '"><i class="fa fa-check"></i></a>';
 			}
+
+			if ($ENABLE_DELETE && $item['status'] == '1') {
+				$option .= ' <a class="btn btn-danger btn-sm delete" href="javascript:void(0)" title="Delete PO" data-no_po="' . $item['no_po'] . '"><i class="fa fa-trash"></i></a>';
+			}
 			// }
 
 			$hasil[] = [

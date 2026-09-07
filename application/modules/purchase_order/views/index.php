@@ -262,6 +262,58 @@ $ENABLE_DELETE  = has_permission('Purchase_Order.Delete');
 
 	})
 
+	$(document).on('click', '.delete', function(e) {
+		e.preventDefault();
+		var id = $(this).data('no_po');
+		swal({
+				title: "Anda Yakin?",
+				text: "Data Purchase Order ini akan dihapus!",
+				type: "warning",
+				showCancelButton: true,
+				confirmButtonClass: "btn-danger",
+				confirmButtonText: "Ya, Hapus!",
+				cancelButtonText: "Batal",
+				closeOnConfirm: false
+			},
+			function() {
+				$.ajax({
+					type: 'POST',
+					url: siteurl + 'purchase_order/delete_po',
+					dataType: "json",
+					data: {
+						'id': id
+					},
+					success: function(result) {
+						if (result.status == '1') {
+							swal({
+									title: "Sukses",
+									text: result.pesan || "Data PO berhasil dihapus.",
+									type: "success",
+									timer: 2800,
+									showConfirmButton: false
+								},
+								function() {
+									window.location.reload(true);
+								});
+						} else {
+							swal({
+								title: "Error",
+								text: result.pesan || "Data error. Gagal menghapus PO.",
+								type: "error"
+							});
+						}
+					},
+					error: function() {
+						swal({
+							title: "Error",
+							text: "Data error. Gagal request Ajax",
+							type: "error"
+						});
+					}
+				});
+			});
+	});
+
 	$(function() {
 		// $('#example1 thead tr').clone(true).appendTo( '#example1 thead' );
 		// $('#example1 thead tr:eq(1) th').each( function (i) {
