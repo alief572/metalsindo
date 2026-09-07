@@ -1178,6 +1178,121 @@ class Purchase_order extends Admin_Controller
 
 		echo json_encode($status);
 	}
+
+	public function delete_po()
+	{
+		$this->auth->restrict($this->deletePermission);
+		$id = $this->input->post('id');
+
+		if (empty($id)) {
+			echo json_encode(array(
+				'status' => 0,
+				'pesan'  => 'ID Purchase Order tidak valid!'
+			));
+			return;
+		}
+
+		// 1. Cek data PO di database
+		$po = $this->db->get_where('tr_purchase_order', array('no_po' => $id))->row();
+		if (empty($po)) {
+			echo json_encode(array(
+				'status' => 0,
+				'pesan'  => 'Data Purchase Order tidak ditemukan!'
+			));
+			return;
+		}
+
+		// 2. Cek transaksi downstream (Incoming, Invoice, Uang Muka, Request Payment)
+		$check_incoming = $this->db->get_where('dt_incoming_po', array('no_po' => $id))->num_rows();
+		if ($check_incoming > 0) {
+			echo json_encode(array(
+				'status' => 0,
+				'pesan'  => 'PO tidak dapat dihapus karena sudah memiliki data Incoming (Penerimaan Barang) di gudang!'
+			));
+			return;
+		}
+
+		$check_invoice = $this->db->get_where('tr_invoice_po', array('no_po' => $id))->num_rows();
+		if ($check_invoice > 0) {
+			echo json_encode(array(
+				'status' => 0,
+				'pesan'  => 'PO tidak dapat dihapus karena sudah memiliki data Invoice / Tagihan!'
+			));
+			return;
+		}
+
+		$check_um = $this->db->get_where('tr_uangmuka_pembelian', array('no_po' => $id))->num_rows();
+		if ($check_um > 0) {
+			echo json_encode(array(
+				'status' => 0,
+				'pesan'  => 'PO tidak dapat dihapus karena sudah memiliki transaksi Uang Muka!'
+			));
+			return;
+		}
+
+		$check_req_pay = $this->db->get_where('tr_request_payment_detail', array('no_po' => $id))->num_rows();
+		if ($check_req_pay > 0) {
+			echo json_encode(array(
+				'status' => 0,
+				'pesan'  => 'PO tidak dapat dihapus karena sudah terdaftar di Request Payment!'
+			));
+			return;
+		}
+
+		$this->db->trans_begin();
+
+		// 3. Simpan ke arsip backup jika tabel tersedia
+		if ($this->db->table_exists('tr_purchase_order_deleted')) {
+			$po_array = (array) $po;
+			$fields_header = $this->db->list_fields('tr_purchase_order_deleted');
+			$data_archive_header = array_intersect_key($po_array, array_flip($fields_header));
+			$this->db->insert('tr_purchase_order_deleted', $data_archive_header);
+		}
+
+		$po_details = $this->db->get_where('dt_trans_po', array('no_po' => $id))->result_array();
+		if (!empty($po_details) && $this->db->table_exists('dt_trans_po_deleted')) {
+			$fields_detail = $this->db->list_fields('dt_trans_po_deleted');
+			$flip_detail = array_flip($fields_detail);
+			foreach ($po_details as $dt) {
+				$data_archive_detail = array_intersect_key($dt, $flip_detail);
+				$this->db->insert('dt_trans_po_deleted', $data_archive_detail);
+			}
+		}
+
+		// 4. Hapus detail PO
+		$this->db->delete('dt_trans_po', array('no_po' => $id));
+
+		// 5. Hapus header PO
+		$this->db->delete('tr_purchase_order', array('no_po' => $id));
+
+		// 6. Catat aktivitas
+		$no_surat = (!empty($po->no_surat)) ? $po->no_surat : $id;
+		$this->aktifitas_model->simpan_aktifitas(
+			$this->deletePermission,
+			$id,
+			'Delete Purchase Order No: ' . $no_surat,
+			1,
+			null,
+			true
+		);
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+			$status = array(
+				'pesan'  => 'Gagal menghapus data Purchase Order.',
+				'status' => 0
+			);
+		} else {
+			$this->db->trans_commit();
+			$status = array(
+				'pesan'  => 'Data Purchase Order berhasil dihapus.',
+				'status' => 1
+			);
+		}
+
+		echo json_encode($status);
+	}
+
 	function get_inven2()
 	{
 		$inventory_1 = $_GET['inventory_1'];
