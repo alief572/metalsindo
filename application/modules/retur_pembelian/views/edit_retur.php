@@ -31,6 +31,95 @@
     .table-detail-retur tbody td {
         vertical-align: middle !important;
     }
+    /* Drag & Drop Upload Zone */
+    .dropzone-wrapper {
+        border: 2px dashed #f39c12;
+        border-radius: 8px;
+        background-color: #fefcf8;
+        padding: 20px 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.25s ease-in-out;
+        position: relative;
+    }
+    .dropzone-wrapper:hover, .dropzone-wrapper.dragover {
+        background-color: #fef7ec;
+        border-color: #d68910;
+        transform: scale(1.005);
+    }
+    .dropzone-wrapper .dropzone-icon {
+        font-size: 38px;
+        color: #f39c12;
+        margin-bottom: 8px;
+    }
+    .dropzone-wrapper .dropzone-text {
+        font-size: 13px;
+        color: #444;
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+    .dropzone-wrapper .dropzone-text .browse-link {
+        color: #e08e0b;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+    .dropzone-wrapper .dropzone-desc {
+        font-size: 11px;
+        color: #888;
+    }
+    .file-preview-container {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .file-preview-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid #f39c12;
+        border-radius: 4px;
+        padding: 6px 10px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .file-existing-item {
+        border-left: 4px solid #00a65a;
+        background: #fcfdfc;
+    }
+    .file-preview-info {
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        margin-right: 8px;
+    }
+    .file-preview-icon {
+        font-size: 18px;
+        margin-right: 8px;
+        flex-shrink: 0;
+    }
+    .file-preview-name {
+        font-size: 12px;
+        font-weight: 600;
+        color: #333;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 240px;
+    }
+    .file-preview-size {
+        font-size: 11px;
+        color: #888;
+        margin-left: 6px;
+        flex-shrink: 0;
+    }
+    .btn-remove-file {
+        padding: 2px 6px;
+        font-size: 11px;
+        border-radius: 3px;
+        flex-shrink: 0;
+    }
 </style>
 
 <div class="box box-warning">
@@ -138,13 +227,55 @@
                                 <textarea name="alasan_retur" rows="3" class="form-control" required><?= $header->alasan_retur ?></textarea>
                             </div>
                             <div class="form-group">
-                                <label>File NCR / Berita Acara (Kosongkan jika tidak diubah)</label>
-                                <input type="file" class="form-control" name="file_ba" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
-                                <?php if (!empty($header->file_ba) && file_exists($header->file_ba)) : ?>
-                                    <div style="margin-top: 6px;">
-                                        <a href="<?= base_url($header->file_ba) ?>" target="_blank" class="btn btn-xs btn-info"><i class="fa fa-download"></i> Unduh File NCR Saat Ini</a>
+                                <label>File NCR / Berita Acara</label>
+                                
+                                <?php
+                                $list_existing = !empty($files_ba) ? $files_ba : Retur_pembelian::parse_file_ba($header->file_ba);
+                                ?>
+                                <?php if (!empty($list_existing)) : ?>
+                                    <div style="margin-bottom: 10px;" id="existing_files_container">
+                                        <div style="font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px;">
+                                            <i class="fa fa-folder-open text-success"></i> Berkas Tersimpan Saat Ini:
+                                        </div>
+                                        <div class="file-preview-container" style="margin-top: 0;">
+                                            <?php foreach ($list_existing as $fpath) : 
+                                                $f_name = basename($fpath);
+                                                $ext = strtolower(pathinfo($fpath, PATHINFO_EXTENSION));
+                                                $icon = 'fa-file-o text-muted';
+                                                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) $icon = 'fa-file-image-o text-primary';
+                                                elseif ($ext === 'pdf') $icon = 'fa-file-pdf-o text-danger';
+                                                elseif (in_array($ext, ['doc', 'docx'])) $icon = 'fa-file-word-o text-info';
+                                            ?>
+                                                <div class="file-preview-item file-existing-item" id="existing_item_<?= md5($fpath) ?>">
+                                                    <input type="hidden" name="existing_files[]" value="<?= htmlspecialchars($fpath) ?>" class="existing-file-input">
+                                                    <div class="file-preview-info">
+                                                        <i class="fa <?= $icon ?> file-preview-icon"></i>
+                                                        <span class="file-preview-name" title="<?= htmlspecialchars($f_name) ?>"><?= htmlspecialchars($f_name) ?></span>
+                                                    </div>
+                                                    <div style="display: flex; gap: 5px; align-items: center;">
+                                                        <a href="<?= base_url($fpath) ?>" target="_blank" class="btn btn-xs btn-info" title="Unduh berkas"><i class="fa fa-download"></i> Unduh</a>
+                                                        <button type="button" class="btn btn-xs btn-danger btn-remove-existing" data-target="existing_item_<?= md5($fpath) ?>" title="Hapus dari retur"><i class="fa fa-times"></i></button>
+                                                    </div>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
                                     </div>
                                 <?php endif; ?>
+
+                                <div style="font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px;">
+                                    <i class="fa fa-cloud-upload text-warning"></i> Unggah Berkas Baru / Tambahan:
+                                </div>
+                                <div class="dropzone-wrapper" id="dropzone_box">
+                                    <input type="file" id="file_ba_input" name="file_ba[]" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display: none;">
+                                    <i class="fa fa-cloud-upload dropzone-icon"></i>
+                                    <div class="dropzone-text">
+                                        <b>Tarik & lepaskan file ke sini</b>, atau <span class="browse-link">Pilih File</span>
+                                    </div>
+                                    <div class="dropzone-desc">
+                                        <i class="fa fa-info-circle"></i> Mendukung multi-file. Format: PDF, JPG, PNG, DOC, DOCX (Maks. 5MB per file)
+                                    </div>
+                                </div>
+                                <div class="file-preview-container" id="file_preview_list"></div>
                             </div>
                         </div>
                     </div>
@@ -507,8 +638,142 @@
         hitungFooter();
     });
 
+    // Drag & Drop and Multi-File Management for Edit Mode
+    var selectedFiles = [];
+    var $dropzone = $('#dropzone_box');
+    var $fileInput = $('#file_ba_input');
+    var $previewList = $('#file_preview_list');
+
+    $dropzone.on('click', function(e) {
+        if ($(e.target).closest('.btn-remove-file').length === 0) {
+            $fileInput.trigger('click');
+        }
+    });
+
+    $fileInput.on('change', function(e) {
+        handleFiles(this.files);
+        $fileInput.val('');
+    });
+
+    $dropzone.on('dragover dragenter', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $dropzone.addClass('dragover');
+    });
+
+    $dropzone.on('dragleave drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $dropzone.removeClass('dragover');
+    });
+
+    $dropzone.on('drop', function(e) {
+        var droppedFiles = e.originalEvent.dataTransfer.files;
+        handleFiles(droppedFiles);
+    });
+
+    function handleFiles(files) {
+        var allowedExtensions = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'];
+        var maxSizeBytes = 5 * 1024 * 1024; // 5MB
+
+        for (var i = 0; i < files.length; i++) {
+            var file = files[i];
+            var ext = file.name.split('.').pop().toLowerCase();
+
+            if ($.inArray(ext, allowedExtensions) === -1) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Format File Tidak Didukung',
+                    text: 'File "' + file.name + '" dilewati. Format yang diperbolehkan: ' + allowedExtensions.join(', ')
+                });
+                continue;
+            }
+
+            if (file.size > maxSizeBytes) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Ukuran File Terlalu Besar',
+                    text: 'File "' + file.name + '" melebihi 5MB dan tidak dapat ditambahkan.'
+                });
+                continue;
+            }
+
+            var isDuplicate = false;
+            for (var j = 0; j < selectedFiles.length; j++) {
+                if (selectedFiles[j].name === file.name && selectedFiles[j].size === file.size) {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+
+            if (!isDuplicate) {
+                selectedFiles.push(file);
+            }
+        }
+        renderFilePreview();
+    }
+
+    function renderFilePreview() {
+        $previewList.empty();
+        if (selectedFiles.length === 0) {
+            return;
+        }
+
+        $.each(selectedFiles, function(index, file) {
+            var ext = file.name.split('.').pop().toLowerCase();
+            var iconClass = 'fa-file-o text-muted';
+            if ($.inArray(ext, ['jpg', 'jpeg', 'png', 'gif']) !== -1) {
+                iconClass = 'fa-file-image-o text-primary';
+            } else if (ext === 'pdf') {
+                iconClass = 'fa-file-pdf-o text-danger';
+            } else if ($.inArray(ext, ['doc', 'docx']) !== -1) {
+                iconClass = 'fa-file-word-o text-info';
+            }
+
+            var sizeStr = (file.size >= 1048576) 
+                ? (file.size / 1048576).toFixed(2) + ' MB' 
+                : (file.size / 1024).toFixed(1) + ' KB';
+
+            var itemHtml = '<div class="file-preview-item">' +
+                '<div class="file-preview-info">' +
+                    '<i class="fa ' + iconClass + ' file-preview-icon"></i>' +
+                    '<span class="file-preview-name" title="' + file.name + '">' + file.name + '</span>' +
+                    '<span class="file-preview-size">(' + sizeStr + ')</span>' +
+                '</div>' +
+                '<button type="button" class="btn btn-xs btn-danger btn-remove-file" data-index="' + index + '" title="Hapus berkas">' +
+                    '<i class="fa fa-times"></i>' +
+                '</button>' +
+            '</div>';
+
+            $previewList.append(itemHtml);
+        });
+    }
+
+    $(document).on('click', '.btn-remove-file', function(e) {
+        e.stopPropagation();
+        var index = $(this).data('index');
+        selectedFiles.splice(index, 1);
+        renderFilePreview();
+    });
+
+    $(document).on('click', '.btn-remove-existing', function(e) {
+        e.stopPropagation();
+        var targetId = $(this).data('target');
+        $('#' + targetId).remove();
+    });
+
     $(document).on('submit', '#frm-data', function(e) {
         e.preventDefault();
+
+        var existingCount = $('.existing-file-input').length;
+        if (existingCount === 0 && selectedFiles.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian !',
+                text: 'File NCR / Berita Acara minimal harus ada 1 berkas!'
+            });
+            return false;
+        }
 
         Swal.fire({
             icon: 'warning',
@@ -521,6 +786,13 @@
         }).then((next) => {
             if (next.isConfirmed) {
                 var formdata = new FormData($('#frm-data')[0]);
+
+                // Bersihkan input file_ba bawaan form dan append dari selectedFiles
+                formdata.delete('file_ba[]');
+                formdata.delete('file_ba');
+                for (var i = 0; i < selectedFiles.length; i++) {
+                    formdata.append('file_ba[]', selectedFiles[i]);
+                }
 
                 $.ajax({
                     type: 'post',
@@ -548,10 +820,12 @@
                         });
                     },
                     error: function(xhr, status, error) {
+                        $('.save_btn').attr('disabled', false);
+                        var errMsg = (xhr.responseJSON && xhr.responseJSON.pesan) ? xhr.responseJSON.pesan : (xhr.responseJSON && xhr.responseJSON.message) ? xhr.responseJSON.message : error;
                         Swal.fire({
                             icon: 'error',
                             title: 'Error !',
-                            text: 'Oops ! ' + error
+                            text: errMsg
                         });
                     }
                 });

@@ -473,6 +473,94 @@ class Retur_pembelian extends Admin_Controller
 		}
 	}
 
+	/**
+	 * Memastikan direktori upload ada dan berstatus writable.
+	 * Jika direktori belum ada, fungsi akan membuatnya secara rekursif dan langsung memberi hak akses 0777.
+	 */
+	protected function _ensure_upload_dir($target_dir)
+	{
+		if (!file_exists($target_dir)) {
+			if (!mkdir($target_dir, 0777, true)) {
+				throw new Exception('Gagal membuat direktori upload: ' . $target_dir);
+			}
+			@chmod($target_dir, 0777);
+		} elseif (!is_writable($target_dir)) {
+			@chmod($target_dir, 0777);
+		}
+
+		if (!is_writable($target_dir)) {
+			@chmod($target_dir, 0777);
+			if (!is_writable($target_dir)) {
+				throw new Exception('Direktori upload (' . $target_dir . ') tidak memiliki izin tulis (writable).');
+			}
+		}
+	}
+
+	/**
+	 * Helper untuk mem-parsing string file_ba ke bentuk array.
+	 * Kompatibel dengan JSON array, comma separated string, ataupun string single file lama.
+	 */
+	public static function parse_file_ba($file_ba_raw)
+	{
+		if (empty($file_ba_raw)) {
+			return [];
+		}
+		$decoded = json_decode($file_ba_raw, true);
+		if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+			return array_values(array_filter($decoded));
+		}
+		if (strpos($file_ba_raw, ',') !== false) {
+			return array_values(array_filter(array_map('trim', explode(',', $file_ba_raw))));
+		}
+		return [trim($file_ba_raw)];
+	}
+
+	/**
+	 * Helper untuk memproses upload multi-file dari $_FILES
+	 */
+	protected function _handle_upload_files($field_name = 'file_ba', $target_dir = './assets/file_ba/')
+	{
+		$this->_ensure_upload_dir($target_dir);
+
+		$uploaded_files = [];
+		if (!empty($_FILES[$field_name]['name'])) {
+			$files = $_FILES[$field_name];
+			$is_multi = is_array($files['name']);
+			$count = $is_multi ? count($files['name']) : 1;
+
+			for ($i = 0; $i < $count; $i++) {
+				$orig_name = $is_multi ? $files['name'][$i] : $files['name'];
+				if (empty($orig_name)) {
+					continue;
+				}
+
+				$_FILES['temp_upload_item']['name']     = $is_multi ? $files['name'][$i] : $files['name'];
+				$_FILES['temp_upload_item']['type']     = $is_multi ? $files['type'][$i] : $files['type'];
+				$_FILES['temp_upload_item']['tmp_name'] = $is_multi ? $files['tmp_name'][$i] : $files['tmp_name'];
+				$_FILES['temp_upload_item']['error']    = $is_multi ? $files['error'][$i] : $files['error'];
+				$_FILES['temp_upload_item']['size']     = $is_multi ? $files['size'][$i] : $files['size'];
+
+				$config = [
+					'upload_path'   => $target_dir,
+					'allowed_types' => 'pdf|jpg|jpeg|png|doc|docx',
+					'max_size'      => 10240, // 10MB
+					'encrypt_name'  => TRUE,
+					'remove_spaces' => TRUE
+				];
+
+				$this->upload->initialize($config);
+				if ($this->upload->do_upload('temp_upload_item')) {
+					$uploadData = $this->upload->data();
+					$uploaded_files[] = 'assets/file_ba/' . $uploadData['file_name'];
+				} else {
+					throw new Exception('Maaf, file "' . $orig_name . '" gagal diunggah: ' . $this->upload->display_errors('', ''));
+				}
+			}
+		}
+
+		return $uploaded_files;
+	}
+
 	public function save_retur_pembelian()
 	{
 		$no_surat = $this->Retur_pembelian_model->BuatNomor();
@@ -486,33 +574,13 @@ class Retur_pembelian extends Admin_Controller
 			}
 
 			$target_dir = './assets/file_ba/';
-			if (!is_dir($target_dir)) {
-				mkdir($target_dir, 0777, true);
-				chmod($target_dir, 0777);
-			} elseif (!is_writable($target_dir)) {
-				@chmod($target_dir, 0777);
-			}
+			$this->_ensure_upload_dir($target_dir);
 
-			$filenames = '';
-			if (!empty($_FILES['file_ba']['name'])) {
-				$fileName = $_FILES['file_ba']['name'];
-				$this->load->library(array('PHPExcel'));
-				$config['upload_path'] = $target_dir;
-				$config['file_name'] = $fileName;
-				$config['allowed_types'] = '*';
-				$config['max_size'] = 10000;
-				$config['remove_spaces'] = TRUE;
-				$config['encrypt_name'] = TRUE;
-
-				$this->load->library('upload', $config);
-				$this->upload->initialize($config);
-				if ($this->upload->do_upload('file_ba')) {
-					$uploadData = $this->upload->data();
-					$filenames = $uploadData['file_name'];
-				} else {
-					throw new Exception('Maaf, File BA gagal terupload: ' . $this->upload->display_errors('', ''));
-				}
+			$uploaded_files = $this->_handle_upload_files('file_ba', $target_dir);
+			if (empty($uploaded_files)) {
+				throw new Exception('File NCR / Berita Acara wajib diunggah !');
 			}
+			$file_ba_json = json_encode($uploaded_files);
 
 			$get_supplier = $this->Retur_pembelian_model->get_supplier($this->input->post('supplier', true));
 
@@ -624,7 +692,7 @@ class Retur_pembelian extends Admin_Controller
 				'tgl_retur' => $this->input->post('tanggal_retur', true),
 				'no_ng_report' => $this->input->post('no_ng_report', true),
 				'alasan_retur' => $this->input->post('alasan_retur', true),
-				'file_ba' => 'assets/file_ba/' . $filenames,
+				'file_ba' => $file_ba_json,
 				'no_ref_invoice' => $no_ref_invoice,
 				'tgl_invoice' => $this->input->post('tanggal_invoice', true),
 				'matauang' => $matauang,
@@ -692,32 +760,19 @@ class Retur_pembelian extends Admin_Controller
 			$reset_detail = $this->db->delete('dt_retur_pembelian', ['id_header' => $no_surat]);
 
 			$target_dir = './assets/file_ba/';
-			if (!is_dir($target_dir)) {
-				mkdir($target_dir, 0777, true);
-				chmod($target_dir, 0777);
-			} elseif (!is_writable($target_dir)) {
-				@chmod($target_dir, 0777);
+			$this->_ensure_upload_dir($target_dir);
+
+			$new_uploaded_files = $this->_handle_upload_files('file_ba', $target_dir);
+
+			$retained_existing_files = $this->input->post('existing_files', true);
+			if (!is_array($retained_existing_files)) {
+				$retained_existing_files = !empty($retained_existing_files) ? [$retained_existing_files] : [];
 			}
 
-			$filenames = '';
-			if (!empty($_FILES['file_ba']['name'])) {
-				$fileName = $_FILES['file_ba']['name'];
-				$this->load->library(array('PHPExcel'));
-				$config['upload_path'] = $target_dir;
-				$config['file_name'] = $fileName;
-				$config['allowed_types'] = '*';
-				$config['max_size'] = 10000;
-				$config['remove_spaces'] = TRUE;
-				$config['encrypt_name'] = TRUE;
-
-				$this->load->library('upload', $config);
-				$this->upload->initialize($config);
-				if ($this->upload->do_upload('file_ba')) {
-					$uploadData = $this->upload->data();
-					$filenames = $uploadData['file_name'];
-				} else {
-					throw new Exception('Maaf, File BA gagal terupload: ' . $this->upload->display_errors('', ''));
-				}
+			// Gabungkan file lama yang dipertahankan dengan file baru yang diunggah
+			$all_files = array_merge($retained_existing_files, $new_uploaded_files);
+			if (empty($all_files)) {
+				throw new Exception('File NCR / Berita Acara minimal harus ada 1 berkas !');
 			}
 
 			$id_rec_inv_ap = $this->input->post('id_rec_inv_ap', true);
@@ -832,9 +887,7 @@ class Retur_pembelian extends Admin_Controller
 				'updated_by' => $this->auth->user_id(),
 				'updated_date' => date('Y-m-d H:i:s')
 			];
-			if (!empty($filenames)) {
-				$arr_insert_header['file_ba'] = 'assets/file_ba/' . $filenames;
-			}
+			$arr_insert_header['file_ba'] = json_encode(array_values($all_files));
 
 			$insert_header = $this->db->update('tr_retur_pembelian', $arr_insert_header, ['id' => $id]);
 			if (!$insert_header) {
@@ -1080,7 +1133,8 @@ class Retur_pembelian extends Admin_Controller
 			'detail' => $retur_detail,
 			'list_supplier' => $get_supplier,
 			'arr_detail' => $arr_detail,
-			'id_rec_inv_ap' => $retur_header->id_rec_inv_ap
+			'id_rec_inv_ap' => $retur_header->id_rec_inv_ap,
+			'files_ba' => self::parse_file_ba($retur_header->file_ba)
 		];
 
 		// Requirement 5.1: if id_rec_inv_ap is set, fetch no_invoice from tr_receive_invoice_ap_header
@@ -1110,7 +1164,8 @@ class Retur_pembelian extends Admin_Controller
 			'detail' => $retur_detail,
 			'list_supplier' => $get_supplier,
 			'arr_detail' => $arr_detail,
-			'id_rec_inv_ap' => $retur_header->id_rec_inv_ap
+			'id_rec_inv_ap' => $retur_header->id_rec_inv_ap,
+			'files_ba' => self::parse_file_ba($retur_header->file_ba)
 		];
 
 		$this->template->title('Edit Retur');

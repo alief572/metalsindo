@@ -107,12 +107,29 @@
                                 <td>: <?= nl2br(htmlspecialchars($header->alasan_retur)) ?></td>
                             </tr>
                             <tr>
-                                <td>Dokumen NCR</td>
+                                <td style="vertical-align: top; width: 130px;">Dokumen NCR</td>
                                 <td>: 
-                                    <?php if (!empty($header->file_ba) && file_exists($header->file_ba)) : ?>
-                                        <a href="<?= base_url($header->file_ba) ?>" class="btn btn-sm btn-primary" title="Download file NCR" target="_blank" download>
-                                            <i class="fa fa-download"></i> Unduh Berkas NCR
-                                        </a>
+                                    <?php
+                                    $list_files = !empty($files_ba) ? $files_ba : Retur_pembelian::parse_file_ba($header->file_ba);
+                                    ?>
+                                    <?php if (!empty($list_files)) : ?>
+                                        <div style="display: inline-block; vertical-align: top;">
+                                            <?php foreach ($list_files as $fpath) : 
+                                                $f_name = basename($fpath);
+                                                $ext = strtolower(pathinfo($fpath, PATHINFO_EXTENSION));
+                                                $icon = 'fa-file-o text-muted';
+                                                if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) $icon = 'fa-file-image-o text-primary';
+                                                elseif ($ext === 'pdf') $icon = 'fa-file-pdf-o text-danger';
+                                                elseif (in_array($ext, ['doc', 'docx'])) $icon = 'fa-file-word-o text-info';
+                                            ?>
+                                                <div style="margin-bottom: 6px;">
+                                                    <a href="<?= base_url($fpath) ?>" class="btn btn-sm btn-default" title="Download file NCR: <?= htmlspecialchars($f_name) ?>" target="_blank" download style="text-align: left;">
+                                                        <i class="fa <?= $icon ?>" style="margin-right: 5px;"></i> <?= htmlspecialchars($f_name) ?>
+                                                        <i class="fa fa-download text-primary" style="margin-left: 10px;"></i>
+                                                    </a>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
                                     <?php else : ?>
                                         <span class="text-muted"><i class="fa fa-times-circle text-danger"></i> Tidak ada file lampiran</span>
                                     <?php endif; ?>
