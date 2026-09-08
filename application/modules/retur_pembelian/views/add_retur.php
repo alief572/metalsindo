@@ -197,8 +197,8 @@
                             </div>
                             <div class="form-group">
                                 <label>Upload File NCR / Berita Acara <span class="text-danger">*</span></label>
+                                <input type="file" id="file_ba_input" name="file_ba[]" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display: none;">
                                 <div class="dropzone-wrapper" id="dropzone_box">
-                                    <input type="file" id="file_ba_input" name="file_ba[]" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" style="display: none;">
                                     <i class="fa fa-cloud-upload dropzone-icon"></i>
                                     <div class="dropzone-text">
                                         <b>Tarik & lepaskan file di sini</b>, atau <span class="browse-link">Pilih File</span>
@@ -344,10 +344,15 @@
     var $fileInput = $('#file_ba_input');
     var $previewList = $('#file_preview_list');
 
+    $fileInput.on('click', function(e) {
+        e.stopPropagation();
+    });
+
     $dropzone.on('click', function(e) {
-        if ($(e.target).closest('.btn-remove-file').length === 0) {
-            $fileInput.trigger('click');
+        if ($(e.target).closest('.btn-remove-file').length > 0) {
+            return;
         }
+        $fileInput.trigger('click');
     });
 
     $fileInput.on('change', function(e) {
