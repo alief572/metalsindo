@@ -30,11 +30,11 @@ thead input {
 		<span class="pull-right"></span>
 	</div>
         	<div class="box-body">
-		<table id="example1" class="table table-bordered table-striped">
+		<table id="example1" class="table table-bordered table-striped" style="width: 100%;">
 		<thead>
 		<tr>
-			<th width="5">#</th>
-			<th width="13%">Update Date</th>
+			<th width="5" class='text-center'>#</th>
+			<th width="15%">Update Date</th>
 			<th>Update By</th>
 			<th class='text-center'>cu</th>
 			<th class='text-center'>zn</th>
@@ -46,31 +46,6 @@ thead input {
 		</thead>
 
 		<tbody>
-		<?php if(empty($results['history'])){
-		}else{
-			
-			$numb=0; foreach($results['history'] AS $history){ $numb++;
-			$cu = $this->db->query("SELECT * FROM child_history_lme WHERE id_history_lme ='$history->id_history_lme' AND id_compotition = '13' ")->result();
-			$zn = $this->db->query("SELECT * FROM child_history_lme WHERE id_history_lme ='$history->id_history_lme' AND id_compotition = '14' ")->result();
-			$sn = $this->db->query("SELECT * FROM child_history_lme WHERE id_history_lme ='$history->id_history_lme' AND id_compotition = '15' ")->result();
-			$ni = $this->db->query("SELECT * FROM child_history_lme WHERE id_history_lme ='$history->id_history_lme' AND id_compotition = '16' ")->result();
-			$ag = $this->db->query("SELECT * FROM child_history_lme WHERE id_history_lme ='$history->id_history_lme' AND id_compotition = '17' ")->result();
-			$al = $this->db->query("SELECT * FROM child_history_lme WHERE id_history_lme ='$history->id_history_lme' AND id_compotition = '18' ")->result();
-			
-			?>
-			
-		<tr>
-		    <td><?= $numb; ?></td>
-			<td><?= $history->tanggal_update?></td>
-			<td><?= $history->nm_lengkap ?></td>
-			<td class='text-right'>$ <?= number_format($cu[0]->nominal,2) ?>/ton</td>
-			<td class='text-right'>$ <?= number_format($zn[0]->nominal,2) ?>/ton</td>
-			<td class='text-right'>$ <?= number_format($sn[0]->nominal,2) ?>/ton</td>
-			<td class='text-right'>$ <?= number_format($ni[0]->nominal,2) ?>/ton</td>
-			<td class='text-right'>$ <?= number_format($ag[0]->nominal,2) ?>/ton</td>
-			<td class='text-right'>$ <?= number_format($al[0]->nominal,2) ?>/ton</td>
-		</tr>
-		<?php } }  ?>
 		</tbody>
 		</table>
 	</div>
@@ -79,11 +54,11 @@ thead input {
 
     <div class="tab-pane" id="rate">
         	<div class="box-body">
-		<table id="example1" class="table table-bordered table-striped">
+		<table id="table_rate" class="table table-bordered table-striped" style="width: 100%;">
 		<thead>
 		<tr>
-			<th width="5">#</th>
-			<th width="13%">Kompisisi</th>
+			<th width="5" class='text-center'>#</th>
+			<th width="20%">Komposisi</th>
 			<th>Rate H-30</th>
 			<th>Rate H-10</th>
 			<th>Rate Saat Ini</th>
@@ -114,11 +89,11 @@ thead input {
 			$lme_30hari	= $this->db->query("SELECT AVG(nominal) as nominal FROM child_history_lme WHERE MONTH(tanggal_update) =  '$blnkmrn' AND YEAR(tanggal_update) = '$yearkemaren' AND id_compotition='$id_comp' ")->result();
 			?>
 		<tr>
-		    <td><?= $numbc; ?></td>
+		    <td class='text-center'><?= $numb3; ?></td>
 			<td><?= $comp->name_compotition ?></td>
-			<td>$ <?= number_format( $lme_30hari[0]->nominal,2);?></td>
-			<td>$ <?= number_format( $lme_10hari[0]->nominal,2);?></td>
-			<td>$ <?= number_format( $comp->nominal_harga,2); ?></td>
+			<td class='text-right'>$ <?= !empty($lme_30hari) ? number_format($lme_30hari[0]->nominal, 2) : '0.00'; ?></td>
+			<td class='text-right'>$ <?= !empty($lme_10hari) ? number_format($lme_10hari[0]->nominal, 2) : '0.00'; ?></td>
+			<td class='text-right'>$ <?= number_format($comp->nominal_harga, 2); ?></td>
 		</tr>
 		
 		<?php } }  ?>
@@ -448,13 +423,66 @@ thead input {
 	});
 
   	$(function() {
+		DataTables();
 
-	    var table = $('#example1').DataTable( {
-	        orderCellsTop: true,
-	        fixedHeader: true
-	    } );
+		$('#table_rate').DataTable({
+			paging: true,
+			ordering: true,
+			info: true,
+			searching: true
+		});
+
+		$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+			$($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+		});
+
     	$("#form-area").hide();
   	});
+
+	function DataTables() {
+		$('#example1').DataTable({
+			serverSide: true,
+			processing: true,
+			destroy: true,
+			paging: true,
+			stateSave: true,
+			responsive: true,
+			order: [[1, 'desc']],
+			ajax: {
+				type: 'post',
+				url: siteurl + 'master_lme/get_data_history',
+				dataType: 'json',
+				cache: false
+			},
+			columns: [
+				{ data: 'no', className: 'text-center', orderable: false },
+				{ data: 'tanggal_update' },
+				{ data: 'nm_lengkap' },
+				{ data: 'cu', className: 'text-right', orderable: false },
+				{ data: 'zn', className: 'text-right', orderable: false },
+				{ data: 'sn', className: 'text-right', orderable: false },
+				{ data: 'ni', className: 'text-right', orderable: false },
+				{ data: 'ag', className: 'text-right', orderable: false },
+				{ data: 'al', className: 'text-right', orderable: false }
+			],
+			language: {
+				processing: '<div style="padding: 8px 16px;"><i class="fa fa-spinner fa-spin fa-lg" style="color: #205072; margin-right: 8px;"></i> Memuat data...</div>',
+				search: '<i class="fa fa-search" style="color: #64748b;"></i>',
+				searchPlaceholder: 'Cari tanggal / user...',
+				lengthMenu: 'Tampilkan _MENU_ data',
+				info: 'Menampilkan <b>_START_</b> - <b>_END_</b> dari <b>_TOTAL_</b> data',
+				infoEmpty: 'Menampilkan 0 data',
+				infoFiltered: '(disaring dari _MAX_ total data)',
+				zeroRecords: '<div style="padding: 20px; color: #94a3b8; text-align: center;"><i class="fa fa-folder-open-o fa-2x" style="margin-bottom: 8px;"></i><br>Tidak ada data LME yang cocok</div>',
+				paginate: {
+					first: '<i class="fa fa-angle-double-left"></i>',
+					previous: '<i class="fa fa-angle-left"></i>',
+					next: '<i class="fa fa-angle-right"></i>',
+					last: '<i class="fa fa-angle-double-right"></i>'
+				}
+			}
+		});
+	}
 	
 	
 	//Delete
