@@ -1146,7 +1146,7 @@ class Incoming extends Admin_Controller
 				$ArrDetail2[$val2 . $val]['id_dt_po']	 			= $valx2['iddtpo'];
 				$ArrDetail2[$val2 . $val]['id_material'] 			= $valx2['id_material'];
 				$ArrDetail2[$val2 . $val]['nama_material'] 		= $valx2['nama_material'];
-				$ArrDetail2[$val2 . $val]['length'] 				= $valx2['panjang2'];
+				$ArrDetail2[$val2 . $val]['length'] 				= str_replace(',', '', $valx2['length']);
 				$ArrDetail2[$val2 . $val]['width'] 				= str_replace(',', '', $valx2['weight']);
 				$ArrDetail2[$val2 . $val]['weight'] 				= str_replace(',', '', $valx2['weight']);
 				$ArrDetail2[$val2 . $val]['qty_order'] 			= str_replace(',', '', $valx2['qtyorder']);
