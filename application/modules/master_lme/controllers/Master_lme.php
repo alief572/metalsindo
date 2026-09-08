@@ -35,19 +35,22 @@ class Master_lme extends Admin_Controller
 
     public function index()
     {
-       $this->auth->restrict($this->viewPermission);
+        $this->auth->restrict($this->viewPermission);
         $session = $this->session->userdata('app_session');
-		$this->template->page_icon('fa fa-users');
-		$deleted = '0';
-        $history = $this->Lme_model->gethistory();
-		$comp = $this->Lme_model->getRate();
-		$data = [
-			'history' => $history,
-			'comp' => $comp
-		];
+        $this->template->page_icon('fa fa-users');
+        $comp = $this->Lme_model->getRate();
+        $data = [
+            'comp' => $comp
+        ];
         $this->template->set('results', $data);
         $this->template->title('Master LME');
         $this->template->render('index');
+    }
+
+    public function get_data_history()
+    {
+        $this->auth->restrict($this->viewPermission);
+        $this->Lme_model->get_data_history();
     }
 	public function editCustomer($id){
 		$this->auth->restrict($this->viewPermission);

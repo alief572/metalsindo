@@ -184,8 +184,107 @@ class Lme_model extends BF_Model
             ->get()
 			->result();
 	}
-       
 
-   
+	public function get_data_history()
+	{
+		$draw = $this->input->post('draw');
+		$length = $this->input->post('length');
+		$start = $this->input->post('start');
+		$search = $this->input->post('search');
+		$order = $this->input->post('order');
 
+		// Total unfiltered records
+		$recordsTotal = $this->db->count_all('ms_history_lme');
+
+		// Base query
+		$this->db->select('a.id_history_lme, a.tanggal_update, b.nm_lengkap');
+		$this->db->from('ms_history_lme a');
+		$this->db->join('users b', 'b.id_user = a.created_by', 'left');
+
+		if (!empty($search['value'])) {
+			$search_val = trim($search['value']);
+			$this->db->group_start();
+			$this->db->like('a.tanggal_update', $search_val, 'both');
+			$this->db->or_like('b.nm_lengkap', $search_val, 'both');
+			$this->db->group_end();
+		}
+
+		$db_clone = clone $this->db;
+		$recordsFiltered = $db_clone->count_all_results();
+
+		// Column mapping for order
+		$columns = array(
+			0 => 'a.id_history_lme',
+			1 => 'a.tanggal_update',
+			2 => 'b.nm_lengkap'
+		);
+
+		if (isset($order[0]['column']) && isset($columns[$order[0]['column']])) {
+			$colIndex = $order[0]['column'];
+			$dir = (isset($order[0]['dir']) && strtolower($order[0]['dir']) === 'asc') ? 'asc' : 'desc';
+			$this->db->order_by($columns[$colIndex], $dir);
+		} else {
+			$this->db->order_by('a.tanggal_update', 'desc');
+			$this->db->order_by('a.id_history_lme', 'desc');
+		}
+
+		if ($length != -1) {
+			$this->db->limit($length, $start);
+		}
+
+		$get_data = $this->db->get()->result_array();
+
+		// Batch fetch child composition data for the returned rows
+		$child_data = array();
+		if (!empty($get_data)) {
+			$history_ids = array();
+			foreach ($get_data as $row) {
+				$history_ids[] = $row['id_history_lme'];
+			}
+
+			$this->db->select('id_history_lme, id_compotition, nominal');
+			$this->db->from('child_history_lme');
+			$this->db->where_in('id_history_lme', $history_ids);
+			$child_rows = $this->db->get()->result_array();
+
+			foreach ($child_rows as $c) {
+				$child_data[$c['id_history_lme']][$c['id_compotition']] = $c['nominal'];
+			}
+		}
+
+		$hasil = array();
+		$no = (0 + $start);
+		foreach ($get_data as $item) {
+			$no++;
+			$hid = $item['id_history_lme'];
+
+			$cu = (isset($child_data[$hid]['13']) && $child_data[$hid]['13'] !== null && $child_data[$hid]['13'] !== '') ? '$ ' . number_format($child_data[$hid]['13'], 2) . '/ton' : '-';
+			$zn = (isset($child_data[$hid]['14']) && $child_data[$hid]['14'] !== null && $child_data[$hid]['14'] !== '') ? '$ ' . number_format($child_data[$hid]['14'], 2) . '/ton' : '-';
+			$sn = (isset($child_data[$hid]['15']) && $child_data[$hid]['15'] !== null && $child_data[$hid]['15'] !== '') ? '$ ' . number_format($child_data[$hid]['15'], 2) . '/ton' : '-';
+			$ni = (isset($child_data[$hid]['16']) && $child_data[$hid]['16'] !== null && $child_data[$hid]['16'] !== '') ? '$ ' . number_format($child_data[$hid]['16'], 2) . '/ton' : '-';
+			$ag = (isset($child_data[$hid]['17']) && $child_data[$hid]['17'] !== null && $child_data[$hid]['17'] !== '') ? '$ ' . number_format($child_data[$hid]['17'], 2) . '/ton' : '-';
+			$al = (isset($child_data[$hid]['18']) && $child_data[$hid]['18'] !== null && $child_data[$hid]['18'] !== '') ? '$ ' . number_format($child_data[$hid]['18'], 2) . '/ton' : '-';
+
+			$hasil[] = array(
+				'no' => $no,
+				'tanggal_update' => $item['tanggal_update'],
+				'nm_lengkap' => !empty($item['nm_lengkap']) ? $item['nm_lengkap'] : '-',
+				'cu' => $cu,
+				'zn' => $zn,
+				'sn' => $sn,
+				'ni' => $ni,
+				'ag' => $ag,
+				'al' => $al
+			);
+		}
+
+		$response = array(
+			'draw' => intval($draw),
+			'recordsTotal' => intval($recordsTotal),
+			'recordsFiltered' => intval($recordsFiltered),
+			'data' => $hasil
+		);
+
+		echo json_encode($response);
+	}
 }
