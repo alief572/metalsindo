@@ -15,7 +15,7 @@
                                     <?php
                                     $tglinv = date('Y-m-d');
                                     ?>
-                                    <label for="tgl_bayar" class="col-sm-4 control-label">Tgl Bayar :</label>
+                                    <label for="tgl_bayar" class="col-sm-4 control-label">Tgl Invoice :</label>
                                     <div class="col-sm-6">
                                         <input type="date" name="tgl_bayar" id="tgl_bayar" class="form-control input-sm tanggal" value="<?php echo date('Y-m-d', strtotime($header->tgl_bayar)) ?>" readonly>
                                     </div>

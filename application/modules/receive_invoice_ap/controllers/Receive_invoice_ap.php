@@ -401,6 +401,7 @@ class Receive_invoice_ap extends Admin_Controller
   public function server_side_request()
   {
     $id_suplier = $this->input->post('id_suplier');
+    $existing_incoming = (array) $this->input->post('existing_incoming');
     $draw       = (int) $this->input->post('draw');
     $start      = (int) $this->input->post('start');
     $length     = (int) $this->input->post('length');
@@ -534,7 +535,11 @@ class Receive_invoice_ap extends Admin_Controller
         $no_po = implode(',', array_filter(array_unique($list_no_po)));
         $total_incoming = isset($map_total_incoming[$item->id_incoming]) ? $map_total_incoming[$item->id_incoming] : 0;
 
-        $action = '<button type="button" class="btn btn-sm btn-warning add_incoming add_incoming_' . $no . '" data-id_incoming="' . $item->id_incoming . '" data-no_po="' . $no_po . '" data-sj_supplier="' . (isset($item->sj_supplier) ? $item->sj_supplier : '') . '" data-id_suplier="' . $item->id_suplier . '" data-name_suplier="' . $item->name_suplier . '" data-nilai="' . $total_incoming . '" data-tanggal_incoming="' . $item->tanggal . '" data-no="' . $no . '"><i class="fa fa-plus"></i> Add</button>';
+        if (in_array($item->id_incoming, $existing_incoming)) {
+          $action = '<button type="button" class="btn btn-sm btn-danger" disabled><i class="fa fa-check"></i> Added</button>';
+        } else {
+          $action = '<button type="button" class="btn btn-sm btn-warning add_incoming add_incoming_' . $no . '" data-id_incoming="' . $item->id_incoming . '" data-no_po="' . $no_po . '" data-sj_supplier="' . (isset($item->sj_supplier) ? $item->sj_supplier : '') . '" data-id_suplier="' . $item->id_suplier . '" data-name_suplier="' . $item->name_suplier . '" data-nilai="' . $total_incoming . '" data-tanggal_incoming="' . $item->tanggal . '" data-no="' . $no . '"><i class="fa fa-plus"></i> Add</button>';
+        }
 
         $data[] = [
           '<div class="text-center">' . htmlspecialchars($item->id_incoming) . '</div>',
@@ -581,8 +586,14 @@ class Receive_invoice_ap extends Admin_Controller
     ];
 
     $data_detail = [];
+    $processed_incoming = [];
     if (isset($post['kp'])) {
       foreach ($post['kp'] as $item) {
+        if (empty($item['id_incoming']) || in_array($item['id_incoming'], $processed_incoming)) {
+          continue;
+        }
+        $processed_incoming[] = $item['id_incoming'];
+
         $data_detail[] = [
           'id_rec_inv_ap' => $id_rec_inv_ap,
           'id_incoming' => $item['id_incoming'],
@@ -706,8 +717,14 @@ class Receive_invoice_ap extends Admin_Controller
     ];
 
     $data_detail = [];
+    $processed_incoming = [];
     if (isset($post['kp'])) {
       foreach ($post['kp'] as $item) {
+        if (empty($item['id_incoming']) || in_array($item['id_incoming'], $processed_incoming)) {
+          continue;
+        }
+        $processed_incoming[] = $item['id_incoming'];
+
         $data_detail[] = [
           'id_rec_inv_ap' => $post['id_rec_inv_ap'],
           'id_incoming' => $item['id_incoming'],

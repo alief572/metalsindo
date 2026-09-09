@@ -35,6 +35,14 @@
                 "type": "POST",
                 "data": function(d) {
                     d.id_suplier = $('#id_suplier_modal').val();
+                    var existing_incoming = [];
+                    $('#list_item_mutasi input[name*="[id_incoming]"]').each(function() {
+                        var val = $(this).val();
+                        if (val) {
+                            existing_incoming.push(val);
+                        }
+                    });
+                    d.existing_incoming = existing_incoming;
                 }
             },
             "columns": [{
