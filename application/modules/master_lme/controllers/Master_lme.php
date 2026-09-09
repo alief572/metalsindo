@@ -439,6 +439,23 @@ class Master_lme extends Admin_Controller
     {
         $this->auth->restrict($this->addPermission);
 		$post = $this->input->post();
+
+		if (empty($post['data1']) || !is_array($post['data1'])) {
+			echo json_encode([
+				'status' => 0,
+				'pesan'  => 'Tidak ada data komposisi yang dikirim!'
+			]);
+			return;
+		}
+
+		if (empty($post['tanggal'])) {
+			echo json_encode([
+				'status' => 0,
+				'pesan'  => 'Tanggal update harus diisi!'
+			]);
+			return;
+		}
+
 		$session = $this->session->userdata('app_session');
 		$code = $this->Lme_model->generate_id();
 		$datake = $this->db->query("SELECT MAX(no_data) as max_number FROM ms_history_lme")->result();
@@ -446,7 +463,7 @@ class Master_lme extends Admin_Controller
 		$this->db->trans_begin();
 					$header1 =  array(
 							'id_history_lme'		=> $code,
-							'tanggal_update'		=> $post[tanggal],
+							'tanggal_update'		=> $post['tanggal'],
 							'no_data'				=> $no_data,
 							'created_on'			=> date('Y-m-d H:i:s'),
 							'tanggal_edit'			=> date('d'),
@@ -461,14 +478,14 @@ class Master_lme extends Admin_Controller
                             );
 				$this->db->update("child_history_lme",$hilang);
 		$numb2 =0;
-		foreach($_POST['data1'] as $d1){
+		foreach($post['data1'] as $d1){
 		$numb2++;
               $data =  array(
 			                    'id_history_lme'		=>$code,
 								'nomor_data'				=> $no_data,
-								'id_compotition'		=>$d1[id_compotition],
-								'tanggal_update'		=>$post[tanggal],
-								'nominal'				=> str_replace(',','',$d1[nilai_compotition]),
+								'id_compotition'		=>$d1['id_compotition'],
+								'tanggal_update'		=>$post['tanggal'],
+								'nominal'				=> str_replace(',','',$d1['nilai_compotition']),
 								'status'				=>'0',
 								'created_on'			=> date('Y-m-d H:i:s'),
 								'created_by'			=> $this->auth->user_id()
