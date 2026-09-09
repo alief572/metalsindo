@@ -154,22 +154,40 @@ class Lme_model extends BF_Model
 		return $query->result();
 	}
 	public function getUpdate(){
-		$search = "a.deleted='0' and a.id_category1='I2000002' and b.status='0'";
-		$this->db->select('a.*, b.nominal as nominal_harga');
-		$this->db->from('ms_compotition a');
-		$this->db->join('child_history_lme b','b.id_compotition=a.id_compotition');
-		$this->db->where($search);
-		$query = $this->db->get();		
+		$sql = "SELECT a.*, COALESCE(b.nominal, latest.nominal, 0) as nominal_harga
+				FROM ms_compotition a
+				LEFT JOIN child_history_lme b ON b.id_compotition = a.id_compotition AND b.status = '0'
+				LEFT JOIN (
+					SELECT c1.id_compotition, c1.nominal
+					FROM child_history_lme c1
+					INNER JOIN (
+						SELECT id_compotition, MAX(id_detail_history_lme) as max_id
+						FROM child_history_lme
+						GROUP BY id_compotition
+					) c2 ON c1.id_detail_history_lme = c2.max_id
+				) latest ON latest.id_compotition = a.id_compotition
+				WHERE a.deleted = '0' AND a.id_category1 = 'I2000002'
+				ORDER BY a.id_compotition ASC";
+		$query = $this->db->query($sql);		
 		return $query->result();
 	}
 	
 	public function getRate(){
-		$search = "a.deleted='0' and b.status='0'";
-		$this->db->select('a.*, b.nominal as nominal_harga');
-		$this->db->from('ms_compotition a');
-		$this->db->join('child_history_lme b','b.id_compotition=a.id_compotition');
-		$this->db->where($search);
-		$query = $this->db->get();		
+		$sql = "SELECT a.*, COALESCE(b.nominal, latest.nominal, 0) as nominal_harga
+				FROM ms_compotition a
+				LEFT JOIN child_history_lme b ON b.id_compotition = a.id_compotition AND b.status = '0'
+				LEFT JOIN (
+					SELECT c1.id_compotition, c1.nominal
+					FROM child_history_lme c1
+					INNER JOIN (
+						SELECT id_compotition, MAX(id_detail_history_lme) as max_id
+						FROM child_history_lme
+						GROUP BY id_compotition
+					) c2 ON c1.id_detail_history_lme = c2.max_id
+				) latest ON latest.id_compotition = a.id_compotition
+				WHERE a.deleted = '0' AND a.id_category1 = 'I2000002'
+				ORDER BY a.id_compotition ASC";
+		$query = $this->db->query($sql);		
 		return $query->result();
 	}
     function getById($id)
