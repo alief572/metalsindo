@@ -221,22 +221,25 @@
                 ?>
 
                     <th width='20%'>Nama Material</th>
-                    <th width='20%'>Lot Number</th>
-                    <th width='10%'>Lebar</th>
-                    <th width='10%'>Thickness</th>
-                    <th width='10%'>Qty KG</th>
-                    <th width='10%'>Qty Sheet</th>
-
+                    <th width='16%'>Lot Number</th>
+                    <th width='7%'>Lebar</th>
+                    <th width='7%'>Thickness</th>
+                    <th width='8%'>Qty KG</th>
+                    <th width='8%'>Qty Sheet</th>
+                    <th width='16%'>Harga / Sheet</th>
+                    <th width='18%'>Subtotal</th>
 
                 <?php
                 } else {
                 ?>
 
-                    <th width='20%'>Nama Material</th>
-                    <th width='20%'>Lot Number</th>
+                    <th width='22%'>Nama Material</th>
+                    <th width='18%'>Lot Number</th>
                     <th width='8%'>Lebar</th>
-                    <th width='9%'>Thickness</th>
-                    <th width='8%'>Qty KG</th>
+                    <th width='8%'>Thickness</th>
+                    <th width='10%'>Qty KG</th>
+                    <th width='16%'>Harga / Kg</th>
+                    <th width='18%'>Subtotal</th>
 
                 <?php
                 }
@@ -248,12 +251,14 @@
             $loop = 0;
             $SUM = 0;
             $SUM_PPN = 0;
-            $thg = 0;
             foreach ($detail as $dt) {
-                $SUM += $dt->total_harga;
-                $SUM_PPN += $dt->total_ppn;
+                $is_sheet = ($type_sheet == '1' && (float)$dt->total_sheet > 0);
+                $qty_used = $is_sheet ? (float)$dt->total_sheet : (float)$dt->weight;
+                $row_subtotal = ((float)$dt->total_harga > 0) ? (float)$dt->total_harga : ($qty_used * (float)$dt->harga_deal);
+                $row_ppn = (float)$dt->total_ppn;
 
-                $thg = number_format($dt->total_harga, 2);
+                $SUM += $row_subtotal;
+                $SUM_PPN += $row_ppn;
                 $loop++;
 
             ?>
@@ -262,22 +267,26 @@
                 if ($type_sheet == '1') {
                 ?>
                     <tr>
-                        <td width="20%"><?= wordwrap($dt->item, 25, "<br />\n", true) ?></td>
+                        <td width="20%"><?= wordwrap($dt->item, 20, "<br />\n", true) ?></td>
                         <td><?= $dt->lotno ?></td>
                         <td align="right"><?= $dt->width ?></td>
                         <td align="right"><?= $dt->thickness ?></td>
-                        <td align="right"><?= $dt->weight ?></td>
-                        <td align="right"><?= $dt->total_sheet ?></td>
+                        <td align="right"><?= number_format($dt->weight, 2) ?></td>
+                        <td align="right"><?= number_format($dt->total_sheet) ?></td>
+                        <td align="right"><?= number_format($dt->harga_deal, 2) ?></td>
+                        <td align="right"><?= number_format($row_subtotal, 2) ?></td>
                     </tr>
                 <?php
                 } else {
                 ?>
                     <tr>
-                        <td width="20%"><?= wordwrap($dt->item, 25, "<br />\n", true) ?></td>
-                        <td align="right"><?= $dt->lotno ?></td>
+                        <td width="22%"><?= wordwrap($dt->item, 25, "<br />\n", true) ?></td>
+                        <td><?= $dt->lotno ?></td>
                         <td align="right"><?= $dt->width ?></td>
                         <td align="right"><?= $dt->thickness ?></td>
-                        <td align="right"><?= $dt->weight ?></td>
+                        <td align="right"><?= number_format($dt->weight, 2) ?></td>
+                        <td align="right"><?= number_format($dt->harga_deal, 2) ?></td>
+                        <td align="right"><?= number_format($row_subtotal, 2) ?></td>
                     </tr>
                 <?php
                 }
@@ -289,19 +298,19 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="<?= ($type_sheet == 1) ? '5' : '4'; ?>" align="right"><strong>Subtotal :</strong></td>
+                <td colspan="<?= ($type_sheet == 1) ? '7' : '6'; ?>" align="right"><strong>Subtotal :</strong></td>
                 <td align="right" style="padding: 4px;">
                     <strong><?= number_format($SUM, 0) ?></strong>
                 </td>
             </tr>
             <tr>
-                <td colspan="<?= ($type_sheet == 1) ? '5' : '4'; ?>" align="right"><strong>PPn :</strong></td>
+                <td colspan="<?= ($type_sheet == 1) ? '7' : '6'; ?>" align="right"><strong>PPn :</strong></td>
                 <td align="right" style="padding: 4px;">
                     <strong><?= number_format($SUM_PPN, 0) ?></strong>
                 </td>
             </tr>
             <tr>
-                <td colspan="<?= ($type_sheet == 1) ? '5' : '4'; ?>" align="right"><strong>Grand Total :</strong></td>
+                <td colspan="<?= ($type_sheet == 1) ? '7' : '6'; ?>" align="right"><strong>Grand Total :</strong></td>
                 <td align="right" style="padding: 4px;">
                     <strong><?= number_format($SUM + $SUM_PPN, 0) ?></strong>
                 </td>
@@ -314,19 +323,19 @@
     <br>
     <table class='gridtable' width='100%' border='1' cellpadding='0' cellspacing='0'>
         <tr>
-            <td width='340'>NOTE</td>
+            <td width='320'>NOTE</td>
             <td width='30' class='nonebordercst'></td>
-            <td width='120' align="center">DITERIMA OLEH</td>
+            <td width='150' align="center">DITERIMA OLEH</td>
         </tr>
         <tr>
-            <td width='340' height='50' style='border-bottom:none; vertical-align:top;'><?= strtoupper($header[0]->note); ?></td>
+            <td width='320' height='50' style='border-bottom:none; vertical-align:top;'><?= strtoupper($header[0]->note); ?></td>
             <td class='nonebordercst'></td>
             <td></td>
         </tr>
         <tr>
             <td style='border-top:none;'></td>
             <td class='nonebordercst'></td>
-            <td align="center">WAREHOUSE</td>
+            <td align="center">FINANCE &amp; ACCOUNTING</td>
         </tr>
     </table>
 
