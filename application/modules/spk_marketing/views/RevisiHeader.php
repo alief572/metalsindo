@@ -176,6 +176,7 @@ foreach ($results['tr_spk'] as $tr_spk) {
 										<tbody id="list_penawaran_slot">
 											<?php $loop = 0;
 											$sum_total_harga = 0;
+											$crcl_list = isset($results['crcl']) && is_array($results['crcl']) ? $results['crcl'] : (isset($crcl) && is_array($crcl) ? $crcl : []);
 											foreach ($results['dtspk'] as $dt) {
 												$thg = number_format($dt->total_harga, 2, ',', '.');
 												$disc_val = isset($dt->nominal_discount) ? $dt->nominal_discount : 0;
@@ -183,10 +184,13 @@ foreach ($results['tr_spk'] as $tr_spk) {
 												$harga_penawaran_fmt = number_format($dt->harga_penawaran, 2, ',', '.');
 												$harga_deal_fmt = number_format($dt->harga_deal, 2, ',', '.');
 												$qty_fmt = number_format($dt->qty_produk, 2, ',', '.');
-												$width_fmt = number_format($dt->width, 2, ',', '.');
-												$length_fmt = number_format($dt->length, 2, ',', '.');
+												$width_val = !empty($dt->width) ? $dt->width : 0;
+												$width_fmt = number_format($width_val, 2, ',', '.');
+												$length_val = !empty($dt->length) ? $dt->length : 0;
+												$length_fmt = number_format($length_val, 2, ',', '.');
 												$sum_total_harga += $dt->total_harga;
 												$loop++;
+												$deal_checked = ($dt->deal == '1') ? 'checked' : '';
 												echo "
 			<tr id='tabel_penawaran_$loop'>
 			<th hidden><input type='text' class='form-control' 	value='$dt->id_child_penawaran' readonly id='dp_id_child_penawaran_$loop' required name='dp[$loop][id_child_penawaran]'></th>
@@ -200,32 +204,24 @@ foreach ($results['tr_spk'] as $tr_spk) {
 			<th><input type='text' class='form-control nominal-format' value='$harga_deal_fmt' onchange='return AksiDetail($loop);' id='dp_hgdeal_$loop' required name='dp[$loop][hgdeal]'></th>
 			<th><input type='text' class='form-control nominal-format' value='$disc_formatted' onchange='return onItemDiscountInput($loop);' id='dp_discount_$loop' name='dp[$loop][nominal_discount]'></th>
 			<th><input type='text' class='form-control nominal-format' value='$qty_fmt' onchange='return AksiDetail($loop);' id='dp_qty_$loop' required name='dp[$loop][qty]'></th>
-			<th hidden><input type='text' class='form-control' 	value='$dt->weight' onchange='return AksiDetail($loop);'id='dp_weight_$loop' required name='dp[$loop][weight]'></th>
-			<th id='total_weight_$loop' hidden><input type='text' value='$dt->total_weight' class='form-control' id='dp_twight_$loop' required name='dp[$loop][twight]'></th>
+			<th hidden><input type='text' class='form-control' 	value='$dt->weight' onchange='return AksiDetail($loop);'id='dp_weight_$loop' name='dp[$loop][weight]'></th>
+			<th id='total_weight_$loop' hidden><input type='text' value='$dt->total_weight' class='form-control' id='dp_twight_$loop' name='dp[$loop][twight]'></th>
 			
 			<th id='total_harga_$loop'><div hidden><input type='text' class='form-control' value='$dt->total_harga' readonly id='dp_tharga_$loop' required name='dp[$loop][tharga]'></div>
 			<input type='text' class='form-control' value='" . $thg . "' readonly></th>
 			
-			<th><input type='date' class='form-control'   value='$dt->delivery' id='dp_ddate_$loop' data-role='qtip' required name='dp[$loop][ddate]'></th>
+			<th><input type='date' class='form-control'   value='$dt->delivery' id='dp_ddate_$loop' data-role='qtip' name='dp[$loop][ddate]'></th>
 			
-			<th><select id='dp_crcl_$loop' name='dp[$loop][crcl]' class='form-control select' required>
+			<th><select id='dp_crcl_$loop' name='dp[$loop][crcl]' class='form-control select'>
 						<option value=''>--Pilih--</option>";
-												if (isset($crcl) && is_array($crcl)) {
-													foreach ($crcl as $c_item) {
-														$sel_crcl = ($dt->crcl == $c_item->id_dt_inquery) ? 'selected' : '';
-														echo "<option value='$c_item->id_dt_inquery' $sel_crcl>$c_item->id_surat_crcl</option>";
-													}
+												foreach ($crcl_list as $c_item) {
+													$sel_crcl = ($dt->crcl == $c_item->id_dt_inquery) ? 'selected' : '';
+													echo "<option value='$c_item->id_dt_inquery' $sel_crcl>$c_item->id_surat_crcl</option>";
 												}
 												echo "</select></th>
-		<th id='total_keterangan_$loop'><textarea class='form-control' id='dp_keterangan_$loop' required name='dp[$loop][keterangan]' rows='2'>$dt->keterangan</textarea> </th>
-		";
-
-												if ($dt->deal == '1') {
-													echo "<th><input type='checkbox' value='1' checked id='dp_deal_$loop' required name='dp[$loop][deal]'></th>";
-												} else {
-													echo "<th><input type='checkbox' value='1' id='dp_deal_$loop' required name='dp[$loop][deal]'></th>";
-												}
-												echo "</tr>";
+		<th id='total_keterangan_$loop'><textarea class='form-control' id='dp_keterangan_$loop' name='dp[$loop][keterangan]' rows='2'>$dt->keterangan</textarea> </th>
+			<th><input type='checkbox' value='1' $deal_checked id='dp_deal_$loop' name='dp[$loop][deal]'></th>
+			</tr>";
 											};
 											$total_discount_val = isset($tr_spk->total_discount) ? $tr_spk->total_discount : 0;
 											$ppn_val = isset($tr_spk->ppn) ? $tr_spk->ppn : 0;

@@ -243,6 +243,65 @@ class Spk_marketing extends Admin_Controller
 		INNER JOIN ms_inventory_category3 b ON b.id_category3 = a.id_material
 		WHERE a.id_spkmarketing ='$id' AND a.deal='1'")->result();
 
+		$spk = $this->db->query("SELECT a.* FROM tr_spk_marketing a WHERE a.id_spkmarketing='$id'")->row();
+		$nomorpnwr = !empty($spk) ? $spk->no_penawaran : '';
+
+		// Ambil semua item dari penawaran saat ini
+		$dtpnwr = $this->db->query("SELECT a.*, b.nama as nama, b.maker as maker, b.id_bentuk FROM child_penawaran a
+		INNER JOIN ms_inventory_category3 b ON b.id_category3 = a.id_category3
+		WHERE a.no_penawaran='$nomorpnwr'")->result();
+
+		// Index item spk lama berdasarkan id_child_penawaran
+		$spk_by_child = [];
+		foreach ($dtspk as $item) {
+			$item->is_new = false;
+			$spk_by_child[$item->id_child_penawaran] = $item;
+		}
+
+		// Gabungkan data: item lama dipertahankan, item tambahan baru dari penawaran ditambahkan
+		$merged_items = [];
+		$handled_spk_ids = [];
+
+		if (!empty($dtpnwr)) {
+			foreach ($dtpnwr as $pnwr) {
+				if (isset($spk_by_child[$pnwr->id_child_penawaran])) {
+					$merged_items[] = $spk_by_child[$pnwr->id_child_penawaran];
+					$handled_spk_ids[$pnwr->id_child_penawaran] = true;
+				} else {
+					// Item tambahan baru dari penawaran yang belum ada di SPK
+					$new_item = new stdClass();
+					$new_item->id_child_penawaran = $pnwr->id_child_penawaran;
+					$new_item->id_material        = $pnwr->id_category3;
+					$new_item->nama               = $pnwr->nama;
+					$new_item->maker              = $pnwr->maker;
+					$new_item->thickness          = $pnwr->thickness;
+					$new_item->width              = !empty($pnwr->width) ? $pnwr->width : 0;
+					$new_item->length             = !empty($pnwr->length) ? $pnwr->length : 0;
+					$new_item->part_number        = !empty($pnwr->lotno) ? $pnwr->lotno : '';
+					$new_item->harga_penawaran    = $pnwr->harga_penawaran_cust;
+					$new_item->harga_deal         = $pnwr->harga_penawaran_cust;
+					$new_item->nominal_discount   = 0;
+					$new_item->qty_produk         = 0;
+					$new_item->weight             = 0;
+					$new_item->total_weight       = 0;
+					$new_item->total_harga        = 0;
+					$new_item->delivery           = '';
+					$new_item->crcl               = '';
+					$new_item->keterangan         = !empty($pnwr->keterangan) ? $pnwr->keterangan : '';
+					$new_item->deal               = 0;
+					$new_item->is_new             = true;
+					$merged_items[] = $new_item;
+				}
+			}
+		}
+
+		// Jika ada item lama di SPK yang id_child_penawaran nya tidak cocok di dtpnwr
+		foreach ($dtspk as $item) {
+			if (!isset($handled_spk_ids[$item->id_child_penawaran])) {
+				$merged_items[] = $item;
+			}
+		}
+
 		$check_sheet = $this->db->query("SELECT a.*, b.nama, b.maker FROM dt_spkmarketing a
 		JOIN ms_inventory_category3 b ON b.id_category3 = a.id_material
 		WHERE a.id_spkmarketing ='$id' AND a.deal='1' AND b.id_bentuk = 'B2000002'")->result();
@@ -250,18 +309,16 @@ class Spk_marketing extends Admin_Controller
 		$tipe_sheet = 0;
 		if (count($check_sheet) > 0) {
 			$tipe_sheet = 1;
+		} else if (!empty($dtpnwr)) {
+			foreach ($dtpnwr as $pnwr) {
+				if ($pnwr->id_bentuk == 'B2000002') {
+					$tipe_sheet = 1;
+					break;
+				}
+			}
 		}
 
-		$spk = $this->db->query("SELECT a.* FROM tr_spk_marketing a WHERE a.id_spkmarketing='$id'")->row();
-		$nomorpnwr = $spk->no_penawaran;
-		$dtpnwr = $this->db->query("SELECT a.* FROM child_penawaran a WHERE a.no_penawaran='$nomorpnwr'")->result();
-
-
-
 		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran', 'no_penawaran', $nomorpnwr);
-
-		// print_r($penawaran);
-		// exit;
 
 		$customer = $this->db
 			->select('a.id_customer, b.name_customer')
@@ -274,15 +331,27 @@ class Spk_marketing extends Admin_Controller
 			->result();
 		$karyawan = $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted);
 		$mata_uang = $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted);
+
+		// Ambil list CRCL customer
+		$crcl = [];
+		if (!empty($spk) && !empty($spk->id_customer)) {
+			$cr = $this->db->query("SELECT * FROM tr_inquiry WHERE id_customer = '$spk->id_customer'")->result();
+			if (!empty($cr)) {
+				$idcr = $cr[0]->no_inquiry;
+				$crcl = $this->db->query("SELECT * FROM dt_inquery_transaksi WHERE no_inquery = '$idcr'")->result();
+			}
+		}
+
 		$data = [
 			'tr_spk' => $tr_spk,
-			'dtspk' => $dtspk,
+			'dtspk' => $merged_items,
 			'dtpnwr' => $dtpnwr,
 			'penawaran' => $penawaran,
 			'customer' => $customer,
 			'karyawan' => $karyawan,
 			'mata_uang' => $mata_uang,
-			'tipe_sheet' => $tipe_sheet
+			'tipe_sheet' => $tipe_sheet,
+			'crcl' => $crcl
 		];
 		$this->template->set('results', $data);
 		$this->template->title('Revisi SPK Marketing');
@@ -679,44 +748,50 @@ class Spk_marketing extends Admin_Controller
 	{
 		$no_penawaran = $_GET['no_penawaran'];
 		$dt1	= $this->db->query("SELECT * FROM tr_penawaran WHERE no_penawaran = '$no_penawaran' ")->result();
+		if (empty($dt1)) {
+			return;
+		}
 		$id_customer = $dt1[0]->id_customer;
 		$nm	= $this->db->query("SELECT * FROM master_customers WHERE id_customer = '$id_customer' ")->result();
-		$nama = $nm[0]->name_customer;
+		$nama = !empty($nm) ? $nm[0]->name_customer : '';
 		$dt	= $this->db->query("SELECT a.*, b.nama as nama3, b.maker as maker, b.hardness as hard FROM child_penawaran as a inner join ms_inventory_category3 as b on a.id_category3 = b.id_category3 WHERE no_penawaran = '$no_penawaran'  ")->result();
 		$cr	= $this->db->query("SELECT * FROM tr_inquiry WHERE id_customer = '$id_customer' ")->result();
-		$idcr = $cr[0]->no_inquiry;
+		$idcr = !empty($cr) ? $cr[0]->no_inquiry : '';
 		$loop = 0;
-		foreach ($dt as $dt) {
+		foreach ($dt as $row_dt) {
 			$loop++;
-			$id_category3 = $dt->id_category3;
-			$harga_penawaran_fmt = number_format($dt->harga_penawaran_cust, 2, ',', '.');
-			$crcl	= $this->db->query("SELECT * FROM dt_inquery_transaksi WHERE no_inquery = '$idcr' AND id_category3='$id_category3' ")->result();
+			$id_category3 = $row_dt->id_category3;
+			$harga_penawaran_fmt = number_format($row_dt->harga_penawaran_cust, 2, ',', '.');
+			$crcl	= !empty($idcr) ? $this->db->query("SELECT * FROM dt_inquery_transaksi WHERE no_inquery = '$idcr' AND id_category3='$id_category3' ")->result() : [];
+			$jcc = 0;
+			$th = 0;
+			$thg = '0,00';
 			echo "
 		<tr id='tabel_penawaran_$loop'>
-			<th hidden><input type='text' class='form-control' value='$dt->id_child_penawaran' readonly id='dp_id_child_penawaran_$loop' required name='dp[$loop][id_child_penawaran]'></th>
-			<th hidden><input type='text' class='form-control' value='$dt->id_category3' readonly id='dp_idmaterial_$loop' required name='dp[$loop][idmaterial]'></th>
-			<th><input type='text' class='form-control' value='$dt->nama3|$dt->maker' readonly id='dp_noalloy_$loop' required name='dp[$loop][noalloy]'></th>
-			<th><input type='text' class='form-control' value='$dt->thickness' readonly id='dp_thickness_$loop' required name='dp[$loop][thickness]'></th>
-			<th><input type='text' class='form-control' value='$dt->width' id='dp_width_$loop' required name='dp[$loop][width]'></th>
-			<th><input type='text' class='form-control' value='$dt->length' id='dp_length_$loop' required name='dp[$loop][length]'></th>
-			<th id='part_number'><input type='text' class='form-control' value='$dt->lotno' readonly id='dp_part_number_$loop' required name='dp[$loop][part_number]'></th>
+			<th hidden><input type='text' class='form-control' value='$row_dt->id_child_penawaran' readonly id='dp_id_child_penawaran_$loop' required name='dp[$loop][id_child_penawaran]'></th>
+			<th hidden><input type='text' class='form-control' value='$row_dt->id_category3' readonly id='dp_idmaterial_$loop' required name='dp[$loop][idmaterial]'></th>
+			<th><input type='text' class='form-control' value='$row_dt->nama3|$row_dt->maker' readonly id='dp_noalloy_$loop' required name='dp[$loop][noalloy]'></th>
+			<th><input type='text' class='form-control' value='$row_dt->thickness' readonly id='dp_thickness_$loop' required name='dp[$loop][thickness]'></th>
+			<th><input type='text' class='form-control' value='$row_dt->width' id='dp_width_$loop' required name='dp[$loop][width]'></th>
+			<th><input type='text' class='form-control' value='$row_dt->length' id='dp_length_$loop' required name='dp[$loop][length]'></th>
+			<th id='part_number'><input type='text' class='form-control' value='$row_dt->lotno' readonly id='dp_part_number_$loop' required name='dp[$loop][part_number]'></th>
 			<th><input type='text' class='form-control nominal-format' value='$harga_penawaran_fmt' readonly id='dp_hgpenwaran_$loop' required name='dp[$loop][hgpenaaran]'></th>
 			<th><input type='text' class='form-control nominal-format' value='$harga_penawaran_fmt' onchange='return AksiDetail($loop);' id='dp_hgdeal_$loop' required name='dp[$loop][hgdeal]'></th>
 			<th><input type='text' class='form-control nominal-format' value='0' onchange='return onItemDiscountInput($loop);' id='dp_discount_$loop' name='dp[$loop][nominal_discount]'></th>
 			<th ><input type='text' class='form-control nominal-format' onchange='return AksiDetail($loop);' id='dp_qty_$loop' required name='dp[$loop][qty]'></th>
 			<th hidden><input type='text' class='form-control' onchange='return AksiDetail($loop);'id='dp_weight_$loop' required name='dp[$loop][weight]'></th>
 			<th id='total_weight_$loop' hidden><input type='text' class='form-control' value='$jcc'  id='dp_twight_$loop' required name='dp[$loop][twight]'></th>
-			<th id='total_harga_$loop'><div hidden><input type='text' class='form-control' value='$th' readonly id='dp_tharga_$id' required name='dp[$id][tharga]'></div>
+			<th id='total_harga_$loop'><div hidden><input type='text' class='form-control' value='$th' readonly id='dp_tharga_$loop' required name='dp[$loop][tharga]'></div>
 			<input type='text' class='form-control' value='$thg' readonly></th>
 			<th><input type='date' class='form-control'   id='dp_ddate_$loop' data-role='qtip' required name='dp[$loop][ddate]'></th>
-			<th><select id='dp_crcl_$loop' name='dp[$loop][crcl]' class='form-control select' required>
+			<th><select id='dp_crcl_$loop' name='dp[$loop][crcl]' class='form-control select'>
 						<option value=''>--Pilih--</option>";
-			foreach ($crcl as $crcl) {
-				echo "<option value='$crcl->id_dt_inquery'>$crcl->id_surat_crcl</option>";
+			foreach ($crcl as $c_item) {
+				echo "<option value='$c_item->id_dt_inquery'>$c_item->id_surat_crcl</option>";
 			}
 			echo "</select></th>
-		    <th id='total_keterangan_$loop'><textarea class='form-control' id='dp_keterangan_$loop' required name='dp[$id][keterangan]' rows='2'></textarea> </th>
-			<th><input type='checkbox' value='1' id='dp_deal_$loop' required name='dp[$loop][deal]'></th>
+		    <th id='total_keterangan_$loop'><textarea class='form-control' id='dp_keterangan_$loop' name='dp[$loop][keterangan]' rows='2'></textarea> </th>
+			<th><input type='checkbox' value='1' id='dp_deal_$loop' name='dp[$loop][deal]'></th>
 		</tr>
 		";
 		};
