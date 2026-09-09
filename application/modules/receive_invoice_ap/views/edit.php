@@ -15,7 +15,7 @@
                                     <?php
                                     $tglinv = date('Y-m-d');
                                     ?>
-                                    <label for="tgl_bayar" class="col-sm-4 control-label">Tgl Bayar :</label>
+                                    <label for="tgl_bayar" class="col-sm-4 control-label">Tgl Invoice :</label>
                                     <div class="col-sm-6">
                                         <input type="date" name="tgl_bayar" id="tgl_bayar" class="form-control input-sm tanggal" value="<?php echo date('Y-m-d', strtotime($header->tgl_bayar)) ?>">
                                     </div>
@@ -746,6 +746,25 @@
         var tanggal_incoming = $(this).data('tanggal_incoming');
         var no = $(this).data('no');
 
+        var exists = false;
+        $('#list_item_mutasi input[name*="[id_incoming]"]').each(function() {
+            if ($(this).val() == id_incoming) {
+                exists = true;
+                return false;
+            }
+        });
+
+        if (exists) {
+            swal({
+                title: "Peringatan!",
+                text: "Incoming " + id_incoming + " sudah ditambahkan ke daftar!",
+                type: "warning",
+                timer: 3000
+            });
+            $(this).removeClass('btn-warning add_incoming').addClass('btn-danger').prop('disabled', true).html('<i class="fa fa-check"></i> Added');
+            return false;
+        }
+
         var Rows = '<tr class="tr_inc_add_' + no_list + '">';
 
         Rows += '<td class="text-center">';
@@ -798,7 +817,8 @@
         $('#list_item_mutasi').append(Rows);
         $('.divide').autoNumeric();
 
-        $('.add_incoming_' + no).html('Added !');
+        $(this).removeClass('btn-warning add_incoming').addClass('btn-danger').prop('disabled', true).html('<i class="fa fa-check"></i> Added');
+        $('.add_incoming_' + no).html('<i class="fa fa-check"></i> Added');
         $('.add_incoming_' + no).attr('disabled', true);
 
         hitung_grand_total();
@@ -811,6 +831,10 @@
 
         $('.tr_inc_add_' + no).remove();
         hitung_grand_total();
+
+        if ($.fn.DataTable.isDataTable('#list_item_stokk')) {
+            $('#list_item_stokk').DataTable().ajax.reload(null, false);
+        }
     });
 
 
