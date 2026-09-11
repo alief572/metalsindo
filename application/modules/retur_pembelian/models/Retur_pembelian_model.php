@@ -249,12 +249,42 @@ class Retur_pembelian_model extends BF_Model
 	}
 
 	/**
-	 * Mengambil detail item material dari Receive Invoice AP melalui join chain.
+	 * Mengambil akumulasi kuantitas retur aktif sebelumnya untuk id_detail_po dan lotno tertentu.
+	 * @param int|string $id_detail_po
+	 * @param string|null $lotno
+	 * @param string|null $exclude_no_surat
+	 * @return object {total_retur_kg, total_retur_sheet}
+	 */
+	public function get_qty_already_returned($id_detail_po, $lotno = null, $exclude_no_surat = null)
+	{
+		$this->db->select('COALESCE(SUM(dt.jumlah_retur), 0) AS total_retur_kg, COALESCE(SUM(dt.qty_sheet_retur), 0) AS total_retur_sheet', FALSE);
+		$this->db->from('dt_retur_pembelian dt');
+		$this->db->join('tr_retur_pembelian tr', 'tr.no_surat = dt.id_header');
+		$this->db->where('tr.deleted_by IS NULL');
+		$this->db->where('dt.id_detail_po', $id_detail_po);
+		if (!empty($lotno)) {
+			$this->db->where('dt.lotno', $lotno);
+		}
+		if (!empty($exclude_no_surat)) {
+			$this->db->where('tr.no_surat !=', $exclude_no_surat);
+		}
+		return $this->db->get()->row();
+	}
+
+	/**
+	 * Mengambil detail item material dari Receive Invoice AP melalui join chain,
+	 * dilengkapi dengan pelacakan kuantitas retur yang sudah pernah dibuat sebelumnya.
 	 * @param string $id_rec_inv_ap
+	 * @param string|null $exclude_no_surat Nomor surat retur yang dikecualikan (dipakai saat mode edit)
 	 * @return array of objects
 	 */
-	public function get_detail_by_receive_invoice_ap($id_rec_inv_ap)
+	public function get_detail_by_receive_invoice_ap($id_rec_inv_ap, $exclude_no_surat = null)
 	{
+		$exclude_filter = '';
+		if (!empty($exclude_no_surat)) {
+			$exclude_filter = " AND rth.no_surat != " . $this->db->escape($exclude_no_surat);
+		}
+
 		$this->db->select('
 			dtp.id_dt_po,
 			dtp.no_po,
@@ -271,7 +301,9 @@ class Retur_pembelian_model extends BF_Model
 			mic3.total_weight,
 			ti.tanggal AS tanggal_incoming,
 			riad.id_rec_inv_ap,
-			tpo.matauang
+			tpo.matauang,
+			COALESCE(rtd.total_retur_kg, 0) AS qty_already_retur_kg,
+			COALESCE(rtd.total_retur_sheet, 0) AS qty_already_retur_sheet
 		', FALSE);
 		$this->db->from('tr_receive_invoice_ap_detail riad');
 		$this->db->join('tr_incoming ti', 'ti.id_incoming = riad.id_incoming');
@@ -279,7 +311,19 @@ class Retur_pembelian_model extends BF_Model
 		$this->db->join('dt_trans_po dtp', 'dtp.id_dt_po = di.id_dt_po');
 		$this->db->join('ms_inventory_category3 mic3', 'mic3.id_category3 = dtp.idmaterial', 'left');
 		$this->db->join('tr_purchase_order tpo', 'tpo.no_po = dtp.no_po', 'left');
+		$this->db->join("
+			(SELECT 
+				rtd_inner.id_detail_po,
+				COALESCE(rtd_inner.lotno, '') AS lotno_grp,
+				SUM(rtd_inner.jumlah_retur) AS total_retur_kg,
+				SUM(rtd_inner.qty_sheet_retur) AS total_retur_sheet
+			FROM dt_retur_pembelian rtd_inner
+			JOIN tr_retur_pembelian rth ON rth.no_surat = rtd_inner.id_header
+			WHERE rth.deleted_by IS NULL {$exclude_filter}
+			GROUP BY rtd_inner.id_detail_po, COALESCE(rtd_inner.lotno, '')
+			) rtd", "rtd.id_detail_po = dtp.id_dt_po AND (rtd.lotno_grp = COALESCE(di.lotno, '') OR di.lotno IS NULL)", 'left');
 		$this->db->where('riad.id_rec_inv_ap', $id_rec_inv_ap);
 		return $this->db->get()->result();
 	}
 }
+

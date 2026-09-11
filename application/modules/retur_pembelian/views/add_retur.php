@@ -334,7 +334,80 @@
         }
     });
 
-    $(document).on('input change keyup', '.hitung_detail_total, #footer_ppn_persen', function() {
+    $(document).on('change', '#check_all_detail', function() {
+        var isChecked = $(this).is(':checked');
+        $('.check_item:not(:disabled)').prop('checked', isChecked);
+        $('.list_detail_po tbody tr').each(function() {
+            var $chk = $(this).find('.check_item');
+            if ($chk.length > 0 && !$chk.is(':disabled')) {
+                var isSheetInput = $(this).find('input[data-is_sheet]');
+                var isSheet = (isSheetInput.length > 0 && isSheetInput.data('is_sheet') == '1');
+                var returInput = isSheet ? $(this).find('input[name$="[retur_sheet]"]') : $(this).find('input[name$="[retur]"]');
+                if (!isChecked) {
+                    returInput.autoNumeric('set', 0);
+                }
+            }
+        });
+        hitungFooter();
+    });
+
+    $(document).on('change', '.check_item', function() {
+        var isChecked = $(this).is(':checked');
+        var $row = $(this).closest('tr');
+        var isSheetInput = $row.find('input[data-is_sheet]');
+        var isSheet = (isSheetInput.length > 0 && isSheetInput.data('is_sheet') == '1');
+        var returInput = isSheet ? $row.find('input[name$="[retur_sheet]"]') : $row.find('input[name$="[retur]"]');
+        var maxQty = parseFloat(returInput.data('max-qty')) || 0;
+
+        if (isChecked) {
+            var curVal = parseFloat(returInput.val().split(',').join('')) || 0;
+            if (curVal <= 0 && maxQty > 0) {
+                returInput.focus();
+            }
+        } else {
+            returInput.autoNumeric('set', 0);
+        }
+
+        var totalCheckboxes = $('.check_item:not(:disabled)').length;
+        var totalChecked = $('.check_item:not(:disabled):checked').length;
+        $('#check_all_detail').prop('checked', totalCheckboxes > 0 && totalCheckboxes === totalChecked);
+
+        hitungFooter();
+    });
+
+    $(document).on('input change keyup', '.hitung_detail_total', function() {
+        var $row = $(this).closest('tr');
+        var $chk = $row.find('.check_item');
+        var val = parseFloat($(this).val().split(',').join('')) || 0;
+        var maxQty = parseFloat($(this).data('max-qty')) || 0;
+
+        if ($chk.length > 0 && !$chk.is(':disabled')) {
+            if (val > 0) {
+                $chk.prop('checked', true);
+            } else {
+                $chk.prop('checked', false);
+            }
+        }
+
+        if (maxQty > 0 && val > maxQty) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Kuantitas Melebihi Batas!',
+                text: 'Maksimal kuantitas yang bisa diretur untuk item ini adalah ' + maxQty,
+                timer: 2000,
+                showConfirmButton: false
+            });
+            $(this).autoNumeric('set', maxQty);
+        }
+
+        var totalCheckboxes = $('.check_item:not(:disabled)').length;
+        var totalChecked = $('.check_item:not(:disabled):checked').length;
+        $('#check_all_detail').prop('checked', totalCheckboxes > 0 && totalCheckboxes === totalChecked);
+
+        hitungFooter();
+    });
+
+    $(document).on('input change keyup', '#footer_ppn_persen', function() {
         hitungFooter();
     });
 
@@ -475,6 +548,31 @@
             return false;
         }
 
+        // Validasi minimal 1 item dipilih dan qty retur > 0
+        var hasValidItem = false;
+        $('.list_detail_po tbody tr').each(function() {
+            var $chk = $(this).find('.check_item');
+            if ($chk.is(':checked')) {
+                var isSheetInput = $(this).find('input[data-is_sheet]');
+                var isSheet = (isSheetInput.length > 0 && isSheetInput.data('is_sheet') == '1');
+                var returInput = isSheet ? $(this).find('input[name$="[retur_sheet]"]') : $(this).find('input[name$="[retur]"]');
+                var val = parseFloat(returInput.val().split(',').join('')) || 0;
+                if (val > 0) {
+                    hasValidItem = true;
+                    return false;
+                }
+            }
+        });
+
+        if (!hasValidItem) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian !',
+                text: 'Silakan pilih dan centang minimal 1 item material untuk diretur dengan kuantitas lebih dari 0!'
+            });
+            return false;
+        }
+
         Swal.fire({
             icon: 'warning',
             title: 'Anda yakin ?',
@@ -543,6 +641,9 @@
         var subtotal = 0;
 
         $('.list_detail_po tbody tr').each(function() {
+            var $chk = $(this).find('.check_item');
+            var isChecked = ($chk.length === 0 || $chk.is(':checked'));
+
             var isSheetInput = $(this).find('input[data-is_sheet]');
             var isSheet = (isSheetInput.length > 0 && isSheetInput.data('is_sheet') == '1');
 
@@ -558,9 +659,10 @@
             totalQtyReceive += qtyRecVal;
 
             var returVal = 0;
-            if (returInput.length > 0 && returInput.val()) {
+            if (isChecked && returInput.length > 0 && returInput.val()) {
                 returVal = parseFloat(returInput.val().split(',').join('')) || 0;
             }
+
             totalRetur += returVal;
 
             var hargaVal = 0;
@@ -568,7 +670,7 @@
                 hargaVal = parseFloat(hargaInput.val().split(',').join('')) || 0;
             }
 
-            var rowTotal = returVal * hargaVal;
+            var rowTotal = isChecked ? (returVal * hargaVal) : 0;
             if (rowTotalInput.length > 0) {
                 rowTotalInput.autoNumeric('set', rowTotal);
             }

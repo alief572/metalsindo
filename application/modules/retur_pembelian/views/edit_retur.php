@@ -296,88 +296,156 @@
                 ?>
                 <?php if (!empty($id_rec_inv_ap)) : ?>
                     <?php
+                    // Indeks item yang sudah tersimpan di retur ini
+                    $saved_items = [];
+                    foreach ($detail as $d_item) {
+                        $k = $d_item->id_detail_po . '_' . trim($d_item->lotno);
+                        $saved_items[$k] = $d_item;
+                    }
+
+                    $items_to_render = !empty($all_invoice_items) ? $all_invoice_items : $detail;
+
                     echo '<div class="table-responsive">';
                     echo '<table class="table table-striped table-bordered table-hover table-detail-retur" style="font-size: 13px;">';
                     echo '<thead style="background-color: #2c3e50; color: #fff;">';
                     echo '<tr>';
-                    echo '<th class="text-center" style="width: 10%; vertical-align: middle;">Tgl Incoming</th>';
-                    echo '<th class="text-center" style="width: 12%; vertical-align: middle;">Lot Number</th>';
-                    echo '<th class="text-center" style="width: 18%; vertical-align: middle;">Nama Material</th>';
+                    echo '<th class="text-center" style="width: 4%; vertical-align: middle;"><input type="checkbox" id="check_all_detail" title="Pilih Semua" style="cursor: pointer; width: 16px; height: 16px;"></th>';
+                    echo '<th class="text-center" style="width: 9%; vertical-align: middle;">Tgl Incoming</th>';
+                    echo '<th class="text-center" style="width: 11%; vertical-align: middle;">Lot Number</th>';
+                    echo '<th class="text-center" style="width: 17%; vertical-align: middle;">Nama Material</th>';
                     echo '<th class="text-center" style="width: 7%; vertical-align: middle;">Width</th>';
                     echo '<th class="text-center" style="width: 8%; vertical-align: middle;">Qty Order</th>';
-                    echo '<th class="text-center" style="width: 12%; vertical-align: middle;">Qty Rec</th>';
-                    echo '<th class="text-center" style="width: 12%; vertical-align: middle;">Qty Retur</th>';
-                    echo '<th class="text-center" style="width: 11%; vertical-align: middle;">Harga Satuan</th>';
-                    echo '<th class="text-center" style="width: 10%; vertical-align: middle;">Total Harga</th>';
+                    echo '<th class="text-center" style="width: 13%; vertical-align: middle;">Qty Rec</th>';
+                    echo '<th class="text-center" style="width: 13%; vertical-align: middle;">Qty Retur</th>';
+                    echo '<th class="text-center" style="width: 9%; vertical-align: middle;">Harga Satuan</th>';
+                    echo '<th class="text-center" style="width: 9%; vertical-align: middle;">Total Harga</th>';
                     echo '</tr>';
                     echo '</thead>';
                     echo '<tbody>';
 
                     $no_detail = 0;
-                    foreach ($detail as $item_detail) {
+                    foreach ($items_to_render as $item_render) {
                         $no_detail++;
 
-                        $material = !empty($item_detail->id_material) ? $this->db->select('id_bentuk')->get_where('ms_inventory_category3', ['id_category3' => $item_detail->id_material])->row() : null;
+                        $id_dt_po = isset($item_render->id_dt_po) ? $item_render->id_dt_po : $item_render->id_detail_po;
+                        $lotno = isset($item_render->lotno) ? $item_render->lotno : '';
+                        $k = $id_dt_po . '_' . trim($lotno);
+                        $is_saved_in_this_retur = isset($saved_items[$k]);
+                        $saved_obj = $is_saved_in_this_retur ? $saved_items[$k] : null;
+
+                        $id_material = isset($item_render->idmaterial) ? $item_render->idmaterial : $item_render->id_material;
+                        $nama_material = isset($item_render->namamaterial) ? $item_render->namamaterial : $item_render->nama_material;
+                        $width = isset($item_render->width) ? (float)$item_render->width : 0;
+                        $qty_order = isset($item_render->totalwidth) ? (float)$item_render->totalwidth : (float)$item_render->qty_order;
+                        $no_po = isset($item_render->no_po) ? $item_render->no_po : '';
+                        $id_pr = isset($item_render->idpr) ? $item_render->idpr : (isset($item_render->id_pr) ? $item_render->id_pr : '');
+                        $tgl_incoming = isset($item_render->tanggal_incoming) ? $item_render->tanggal_incoming : $header->tgl_retur;
+
+                        $material = !empty($id_material) ? $this->db->select('id_bentuk, total_weight')->get_where('ms_inventory_category3', ['id_category3' => $id_material])->row() : null;
                         $is_sheet = (!empty($material) && $material->id_bentuk == 'B2000002');
                         $unit_label = $is_sheet ? 'Sheet' : 'KGS';
                         $price_label = $is_sheet ? '/Sheet' : '/Kg';
-                        $qty_rec_val = $is_sheet ? $item_detail->qty_sheet : $item_detail->qty_receive;
-                        $qty_retur_val = $is_sheet ? $item_detail->qty_sheet_retur : $item_detail->jumlah_retur;
-                        $harga = (float) $item_detail->harga_satuan;
-                        $total_harga_item = $qty_retur_val * $harga;
 
-                        echo '<tr>';
-                        echo '<td class="text-center" style="vertical-align: middle;">';
-                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][id]" value="' . $item_detail->id_detail_po . '">';
-                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][no_po]" value="' . $item_detail->no_po . '">';
-                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][id_pr]" value="' . $item_detail->id_pr . '">';
-                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][idmaterial]" value="' . $item_detail->id_material . '">';
-                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][namamaterial]" value="' . $item_detail->nama_material . '">';
-                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][width]" value="' . $item_detail->width . '">';
-                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][qty_order]" value="' . $item_detail->qty_order . '">';
-                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][lotno]" value="' . $item_detail->lotno . '">';
-                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][is_sheet]" value="' . ($is_sheet ? '1' : '0') . '">';
-                        echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][matauang]" value="' . $matauang . '">';
-                        echo date('d/m/Y', strtotime($header->tgl_retur));
-                        echo '</td>';
-                        echo '<td class="text-center" style="vertical-align: middle;"><span class="badge bg-gray text-bold" style="font-size: 11px;">' . $item_detail->lotno . '</span></td>';
-                        echo '<td style="vertical-align: middle;"><b>' . $item_detail->nama_material . '</b></td>';
-                        echo '<td class="text-right" style="vertical-align: middle;">' . number_format($item_detail->width, 2) . '</td>';
-                        echo '<td class="text-right" style="vertical-align: middle;">' . number_format($item_detail->qty_order, 2) . '</td>';
+                        $total_weight = !empty($material->total_weight) ? (float)$material->total_weight : (isset($item_render->total_weight) ? (float)$item_render->total_weight : 0);
+
+                        if (isset($item_render->hargasatuan)) {
+                            $harga = $is_sheet ? ((float)$item_render->hargasatuan * $total_weight) : (float)$item_render->hargasatuan;
+                        } else {
+                            $harga = (float)$item_render->harga_satuan;
+                        }
+
+                        $qty_rec_val = $is_sheet ? (int)(isset($item_render->qty_sheet) ? $item_render->qty_sheet : 0) : (float)(isset($item_render->width_recive) ? $item_render->width_recive : $item_render->qty_receive);
                         
-                        // Qty Receive with input-group
+                        // Kuantitas retur pada dokumen lain
+                        $qty_already_retur_other = $is_sheet ? (int)(isset($item_render->qty_already_retur_sheet) ? $item_render->qty_already_retur_sheet : 0) : (float)(isset($item_render->qty_already_retur_kg) ? $item_render->qty_already_retur_kg : 0);
+                        $sisa_available = max(0, $qty_rec_val - $qty_already_retur_other);
+
+                        if ($is_saved_in_this_retur) {
+                            $qty_retur_val = $is_sheet ? (int)$saved_obj->qty_sheet_retur : (float)$saved_obj->jumlah_retur;
+                            $is_checked = true;
+                        } else {
+                            $qty_retur_val = 0;
+                            $is_checked = false;
+                        }
+
+                        $total_harga_item = $qty_retur_val * $harga;
+                        $is_exhausted = (!$is_checked && $sisa_available <= 0);
+
+                        echo '<tr class="row-detail-item" data-no_po="' . $no_po . '" data-no="' . $no_detail . '">';
+
+                        // Checkbox column
+                        echo '<td class="text-center" style="vertical-align: middle;">';
+                        if ($is_exhausted) {
+                            echo '<input type="checkbox" disabled title="Item ini sudah diretur penuh di dokumen lain" style="width: 16px; height: 16px; opacity: 0.5;">';
+                        } else {
+                            echo '<input type="checkbox" class="check_item" name="dt_' . $no_po . '[' . $no_detail . '][check]" value="1" data-no_po="' . $no_po . '" data-no="' . $no_detail . '" ' . ($is_checked ? 'checked' : '') . ' style="cursor: pointer; width: 16px; height: 16px;">';
+                        }
+                        echo '</td>';
+
+                        echo '<td class="text-center" style="vertical-align: middle;">';
+                        echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][id]" value="' . $id_dt_po . '">';
+                        echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][no_po]" value="' . $no_po . '">';
+                        echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][id_pr]" value="' . $id_pr . '">';
+                        echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][idmaterial]" value="' . $id_material . '">';
+                        echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][namamaterial]" value="' . $nama_material . '">';
+                        echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][width]" value="' . $width . '">';
+                        echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][qty_order]" value="' . $qty_order . '">';
+                        echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][lotno]" value="' . $lotno . '">';
+                        echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][is_sheet]" value="' . ($is_sheet ? '1' : '0') . '">';
+                        echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][matauang]" value="' . $matauang . '">';
+                        echo date('d/m/Y', strtotime($tgl_incoming));
+                        echo '</td>';
+                        echo '<td class="text-center" style="vertical-align: middle;"><span class="badge bg-gray text-bold" style="font-size: 11px;">' . $lotno . '</span></td>';
+                        echo '<td style="vertical-align: middle;"><b>' . $nama_material . '</b></td>';
+                        echo '<td class="text-right" style="vertical-align: middle;">' . number_format($width, 2) . '</td>';
+                        echo '<td class="text-right" style="vertical-align: middle;">' . number_format($qty_order, 2) . '</td>';
+                        
+                        // Qty Receive with tracking
                         echo '<td style="vertical-align: middle;">';
                         echo '<div class="input-group input-group-sm">';
                         if ($is_sheet) {
-                            echo '<input type="text" class="form-control text-right auto_num" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][qty_sheet]" value="' . $item_detail->qty_sheet . '" readonly style="background-color: #f9f9f9; font-weight: 500;">';
-                            echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][qty_receive]" value="' . $item_detail->qty_receive . '">';
+                            echo '<input type="text" class="form-control text-right auto_num" name="dt_' . $no_po . '[' . $no_detail . '][qty_sheet]" value="' . $qty_rec_val . '" readonly style="background-color: #f9f9f9; font-weight: 500;">';
+                            echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][qty_receive]" value="' . (isset($item_render->width_recive) ? $item_render->width_recive : $item_render->qty_receive) . '">';
                         } else {
-                            echo '<input type="text" class="form-control text-right auto_num" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][qty_receive]" value="' . $item_detail->qty_receive . '" readonly style="background-color: #f9f9f9; font-weight: 500;">';
-                            echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][qty_sheet]" value="' . $item_detail->qty_sheet . '">';
+                            echo '<input type="text" class="form-control text-right auto_num" name="dt_' . $no_po . '[' . $no_detail . '][qty_receive]" value="' . $qty_rec_val . '" readonly style="background-color: #f9f9f9; font-weight: 500;">';
+                            echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][qty_sheet]" value="' . (isset($item_render->qty_sheet) ? $item_render->qty_sheet : 0) . '">';
                         }
                         echo '<span class="input-group-addon" style="font-size: 10px; font-weight: bold; background: #eee; min-width: 45px;">' . $unit_label . '</span>';
                         echo '</div>';
+                        if ($qty_already_retur_other > 0) {
+                            echo '<div style="font-size: 10px; margin-top: 2px; line-height: 1.2;">';
+                            echo '<span class="text-warning">Retur lain: ' . ($is_sheet ? number_format($qty_already_retur_other) : number_format($qty_already_retur_other, 2)) . '</span><br>';
+                            echo '<span class="text-success text-bold">Sisa: ' . ($is_sheet ? number_format($sisa_available) : number_format($sisa_available, 2)) . ' ' . $unit_label . '</span>';
+                            echo '</div>';
+                        }
                         echo '</td>';
 
-                        // Qty Retur with input-group
+                        // Qty Retur
                         echo '<td style="vertical-align: middle;">';
-                        echo '<div class="input-group input-group-sm">';
-                        if ($is_sheet) {
-                            echo '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][retur_sheet]" data-no_po="' . $item_detail->no_po . '" data-no="' . $no_detail . '" data-is_sheet="1" value="' . $item_detail->qty_sheet_retur . '" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
-                            echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][retur]" value="' . $item_detail->jumlah_retur . '">';
+                        if ($is_exhausted) {
+                            echo '<span class="badge bg-green" style="font-size: 11px;"><i class="fa fa-check"></i> Sudah Full Retur</span>';
+                            echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][retur]" value="0">';
+                            echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][retur_sheet]" value="0">';
                         } else {
-                            echo '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][retur]" data-no_po="' . $item_detail->no_po . '" data-no="' . $no_detail . '" data-is_sheet="0" value="' . $item_detail->jumlah_retur . '" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
-                            echo '<input type="hidden" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][retur_sheet]" value="0">';
+                            echo '<div class="input-group input-group-sm">';
+                            if ($is_sheet) {
+                                echo '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $no_po . '[' . $no_detail . '][retur_sheet]" data-no_po="' . $no_po . '" data-no="' . $no_detail . '" data-is_sheet="1" data-max-qty="' . $sisa_available . '" value="' . $qty_retur_val . '" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
+                                echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][retur]" value="0">';
+                            } else {
+                                echo '<input type="text" class="form-control text-right auto_num hitung_detail_total" name="dt_' . $no_po . '[' . $no_detail . '][retur]" data-no_po="' . $no_po . '" data-no="' . $no_detail . '" data-is_sheet="0" data-max-qty="' . $sisa_available . '" value="' . $qty_retur_val . '" style="border-color: #3c8dbc; font-weight: bold; color: #3c8dbc;">';
+                                echo '<input type="hidden" name="dt_' . $no_po . '[' . $no_detail . '][retur_sheet]" value="0">';
+                            }
+                            echo '<span class="input-group-addon" style="font-size: 10px; font-weight: bold; background: #3c8dbc; color: #fff; min-width: 45px;">' . $unit_label . '</span>';
+                            echo '</div>';
+                            echo '<div style="font-size: 10px; color: #777; margin-top: 2px;">Maks: <b>' . ($is_sheet ? number_format($sisa_available) : number_format($sisa_available, 2)) . ' ' . $unit_label . '</b></div>';
                         }
-                        echo '<span class="input-group-addon" style="font-size: 10px; font-weight: bold; background: #3c8dbc; color: #fff; min-width: 45px;">' . $unit_label . '</span>';
-                        echo '</div>';
                         echo '</td>';
 
                         // Harga Satuan with input-group
                         echo '<td style="vertical-align: middle;">';
                         echo '<div class="input-group input-group-sm">';
                         echo '<span class="input-group-addon" style="font-size: 10px; background: #eee; min-width: 32px;">' . $curr_label . '</span>';
-                        echo '<input type="text" class="form-control text-right auto_num" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][harga]" value="' . $harga . '" readonly style="background-color: #f9f9f9;">';
+                        echo '<input type="text" class="form-control text-right auto_num" name="dt_' . $no_po . '[' . $no_detail . '][harga]" value="' . $harga . '" readonly style="background-color: #f9f9f9;">';
                         echo '<span class="input-group-addon" style="font-size: 10px; background: #eee; min-width: 45px;">' . $price_label . '</span>';
                         echo '</div>';
                         echo '</td>';
@@ -386,7 +454,7 @@
                         echo '<td style="vertical-align: middle;">';
                         echo '<div class="input-group input-group-sm">';
                         echo '<span class="input-group-addon" style="font-size: 10px; background: #eee; min-width: 32px;">' . $curr_label . '</span>';
-                        echo '<input type="text" class="form-control text-right auto_num row_total_harga" name="dt_' . $item_detail->no_po . '[' . $no_detail . '][total_harga]" value="' . $total_harga_item . '" readonly style="background-color: #f9f9f9; font-weight: bold;">';
+                        echo '<input type="text" class="form-control text-right auto_num row_total_harga" name="dt_' . $no_po . '[' . $no_detail . '][total_harga]" value="' . $total_harga_item . '" readonly style="background-color: #f9f9f9; font-weight: bold;">';
                         echo '</div>';
                         echo '</td>';
 
@@ -398,7 +466,7 @@
                     echo '</tbody>';
                     echo '<tfoot style="background-color: #fcfcfc;">';
                     echo '<tr>';
-                    echo '<td colspan="5" class="text-right text-bold" style="vertical-align: middle;">Total Qty</td>';
+                    echo '<td colspan="6" class="text-right text-bold" style="vertical-align: middle;">Total Qty</td>';
                     echo '<td style="vertical-align: middle;"><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_qty_receive" readonly style="background: transparent; border: none; font-weight: bold;"></td>';
                     echo '<td style="vertical-align: middle;"><input type="text" class="form-control form-control-sm text-right auto_num" id="footer_total_retur" readonly style="background: transparent; border: none; font-weight: bold; color: #3c8dbc;"></td>';
                     echo '<td class="text-right text-bold" style="vertical-align: middle;">Subtotal</td>';
@@ -410,7 +478,7 @@
                     echo '</td>';
                     echo '</tr>';
                     echo '<tr>';
-                    echo '<td colspan="8" class="text-right text-bold" style="vertical-align: middle;">';
+                    echo '<td colspan="9" class="text-right text-bold" style="vertical-align: middle;">';
                     echo '<div style="display: flex; justify-content: flex-end; align-items: center;">';
                     echo '<span style="margin-right: 10px;">PPN</span>';
                     echo '<div class="input-group input-group-sm" style="width: 100px;">';
@@ -427,7 +495,7 @@
                     echo '</td>';
                     echo '</tr>';
                     echo '<tr style="background-color: #f0f7fd; border-top: 2px solid #3c8dbc;">';
-                    echo '<td colspan="8" class="text-right text-bold" style="font-size: 15px; vertical-align: middle; color: #2c3e50;">Grand Total</td>';
+                    echo '<td colspan="9" class="text-right text-bold" style="font-size: 15px; vertical-align: middle; color: #2c3e50;">Grand Total</td>';
                     echo '<td style="vertical-align: middle;">';
                     echo '<div class="input-group input-group-sm">';
                     echo '<span class="input-group-addon" style="font-size: 11px; background: #3c8dbc; color: #fff; font-weight: bold; min-width: 32px;">' . $curr_label . '</span>';
@@ -634,7 +702,80 @@
         hitungFooter();
     });
 
-    $(document).on('input change keyup', '.hitung_detail_total, #footer_ppn_persen', function() {
+    $(document).on('change', '#check_all_detail', function() {
+        var isChecked = $(this).is(':checked');
+        $('.check_item:not(:disabled)').prop('checked', isChecked);
+        $('.list_detail_po tbody tr').each(function() {
+            var $chk = $(this).find('.check_item');
+            if ($chk.length > 0 && !$chk.is(':disabled')) {
+                var isSheetInput = $(this).find('input[data-is_sheet]');
+                var isSheet = (isSheetInput.length > 0 && isSheetInput.data('is_sheet') == '1');
+                var returInput = isSheet ? $(this).find('input[name$="[retur_sheet]"]') : $(this).find('input[name$="[retur]"]');
+                if (!isChecked) {
+                    returInput.autoNumeric('set', 0);
+                }
+            }
+        });
+        hitungFooter();
+    });
+
+    $(document).on('change', '.check_item', function() {
+        var isChecked = $(this).is(':checked');
+        var $row = $(this).closest('tr');
+        var isSheetInput = $row.find('input[data-is_sheet]');
+        var isSheet = (isSheetInput.length > 0 && isSheetInput.data('is_sheet') == '1');
+        var returInput = isSheet ? $row.find('input[name$="[retur_sheet]"]') : $row.find('input[name$="[retur]"]');
+        var maxQty = parseFloat(returInput.data('max-qty')) || 0;
+
+        if (isChecked) {
+            var curVal = parseFloat(returInput.val().split(',').join('')) || 0;
+            if (curVal <= 0 && maxQty > 0) {
+                returInput.focus();
+            }
+        } else {
+            returInput.autoNumeric('set', 0);
+        }
+
+        var totalCheckboxes = $('.check_item:not(:disabled)').length;
+        var totalChecked = $('.check_item:not(:disabled):checked').length;
+        $('#check_all_detail').prop('checked', totalCheckboxes > 0 && totalCheckboxes === totalChecked);
+
+        hitungFooter();
+    });
+
+    $(document).on('input change keyup', '.hitung_detail_total', function() {
+        var $row = $(this).closest('tr');
+        var $chk = $row.find('.check_item');
+        var val = parseFloat($(this).val().split(',').join('')) || 0;
+        var maxQty = parseFloat($(this).data('max-qty')) || 0;
+
+        if ($chk.length > 0 && !$chk.is(':disabled')) {
+            if (val > 0) {
+                $chk.prop('checked', true);
+            } else {
+                $chk.prop('checked', false);
+            }
+        }
+
+        if (maxQty > 0 && val > maxQty) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Kuantitas Melebihi Batas!',
+                text: 'Maksimal kuantitas yang bisa diretur untuk item ini adalah ' + maxQty,
+                timer: 2000,
+                showConfirmButton: false
+            });
+            $(this).autoNumeric('set', maxQty);
+        }
+
+        var totalCheckboxes = $('.check_item:not(:disabled)').length;
+        var totalChecked = $('.check_item:not(:disabled):checked').length;
+        $('#check_all_detail').prop('checked', totalCheckboxes > 0 && totalCheckboxes === totalChecked);
+
+        hitungFooter();
+    });
+
+    $(document).on('input change keyup', '#footer_ppn_persen', function() {
         hitungFooter();
     });
 
@@ -780,6 +921,31 @@
             return false;
         }
 
+        // Validasi minimal 1 item dipilih dan qty retur > 0
+        var hasValidItem = false;
+        $('.list_detail_po tbody tr').each(function() {
+            var $chk = $(this).find('.check_item');
+            if ($chk.is(':checked')) {
+                var isSheetInput = $(this).find('input[data-is_sheet]');
+                var isSheet = (isSheetInput.length > 0 && isSheetInput.data('is_sheet') == '1');
+                var returInput = isSheet ? $(this).find('input[name$="[retur_sheet]"]') : $(this).find('input[name$="[retur]"]');
+                var val = parseFloat(returInput.val().split(',').join('')) || 0;
+                if (val > 0) {
+                    hasValidItem = true;
+                    return false;
+                }
+            }
+        });
+
+        if (!hasValidItem) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Perhatian !',
+                text: 'Silakan pilih dan centang minimal 1 item material untuk diretur dengan kuantitas lebih dari 0!'
+            });
+            return false;
+        }
+
         Swal.fire({
             icon: 'warning',
             title: 'Anda yakin ?',
@@ -848,6 +1014,9 @@
         var subtotal = 0;
 
         $('.list_detail_po tbody tr').each(function() {
+            var $chk = $(this).find('.check_item');
+            var isChecked = ($chk.length === 0 || $chk.is(':checked'));
+
             var isSheetInput = $(this).find('input[data-is_sheet]');
             var isSheet = (isSheetInput.length > 0 && isSheetInput.data('is_sheet') == '1');
 
@@ -863,9 +1032,10 @@
             totalQtyReceive += qtyRecVal;
 
             var returVal = 0;
-            if (returInput.length > 0 && returInput.val()) {
+            if (isChecked && returInput.length > 0 && returInput.val()) {
                 returVal = parseFloat(returInput.val().split(',').join('')) || 0;
             }
+
             totalRetur += returVal;
 
             var hargaVal = 0;
@@ -873,7 +1043,7 @@
                 hargaVal = parseFloat(hargaInput.val().split(',').join('')) || 0;
             }
 
-            var rowTotal = returVal * hargaVal;
+            var rowTotal = isChecked ? (returVal * hargaVal) : 0;
             if (rowTotalInput.length > 0) {
                 rowTotalInput.autoNumeric('set', rowTotal);
             }
