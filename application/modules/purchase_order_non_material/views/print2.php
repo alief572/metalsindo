@@ -111,14 +111,22 @@
         </tr>
     </table>
 
-    <table class="gridtable" style="width: 100%; margin-top: 15px; table-layout: fixed;">
+    <table class="gridtable" style="width: 100%; margin-top: 15px;">
+        <col style="width: 8%;">
+        <col style="width: 32%;">
+        <col style="width: 6%;">
+        <col style="width: 7%;">
+        <col style="width: 15%;">
+        <col style="width: 6%;">
+        <col style="width: 8%;">
+        <col style="width: 18%;">
         <thead>
             <tr style='background-color:#c2c2c2; font-weight:bold; text-align: center;'>
-                <th style="width: 10%;">Code</th>
-                <th style="width: 30%;">Description</th>
-                <th style="width: 7%;">UM</th>
+                <th style="width: 8%;">Code</th>
+                <th style="width: 32%;">Description</th>
+                <th style="width: 6%;">UM</th>
                 <th style="width: 7%;">Qty Pk</th>
-                <th style="width: 14%;">Price</th>
+                <th style="width: 15%;">Price</th>
                 <th style="width: 6%;">Qty</th>
                 <th style="width: 8%;">Disc</th>
                 <th style="width: 18%;">Total</th>
@@ -133,28 +141,28 @@
                 $konversi = ($row->konversi > 0) ? $row->konversi : 1;
             ?>
                 <tr>
-                    <td style="font-size: 8px; word-wrap: break-word; overflow: hidden;"><?= $row->idmaterial ?></td>
-                    <td style="font-size: 8px; word-wrap: break-word; overflow: hidden;"><?= $row->nama ?></td>
-                    <td align="center"><?= ucfirst($row->satuan) ?></td>
-                    <td align="right"><?= number_format($row->qty / $konversi) ?></td>
-                    <td align="right" style="white-space: nowrap;"><?= $h->matauang ?> <?= number_format($row->hargasatuan, 2) ?></td>
-                    <td align="right"><?= number_format($row->qty) ?></td>
-                    <td align="right"><?= number_format($row->nilai_disc) ?></td>
-                    <td align="right" style="white-space: nowrap;"><?= $h->matauang ?> <?= number_format($JH, 2) ?></td>
+                    <td style="width: 8%; font-size: 8px;"><?= $row->idmaterial ?></td>
+                    <td style="width: 32%; font-size: 8px;"><?= $row->nama ?></td>
+                    <td style="width: 6%; font-size: 8px;" align="center"><?= ucfirst($row->satuan) ?></td>
+                    <td style="width: 7%; font-size: 8px;" align="right"><?= number_format($row->qty / $konversi) ?></td>
+                    <td style="width: 15%; font-size: 8px; white-space: nowrap;" align="right"><?= $h->matauang ?> <?= number_format($row->hargasatuan, 2) ?></td>
+                    <td style="width: 6%; font-size: 8px;" align="right"><?= number_format($row->qty) ?></td>
+                    <td style="width: 8%; font-size: 8px;" align="right"><?= number_format($row->nilai_disc) ?></td>
+                    <td style="width: 18%; font-size: 8px; white-space: nowrap;" align="right"><?= $h->matauang ?> <?= number_format($JH, 2) ?></td>
                 </tr>
             <?php } ?>
         </tbody>
         <tr style="background-color: #eee;">
             <td colspan="7" align="right"><b>Sub Total</b></td>
-            <td align="right"><b><?= $h->matauang ?> <?= number_format($TTL, 2) ?></b></td>
+            <td style="width: 18%; font-size: 8px; white-space: nowrap;" align="right"><b><?= $h->matauang ?> <?= number_format($TTL, 2) ?></b></td>
         </tr>
         <tr>
             <td colspan="7" align="right">PPN</td>
-            <td align="right"><?= $h->matauang ?> <?= number_format($h->total_ppn, 2) ?></td>
+            <td style="width: 18%; font-size: 8px; white-space: nowrap;" align="right"><?= $h->matauang ?> <?= number_format($h->total_ppn, 2) ?></td>
         </tr>
         <tr style="background-color: #c2c2c2;">
             <td colspan="7" align="right"><b>Grand Total</b></td>
-            <td align="right"><b><?= $h->matauang ?> <?= number_format($TTL + $h->total_ppn, 2) ?></b></td>
+            <td style="width: 18%; font-size: 8px; white-space: nowrap;" align="right"><b><?= $h->matauang ?> <?= number_format($TTL + $h->total_ppn, 2) ?></b></td>
         </tr>
     </table>
 
@@ -206,10 +214,10 @@
     </table>
 
     <page_footer>
-        <table style="width: 100%; padding: 10px;">
+        <table style="width: 100%;">
             <tr>
-                <td style="text-align: left; width: 50%;">PT METALSINDO PACIFIC</td>
-                <td style="text-align: right; width: 50%;">Page [[page_cu]] / [[page_nb]]</td>
+                <td style="text-align: left; width: 50%; font-size: 8px;">PT METALSINDO PACIFIC</td>
+                <td style="text-align: right; width: 50%; font-size: 8px;">Page [[page_cu]] / [[page_nb]]</td>
             </tr>
         </table>
     </page_footer>
