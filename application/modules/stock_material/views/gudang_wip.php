@@ -45,9 +45,10 @@ thead input {
             <tbody></tbody>
             <tfoot>
                 <tr>
-                    <th colspan="6" style="text-align:center">TOTAL KESELURUHAN</th>
+                    <th colspan="7" style="text-align:center">TOTAL KESELURUHAN</th>
                     <th></th>
                     <th></th>
+                    <th colspan="3"></th>
                 </tr>
             </tfoot>
         </table>
@@ -122,7 +123,7 @@ thead input {
 				"targets"	: 'no-sort',
 				"orderable"	: false,
 				},
-				{ className: 'text-right', targets: [5, 6, 7] }
+				{ className: 'text-right', targets: [5, 6, 7, 8] }
 			],
 			"dom": 'Blfrtip',
 				"buttons": [
@@ -154,7 +155,7 @@ thead input {
 			drawCallback: function( settings ) {
 				var api = this.api();
 
-				$( api.column( 7 ).footer() ).html("<div align='right'>"+ number_format(total_aset,2) +"</div>");
+				$( api.column( 8 ).footer() ).html("<div align='right'>"+ number_format(total_aset,2) +"</div>");
 			}
 
 
