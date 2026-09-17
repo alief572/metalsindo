@@ -337,17 +337,26 @@
                     $harga_sheet = ($detail->hargasatuan * $get_material->total_weight);
 
                     $nama = $detail->nama;
-                    $exp_nama = explode('-', $nama);
-                    $nama_end = (!empty($exp_nama[6])) ? $exp_nama[6] : '';
-
-                    $nama_fix = str_replace('-HOT ROLLED', '', $nama);
-                    $nama_fix2 = str_replace('-COLD ROLLED', '', $nama_fix);
-
+                    $nama_clean = str_replace(['-HOT ROLLED', '-COLD ROLLED'], '', $nama);
+                    $parts = explode('-', $nama_clean);
+                    if (count($parts) >= 3) {
+                        $last_val = end($parts);
+                        $prev_val = prev($parts);
+                        if (is_numeric($last_val) && is_numeric($prev_val)) {
+                            array_pop($parts);
+                            array_pop($parts);
+                            $nama_display = implode('-', $parts);
+                        } else {
+                            $nama_display = $nama_clean;
+                        }
+                    } else {
+                        $nama_display = $nama_clean;
+                    }
 
                     echo "	
                     <tr >
                         <td width='5'>" . $no . "</td>
-                        <td width='70'>" . wordwrap($nama_fix2, 13, "<br />\n", true) . "</td>
+                        <td width='70'>" . wordwrap($nama_display, 13, "<br />\n", true) . "</td>
                         <td width='30' align='right'>" . number_format($detail->width, 2) . "</td>
                         <td width='30' align='right'>" . number_format($detail->panjang, 2) . "</td>
                         <td width='20' align='right'>" . number_format($weight_sheet, 2) . "</td>
