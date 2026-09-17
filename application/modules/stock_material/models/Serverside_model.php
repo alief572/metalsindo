@@ -194,7 +194,9 @@ class Serverside_model extends BF_Model
 			$nestedData[]	= "<div align='right'>" . $jumlah_item . "</div>";
 			$nestedData[]	= "<div align='right'>" . number_format($row['sisa_spk'], 2) . "</div>";
 			$nestedData[]	= "<div align='right'>" . number_format($row['sisa_spk'] * $row['qty'], 2) . "</div>";
-			$nestedData[]	= "<div align='right'>" . number_format($total_sheet) . "</div>";
+			if (isset($requestData['gudang']) && $requestData['gudang'] == '3') {
+				$nestedData[]	= "<div align='right'>" . number_format($total_sheet) . "</div>";
+			}
 			$nestedData[]	= "<div align='left'>" . $row['no_surat'] . "</div>";
 			$nestedData[]	= "<div align='left'>" . strtoupper(strtolower($row['nama_gudang'])) . "</div>";
 			$nestedData[]	= "<div align='left'>" . strtoupper(strtolower($row['customer'])) . "</div>";
@@ -242,6 +244,8 @@ class Serverside_model extends BF_Model
                         OR a.nama_material LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 						OR a.id_category3 LIKE '%" . $this->db->escape_like_str($like_value) . "%'
 						OR a.no_surat LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+						OR g.name_customer LIKE '%" . $this->db->escape_like_str($like_value) . "%'
+						OR a.customer LIKE '%" . $this->db->escape_like_str($like_value) . "%'
                     )";
 		}
 
@@ -253,7 +257,7 @@ class Serverside_model extends BF_Model
 					a.sisa_spk,
 					a.qty,
 					a.no_surat,
-					a.customer, 
+					COALESCE(NULLIF(g.name_customer, ''), a.customer) as customer, 
 					a.totalweight,
                     b.nama_gudang as nama_gudang,
 					c.maker
@@ -264,6 +268,7 @@ class Serverside_model extends BF_Model
                     LEFT JOIN ms_inventory_type d ON c.id_type=d.id_type
                     LEFT JOIN ms_inventory_category1 e ON c.id_category1 =e.id_category1
                     LEFT JOIN ms_inventory_category2 f ON c.id_category2 =f.id_category2
+                    LEFT JOIN master_customers g ON g.id_customer = a.customer
                 WHERE 1=1
                     " . $where_kategori . "
 					" . $where_series . "
