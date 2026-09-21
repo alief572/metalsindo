@@ -6,27 +6,32 @@
         background: #fff;
         border-radius: 8px;
         padding: 16px 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         border: 1px solid #e2e8f0;
         margin-bottom: 20px;
         transition: transform 0.2s, box-shadow 0.2s;
     }
+
     .kpi-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     }
+
     .kpi-card.card-red {
         background: #fff5f5;
         border-color: #feb2b2;
     }
+
     .kpi-card.card-orange {
         background: #fffaf0;
         border-color: #fbd38d;
     }
+
     .kpi-card.card-green {
         background: #f0fff4;
         border-color: #9ae6b4;
     }
+
     .kpi-title {
         font-size: 13px;
         color: #64748b;
@@ -35,18 +40,37 @@
         letter-spacing: 0.5px;
         margin-bottom: 6px;
     }
+
     .kpi-value {
         font-size: 26px;
         font-weight: 700;
         color: #1e293b;
         line-height: 1.2;
     }
-    .card-red .kpi-title { color: #9b2c2c; }
-    .card-red .kpi-value { color: #e53e3e; }
-    .card-orange .kpi-title { color: #9c4221; }
-    .card-orange .kpi-value { color: #dd6b20; }
-    .card-green .kpi-title { color: #22543d; }
-    .card-green .kpi-value { color: #38a169; }
+
+    .card-red .kpi-title {
+        color: #9b2c2c;
+    }
+
+    .card-red .kpi-value {
+        color: #e53e3e;
+    }
+
+    .card-orange .kpi-title {
+        color: #9c4221;
+    }
+
+    .card-orange .kpi-value {
+        color: #dd6b20;
+    }
+
+    .card-green .kpi-title {
+        color: #22543d;
+    }
+
+    .card-green .kpi-value {
+        color: #38a169;
+    }
 
     .filter-panel {
         background: #ffffff;
@@ -54,8 +78,9 @@
         border: 1px solid #e2e8f0;
         padding: 15px 20px;
         margin-bottom: 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
+
     .filter-label {
         font-size: 12px;
         font-weight: 600;
@@ -71,10 +96,12 @@
         font-size: 12px;
         text-transform: uppercase;
     }
+
     #table_outstanding_so tbody td {
         vertical-align: middle;
         font-size: 13px;
     }
+
     .btn-expand {
         cursor: pointer;
         padding: 2px 6px;
@@ -82,9 +109,11 @@
         border: 1px solid #cbd5e1;
         background: #fff;
     }
+
     .btn-expand:hover {
         background: #f1f5f9;
     }
+
     tr.shown .btn-expand {
         background: #e2e8f0;
     }
@@ -193,7 +222,7 @@
                         <th>No SO</th>
                         <th>Customer</th>
                         <th style="width: 90px;" class="text-center">Tgl SO</th>
-                        <th style="width: 110px;" class="text-right">Qty SO</th>
+                        <th style="width: 110px;" class="text-right">Qty PO Awal</th>
                         <th style="width: 110px;" class="text-right">Sisa Qty</th>
                         <th style="width: 140px;" class="text-right">Nilai Outstanding</th>
                         <th style="width: 90px;" class="text-center">Umur (hari)</th>
@@ -224,33 +253,60 @@
             serverSide: true,
             stateSave: false,
             pageLength: 25,
-            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+            lengthMenu: [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]
+            ],
             ajax: {
                 url: siteurl + 'report_outstanding_so/get_data',
                 type: 'POST',
                 data: function(d) {
-                    d.customer_id   = $('#filter_customer').val();
+                    d.customer_id = $('#filter_customer').val();
                     d.status_filter = $('#filter_status').val();
-                    d.start_date    = $('#filter_start_date').val();
-                    d.end_date      = $('#filter_end_date').val();
+                    d.start_date = $('#filter_start_date').val();
+                    d.end_date = $('#filter_end_date').val();
                 }
             },
-            columns: [
-                {
+            columns: [{
                     data: 'expand',
                     orderable: false,
                     className: 'text-center'
                 },
-                { data: 'no_spk' },
-                { data: 'customer' },
-                { data: 'tgl_spk', className: 'text-center' },
-                { data: 'qty_so', className: 'text-right' },
-                { data: 'sisa_qty', className: 'text-right' },
-                { data: 'nilai_outstanding', className: 'text-right' },
-                { data: 'umur_hari', className: 'text-center' },
-                { data: 'status', orderable: false, className: 'text-center' }
+                {
+                    data: 'no_spk'
+                },
+                {
+                    data: 'customer'
+                },
+                {
+                    data: 'tgl_spk',
+                    className: 'text-center'
+                },
+                {
+                    data: 'qty_so',
+                    className: 'text-right'
+                },
+                {
+                    data: 'sisa_qty',
+                    className: 'text-right'
+                },
+                {
+                    data: 'nilai_outstanding',
+                    className: 'text-right'
+                },
+                {
+                    data: 'umur_hari',
+                    className: 'text-center'
+                },
+                {
+                    data: 'status',
+                    orderable: false,
+                    className: 'text-center'
+                }
             ],
-            order: [[3, 'desc']],
+            order: [
+                [3, 'desc']
+            ],
             drawCallback: function(settings) {
                 // Refresh KPI cards when table data updates
                 loadSummary();
@@ -273,11 +329,11 @@
 
         // Function to load summary cards
         function loadSummary() {
-            var customer_id   = $('#filter_customer').val();
+            var customer_id = $('#filter_customer').val();
             var status_filter = $('#filter_status').val();
-            var start_date    = $('#filter_start_date').val();
-            var end_date      = $('#filter_end_date').val();
-            var search_val    = table.search();
+            var start_date = $('#filter_start_date').val();
+            var end_date = $('#filter_end_date').val();
+            var search_val = table.search();
 
             $.ajax({
                 url: siteurl + 'report_outstanding_so/get_summary',
@@ -325,7 +381,9 @@
                 $.ajax({
                     url: siteurl + 'report_outstanding_so/get_detail_do',
                     type: 'POST',
-                    data: { no_spk: no_spk },
+                    data: {
+                        no_spk: no_spk
+                    },
                     success: function(html) {
                         row.child(html).show();
                     },
@@ -371,11 +429,11 @@
 
         // Export button click
         $('#btn_export_excel').on('click', function() {
-            var customer_id   = $('#filter_customer').val() || '';
+            var customer_id = $('#filter_customer').val() || '';
             var status_filter = $('#filter_status').val() || '';
-            var start_date    = $('#filter_start_date').val() || '';
-            var end_date      = $('#filter_end_date').val() || '';
-            var search_val    = table.search() || '';
+            var start_date = $('#filter_start_date').val() || '';
+            var end_date = $('#filter_end_date').val() || '';
+            var search_val = table.search() || '';
 
             var url = siteurl + 'report_outstanding_so/export_excel?' + $.param({
                 customer_id: customer_id,
