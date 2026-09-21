@@ -158,6 +158,7 @@ class Report_outstanding_so_model extends BF_Model
             'no_spk' => 'sub.no_spk',
             'name_customer' => 'sub.name_customer',
             'tgl_spk_marketing' => 'sub.tgl_spk_marketing',
+            'qty_spk' => 'sub.total_qty_spk',
             'sisa_qty' => '(sub.total_qty_spk - sub.total_qty_do)',
             'umur_hari' => 'sub.umur_hari'
         ];

@@ -55,9 +55,10 @@ class Report_outstanding_so extends Admin_Controller
             1 => 'no_spk',
             2 => 'name_customer',
             3 => 'tgl_spk_marketing',
-            4 => 'sisa_qty',
-            5 => 'total_nilai_spk',
-            6 => 'umur_hari'
+            4 => 'qty_spk',
+            5 => 'sisa_qty',
+            6 => 'total_nilai_spk',
+            7 => 'umur_hari'
         ];
         $order_col = isset($col_map[$order_col_idx]) ? $col_map[$order_col_idx] : 'tgl_spk_marketing';
 
@@ -102,6 +103,7 @@ class Report_outstanding_so extends Admin_Controller
                 'no_spk' => '<strong>' . htmlspecialchars($row['no_spk']) . '</strong>',
                 'customer' => htmlspecialchars($row['name_customer']),
                 'tgl_spk' => date('d/m/y', strtotime($row['tgl_spk_marketing'])),
+                'qty_so' => number_format($total_qty_spk, 2, ',', '.'),
                 'sisa_qty' => number_format($sisa_qty, 2, ',', '.'),
                 'nilai_outstanding' => 'Rp ' . number_format($nilai_out, 0, ',', '.'),
                 'umur_hari' => $row['umur_hari'],
@@ -286,19 +288,20 @@ class Report_outstanding_so extends Admin_Controller
                 <thead>
                     <tr>
                         <th width="4%">No</th>
-                        <th width="18%">No SO / SPK</th>
-                        <th width="24%">Customer</th>
+                        <th width="16%">No SO / SPK</th>
+                        <th width="22%">Customer</th>
                         <th width="10%">Tgl SO</th>
+                        <th width="10%">Qty SO</th>
                         <th width="10%">Sisa Qty</th>
-                        <th width="14%">Nilai Outstanding</th>
-                        <th width="8%">Umur (Hari)</th>
-                        <th width="12%">Status</th>
+                        <th width="12%">Nilai Outstanding</th>
+                        <th width="6%">Umur (Hari)</th>
+                        <th width="10%">Status</th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php
                 if (empty($so_list)) {
-                    echo '<tr><td colspan="8" class="text-center">Tidak ada data ditemukan.</td></tr>';
+                    echo '<tr><td colspan="9" class="text-center">Tidak ada data ditemukan.</td></tr>';
                 } else {
                     $no = 1;
                     foreach ($so_list as $so) {
@@ -308,6 +311,7 @@ class Report_outstanding_so extends Admin_Controller
                             <td><strong><?= htmlspecialchars($so['no_spk']) ?></strong></td>
                             <td><?= htmlspecialchars($so['name_customer']) ?></td>
                             <td class="text-center"><?= date('d/m/Y', strtotime($so['tgl_spk_marketing'])) ?></td>
+                            <td class="text-right"><?= number_format($so['total_qty_spk'], 2, ',', '.') ?></td>
                             <td class="text-right"><?= number_format($so['calc_sisa_qty'], 2, ',', '.') ?></td>
                             <td class="text-right">Rp <?= number_format($so['calc_nilai_outstanding'], 0, ',', '.') ?></td>
                             <td class="text-center"><?= $so['umur_hari'] ?></td>
@@ -318,7 +322,7 @@ class Report_outstanding_so extends Admin_Controller
                             ?>
                             <tr>
                                 <td></td>
-                                <td colspan="7" style="padding-left: 20px; background-color: #fafbfc;">
+                                <td colspan="8" style="padding-left: 20px; background-color: #fafbfc;">
                                     <table style="margin-top: 5px; margin-bottom: 5px;">
                                         <thead>
                                             <tr style="background-color: #7f8c8d;">

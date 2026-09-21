@@ -193,6 +193,7 @@
                         <th>No SO</th>
                         <th>Customer</th>
                         <th style="width: 90px;" class="text-center">Tgl SO</th>
+                        <th style="width: 110px;" class="text-right">Qty SO</th>
                         <th style="width: 110px;" class="text-right">Sisa Qty</th>
                         <th style="width: 140px;" class="text-right">Nilai Outstanding</th>
                         <th style="width: 90px;" class="text-center">Umur (hari)</th>
@@ -243,6 +244,7 @@
                 { data: 'no_spk' },
                 { data: 'customer' },
                 { data: 'tgl_spk', className: 'text-center' },
+                { data: 'qty_so', className: 'text-right' },
                 { data: 'sisa_qty', className: 'text-right' },
                 { data: 'nilai_outstanding', className: 'text-right' },
                 { data: 'umur_hari', className: 'text-center' },
