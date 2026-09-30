@@ -345,45 +345,109 @@ class Pr_model extends BF_Model
         return $idcust;
     }
 
+    private function normalize_incoming_filters($filters)
+    {
+        $normalized = array(
+            'no_dokumen' => '',
+            'id_supplier' => '',
+            'tanggal_awal' => '',
+            'tanggal_akhir' => '',
+            'global_search' => ''
+        );
+
+        foreach ($normalized as $key => $value) {
+            if (isset($filters[$key]) && !is_array($filters[$key])) {
+                $normalized[$key] = trim($filters[$key]);
+            }
+        }
+
+        if (!$this->is_valid_date($normalized['tanggal_awal'])) {
+            $normalized['tanggal_awal'] = '';
+        }
+        if (!$this->is_valid_date($normalized['tanggal_akhir'])) {
+            $normalized['tanggal_akhir'] = '';
+        }
+
+        return $normalized;
+    }
+
+    private function is_valid_date($date)
+    {
+        if ($date === '') {
+            return false;
+        }
+
+        $parts = explode('-', $date);
+        return count($parts) === 3
+            && checkdate((int) $parts[1], (int) $parts[2], (int) $parts[0]);
+    }
+
+    private function build_incoming_query($filters)
+    {
+        $filters = $this->normalize_incoming_filters($filters);
+
+        $this->db->from('tr_incoming a');
+        $this->db->join('master_supplier b', 'b.id_suplier=a.id_suplier', 'inner');
+
+        if ($filters['no_dokumen'] !== '') {
+            $this->db->where('a.id_incoming', $filters['no_dokumen']);
+        }
+        if ($filters['id_supplier'] !== '') {
+            $this->db->where('a.id_suplier', $filters['id_supplier']);
+        }
+        if ($filters['tanggal_awal'] !== '') {
+            $this->db->where('a.tanggal >=', $filters['tanggal_awal']);
+        }
+        if ($filters['tanggal_akhir'] !== '') {
+            $this->db->where('a.tanggal <=', $filters['tanggal_akhir']);
+        }
+        if ($filters['global_search'] !== '') {
+            $this->db->group_start();
+            $this->db->like('a.id_incoming', $filters['global_search'], 'both');
+            $this->db->or_like('b.name_suplier', $filters['global_search'], 'both');
+            $this->db->or_like('a.tanggal', $filters['global_search'], 'both');
+            $this->db->or_like('a.pic', $filters['global_search'], 'both');
+            $this->db->or_like('a.keterangan', $filters['global_search'], 'both');
+            $this->db->group_end();
+        }
+    }
+
+    public function get_incoming_rows($filters = array(), $limit = null, $start = 0)
+    {
+        $this->db->select('a.*, b.name_suplier');
+        $this->build_incoming_query($filters);
+        $this->db->order_by('a.created_date', 'DESC');
+
+        if ($limit !== null && (int) $limit >= 0) {
+            $this->db->limit((int) $limit, (int) $start);
+        }
+
+        return $this->db->get();
+    }
+
+    public function count_incoming($filters = array())
+    {
+        $this->build_incoming_query($filters);
+        return $this->db->count_all_results();
+    }
+
     public function get_incoming()
     {
-        $draw = $this->input->post('draw');
-        $length = $this->input->post('length');
-        $start = $this->input->post('start');
+        $draw = (int) $this->input->post('draw');
+        $length = (int) $this->input->post('length');
+        $start = (int) $this->input->post('start');
         $search = $this->input->post('search');
+        $filters = array(
+            'no_dokumen' => $this->input->post('no_dokumen', true),
+            'id_supplier' => $this->input->post('id_supplier', true),
+            'tanggal_awal' => $this->input->post('tanggal_awal', true),
+            'tanggal_akhir' => $this->input->post('tanggal_akhir', true),
+            'global_search' => isset($search['value']) ? $search['value'] : ''
+        );
 
-        $this->db->select('a.*, b.name_suplier');
-        $this->db->from('tr_incoming a');
-        $this->db->join('master_supplier b', 'b.id_suplier=a.id_suplier', 'inner');
-        if (!empty($search['value'])) {
-            $this->db->group_start();
-            $this->db->like('a.id_incoming', $search['value'], 'both');
-            $this->db->or_like('b.name_suplier', $search['value'], 'both');
-            $this->db->or_like('a.tanggal', $search['value'], 'both');
-            $this->db->or_like('a.pic', $search['value'], 'both');
-            $this->db->or_like('a.keterangan', $search['value'], 'both');
-            $this->db->group_end();
-        }
-        $this->db->order_by('a.created_date', 'DESC');
-        $this->db->limit($length, $start);
-
-        $get_data = $this->db->get();
-
-        $this->db->select('a.*, b.name_suplier');
-        $this->db->from('tr_incoming a');
-        $this->db->join('master_supplier b', 'b.id_suplier=a.id_suplier', 'inner');
-        if (!empty($search['value'])) {
-            $this->db->group_start();
-            $this->db->like('a.id_incoming', $search['value'], 'both');
-            $this->db->or_like('b.name_suplier', $search['value'], 'both');
-            $this->db->or_like('a.tanggal', $search['value'], 'both');
-            $this->db->or_like('a.pic', $search['value'], 'both');
-            $this->db->or_like('a.keterangan', $search['value'], 'both');
-            $this->db->group_end();
-        }
-        $this->db->order_by('a.created_date', 'DESC');
-
-        $get_data_all = $this->db->get();
+        $get_data = $this->get_incoming_rows($filters, $length, $start);
+        $records_total = $this->count_incoming();
+        $records_filtered = $this->count_incoming($filters);
 
         $hasil = [];
 
@@ -417,8 +481,8 @@ class Pr_model extends BF_Model
 
         echo json_encode([
             'draw' => intval($draw),
-            'recordsTotal' => $get_data_all->num_rows(),
-            'recordsFiltered' => $get_data_all->num_rows(),
+            'recordsTotal' => $records_total,
+            'recordsFiltered' => $records_filtered,
             'data' => $hasil
         ]);
     }

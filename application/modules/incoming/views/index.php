@@ -5,9 +5,50 @@ $ENABLE_VIEW    = has_permission('Incoming.View');
 $ENABLE_DELETE  = has_permission('Incoming.Delete');
 
 ?>
+<link rel="stylesheet" href="<?= base_url('assets/plugins/select2/select2.min.css') ?>">
 <style type="text/css">
 	thead input {
 		width: 100%;
+	}
+
+	.incoming-filter {
+		background: #f7f7f7;
+		border: 1px solid #e5e5e5;
+		margin-bottom: 20px;
+		padding: 15px 15px 5px;
+	}
+
+	.incoming-filter .form-group {
+		margin-bottom: 10px;
+	}
+
+	.incoming-filter-actions {
+		display: flex;
+		align-items: center;
+		white-space: nowrap;
+		padding-top: 25px;
+	}
+
+	.incoming-filter-actions .btn + .btn {
+		margin-left: 4px;
+	}
+
+	.incoming-filter .select2-container {
+		width: 100% !important;
+	}
+
+	.incoming-filter .select2-container .select2-selection--single {
+		height: 34px;
+		border-color: #d2d6de;
+		border-radius: 0;
+	}
+
+	.incoming-filter .select2-container .select2-selection--single .select2-selection__rendered {
+		line-height: 32px;
+	}
+
+	.incoming-filter .select2-container .select2-selection--single .select2-selection__arrow {
+		height: 32px;
 	}
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
@@ -24,12 +65,61 @@ $ENABLE_DELETE  = has_permission('Incoming.Delete');
 	<!-- /.box-header -->
 	<!-- /.box-header -->
 	<div class="box-body">
+		<div class="incoming-filter">
+			<div class="row">
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="filter_no_dokumen">No. Dokumen</label>
+						<select class="form-control incoming-select2" id="filter_no_dokumen">
+							<option value="">Semua No. Dokumen</option>
+							<?php foreach ($incoming_documents as $document) : ?>
+								<option value="<?= html_escape($document->id_incoming) ?>"><?= html_escape($document->id_incoming) ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<label for="filter_supplier">Supplier</label>
+						<select class="form-control incoming-select2" id="filter_supplier">
+							<option value="">Semua Supplier</option>
+							<?php foreach ($suppliers as $supplier) : ?>
+								<option value="<?= html_escape($supplier->id_suplier) ?>"><?= html_escape($supplier->name_suplier) ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+				</div>
+				<div class="col-md-2">
+					<div class="form-group">
+						<label for="filter_tanggal_awal">Tanggal Awal</label>
+						<input type="date" class="form-control" id="filter_tanggal_awal">
+					</div>
+				</div>
+				<div class="col-md-2">
+					<div class="form-group">
+						<label for="filter_tanggal_akhir">Tanggal Akhir</label>
+						<input type="date" class="form-control" id="filter_tanggal_akhir">
+					</div>
+				</div>
+				<div class="col-md-2 incoming-filter-actions">
+					<button type="button" class="btn btn-primary btn-sm" id="btn_search" title="Search">
+						<i class="fa fa-search"></i> Search
+					</button>
+					<button type="button" class="btn btn-default btn-sm" id="btn_reset" title="Reset">
+						<i class="fa fa-refresh"></i> Reset
+					</button>
+					<button type="button" class="btn btn-success btn-sm" id="btn_export_excel" title="Export Excel">
+						<i class="fa fa-file-excel-o"></i> Export Excel
+					</button>
+				</div>
+			</div>
+		</div>
 		<table id="example5" class="table table-bordered table-striped">
 			<thead>
 				<tr>
 					<th>#</th>
 					<th>No.Dokumen</th>
-					<th>Suplier</th>
+					<th>Supplier</th>
 					<th>Tanggal</th>
 					<th>PIC</th>
 					<th>Keterangan</th>
@@ -86,9 +176,34 @@ $ENABLE_DELETE  = has_permission('Incoming.Delete');
 
 <!-- DataTables -->
 <script src="https://cdn.datatables.net/2.2.2/js/dataTables.min.js"></script>
+<script src="<?= base_url('assets/plugins/select2/select2.full.min.js') ?>"></script>
 
 <!-- page script -->
 <script type="text/javascript">
+	var incomingTable;
+
+	function getIncomingFilters() {
+		return {
+			no_dokumen: $.trim($('#filter_no_dokumen').val()),
+			id_supplier: $('#filter_supplier').val(),
+			tanggal_awal: $('#filter_tanggal_awal').val(),
+			tanggal_akhir: $('#filter_tanggal_akhir').val()
+		};
+	}
+
+	function validateIncomingDateRange(filters) {
+		if (filters.tanggal_awal && filters.tanggal_akhir && filters.tanggal_awal > filters.tanggal_akhir) {
+			swal({
+				title: 'Range tanggal tidak valid',
+				text: 'Tanggal awal tidak boleh lebih besar dari tanggal akhir.',
+				type: 'warning'
+			});
+			return false;
+		}
+
+		return true;
+	}
+
 	$(document).on('click', '.edit', function(e) {
 		var id = $(this).data('no_penawaran');
 		$("#head_title").html("<i class='fa fa-list-alt'></i><b>Edit Inventory</b>");
@@ -201,23 +316,53 @@ $ENABLE_DELETE  = has_permission('Incoming.Delete');
 	})
 
 	$(function() {
+		$('.incoming-select2').select2({
+			width: '100%'
+		});
+
 		DataTables();
 		$("#form-area").hide();
+
+		$('#btn_search').on('click', function() {
+			var filters = getIncomingFilters();
+			if (validateIncomingDateRange(filters)) {
+				incomingTable.ajax.reload(null, true);
+			}
+		});
+
+		$('#btn_reset').on('click', function() {
+			$('#filter_no_dokumen').val('').trigger('change');
+			$('#filter_supplier').val('').trigger('change');
+			$('#filter_tanggal_awal').val('');
+			$('#filter_tanggal_akhir').val('');
+			incomingTable.ajax.reload(null, true);
+		});
+
+		$('#btn_export_excel').on('click', function() {
+			var filters = getIncomingFilters();
+			if (validateIncomingDateRange(filters)) {
+				window.location.href = siteurl + active_controller + 'export_excel?' + $.param(filters);
+			}
+		});
+
 	});
 
 	function DataTables() {
-		var DataTables = $('#example5').DataTable({
+		incomingTable = $('#example5').DataTable({
 			serverSide: true,
 			processing: true,
 			destroy: true,
+			searching: false,
 			language: {
-				searchPlaceholder: "Search...",
 				loadingRecords: 'Loading - Please Wait...'
 			},
 			ajax: {
 				url: siteurl + active_controller + 'get_incoming',
 				type: 'post',
-				dataType: 'json'
+				dataType: 'json',
+				data: function(data) {
+					return $.extend(data, getIncomingFilters());
+				}
 			},
 			columns: [
 				{

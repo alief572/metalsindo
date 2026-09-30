@@ -42,8 +42,21 @@ class Incoming extends Admin_Controller
 		$this->auth->restrict($this->viewPermission);
 		$session = $this->session->userdata('app_session');
 		$this->template->page_icon('fa fa-users');
-		// $data = $this->db->query("SELECT a.*, b.name_suplier as name_suplier FROM tr_incoming as a INNER JOIN master_supplier as b on a.id_suplier=b.id_suplier ORDER BY a.id_incoming DESC")->result();
-		// $this->template->set('results', $data);
+		$suppliers = $this->db
+			->select('id_suplier, name_suplier')
+			->from('master_supplier')
+			->where('deleted', '0')
+			->order_by('name_suplier', 'ASC')
+			->get()
+			->result();
+		$incoming_documents = $this->db
+			->select('id_incoming')
+			->from('tr_incoming')
+			->order_by('created_date', 'DESC')
+			->get()
+			->result();
+		$this->template->set('suppliers', $suppliers);
+		$this->template->set('incoming_documents', $incoming_documents);
 		$this->template->title('Incoming');
 		$this->template->render('index');
 	}
@@ -2848,6 +2861,95 @@ class Incoming extends Admin_Controller
 			'no_pib' => $get_ros->no_pengajuan_pib,
 			'keterangan' => $get_ros->keterangan
 		]);
+	}
+
+	public function export_excel()
+	{
+		$this->auth->restrict($this->viewPermission);
+		set_time_limit(0);
+		ini_set('memory_limit', '1024M');
+		$this->load->library('PHPExcel');
+
+		$filters = array(
+			'no_dokumen' => $this->input->get('no_dokumen', true),
+			'id_supplier' => $this->input->get('id_supplier', true),
+			'tanggal_awal' => $this->input->get('tanggal_awal', true),
+			'tanggal_akhir' => $this->input->get('tanggal_akhir', true)
+		);
+		$rows = $this->Pr_model->get_incoming_rows($filters)->result();
+
+		$objPHPExcel = new PHPExcel();
+		$sheet = $objPHPExcel->getActiveSheet();
+		$sheet->setTitle('Incoming');
+
+		$sheet->mergeCells('A1:G1');
+		$sheet->setCellValue('A1', 'DATA INCOMING');
+		$sheet->getStyle('A1:G1')->getFont()->setBold(true)->setSize(14);
+		$sheet->getStyle('A1:G1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+		$headers = array('No.', 'No. Dokumen', 'Supplier', 'Tanggal', 'PIC', 'Keterangan', 'Tanggal Input');
+		$columns = array('A', 'B', 'C', 'D', 'E', 'F', 'G');
+		foreach ($headers as $index => $header) {
+			$sheet->setCellValue($columns[$index] . '3', $header);
+		}
+
+		$header_style = array(
+			'font' => array('bold' => true),
+			'fill' => array(
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'color' => array('rgb' => 'D9EAF7')
+			),
+			'borders' => array(
+				'allborders' => array('style' => PHPExcel_Style_Border::BORDER_THIN)
+			),
+			'alignment' => array(
+				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+			)
+		);
+		$sheet->getStyle('A3:G3')->applyFromArray($header_style);
+
+		$row_number = 4;
+		$number = 1;
+		foreach ($rows as $item) {
+			$sheet->setCellValue('A' . $row_number, $number);
+			$sheet->setCellValueExplicit('B' . $row_number, $item->id_incoming, PHPExcel_Cell_DataType::TYPE_STRING);
+			$sheet->setCellValue('C' . $row_number, $item->name_suplier);
+			$sheet->setCellValue('D' . $row_number, $item->tanggal);
+			$sheet->setCellValue('E' . $row_number, $item->pic);
+			$sheet->setCellValue('F' . $row_number, $item->keterangan);
+			$sheet->setCellValue('G' . $row_number, date('Y-m-d H:i:s', strtotime($item->created_date)));
+			$row_number++;
+			$number++;
+		}
+
+		if ($row_number > 4) {
+			$sheet->getStyle('A4:G' . ($row_number - 1))->getBorders()->getAllBorders()->setBorderStyle(PHPExcel_Style_Border::BORDER_THIN);
+			$sheet->getStyle('F4:F' . ($row_number - 1))->getAlignment()->setWrapText(true);
+		}
+
+		foreach ($columns as $column) {
+			$sheet->getColumnDimension($column)->setAutoSize(true);
+		}
+		$sheet->freezePane('A4');
+
+		$objPHPExcel->getProperties()
+			->setCreator('Metalsindo')
+			->setTitle('Data Incoming')
+			->setSubject('Export Data Incoming');
+
+		while (ob_get_level() > 0) {
+			ob_end_clean();
+		}
+		header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+		header('Cache-Control: no-store, no-cache, must-revalidate');
+		header('Pragma: no-cache');
+		header('Content-Type: application/vnd.ms-excel');
+		header('Content-Disposition: attachment;filename="incoming-' . date('Ymd-His') . '.xls"');
+
+		$writer = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+		$writer->save('php://output');
+		exit;
 	}
 
 	public function get_incoming()
