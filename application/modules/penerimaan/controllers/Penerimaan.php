@@ -1292,10 +1292,19 @@ class Penerimaan extends Admin_Controller
 	 * Hitung nilai invoice real menggunakan logic yang sama dengan modul Invoicing.
 	 * Untuk produk sheet (id_bentuk = B2000002): qty dari stock_material.qty_sheet
 	 * Untuk produk non-sheet: qty dari tr_invoice_detail.qty_invoice
-	 * Semua dihitung dengan formula DPP Nilai Lain: ceil(11/12 * total) + (dpp * 12/100)
+	 * PPN mengikuti pengecualian kawasan berikat / PPN nol pada modul Invoicing.
+	 * Invoice kena PPN tetap menggunakan DPP Nilai Lain: ceil(11/12 * total).
 	 */
 	private function _calculate_real_invoice_value($no_invoice, $no_do, $id_do)
 	{
+		$this->db->select('a.ppn, a.nilai_ppn, b.facility');
+		$this->db->from('tr_invoice a');
+		$this->db->join('master_customers b', 'b.id_customer = a.id_customer', 'left');
+		$this->db->where('a.no_invoice', $no_invoice);
+		$invoice = $this->db->get()->row();
+		$is_kawasan_berikat = (!empty($invoice->facility) && stripos($invoice->facility, 'Kawasan Berikat') !== false)
+			|| (isset($invoice->ppn, $invoice->nilai_ppn) && $invoice->ppn == 0 && $invoice->nilai_ppn == 0);
+
 		// Cek apakah ada detail dengan produk sheet
 		$this->db->select('a.*');
 		$this->db->from('tr_invoice_detail a');
@@ -1327,7 +1336,7 @@ class Penerimaan extends Admin_Controller
 
 				$total_awal = ($item_sheet->harga_satuan * $qty_sheet);
 				$dpp_lain_lain = ceil(11 / 12 * $total_awal);
-				$ppn = ($dpp_lain_lain * 12 / 100);
+				$ppn = $is_kawasan_berikat ? 0 : ($dpp_lain_lain * 12 / 100);
 				$nilai_invoice += ($total_awal + $ppn);
 			}
 
@@ -1341,7 +1350,7 @@ class Penerimaan extends Admin_Controller
 
 			$ttl_harga = (!empty($get_total_invoice->ttl_harga)) ? $get_total_invoice->ttl_harga : 0;
 			$dpp_nilai_lain = ceil(11 / 12 * $ttl_harga);
-			$ppn = ($dpp_nilai_lain * 12 / 100);
+			$ppn = $is_kawasan_berikat ? 0 : ($dpp_nilai_lain * 12 / 100);
 			$nilai_invoice = ($ttl_harga + $ppn);
 
 			return $nilai_invoice;
