@@ -1,0 +1,21 @@
+{
+  "files": [
+    {
+      "path": "md/report_incoming/SPEC.md",
+      "sha256": "E1A9177A215D2E4D1A4D054FC5C15A26BC7B100724B2E680D7FE81A92CA092FB"
+    },
+    {
+      "path": "scripts/report_incoming_checkpoint.ps1",
+      "sha256": "040AE12337ABBAC77740B67545355EDCC0AF9B87BDD76100EFF0F7D80B2DE4D2"
+    },
+    {
+      "path": "scripts/test_report_incoming.ps1",
+      "sha256": "D8D49AB93B6577E6E334F1BC04456D70B1890424F46684FFFDF46FF0A60A943F"
+    },
+    {
+      "path": "tests/report_incoming/bootstrap.php",
+      "sha256": "4F34F7A04D771101602DA889198C21F03C366A879BA7A2B1086E2317C3895F0F"
+    }
+  ],
+  "phase": 1
+}
