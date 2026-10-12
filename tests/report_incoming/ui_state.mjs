@@ -1,0 +1,54 @@
+import fs from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+const source = fs.readFileSync(new URL('../../application/modules/report_incoming/views/index.php', import.meta.url), 'utf8');
+const script = [...source.matchAll(/<script>([\s\S]*?)<\/script>/g)][0][1];
+const elements = new Map();
+let draft = { start_date: '', end_date: '', search: '' }, config, draw = 1, reloads = 0;
+function element(id) {
+  if (!elements.has(id)) {
+    const item = { handlers: {}, attributes: {}, value: '', visible: false };
+    item[0] = { reset: () => { draft = { start_date: '', end_date: '', search: '' }; } };
+    item.on = (event, callback) => { item.handlers[event] = callback; return item; };
+    item.text = value => { item.value = value; return item; };
+    item.prop = (name, value) => { item.attributes[name] = value; return item; };
+    item.hide = () => { item.visible = false; return item; };
+    item.show = () => { item.visible = true; return item; };
+    item.focus = () => item;
+    item.serializeArray = () => Object.entries(draft).map(([name, value]) => ({ name, value }));
+    item.DataTable = options => { config = options; return { ajax: { reload: () => { reloads++; draw++; pre(); } }, order: () => [[8, 'desc']] }; };
+    elements.set(id, item);
+  }
+  return elements.get(id);
+}
+const $ = argument => typeof argument === 'function' ? argument() : element(argument);
+$.each = (items, callback) => items.forEach((value, index) => callback(index, value));
+$.trim = value => value.trim();
+$.extend = Object.assign;
+$.param = values => new URLSearchParams(values).toString();
+const context = { $, siteurl: '/metalsindo_2/', window: { location: { href: '' } } };
+vm.runInNewContext(script, context);
+const pre = () => element('#incoming-table').handlers['preXhr.dt']();
+const response = payload => element('#incoming-table').handlers['xhr.dt'](null, { iDraw: draw }, payload);
+const submit = () => element('#incoming-filters').handlers.submit({ preventDefault() {} });
+const exportClick = () => element('#incoming-export').handlers.click();
+pre(); exportClick(); assert.equal(context.window.location.href, '');
+response({ draw, recordsFiltered: 7 });
+draft.search = 'unapplied'; exportClick();
+assert.equal(new URL(context.window.location.href, 'http://test').searchParams.get('search'), '');
+draft = { start_date: '2026-09-23', end_date: '2026-09-23', search: 'Lot A' }; submit();
+assert.equal(element('#incoming-export').attributes.disabled, true);
+response({ draw: draw - 1, recordsFiltered: 999 });
+assert.equal(element('#incoming-export').attributes.disabled, true, 'stale response must not enable export');
+response({ draw, recordsFiltered: 2 }); exportClick();
+const url = new URL(context.window.location.href, 'http://test');
+assert.equal(url.searchParams.get('search'), 'Lot A'); assert.equal(url.searchParams.get('order[0][column]'), '8');
+draft.start_date = '2026-09-24'; const before = reloads; submit();
+assert.equal(reloads, before, 'reversed date range does not replace applied filters');
+element('#incoming-reset').handlers.click();
+const request = {}; config.ajax.data(request);
+assert.equal(request.start_date, ''); assert.equal(request.search, '');
+response({ draw, error: 'Invalid filters' });
+assert.equal(element('#incoming-export').attributes.disabled, true);
+assert.equal(element('#incoming-error').visible, true);
+console.log('PASS UI state: applied filters, sorting, stale response, loading/error guard, date validation and reset (no browser)');
