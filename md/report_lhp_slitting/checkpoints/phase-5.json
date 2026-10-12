@@ -1,0 +1,69 @@
+{
+  "files": [
+    {
+      "path": "tests/report_lhp_slitting\\ui_syntax.mjs",
+      "sha256": "756DF0DA418CA9FFC16B8FA67DE9C2A4C9BEF13579222670D41515F0B19EBCEB"
+    },
+    {
+      "path": "tests/report_lhp_slitting\\regression.php",
+      "sha256": "198FC61DCFD60EF789083CA7503C124CE776B9ED07B4CDB0521E659978AF452A"
+    },
+    {
+      "path": "tests/report_lhp_slitting\\mutation.php",
+      "sha256": "C4AD264B3C4AF6C3C20F70D4435A11482A5C59081660B150F20C55C94360B6C5"
+    },
+    {
+      "path": "tests/report_lhp_slitting\\migration.php",
+      "sha256": "A404F5C174C8449D605A556EEBFD4D0591BA5376BC221FE70C8B6AA0C3B3B180"
+    },
+    {
+      "path": "tests/report_lhp_slitting\\existing_data.php",
+      "sha256": "DB99E0F86871FBCD693D33F2D75632C90721F2AEFDC945A14ECF660B98ED244C"
+    },
+    {
+      "path": "tests/report_lhp_slitting\\excel.php",
+      "sha256": "694D8E544D99E7E711649847D8ED5B1188EEEE5DEF976E17F6787F0E95225557"
+    },
+    {
+      "path": "tests/report_lhp_slitting\\controller.php",
+      "sha256": "4F95DB53CA6A099BA0D7F1B4C0B60499A563639024681B558D11B9667CAE6D64"
+    },
+    {
+      "path": "tests/report_lhp_slitting\\acceptance.php",
+      "sha256": "AF74340BC7E48D38C271B4E205211D0544E4517F4D83CE1C7B19DCE2A1D7946A"
+    },
+    {
+      "path": "application/modules/report_lhp_slitting\\views\\index.php",
+      "sha256": "01E8D13DED4498FB669D2FECF69083395AE2FBB2F4C509D0F008D886A0ABA8EB"
+    },
+    {
+      "path": "application/modules/report_lhp_slitting\\controllers\\Report_lhp_slitting.php",
+      "sha256": "9AF4EE03DD7BE70BD0D3E22886184B976EADE7DFE3C5D3E24FD1F346EE12675D"
+    },
+    {
+      "path": "application/modules/report_lhp_slitting\\models\\Report_lhp_slitting_model.php",
+      "sha256": "14E77B502C0DDDA6497BACD0E7E3CCE5A12D1559E7FD142ECF552A04C21A7F32"
+    },
+    {
+      "path": "application/modules/report_lhp_slitting\\libraries\\Report_lhp_slitting_registration.php",
+      "sha256": "F99CA1DE9EA6FFAEAE0C3AF9996743DC053AAED93F9041A9CC5169B72EFEB318"
+    },
+    {
+      "path": "application/modules/report_lhp_slitting\\libraries\\Report_lhp_slitting_excel.php",
+      "sha256": "81F9EADE31FF41DDAFC5A9403A3041B0BABAB1EE1E0A559B3606A7AA51550ABB"
+    },
+    {
+      "path": "scripts/register_report_lhp_slitting.php",
+      "sha256": "77693C692EFD7FE7F75204BA5B33009703223A673A93285D030CCFEBBFE977F1"
+    },
+    {
+      "path": "scripts/report_lhp_slitting_checkpoint.ps1",
+      "sha256": "F7D70382ECB2ECFB66E4D8038D33D7E52586CCBE58BF4DE1F6154E438FBCC950"
+    },
+    {
+      "path": "md/report_lhp_slitting/README.md",
+      "sha256": "FE4E75C92456DF72E41374B5AC3CFE3D6D75D43565E48803D9F9B8456FE41074"
+    }
+  ],
+  "phase": 5
+}

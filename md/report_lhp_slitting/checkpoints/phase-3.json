@@ -1,0 +1,17 @@
+{
+  "files": [
+    {
+      "path": "application/modules/report_lhp_slitting/controllers/Report_lhp_slitting.php",
+      "sha256": "9AF4EE03DD7BE70BD0D3E22886184B976EADE7DFE3C5D3E24FD1F346EE12675D"
+    },
+    {
+      "path": "application/modules/report_lhp_slitting/libraries/Report_lhp_slitting_excel.php",
+      "sha256": "6744BE2FCA6D14D1D644FDD69768397BFE6DFEDEA1A6B7046C26D457AA5773BC"
+    },
+    {
+      "path": "tests/report_lhp_slitting/excel.php",
+      "sha256": "DCE6E08CD2A7B34DB7A7059C5B8497782AC15C84A64E6D1749E35B01B238F08C"
+    }
+  ],
+  "phase": 3
+}
