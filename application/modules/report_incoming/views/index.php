@@ -5,25 +5,30 @@
     <div class="incoming-shell">
         <section class="incoming-panel" aria-labelledby="incoming-filter-title">
             <div class="incoming-panel-heading">
-                <div><span class="incoming-eyebrow">Warehouse report</span><h3 id="incoming-filter-title">Filter laporan</h3><p>Pilih periode incoming atau cari penerimaan yang dibutuhkan.</p></div>
-                <span class="incoming-badge">Incoming material supplier</span>
+                <div><h2 id="incoming-filter-title">Filter laporan</h2><p>Laporan penerimaan material supplier. Pilih periode incoming atau cari dokumen, supplier, material, dan lot.</p></div>
             </div>
             <form id="incoming-filters">
                 <div class="filter-row">
-                    <div class="form-group"><label for="incoming-start">Tanggal incoming mulai</label><input class="form-control" type="date" id="incoming-start" name="start_date"></div>
-                    <div class="form-group"><label for="incoming-end">Tanggal incoming sampai</label><input class="form-control" type="date" id="incoming-end" name="end_date"></div>
+                    <div class="form-group"><label for="incoming-start">Tanggal incoming mulai</label><input class="form-control" type="date" id="incoming-start" name="start_date" aria-describedby="incoming-filter-hint"></div>
+                    <div class="form-group"><label for="incoming-end">Tanggal incoming sampai</label><input class="form-control" type="date" id="incoming-end" name="end_date" aria-describedby="incoming-filter-hint"></div>
                     <div class="form-group search-field"><label for="incoming-search">Pencarian</label><input class="form-control" type="search" id="incoming-search" name="search" placeholder="PR, PO, supplier, material, Incoming, lot, customer"></div>
-                    <div class="filter-actions"><button class="btn incoming-primary" type="submit">Tampilkan <span class="incoming-button-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></button><button class="btn incoming-secondary" id="incoming-reset" type="button">Reset</button></div>
+                    <div class="filter-actions"><button class="btn incoming-primary" type="submit">Tampilkan laporan</button><button class="btn incoming-secondary" id="incoming-reset" type="button">Reset</button></div>
                 </div>
             </form>
-            <p class="incoming-filter-hint">Kosongkan tanggal untuk menampilkan semua periode.</p>
+            <p id="incoming-filter-hint" class="incoming-filter-hint">Kosongkan tanggal untuk menampilkan semua periode.</p>
         </section>
     </div>
     <div id="incoming-error" class="alert alert-danger" role="alert" style="display:none"></div>
     <div class="incoming-shell">
         <section class="incoming-panel incoming-results" aria-labelledby="incoming-results-title">
-            <div class="report-toolbar"><div><h3 id="incoming-results-title">Hasil incoming <span id="incoming-count" class="incoming-count" aria-live="polite">Memuat data...</span></h3><div id="incoming-period">Semua periode</div></div><button class="btn incoming-export" id="incoming-export" type="button" disabled>Export Excel <span class="incoming-button-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v5h14v-5"/></svg></span></button></div>
-            <div class="incoming-table-caption"><span>Detail penerimaan material</span><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M8 8l-4 4 4 4m8-8 4 4-4 4"/></svg> Geser untuk melihat 19 kolom</span></div>
+            <div class="report-toolbar">
+                <div class="incoming-result-heading"><h2 id="incoming-results-title">Hasil incoming</h2><div class="incoming-result-meta"><span id="incoming-count" class="incoming-count" aria-live="polite">Memuat data...</span><span id="incoming-period">Semua periode</span></div></div>
+                <div class="incoming-table-actions"><span class="incoming-scroll-hint">Geser tabel untuk melihat 19 kolom</span><button class="btn incoming-export" id="incoming-export" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v5h14v-5"/></svg>Export Excel</button></div>
+            </div>
+            <div id="incoming-note" class="report-note">
+                <p><strong>Perhatikan progress PO:</strong> satu baris adalah satu detail penerimaan/lot. Total Qty Receive dan Balance adalah progress item PO terkini yang diulang pada setiap lot; jangan dijumlahkan antarbaris. Filter tanggal tidak mengubah total receive.</p>
+                <p><strong>Keterangan data:</strong> PIC/Surat Jalan yang ambigu ditandai <strong>Belum terverifikasi</strong>. Customer mengikuti data stok historis dan dapat berubah.</p>
+            </div>
             <div role="region" aria-label="Tabel Report Incoming" tabindex="0">
                 <table id="incoming-table" class="table table-bordered table-striped" style="width:100%" aria-describedby="incoming-note">
                     <thead><tr class="column-groups"><th colspan="8" scope="colgroup">A. Purchase Order</th><th colspan="5" scope="colgroup">B. Penerimaan</th><th colspan="6" scope="colgroup">C. Dokumen dan Lot</th></tr><tr>
@@ -31,7 +36,6 @@
                     </tr></thead><tbody></tbody>
                 </table>
             </div>
-            <div id="incoming-note" class="report-note"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/></svg><p><strong>Catatan pembacaan</strong><br>Satu baris = satu detail penerimaan/lot. Total Qty Receive dan Balance adalah progress item PO terkini yang diulang pada setiap lot; jangan dijumlahkan antarbaris. Filter tanggal tidak mengubah total receive. PIC/Surat Jalan yang ambigu ditandai Belum terverifikasi. Customer mengikuti data stok historis dan dapat berubah.</p></div>
         </section>
     </div>
 </div>
@@ -77,7 +81,7 @@ $(function () {
         pageLength:25, lengthMenu:[10,25,50,100], order:[[8,'desc']], orderMulti:false,
         columnDefs:[{targets:0,orderable:false},{targets:[6,7,9,10,11],className:'incoming-number'}, {targets:[1,2,13,17],className:'incoming-document'}, {targets:[3,8],className:'incoming-date'}],
         ajax:{url:siteurl+'report_incoming/get_data', type:'POST', data:function (data) { $.extend(data,activeFilters); }},
-        language:{emptyTable:'Belum ada data Incoming.', zeroRecords:'Tidak ada hasil sesuai filter.', processing:'Memuat penerimaan...', lengthMenu:'Tampilkan _MENU_ baris', info:'Menampilkan _START_–_END_ dari _TOTAL_ hasil', infoEmpty:'Menampilkan 0 hasil', infoFiltered:'(dari _MAX_ hasil)', paginate:{first:'Awal',last:'Akhir',next:'Berikutnya',previous:'Sebelumnya'}}
+        language:{emptyTable:'Belum ada data Incoming material supplier. Pastikan penerimaan material supplier sudah dicatat pada modul Incoming.', zeroRecords:'Tidak ada hasil sesuai filter. Ubah periode atau kata pencarian, atau klik Reset untuk melihat semua hasil.', processing:'Memuat penerimaan...', lengthMenu:'Tampilkan _MENU_ baris', info:'Menampilkan _START_–_END_ dari _TOTAL_ hasil', infoEmpty:'Menampilkan 0 hasil', infoFiltered:'(dari _MAX_ hasil)', paginate:{first:'Awal',last:'Akhir',next:'Berikutnya',previous:'Sebelumnya'}}
     });
     form.on('submit', function (event) { event.preventDefault(); apply(); });
     $('#incoming-reset').on('click', function () { form[0].reset(); apply(); });
