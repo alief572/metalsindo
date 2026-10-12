@@ -1,0 +1,506 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analisa Diskon Manual - Create Invoice</title>
+<!-- @formatter:off -->
+<!-- prettier-ignore -->
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Tahoma,sans-serif;background:#f0f2f5;color:#1a1a2e;line-height:1.7;padding:40px 20px}.container{max-width:1100px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.08);padding:50px 60px}h1{font-size:26px;color:#1a1a2e;border-bottom:3px solid #4361ee;padding-bottom:15px;margin-bottom:10px}.subtitle{color:#636e72;margin-bottom:30px;font-size:14px}h2{font-size:20px;color:#4361ee;margin-top:45px;margin-bottom:16px;padding-left:12px;border-left:4px solid #4361ee}h3{font-size:16px;color:#2d3436;margin-top:25px;margin-bottom:10px}p,li{margin-bottom:10px;font-size:15px}ul,ol{padding-left:24px;margin:10px 0 16px}table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}th,td{border:1px solid #dee2e6;padding:9px 12px;text-align:left}th{background:#4361ee;color:#fff;font-weight:600;font-size:12px}tr:nth-child(even){background:#f8f9fa}.info{background:#e3f2fd;border-left:4px solid #2196f3;padding:14px 18px;margin:16px 0;border-radius:4px}.warn{background:#fff3e0;border-left:4px solid #ff9800;padding:14px 18px;margin:16px 0;border-radius:4px}.danger{background:#ffebee;border-left:4px solid #f44336;padding:14px 18px;margin:16px 0;border-radius:4px}.success{background:#e8f5e9;border-left:4px solid #4caf50;padding:14px 18px;margin:16px 0;border-radius:4px}pre{background:#1e1e2e;color:#cdd6f4;padding:18px;border-radius:8px;overflow-x:auto;font-size:12px;line-height:1.5;margin:14px 0;white-space:pre}code{background:#e9ecef;padding:2px 6px;border-radius:4px;font-size:12px;color:#e83e8c}.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600}.badge-h{background:#ffcdd2;color:#c62828}.badge-m{background:#fff9c4;color:#f57f17}.badge-l{background:#c8e6c9;color:#2e7d32}.toc{background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:20px 28px;margin:20px 0 35px}.toc h3{margin-top:0;color:#4361ee}.toc ol{padding-left:20px}.toc li{margin-bottom:5px}.toc a{color:#4361ee;text-decoration:none}.toc a:hover{text-decoration:underline}hr{border:none;border-top:2px dashed #dee2e6;margin:40px 0}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}.card{border:1px solid #dee2e6;border-radius:8px;padding:16px}.card h4{font-size:14px;margin-bottom:8px;color:#4361ee}.pro{color:#2e7d32}.con{color:#c62828}@media(max-width:768px){.container{padding:24px 20px}.grid2{grid-template-columns:1fr}}@media print{body{background:#fff;padding:0}.container{box-shadow:none;padding:20px}}</style>
+</head>
+<body>
+<div class="container">
+<h1>&#128203; Analisa Perubahan: Diskon Manual pada Create Invoice</h1>
+<p class="subtitle">Modul WT Invoicing &bull; Tanggal: 24 Juli 2026 &bull; Status: Draft &mdash; Menunggu Review BA</p>
+<table><tr><th width="180">Item</th><th>Detail</th></tr><tr><td>Modul</td><td>WT Invoicing (<code>wt_invoicing/createInvoice</code>)</td></tr><tr><td>Dibuat Oleh</td><td>Development Team</td></tr><tr><td>Scope</td><td>Form Create Invoice (dari SPK &amp; DO), Print Invoice, Halaman Index/Monitoring</td></tr><tr><td>Request</td><td>Kolom diskon bisa diinput manual oleh user (nominal Rupiah)</td></tr><tr><td>Validasi</td><td>Diskon tidak boleh melebihi total Amount</td></tr></table>
+
+<div class="toc">
+<h3>Daftar Isi</h3>
+<ol>
+<li><a href="#s1">Latar Belakang & Kondisi Saat Ini</a></li>
+<li><a href="#s2">Masalah yang Ditemukan (6 Problem)</a></li>
+<li><a href="#s3">Opsi Solusi (4 Opsi)</a></li>
+<li><a href="#s4">Perbandingan Opsi</a></li>
+<li><a href="#s5">Rekomendasi & Detail Implementasi</a></li>
+<li><a href="#s6">Skenario Penggunaan</a></li>
+<li><a href="#s7">Risiko & Mitigasi</a></li>
+<li><a href="#s8">Checklist Implementasi</a></li>
+<li><a href="#s9">Pertanyaan untuk BA</a></li>
+<li><a href="#s10">Diagram Alur Setelah Perubahan</a></li>
+<li><a href="#s11">Kesimpulan & Estimasi</a></li>
+</ol>
+</div>
+
+<hr>
+
+<h2 id="s1">1. Latar Belakang & Kondisi Saat Ini</h2>
+<p>Saat ini, kolom <strong>diskon</strong> pada form Create Invoice bersifat <strong>readonly</strong> (tidak bisa diedit oleh user). Nilai diskon otomatis diambil dari tabel master <code>ms_diskon</code> berdasarkan:</p>
+<ul>
+<li><strong>Tipe produk</strong> (<code>id_type</code> dari <code>ms_inventory_category3</code>)</li>
+<li><strong>Term of Payment</strong> (<code>id_top</code> dari <code>ms_top</code>)</li>
+</ul>
+
+<h3>Flow Perhitungan Saat Ini</h3>
+<pre>
+Master ms_diskon --> CariDiskon() via AJAX --> Nilai Diskon % (auto-fill)
+     (per tipe produk + TOP)
+
+Per Item:
+  Total Harga  = Qty x Harga Satuan
+  Nilai Diskon = Total Harga x (Diskon % / 100)
+  Amount Item  = Total Harga - Nilai Diskon + Freight
+
+Footer:
+  Amount       = SUM(Amount Item)         &lt;-- readonly
+  Discount     = SUM(Nilai Diskon)        &lt;-- readonly (dari master)
+  Total        = Amount - Discount        &lt;-- readonly
+  Persentase   = % invoice                &lt;-- editable
+  Grand Total  = Total x Persentase%      &lt;-- readonly
+  DPP          = Grand Total              &lt;-- readonly
+  PPN          = DPP x PPN%              &lt;-- readonly
+  Total Inv    = Grand Total + PPN        &lt;-- readonly
+</pre>
+
+<h3>Tabel Database yang Terlibat</h3>
+<table>
+<tr><th>Tabel</th><th>Kolom</th><th>Keterangan</th></tr>
+<tr><td><code>tr_invoice</code></td><td><code>diskon</code></td><td>Total diskon header (nominal Rp)</td></tr>
+<tr><td><code>tr_invoice</code></td><td><code>total</code></td><td>Total setelah diskon (Amount - Discount)</td></tr>
+<tr><td><code>tr_invoice</code></td><td><code>nilai_invoice</code></td><td>Nilai tagihan final (incl. PPN)</td></tr>
+<tr><td><code>tr_invoice_detail</code></td><td><code>diskon</code></td><td>Persentase diskon per item</td></tr>
+<tr><td><code>tr_invoice_detail</code></td><td><code>nilai_diskon</code></td><td>Nilai diskon per item (Rp)</td></tr>
+<tr><td><code>tr_invoice_detail</code></td><td><code>diskon_compare</code></td><td>Diskon pembanding / dari master (untuk audit)</td></tr>
+<tr><td><code>ms_diskon</code></td><td><code>nilai_diskon</code></td><td>Master diskon per tipe produk + TOP</td></tr>
+</table>
+
+<h3>File yang Terkait</h3>
+<table>
+<tr><th>File</th><th>Fungsi</th></tr>
+<tr><td><code>views/create_invoice.php</code></td><td>Form create invoice dari SPK Marketing</td></tr>
+<tr><td><code>views/create_invoice_do.php</code></td><td>Form create invoice dari Delivery Order</td></tr>
+<tr><td><code>views/create_invoice_do_slitting.php</code></td><td>Form create invoice DO Slitting</td></tr>
+<tr><td><code>controllers/Wt_invoicing.php - SaveNewInvoice()</code></td><td>Simpan data invoice</td></tr>
+<tr><td><code>controllers/Wt_invoicing.php - CariDiskon()</code></td><td>AJAX ambil diskon dari master</td></tr>
+<tr><td><code>models/Wt_invoicing_model.php - get_invoicing()</code></td><td>Data untuk halaman index</td></tr>
+<tr><td><code>models/Wt_invoicing_model.php - get_monitoring_invoice()</code></td><td>Data monitoring piutang</td></tr>
+<tr><td><code>views/PrintInvoice.php</code></td><td>Template cetak PDF invoice</td></tr>
+</table>
+
+<hr>
+
+<h2 id="s2">2. Masalah yang Ditemukan</h2>
+
+<h3>&#9888;&#65039; Problem #1: Perbedaan Basis Hitung (KG vs Sheet) &mdash; KRUSIAL</h3>
+<div class="danger">
+<strong>Ini adalah masalah paling kritis yang harus dipahami.</strong><br>
+Produk di Metalsindo ada 2 jenis berdasarkan bentuk material:<br>
+&bull; <strong>Reguler (Coil/Plate)</strong> &rarr; satuan KG<br>
+&bull; <strong>Sheet</strong> (id_bentuk = B2000002) &rarr; satuan Lembar (Sheets)
+</div>
+
+<p><strong>Di Form Create Invoice (saat input):</strong></p>
+<pre>
+Qty      = total_kirim (KG)      contoh: 2.500 KG
+Per Unit = harga_deal (per KG)   contoh: Rp 10.000/KG
+Amount   = 2.500 x 10.000       = Rp 25.000.000
+</pre>
+
+<p><strong>Di Print Invoice (PDF yang dikirim ke customer):</strong></p>
+<pre>
+Qty      = qty_sheet (lembar)       contoh: 500 Sheets
+Per Unit = harga_satuan (per sheet) contoh: Rp 50.000/sheet
+Amount   = 500 x 50.000            = Rp 25.000.000
+</pre>
+
+<div class="warn">
+<strong>Masalahnya:</strong> User di form create melihat basis KG, tapi customer di invoice melihat basis Sheet.<br><br>
+Jika user terbiasa menghitung diskon per-sheet (misal Rp 5.000/sheet x 500 = Rp 2.500.000), mereka <strong>tidak bisa langsung validasi</strong> angka tersebut di form create karena qty yang tampil adalah KG, bukan Sheet.
+</div>
+
+<h3>&#9888;&#65039; Problem #2: Print Invoice Tidak Menampilkan Baris Diskon</h3>
+<p>Template <code>PrintInvoice.php</code> saat ini <strong>TIDAK menampilkan baris Discount</strong>. Footer PDF hanya:</p>
+<pre>
+| Total          | Rp 25.000.000 |
+| DPP Nilai Lain | Rp 22.916.667 |
+| PPN            | Rp  2.750.000 |
+| Grand Total    | Rp 27.750.000 |
+</pre>
+<p>Meskipun diskon di-input, customer tidak akan melihat potongan diskon di invoice cetak.</p>
+
+<h3>&#9888;&#65039; Problem #3: Halaman Index & Monitoring Tidak Memperhitungkan Diskon</h3>
+<p>Di model <code>get_invoicing()</code> dan <code>get_monitoring_invoice()</code>, nilai invoice yang ditampilkan <strong>TIDAK dikurangi diskon</strong>:</p>
+<pre>
+// Non-sheet:
+$ttl_harga = SUM(qty_invoice x harga_satuan);  // tanpa kurangi diskon
+$nilai_invoice = $ttl_harga + $ppn;
+
+// Sheet:
+$nilai_invoice += ($harga_satuan * $qty_sheet) + PPN;  // tanpa kurangi diskon
+</pre>
+<div class="warn"><strong>Akibat:</strong> Nilai di halaman index/monitoring bisa lebih besar dari yang seharusnya.</div>
+
+<h3>&#9888;&#65039; Problem #4: Dampak ke E-Faktur / CoreTax</h3>
+<p>Di <code>generate_efaktur()</code>, DPP dihitung tanpa memperhitungkan diskon:</p>
+<pre>
+DPP = Qty x Harga Satuan (TANPA kurangi diskon)
+DPP Nilai Lain = ceil(11/12 x DPP)
+PPN = DPP Nilai Lain x 12%
+</pre>
+<div class="warn"><strong>Risiko:</strong> DPP yang dilaporkan ke pajak lebih besar dari nilai sebenarnya &rarr; potensi lebih bayar PPN.</div>
+
+<h3>&#9888;&#65039; Problem #5: Update SPK Marketing Bisa Tidak Akurat</h3>
+<p>Saat save invoice, ada update akumulasi:</p>
+<pre>
+UPDATE tr_spk_marketing 
+SET percent_invoice = percent_invoice + $percent,  
+    total_invoice = total_invoice + $dpp  
+WHERE id_spkmarketing = '$no_so'
+</pre>
+<p>Jika diskon manual mengubah DPP, monitoring persentase penyelesaian invoice di SPK Marketing bisa salah.</p>
+
+<h3>&#9888;&#65039; Problem #6: Tidak Ada Audit Trail Diskon Manual</h3>
+<p>Saat ini tidak ada catatan:</p>
+<ul>
+<li>Siapa yang mengubah diskon dari nilai master</li>
+<li>Berapa diskon seharusnya (dari master <code>ms_diskon</code>)</li>
+<li>Alasan pemberian diskon khusus</li>
+</ul>
+<p>Kolom <code>diskon_compare</code> sudah tersedia di <code>tr_invoice_detail</code> tapi belum digunakan aktif.</p>
+
+<hr>
+
+<h2 id="s3">3. Opsi Solusi</h2>
+
+<div class="grid2">
+<div class="card">
+<h4>Opsi A: Input Diskon Nominal Total (Rp) di Footer</h4>
+<p>Field diskon di footer form dibuat editable. User input nominal total Rupiah langsung.</p>
+<p class="pro">&#10004; Implementasi paling sederhana</p>
+<p class="pro">&#10004; Tidak perlu ubah struktur database</p>
+<p class="pro">&#10004; Solve masalah KG vs Sheet</p>
+<p class="pro">&#10004; Universal semua tipe produk</p>
+<p class="pro">&#10004; Controller tidak perlu diubah</p>
+<p class="con">&#10008; Tidak ada breakdown per item</p>
+<p class="con">&#10008; User harus hitung sendiri di luar sistem</p>
+</div>
+
+<div class="card">
+<h4>Opsi B: Input Diskon Per-Item (Nominal Rp per Baris)</h4>
+<p>Setiap baris item ditambahkan kolom Diskon (Rp) yang bisa di-input manual.</p>
+<p class="pro">&#10004; Granular - bisa trace per produk</p>
+<p class="pro">&#10004; Akurat untuk e-Faktur</p>
+<p class="con">&#10008; Lebih complex</p>
+<p class="con">&#10008; Tetap ada masalah sheet vs KG</p>
+<p class="con">&#10008; Perlu ubah SaveNewInvoice()</p>
+<p class="con">&#10008; Perlu ubah JavaScript signifikan</p>
+</div>
+
+<div class="card">
+<h4>Opsi C: Input Diskon Per-Item (Persentase %) Editable</h4>
+<p>Sama seperti sekarang (diskon %) tapi field dibuat editable, tidak lagi dari master.</p>
+<p class="pro">&#10004; Perubahan minimal dari kondisi saat ini</p>
+<p class="pro">&#10004; JS HitungTotal() sudah support</p>
+<p class="pro">&#10004; Database tidak perlu diubah</p>
+<p class="con">&#10008; User harus convert nominal ke %</p>
+<p class="con">&#10008; Masalah sheet tetap ada</p>
+<p class="con">&#10008; Tidak intuitif untuk diskon flat</p>
+</div>
+
+<div class="card">
+<h4>Opsi D: Hybrid (Total + Per Item Opsional)</h4>
+<p>Footer bisa di-input manual, opsional expand untuk detail per item.</p>
+<p class="pro">&#10004; Paling fleksibel</p>
+<p class="pro">&#10004; Solve masalah sheet vs KG</p>
+<p class="con">&#10008; Paling complex untuk implementasi</p>
+<p class="con">&#10008; UX bisa membingungkan</p>
+<p class="con">&#10008; Effort development tinggi</p>
+</div>
+</div>
+
+<hr>
+
+<h2 id="s4">4. Perbandingan Opsi</h2>
+<table>
+<tr><th>Aspek</th><th>Opsi A (Total Rp)</th><th>Opsi B (Per Item Rp)</th><th>Opsi C (Per Item %)</th><th>Opsi D (Hybrid)</th></tr>
+<tr><td>Effort Development</td><td><span class="badge badge-l">Rendah</span></td><td><span class="badge badge-m">Sedang</span></td><td><span class="badge badge-l">Rendah</span></td><td><span class="badge badge-h">Tinggi</span></td></tr>
+<tr><td>Perubahan Database</td><td>Tidak perlu</td><td>Perlu (kolom baru)</td><td>Tidak perlu</td><td>Tergantung</td></tr>
+<tr><td>Solve masalah Sheet/KG</td><td><strong>Ya</strong></td><td>Tidak langsung</td><td>Tidak</td><td><strong>Ya</strong></td></tr>
+<tr><td>Intuitif untuk User</td><td><strong>Sangat</strong></td><td>Cukup</td><td>Kurang</td><td>Cukup</td></tr>
+<tr><td>Akurasi E-Faktur</td><td>Perlu adjustment</td><td><strong>Akurat</strong></td><td><strong>Akurat</strong></td><td><strong>Akurat</strong></td></tr>
+<tr><td>Risiko Bugs</td><td><span class="badge badge-l">Rendah</span></td><td><span class="badge badge-m">Sedang</span></td><td><span class="badge badge-l">Rendah</span></td><td><span class="badge badge-h">Tinggi</span></td></tr>
+</table>
+
+<hr>
+
+<h2 id="s5">5. Rekomendasi: Opsi A (Input Diskon Nominal Total di Footer)</h2>
+
+<div class="success">
+<strong>Rekomendasi:</strong> Gunakan Opsi A karena:
+<ol>
+<li><strong>Solve masalah KG vs Sheet</strong> &mdash; User input nominal final, tidak perlu bingung basis hitungnya</li>
+<li><strong>Effort minimal</strong> &mdash; Hapus readonly, tambah JS recalculate, tambah validasi</li>
+<li><strong>Tidak merusak yang sudah jalan</strong> &mdash; Controller SaveNewInvoice() tidak perlu diubah</li>
+<li><strong>Konsisten</strong> &mdash; Berlaku sama untuk reguler, sheet, dan slitting</li>
+</ol>
+</div>
+
+<h3>Detail Perubahan View (Form)</h3>
+<p><strong>File:</strong> <code>create_invoice_do.php</code>, <code>create_invoice.php</code>, <code>create_invoice_do_slitting.php</code></p>
+<p>Sebelum (readonly):</p>
+<pre>&lt;input type='text' class='form-control diskon' id='diskon' name='diskon' 
+       readonly value="&lt;?= number_format($diskon, 2) ?&gt;"&gt;</pre>
+<p>Sesudah (editable + event):</p>
+<pre>&lt;input type='text' class='form-control diskon' id='diskon' name='diskon' 
+       onblur="hitungDiskon()" value="&lt;?= number_format($diskon, 2) ?&gt;"&gt;</pre>
+
+<h3>Detail Perubahan JavaScript</h3>
+<p><strong>Tambah fungsi baru <code>hitungDiskon()</code>:</strong></p>
+<pre>
+function hitungDiskon() {
+    var amount = getNum($('#totalproduk').val().split(",").join(""));
+    var diskon = getNum($('#diskon').val().split(",").join(""));
+    
+    // Validasi: diskon tidak boleh > amount
+    if (diskon > amount) {
+        swal("Warning", "Diskon tidak boleh melebihi total Amount!", "error");
+        $('#diskon').val('0.00');
+        diskon = 0;
+    }
+    
+    // Validasi: diskon tidak boleh negatif
+    if (diskon &lt; 0) {
+        swal("Warning", "Diskon tidak boleh negatif!", "error");
+        $('#diskon').val('0.00');
+        diskon = 0;
+    }
+    
+    var total = amount - diskon;
+    $('#total').val(number_format(total, 2));
+    $('#diskon').val(number_format(diskon, 2));
+    
+    hitungPpn();
+}
+</pre>
+
+<p><strong>Ubah fungsi <code>totalBalanced()</code>:</strong></p>
+<pre>
+function totalBalanced() {
+    var SUMx = 0;
+    $(".total").each(function() {
+        SUMx += Number($(this).val().split(",").join(""));
+    });
+    
+    $('#totalproduk').val(number_format(SUMx, 2));
+    hitungDiskon(); // trigger recalculate dengan diskon
+}
+</pre>
+
+<p><strong>Ubah fungsi <code>hitungPpn()</code>:</strong></p>
+<pre>
+function hitungPpn() {
+    var total = getNum($('#total').val().split(",").join("")); // pakai Total (setelah diskon)
+    var ppn = $('#ppn').val();
+    var persentase = $('#persentase').val();
+
+    var nilai_tagih = (getNum(total) * getNum(persentase)) / 100;
+    var nilai_ppn = (getNum(nilai_tagih) * getNum(ppn)) / 100;
+    var nilai_invoice = getNum(nilai_tagih) + getNum(nilai_ppn);
+
+    $('#grandtotal').val(number_format(nilai_tagih, 2));
+    $('#dpp').val(number_format(nilai_tagih, 2));
+    $('#totalppn').val(number_format(nilai_ppn, 2));
+    $('#nilai_tagih').val(number_format(nilai_invoice, 2));
+}
+</pre>
+
+<h3>Detail Perubahan Print Invoice</h3>
+<p><strong>File:</strong> <code>views/PrintInvoice.php</code></p>
+<p>Tambahkan baris <strong>Discount</strong> dan <strong>Sub Total</strong> di footer tabel (hanya jika diskon &gt; 0):</p>
+<pre>
+&lt;?php if ($header-&gt;diskon &gt; 0) { ?&gt;
+&lt;tr&gt;
+    &lt;th&gt;&lt;/th&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;&lt;/th&gt;
+    &lt;th align="center"&gt;Discount&lt;/th&gt;
+    &lt;th align="right"&gt;&lt;?= number_format($header-&gt;diskon, 2) ?&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+    &lt;th&gt;&lt;/th&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;&lt;/th&gt;
+    &lt;th align="center"&gt;Sub Total&lt;/th&gt;
+    &lt;th align="right"&gt;&lt;?= number_format($totharga - $header-&gt;diskon, 2) ?&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;?php } ?&gt;
+</pre>
+
+<hr>
+
+<h2 id="s6">6. Skenario Penggunaan</h2>
+
+<h3>Skenario 1: Produk Reguler (KG) dengan Diskon Negosiasi</h3>
+<div class="info">
+<strong>Situasi:</strong> Customer PT ABC beli coil 5.000 KG @ Rp 15.000/KG. Negosiasi dapat diskon Rp 5.000.000
+</div>
+<table>
+<tr><th>Tahap</th><th>Field</th><th>Nilai</th></tr>
+<tr><td>Form Create</td><td>Amount</td><td>5.000 x 15.000 = Rp 75.000.000</td></tr>
+<tr><td>Form Create</td><td>Discount (user input)</td><td>Rp 5.000.000</td></tr>
+<tr><td>Form Create</td><td>Total</td><td>Rp 70.000.000</td></tr>
+<tr><td>Print Invoice</td><td>Qty / Per Unit / Amount</td><td>5,000.00 Kgs / 15,000.00 / 75,000,000.00</td></tr>
+<tr><td>Print Invoice</td><td>Discount</td><td>5,000,000.00</td></tr>
+<tr><td>Print Invoice</td><td>Sub Total</td><td>70,000,000.00</td></tr>
+</table>
+
+<h3>Skenario 2: Produk Sheet dengan Diskon Per-Lembar</h3>
+<div class="info">
+<strong>Situasi:</strong> Customer PT XYZ beli sheet 500 lembar (total berat 2.500 KG). Harga per KG = Rp 10.000. Diskon dari sales: Rp 2.000/sheet = 500 x 2.000 = Rp 1.000.000
+</div>
+<table>
+<tr><th>Tahap</th><th>Field</th><th>Nilai</th></tr>
+<tr><td>Form Create (basis KG)</td><td>Amount</td><td>2.500 x 10.000 = Rp 25.000.000</td></tr>
+<tr><td>Form Create</td><td>Discount (user input nominal)</td><td>Rp 1.000.000</td></tr>
+<tr><td>Form Create</td><td>Total</td><td>Rp 24.000.000</td></tr>
+<tr><td>Print Invoice (basis Sheet)</td><td>Qty / Per Unit / Amount</td><td>500.00 Sheets / 50,000.00 / 25,000,000.00</td></tr>
+<tr><td>Print Invoice</td><td>Discount</td><td>1,000,000.00</td></tr>
+<tr><td>Print Invoice</td><td>Sub Total</td><td>24,000,000.00</td></tr>
+</table>
+<div class="success">
+<strong>Mengapa ini bekerja:</strong> User input Rp 1.000.000 (sudah dihitung sendiri: 500 sheet x Rp 2.000). Customer di invoice lihat diskon sebagai nominal total. Tidak ada konflik basis KG vs Sheet.
+</div>
+
+<h3>Skenario 3: Tanpa Diskon (Default)</h3>
+<div class="info">
+<strong>Situasi:</strong> Invoice tanpa diskon. User biarkan field = 0 atau kosongkan.
+</div>
+<p>Di Print Invoice, baris Discount <strong>TIDAK ditampilkan</strong> (conditional: hanya muncul jika diskon &gt; 0).</p>
+
+<hr>
+
+<h2 id="s7">7. Risiko & Mitigasi</h2>
+<table>
+<tr><th>No</th><th>Risiko</th><th>Dampak</th><th>Probabilitas</th><th>Mitigasi</th></tr>
+<tr><td>1</td><td>User salah input nominal (typo)</td><td>Nilai invoice salah, piutang salah</td><td><span class="badge badge-m">Sedang</span></td><td>Tampilkan confirmation dialog sebelum save</td></tr>
+<tr><td>2</td><td>Diskon diberikan tanpa approval</td><td>Kerugian perusahaan</td><td><span class="badge badge-l">Rendah</span></td><td>Simpan nilai master di diskon_compare untuk audit</td></tr>
+<tr><td>3</td><td>E-Faktur tidak match dengan diskon</td><td>Lebih/kurang bayar PPN</td><td><span class="badge badge-l">Rendah</span></td><td>Diskusi dengan tim pajak sebelum implementasi</td></tr>
+<tr><td>4</td><td>Nilai di index berbeda dari print</td><td>Confusion user finance</td><td><span class="badge badge-m">Sedang</span></td><td>Pastikan semua tampilan konsisten</td></tr>
+<tr><td>5</td><td>Diskon > Amount lolos validasi</td><td>Nilai negatif</td><td><span class="badge badge-l">Rendah</span></td><td>Double validation: frontend (JS) + backend (controller)</td></tr>
+</table>
+
+<hr>
+
+<h2 id="s8">8. Checklist Implementasi</h2>
+<table>
+<tr><th>No</th><th>Task</th><th>File</th><th>Priority</th></tr>
+<tr><td>1</td><td>Hapus readonly dari field diskon di form</td><td>3 view files</td><td><span class="badge badge-h">High</span></td></tr>
+<tr><td>2</td><td>Tambah fungsi JS hitungDiskon()</td><td>3 view files</td><td><span class="badge badge-h">High</span></td></tr>
+<tr><td>3</td><td>Update fungsi JS totalBalanced()</td><td>3 view files</td><td><span class="badge badge-h">High</span></td></tr>
+<tr><td>4</td><td>Update fungsi JS hitungPpn() agar basis = Total (setelah diskon)</td><td>3 view files</td><td><span class="badge badge-h">High</span></td></tr>
+<tr><td>5</td><td>Tambah validasi JS (diskon &le; Amount, &ge; 0)</td><td>3 view files</td><td><span class="badge badge-h">High</span></td></tr>
+<tr><td>6</td><td>Tambah validasi backend di SaveNewInvoice()</td><td>Controller</td><td><span class="badge badge-m">Medium</span></td></tr>
+<tr><td>7</td><td>Tambah baris Discount di PrintInvoice.php</td><td>View print</td><td><span class="badge badge-h">High</span></td></tr>
+<tr><td>8</td><td>Update kalkulasi di get_invoicing()</td><td>Model</td><td><span class="badge badge-m">Medium</span></td></tr>
+<tr><td>9</td><td>Update kalkulasi di get_monitoring_invoice()</td><td>Model</td><td><span class="badge badge-m">Medium</span></td></tr>
+<tr><td>10</td><td>Simpan diskon master ke diskon_compare untuk audit</td><td>Controller</td><td><span class="badge badge-l">Low</span></td></tr>
+<tr><td>11</td><td>Update DPP di e-Faktur (jika disetujui tim pajak)</td><td>Controller</td><td><span class="badge badge-l">Low</span></td></tr>
+<tr><td>12</td><td>Testing: invoice reguler tanpa diskon</td><td>-</td><td><span class="badge badge-h">High</span></td></tr>
+<tr><td>13</td><td>Testing: invoice reguler dengan diskon</td><td>-</td><td><span class="badge badge-h">High</span></td></tr>
+<tr><td>14</td><td>Testing: invoice sheet dengan diskon</td><td>-</td><td><span class="badge badge-h">High</span></td></tr>
+<tr><td>15</td><td>Testing: print invoice dengan/tanpa diskon</td><td>-</td><td><span class="badge badge-h">High</span></td></tr>
+<tr><td>16</td><td>Testing: halaman index & monitoring</td><td>-</td><td><span class="badge badge-m">Medium</span></td></tr>
+</table>
+
+<hr>
+
+<h2 id="s9">9. Pertanyaan untuk BA (Butuh Keputusan)</h2>
+<table>
+<tr><th>No</th><th>Pertanyaan</th><th>Konteks</th><th>Opsi Jawaban</th></tr>
+<tr><td>1</td><td>Apakah diskon harus tampil di print invoice?</td><td>Saat ini tidak ada baris Discount di PDF</td><td>Ya / Tidak</td></tr>
+<tr><td>2</td><td>Format tampilan diskon di print?</td><td>Satu baris total saja atau per item?</td><td>Total saja / Per item</td></tr>
+<tr><td>3</td><td>DPP e-Faktur dihitung sebelum atau sesudah diskon?</td><td>Mempengaruhi pelaporan pajak</td><td>Sebelum / Sesudah diskon</td></tr>
+<tr><td>4</td><td>Perlu approval jika diskon melebihi threshold?</td><td>Misal diskon > 10% perlu approval manager</td><td>Ya (berapa %) / Tidak</td></tr>
+<tr><td>5</td><td>Nilai default diskon saat form dibuka?</td><td>Saat ini = nilai dari master ms_diskon</td><td>Tetap dari master / Mulai dari 0</td></tr>
+<tr><td>6</td><td>Halaman index perlu tampilkan kolom diskon?</td><td>Saat ini tidak ada kolom diskon di daftar</td><td>Ya / Tidak</td></tr>
+<tr><td>7</td><td>Scope view yang diubah?</td><td>Ada 3 form create invoice berbeda</td><td>Semua / Hanya tertentu</td></tr>
+</table>
+
+<hr>
+
+<h2 id="s10">10. Diagram Alur Setelah Perubahan</h2>
+<pre>
+User buka form Create Invoice
+     |
+     v
+Sistem load data dari DO/SPK
+Amount = SUM(Qty x Harga Satuan) per item
+Diskon = Pre-fill dari SUM(nilai_diskon) yang ada di SPK/DO
+     |
+     v
++---------------------------------------------+
+| User BISA edit field Diskon (Rp)            |
+| - Ketik nominal baru                       |
+| - Atau biarkan default                     |
++---------------------------------------------+
+     |
+     v
+JavaScript validasi:
+  - Diskon <= Amount? OK
+  - Diskon >= 0? OK
+     |
+     v
+Auto-recalculate:
+  Total         = Amount - Diskon
+  Grand Total   = Total x Persentase%
+  DPP           = Grand Total
+  PPN           = DPP x PPN%
+  Total Invoice = Grand Total + PPN
+     |
+     v
+User klik "Create Invoice"
+     |
+     v
+Backend save ke database:
+  tr_invoice.diskon        = nominal diskon
+  tr_invoice.total         = amount - diskon
+  tr_invoice.nilai_invoice = total invoice
+     |
+     v
++---------------------------------------------------+
+| Tampil di halaman Index  -> Nilai sudah - diskon  |
+| Print Invoice PDF        -> Ada baris "Discount"  |
+| Monitoring Piutang       -> Sisa = setelah diskon |
++---------------------------------------------------+
+</pre>
+
+<hr>
+
+<h2 id="s11">11. Kesimpulan & Estimasi</h2>
+
+<div class="success">
+<strong>Perubahan ini LAYAK diimplementasikan</strong> dengan menggunakan <strong>Opsi A (Input Diskon Nominal Total Rp di Footer)</strong>.
+</div>
+
+<h3>Ringkasan Keputusan</h3>
+<ol>
+<li>Gunakan <strong>Opsi A</strong> - paling efisien dan solve masalah KG vs Sheet</li>
+<li><strong>Wajib update Print Invoice</strong> - tambahkan baris Discount agar customer aware</li>
+<li><strong>Wajib update halaman Index & Monitoring</strong> - agar nilai konsisten</li>
+<li><strong>Diskusi E-Faktur</strong> dengan tim pajak terlebih dahulu</li>
+<li><strong>Simpan diskon master</strong> di diskon_compare untuk audit trail</li>
+</ol>
+
+<h3>Estimasi Effort</h3>
+<table>
+<tr><th>Task</th><th>Estimasi Waktu</th></tr>
+<tr><td>Perubahan view (3 files) + JavaScript</td><td>2-3 jam</td></tr>
+<tr><td>Perubahan PrintInvoice</td><td>1 jam</td></tr>
+<tr><td>Perubahan Model (index + monitoring)</td><td>1-2 jam</td></tr>
+<tr><td>Testing (semua skenario)</td><td>2-3 jam</td></tr>
+<tr><td><strong>TOTAL</strong></td><td><strong>6-9 jam</strong></td></tr>
+</table>
+
+<br>
+<div class="info">
+<strong>Catatan:</strong> Dokumen ini dibuat sebagai bahan diskusi. Implementasi dilakukan setelah mendapat approval dari BA dan stakeholder terkait.
+</div>
+
+</div>
+</body>
+</html>

@@ -9,6 +9,11 @@
 /manifest.json
 /assets/manifest-icon/
 
+# Local documentation, maintenance scripts, and tests
+/md/
+/scripts/
+/tests/
+
 #codeigniter 3
 .vscode/*
 application/config

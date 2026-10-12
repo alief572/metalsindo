@@ -1,0 +1,7 @@
+.git
+.github
+.vscode
+.kiro
+analysis
+*.pdf
+nbproject

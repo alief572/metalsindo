@@ -1,0 +1,1628 @@
+[33mba88a71d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge branch 'main' of https://github.com/alief572/metalsindo
+[33m4f361741[m feat: add LHP slitting report with Excel export and refined UI
+[33m68d352e4[m fix: honor bonded customer VAT exemption in invoice receipts
+[33m792200e2[m Fix: Purchase Order
+[33m3ea92ac0[m Fix: Control PO
+[33mf7ee7e7f[m Fix: Gudang
+[33mfa701be7[m Fix: Print PO Non Material
+[33m9347ce7a[m Feat: Partial return and sheet pricing calculation in retur pembelian
+[33mb61bedb7[m Fix: Print CN Retur Penjualan
+[33mdf1bbdc8[m Fix: Master LME
+[33m29e9b414[m Fix: Receive Invoice AP
+[33mba3a5a9d[m Fix: SPK Marketing
+[33m5e950115[m Fix: Incoming
+[33maaba75f4[m Fix: Retur Pembelian
+[33mcdc90e17[m Fix: Retur Pembelian
+[33ma8d2a030[m Fix: Master LME
+[33mabca8cd4[m Fix: Purchase Order
+[33mde4e6f1c[m Fix: Retur Penjualan
+[33mad3d3f8c[m Fix: Retur Penjualan
+[33m9fb5b177[m Fix: Return Pembelian
+[33m70a4ca23[m Fix: Retur Pembelian
+[33me6065da4[m Fix: Retur Pembelian
+[33m1a463a56[m Fix: Retur Pembelian
+[33me6d3838a[m Fix: Retur Pembelian
+[33mb118bc3e[m Fix: Receive Invoice AP
+[33ma0d53a87[m Fix: Receive Invoice AP
+[33m7aa72133[m refactor(receive_invoice_ap): optimize search query codebase to prevent database freeze
+[33m379150b6[m fix(receive_invoice_ap): optimize search incoming query and add searchDelay
+[33m2638ec39[m Fix: Expense Petty Cash
+[33m5b8bcc09[m Fix: Invoicing
+[33m50794131[m Fix: SPK Marketing
+[33md1ca3927[m Fix: Retur Penjualan
+[33m6db85dcf[m Fix: Penerimaan
+[33m51d0516f[m Fix: Invoice
+[33m6d3da4b9[m Fix: Print Invoice
+[33m4b5b6f04[m Fix: Retur Penjualan
+[33mafb65fbf[m Fix: Retur Penjualan
+[33made4e79d[m Fix: Print Invoicing
+[33m751f9592[m Fix: SPK Marketing
+[33me432f9dc[m Fix: Print Invoice
+[33m71cac3eb[m Fix: PO Non Material
+[33m01a7e985[m Fix: Invoice
+[33ma5157c5d[m Update print2.php
+[33m4915e52b[m Update Wt_invoicing.php
+[33m5e7a0fb5[m Update Wt_invoicing.php
+[33m895e089f[m Update Wt_invoicing.php
+[33m2cc24c0d[m Fix: Receive Invoice Non Material
+[33m9e4a1fb2[m Fix: Receive Invoice AP
+[33m2c3c5354[m Update Receive_invoice_ap.php
+[33m7daad709[m Fix: Penerimaan
+[33md1e5d28b[m Update PrintHeader2.php
+[33mfff38eb4[m Fix: Delivery Order
+[33m3983a055[m Fix: Receive Invoice PA
+[33m39b383f1[m Fix: Receive Invoice AP
+[33maf8605bb[m Update Penerimaan_model.php
+[33mb747ec0f[m Fix: Penerimaan
+[33m1964beb4[m Fix: Retur Penjualan & Penerimaan
+[33mec2b7da3[m Fix: Penerimaan
+[33mb3310321[m Update index.php
+[33mcdee258c[m Update Retur_pembelian.php
+[33ma78ab757[m Fix: Print PO Non Material
+[33m5e0bf185[m Fix: Expense, Kasbon, Pengajuan Rutin
+[33ma32b5591[m Fix: Request Payment
+[33mddce7fce[m Fix: Update Module Non Production
+[33mcf8daac4[m Fix: Retur Penjualan
+[33m29e387c4[m Update terima_barang.php
+[33m6e05bcb7[m Update terima_barang.php
+[33m9ec2da87[m Update terima_barang.php
+[33m346ecb5a[m Update terima_barang.php
+[33m6f2c00a4[m Revert "Fix: Penerimaan Invoice"
+[33m5b9c4be0[m Fix: Expense Report
+[33m3fee3943[m Fix: Penerimaan Invoice
+[33m4d7b5085[m Update list_spkmarketing.php
+[33m08e3c04d[m Update list_spkmarketing.php
+[33m53d69b42[m Update list_spkmarketing.php
+[33ma062fe7b[m Update list_spkmarketing.php
+[33mff06ba30[m Fix: Retur Penjualan
+[33ma6580f6b[m Fix: Pembelian Retur
+[33me1f340e8[m Fix: Retur Penjualan
+[33mb6a0acc7[m Fix: Retur Penjualan
+[33m74733d37[m Fix: Pembelian Retur
+[33m716f8300[m Update print2.php
+[33m2d209120[m Update print2.php
+[33m02a417cf[m Fix: Print PO
+[33mb85fdd3f[m Update Purchase_order_payment.php
+[33m9f4ae83f[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m15362def[m update
+[33mdcc39548[m Update 08 Juni 2026
+[33m9466bbba[m Fix: Receive Invoice AP
+[33m148d31b9[m Fix: Receive Invoice AP
+[33m4aac296b[m Fix: Receive Invoice AP
+[33m1730ce8d[m Update 02 Juni 2026
+[33m464ed4a4[m Fix: Create Invoice Slitting
+[33ma5dfac7e[m Fix: Master Material
+[33m9e887427[m Fix: Print PO Non Material
+[33m3d7bd230[m Update Control_do_model.php
+[33m7d5204e7[m Update Control_do_model.php
+[33m64380f75[m Fix: Control DO
+[33m4d8d3cf3[m Fix: Export Excel E-Faktur
+[33mbd8e354f[m Update .gitignore
+[33m2b8d1a5c[m Fix: Excel E-Faktur
+[33ma2591114[m Fix: Excel E-Faktur
+[33m9aa97c10[m Merge pull request #282 from alief572/development
+[33m06b4f98b[m Batch stock_material queries/updates
+[33meb2a1bc2[m Merge pull request #281 from alief572/development
+[33mafec7b3f[m Use exact width match in stock query
+[33m96d6b39e[m Merge pull request #280 from alief572/development
+[33m0abfd4d8[m Use CDN DataTables assets instead of local files
+[33mf898c398[m Merge pull request #279 from alief572/development
+[33m107c8884[m Remove price_sheet from stock_material select
+[33ma7a8b27d[m Merge pull request #278 from alief572/development
+[33mf9652d6d[m Remove empty-checks before insert_batch calls
+[33m446d232f[m Merge pull request #277 from alief572/development
+[33maa52a3de[m Fix foreach key from width to weight
+[33m29c4c456[m Merge pull request #276 from alief572/development
+[33mc898bcec[m Fix swapped weight and width assignments
+[33mb700afbc[m Merge pull request #275 from alief572/development
+[33m4023e60a[m Fix weight/width field mappings; format method
+[33ma440a61c[m Merge pull request #274 from alief572/development
+[33m5b89d0e1[m Refactor AddHeader view formatting and fixes
+[33mf54c60ae[m Fix placement of get_jurnal_invoicing method
+[33mc0c80e40[m Fix swapped width/weight input ids/names
+[33mb7c92f82[m Merge pull request #273 from alief572/development
+[33m4bfdeda1[m Merge branch 'development' of https://github.com/alief572/metalsindo into development
+[33m0e380760[m Fix swapped width/weight input fields
+[33m8f19fd7a[m Merge pull request #272 from alief572/development
+[33m85b84499[m Merge branch 'main' into development
+[33m43842e90[m Use >= for width in stock_material query
+[33m3212aca7[m Dev - Retur Pembelian
+[33m817763e8[m Perbaikan - SPK Produksi
+[33mfdb2a64e[m Perbaikan - SPK Produksi
+[33mb0d907da[m Perbaikan - Laporan Harian Produksi
+[33ma2a919ab[m Perbaikan - Laporan Harian Produksi
+[33m56aa5c2b[m Perbaikan - Print Penawaran
+[33mf4418dfe[m Perbaikan - Invoicing
+[33m78a317e7[m Perbaikan - Print Penawaran
+[33m7fba733f[m Perbaikan - Coretax
+[33me90c8cfe[m Perbaikan - Coretax
+[33m05a4d2d6[m Perbaikan - Coretax
+[33m2905769f[m Perbaikan - Coretax
+[33maee69b57[m Perbaikan - Coretax
+[33m5fd819a1[m Perbaikan - Coretax
+[33m649ce3af[m Perbaikan - Coretax
+[33m1d491f67[m Perbaikan - Header
+[33md37cb22e[m Perbaikan - Header
+[33mccc83596[m Perbaikan - Header
+[33md3938d98[m conflict
+[33md5162dcc[m Test
+[33mc18ae3d2[m Perbaikan - Coretax
+[33m45a701fc[m Perbaikan - Coretax
+[33m68d8db4e[m Perbaikan - Coretax
+[33mc8e7b65a[m Perbaikan - Coretax
+[33mb2c63a58[m confilct
+[33mc837eb43[m Perbaikan - Coretax
+[33m475d99cd[m Perbaikan - Coretax
+[33m99192619[m Update 18 April 2026
+[33m742b373e[m Perbaikan - Coretax
+[33m3b85f533[m Perbaikan - Coretax
+[33m6b81b108[m awd
+[33m93420e78[m Merge pull request #271 from alief572/development
+[33me844b751[m Perbaikan - E-Faktur
+[33m9d80c46d[m Change database username and password
+[33m38a7cba3[m Change database credentials for live environment
+[33md42114eb[m Perbaikan - Koneksi
+[33maf0babef[m Merge pull request #270 from alief572/development
+[33mc26b2642[m Perbaikan - Delivery Order
+[33m1b1f5a5d[m Merge branch 'main' into development
+[33mb3a73de8[m Perbaikan - Coretax
+[33m78f28c83[m Perbaikan - Coretax
+[33m6de32884[m Perbaikan - Coretax
+[33m3a6c9c56[m Perbaikan - Coretax
+[33m9773318c[m Perbaikan - Coretax
+[33m83c62221[m Perbaikan - Coretax
+[33m2bf2201b[m Perbaikan - Coretax
+[33m42cc62b1[m Perbaikan - Coretax
+[33m1c23364d[m Perbaikan - E-Faktur
+[33m2abd1326[m Perbaikan - E-Faktur
+[33m9583a3b0[m Perbaikan - E-Faktur
+[33m7737f818[m Perbaikan - Penerimaan
+[33m6f3a8ffb[m Perbaikan - Penerimaan
+[33m018e2058[m Perbaikan - Coretax
+[33m2919e316[m Perbaikan - Coretax
+[33m7ba17149[m Perbaikan - Coretax
+[33m2156cc3a[m Perbaikan - Coretax
+[33m9ef9018a[m Perbaikan - Coretax
+[33mda925499[m awd
+[33m31735ba1[m Perbaikan - Coretax
+[33m6eb88c05[m Perbaikan - Coretax
+[33m3ffb9019[m Perbaikan - Coretax
+[33m46429ced[m awd
+[33m8425d4f0[m Perbaikan - Excel Coretax
+[33m790e0b67[m Perbaikan - Excel Coretax
+[33m776247a2[m Perbaikan - Excel Coretax
+[33m1a87fb21[m Perbaikan - Excel Coretax
+[33mfc8ed23b[m Perbaikan - Excel Coretax
+[33m77cb5aa0[m Perbaikan - Excel Coretax
+[33m978ec98c[m Perbaikan - Excel E-Faktur
+[33me7fe679e[m Perbaikan - Excel E-Faktur
+[33m014b1932[m Perbaikan - E Faktur List
+[33meb48ee3c[m Perbaikan - E Faktur List
+[33m48cdc0b5[m Perbaikan - E Faktur List
+[33m29089f5f[m Perbaikan - E Faktur List
+[33m745e39fd[m Perbaikan - E Faktur List
+[33m3979a58d[m Perbaikan - E-Faktur
+[33m43f7e19d[m Perbaikan - E-Faktur
+[33mb35244fc[m Perbaikan - E-Faktur
+[33mcbed23a0[m Perbaikan - E-Faktur
+[33mbc45caf5[m Perbaikan - E-Faktur
+[33med79c5e2[m Perbaikan - E-Faktur
+[33mb41bdbb8[m Perbaikan - E-Faktur
+[33mcd3fda6a[m Perbaikan - E-Faktur
+[33md64f7ba9[m Perbaikan - Mateiral Planning
+[33mf979c594[m Perbaikan - Mateiral Planning
+[33m79121ed2[m Perbaikan - SPK Marketing
+[33m608c3d5c[m Perbaikan - SPK Marketing
+[33m25223b4e[m Perbaikan - Penawaran
+[33me330da3e[m Perbaikan - Penawaran
+[33mc610ba6f[m Perbaikan - E-Faktur
+[33m9e126095[m Perbaikan - E-Faktur
+[33meb33f680[m Perbaikan - E-Faktur
+[33m1425d2ac[m Perbaikan - E-Faktur
+[33m2a284c43[m Perbaikan - Type Alloy
+[33m5d3ee183[m Perbaikan - Type Alloy
+[33m24a24fd1[m awd
+[33md4c98101[m Perbaikan - DN Retur Pembelian
+[33m4e0397af[m Perbaikan - Control DO
+[33mfb1607ac[m Perbaikan - Control DO
+[33m9563fb9a[m Perbaikan - Control DO
+[33me1b75252[m Perbaikan - Control DO
+[33m4075462d[m Perbaikan - Control DO
+[33m360ebaa7[m awd
+[33mb85fe44f[m Perbaikan - Control DO
+[33m927fcfa4[m Perbaikan - PO Non Material
+[33m0f48e1c0[m Perbaikan - PO Non Material
+[33m11306f25[m Update 30 Maret 2026
+[33mda6fca37[m conflict pull
+[33m4ea1df3f[m update 30032026
+[33m3faa41c9[m Update 30 Mar 2026
+[33m93739ae4[m Merge remote-tracking branch 'refs/remotes/origin/main'
+[33m93a05140[m Perbaikan - Penerimaan
+[33m4e1e3386[m Perbaikan - Penerimaan
+[33ma0f5a475[m Perbaikan - Retur Pembelian
+[33mb0cfaffb[m Perbaikan - Retur Pembelian
+[33m8eaa74e8[m Development - Retur Pembelian + DN Retur
+[33ma449f7dc[m fix import efaktur
+[33mcf1f161b[m fix merge
+[33m45362459[m Update - 27 Mar
+[33m1ea3c657[m Update - 27 Mar
+[33mdfe07ad2[m fix efaktur
+[33ma76993d6[m Update - 27 Mar 2026
+[33m1dc243b3[m menu efaktur upload coretax
+[33md99fc0f2[m menu e-faktur upload coretax
+[33m53bf14cf[m Merge branch 'main' of https://github.com/alief572/metalsindo
+[33m10bb6ad7[m menu e-faktur upload coretax
+[33mde2cde1f[m awd
+[33m2daa2941[m awd
+[33m52135a96[m Perbaikan - Retur Penjualan
+[33m2a915a93[m Perbaikan - Retur Penjualan
+[33m6ed46955[m Perbaikan - Retur Penjualan
+[33m424c6dbe[m awd
+[33mfa10cd95[m Development - Retur Pembelian
+[33ma0b514ad[m awd
+[33mef4f7f5e[m Perbaikan - Invoicing
+[33m2a6d20ce[m Perbaikan - Penerimaan & Invoicing
+[33ma2e2e643[m awd
+[33ma3724175[m awd
+[33m2c62fd91[m Perbaikan - SPK Marketing
+[33mcddb0b72[m Perbaikan - SPK Marketing
+[33ma4e418e8[m Development - Retur Pembelian
+[33mb6726e9b[m Development - Retur Pembelian
+[33mcade7d9a[m Development - Retur Pembelian
+[33m5f31cbd1[m awd
+[33mbf1278fe[m Perbaikan - Retur Penjualan
+[33ma95523ee[m awd
+[33m5fe897f3[m Perbaikan - Retur Penjualan
+[33m003b257e[m awd
+[33m4de5b06d[m Perbaikan - Retur Penjualan
+[33m6e574f0c[m awd
+[33m142fafef[m Perbaikan - Retur Penjualan
+[33md35d7552[m Update 16 Maret 2026
+[33mcf5878a1[m Perbaikan - Retur Penjualan
+[33m2e5f8d44[m Perbaikan - Purchase Order
+[33mcdf09db9[m awd
+[33m92caaee4[m Perbaikan - Penerimaan
+[33me5ff1962[m awd
+[33m7f0a388b[m Update 16 Mar 2026
+[33m7183ccb8[m Perbaikan - Invoicing
+[33m139ddb77[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m1a5a835b[m Perbaikan - Monitoring Invoicing
+[33ma93817aa[m Perbaikan - Monitoring Invoicing
+[33mcab0c5cf[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33me22a92a5[m Perbaikan - Control DO
+[33m232235b5[m Perbaikan - Control DO
+[33m4eec2e5d[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m7e1c81bb[m Perbaikan - Print PO Sheet
+[33m1da8eabd[m Perbaikan - Print PO Sheet
+[33md5572244[m Perbaikan - Control DO
+[33mdb3a85ad[m Perbaikan - Control DO
+[33mc7c7d87b[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m9fe2b4f0[m Perbaikan - Control DO
+[33md9c03c6b[m Perbaikan - Control DO
+[33mda9225c4[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mff20b6ff[m Perbaikan - Control DO
+[33mf56c54ea[m Perbaikan - Control DO
+[33m79a36d67[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mb0022510[m Perbaikan - Control DO
+[33m909c74dc[m Perbaikan - Control DO
+[33mf071aed4[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mf0abb5a3[m Perbaikan - Invoicing
+[33m5f516cfd[m Perbaikan - Invoicing
+[33mbd1d874f[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m532abe4e[m Perbaikan - Invoicing
+[33m911c640e[m Perbaikan - Invoicing
+[33me71ff7da[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m3b18cf09[m Perbaikan - Penerimaan & Invoicing
+[33mf3cd7678[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m1ccd3328[m Perbaikan - Penerimaan & Invoicing
+[33m9447b155[m Perbaikan - Penerimaan & Invoicing
+[33m0d35aee4[m awd
+[33m9dd30b57[m Perbaikan - Penerimaan & Invoice
+[33m60c82cf2[m Perbaikan - Retur Penjualan
+[33m24d54b24[m Perbaikan - Retur Penjualan
+[33md13220eb[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m77fa4c5f[m Merge pull request #269 from alief572/development
+[33m527a65b7[m Perbaikan - Print Purchase Order
+[33m6f374180[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33md9d8c85b[m Merge pull request #268 from alief572/development
+[33m841f6b02[m Perbaikan - Control DO
+[33macd3af71[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m3a234291[m Merge pull request #267 from alief572/development
+[33m04fb72c9[m Perbaikan - Purchase Order Non Material
+[33mea0be57f[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m72dccc37[m Merge pull request #266 from alief572/development
+[33m9830a96a[m Perbaikan - Purchase Order Non Material
+[33m2123a389[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m5eab65d6[m Merge pull request #265 from alief572/development
+[33m3594efce[m Perbaikan - Purchase Order Non Material
+[33m52402317[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m2765704f[m Merge pull request #264 from alief572/development
+[33m3637aec9[m Perbaikan - Print PO
+[33m1eb87f5e[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m9a0ec708[m Merge pull request #263 from alief572/development
+[33m6473180f[m Perbaikan - Control DO
+[33m6051d114[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m79cdfe22[m Merge pull request #262 from alief572/development
+[33m5d0a0c6d[m Perbaikan - Purchase Order
+[33mbdd5e134[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m93abf8a7[m Merge pull request #261 from alief572/development
+[33m53456782[m Perbaikan - Print Invoice
+[33m97b96677[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m06f8f053[m Merge pull request #260 from alief572/development
+[33m6b0327a8[m Perbaikan - Print Invoice
+[33mfa6f88cb[m Update 26 Feb 2026
+[33md4e1b99b[m Perbaikan
+[33m001894a8[m Update 26 Feb 2026
+[33m75b69073[m Merge pull request #259 from alief572/development
+[33ma4686baf[m Perbaikan - Penerimaan Invoice
+[33m8dda3dab[m Perbaikan - Kartu Stock
+[33m20bd66de[m Perbaikan - Config
+[33m23994308[m UPdate 25 Feb 2026
+[33m24db48ea[m Merge pull request #258 from alief572/development
+[33m16d6dae4[m Perbaikan - Penerimaan
+[33mfc82e3ab[m Update 24 Feb 2026
+[33m19b08a9b[m Merge pull request #257 from alief572/development
+[33mca16fc7a[m Perbaikan - Penerimaan Invoice
+[33macba68b6[m Update 24 feb 2026
+[33m9b9dbd95[m Merge pull request #256 from alief572/development
+[33mbe24b035[m Perbaikan - Adjustment Stock Material
+[33mda33ee7c[m Merge pull request #255 from alief572/development
+[33m6f4f70a3[m Perbaikan - Adjusment Stock
+[33m5f4b9fe8[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m26676c40[m Merge pull request #254 from alief572/development
+[33m6d14e538[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33md76b3f5d[m awd
+[33me5152d3b[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m10c6d57c[m update server
+[33madf8aa4b[m Perbaikan - Material Planing
+[33m4b854efe[m awd
+[33md2921e91[m Perbaikan - Material Planing
+[33mc16fcd6f[m Perbaikan - Kartu Stock
+[33m7dd28ea8[m Development - Kartu Stock
+[33m59dc2bfa[m awd
+[33m1e5ec47c[m awd
+[33m66878412[m Perbaikan - Adjustment Stock
+[33m6996b614[m Perbaikan - SPK Marketing
+[33mc96ee370[m UPdate Penawaran
+[33mb79e73d1[m Perbaikan - SPK Marketing
+[33m38e29a6e[m Perbaikan - SPK Marketing
+[33m30423767[m Perbaikan - SPK Marketing
+[33m1bd83a81[m Perbaikan - Purchase Request
+[33m3f658866[m Perbaikan - Purchase Request
+[33md6c4f02b[m Merge branch 'main' of github.com:alief572/metalsindo
+[33m6866b7e2[m Perbaikan - Header
+[33mcf8d93ac[m Update 12 Feb 2026
+[33m308e0d13[m Perbaikan - Header
+[33m34c932a1[m Perbaikan - Control DO
+[33mf772a389[m conflict inserver
+[33ma84f6d3b[m update from server
+[33m7411680f[m Perbaikan - Control DO (Confirm DO)
+[33mf0d695a2[m Update 11 Feb 2026
+[33m48048723[m Merge pull request #253 from alief572/development
+[33m7dbcc2c3[m Perbaikan - Purchase Request
+[33mbe561dca[m Update 11 Feb 2026
+[33m7eb0c8c7[m Merge pull request #252 from alief572/development
+[33mfeabcc08[m Perbaikan - Purchase Request
+[33m3b49e4a1[m Update 11 Feb 2026
+[33m2055bc7c[m Merge pull request #251 from alief572/development
+[33m5c6d53f9[m Perbaikan - Invoicing
+[33mb37223b7[m Merge pull request #250 from alief572/development
+[33m9480e0e6[m Perbaikan - Invoicing
+[33m1ce3dc21[m Merge pull request #249 from alief572/development
+[33mcfe6c110[m Perbaikan - Invoicing
+[33m49f70e4b[m Merge pull request #248 from alief572/development
+[33m8d2b6ee6[m perbaikan - retur penjualan
+[33m2cda31c5[m Perbaikan - Adjustment Stock
+[33mbd79a401[m Merge pull request #247 from alief572/development
+[33mc99f4d65[m Perbaikan - Adjustment Stock
+[33me97b2ed5[m awd
+[33m63a8d594[m Merge pull request #246 from alief572/development
+[33m9b7c90b1[m Perbaikan - Adjustment Stock
+[33me4110cf8[m Merge pull request #245 from alief572/development
+[33m4491ecf0[m Perbaikan - Penawaran
+[33mf3f452bf[m Merge pull request #244 from alief572/development
+[33m22a981b0[m Perbaikan - Penawaran
+[33m9bce2981[m Merge pull request #243 from alief572/development
+[33m36d04dc1[m Perbaikan - Penawaran
+[33m9490b69f[m awd
+[33me761a6ba[m Merge pull request #242 from alief572/development
+[33m63917c0a[m Perbaikan - Penawaran
+[33mc7dbb48b[m Merge pull request #241 from alief572/development
+[33me99dbb19[m Perbaikan - Penawaran
+[33mf3d9ca0e[m Merge pull request #240 from alief572/development
+[33m15486852[m Perbaikan - Penawaran
+[33mf06b1766[m awd
+[33mca8d0cc6[m Merge pull request #239 from alief572/development
+[33mc659755a[m Perbaikan - Transaksi Inquiry
+[33m3d702cdb[m Merge pull request #238 from alief572/development
+[33m03d7a2fd[m Perbaikan - Transaksi Inquiry
+[33m37b6cfde[m awd
+[33m94963ef5[m Merge pull request #237 from alief572/development
+[33m1b8b9058[m Perbaikan - Adjustment Stock
+[33mba565863[m Merge pull request #236 from alief572/development
+[33mafc6ab01[m Perbaikan - Control PO
+[33m11211cda[m Merge pull request #235 from alief572/development
+[33m0df37366[m awd
+[33m3da8a079[m Perbaikan - Control DO
+[33m33ae2d00[m Merge pull request #234 from alief572/development
+[33m79fc3cbf[m Merge remote-tracking branch 'refs/remotes/origin/development' into development
+[33m86b452a8[m Perbaikan - Control PO
+[33m52dad421[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mfd36a78b[m update server
+[33m0fba301c[m Merge pull request #233 from alief572/development
+[33mf0dd0c30[m Merge branch 'main' into development
+[33ma99fbf15[m awd
+[33maac196a7[m awd
+[33m0daee5b8[m update git ignore
+[33m38942ef8[m awd
+[33m8d98d9df[m Perbaikan - Control PO
+[33mb427a1b3[m awd
+[33mc9228878[m Perbaikan - Control PO
+[33m97088af7[m Perbaikan - Control PO
+[33m721ec60b[m Perbaikan ignore
+[33m6fd7227c[m awd
+[33m80851409[m awd
+[33m8f5f5ce3[m awd
+[33m61a23fb2[m awd
+[33m6a1d289d[m awd
+[33m07625aa7[m Merge remote-tracking branch 'refs/remotes/origin/main'
+[33m40b107ca[m awd
+[33me1609073[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m99c955e8[m uppdate
+[33m3f61185b[m Perbaikan - Control PO
+[33m7dd0b451[m conflict live
+[33m1d207e8d[m Merge pull request #232 from alief572/development
+[33m0446740e[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m25a1b2e4[m update conflict
+[33m5912b08d[m Perbaikan .gitignore
+[33m782a9601[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m0dec4ee0[m Perbaikan .gitignore
+[33m47279b3a[m conflict module
+[33m78ec9ba3[m contorol_PO index
+[33mf981bdfd[m Perbaikan .gitignore
+[33m04d6028d[m awd
+[33m79eb1066[m awd
+[33m0b37f995[m Merge pull request #231 from alief572/development
+[33m3e5f9279[m Perbaikan - Control PO
+[33m8320774e[m awd
+[33m0904e778[m Merge pull request #230 from alief572/development
+[33mdebb3a8e[m Perbaikan - Control PO
+[33m180a103c[m awd
+[33mbab4cf9f[m Merge pull request #229 from alief572/development
+[33md536410a[m Perbaikan - Control PO
+[33m11ead8ca[m Update 27 Jan 2026
+[33m813f3e60[m Merge pull request #228 from alief572/development
+[33m37382ee7[m Perbaikan - Control PO
+[33m4e76581d[m awd
+[33mbe5d0307[m Merge pull request #227 from alief572/development
+[33m793c28eb[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m2ce1d0a9[m Perbaikan - Print Incoming
+[33m05df847f[m Merge pull request #226 from alief572/development
+[33mb38a5902[m Merge branch 'main' into development
+[33mcf95e606[m Perbaikan - Constant
+[33m8e309903[m Perbaikan - Control PO
+[33m1100dbdf[m Perbaikan - Material Planing
+[33md363dca1[m update server
+[33m1c672c2a[m awd
+[33m6b2619cf[m Merge pull request #225 from alief572/development
+[33mda5c33dd[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mab32734d[m Perbaikan - Material Planing
+[33meb0cab35[m Perbaikan - Material Planing
+[33me7c760f9[m Merge pull request #224 from alief572/development
+[33mc2bc2ab6[m Merge branch 'main' into development
+[33m17d206b0[m Perbaikan - Material Planning
+[33mca487f90[m Perbaikan - Purchase Order
+[33m7f621b2f[m awd
+[33md732306f[m awd
+[33m741efa20[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m08044ded[m Merge pull request #223 from alief572/development
+[33m6a3c8548[m Perbaikan - Invoicing
+[33md21de5b9[m awd
+[33m7b9f7edf[m awd
+[33mb8138a4b[m Merge pull request #222 from alief572/development
+[33m1fa9fffa[m Perbaikan - Print Invoice
+[33m7123e851[m awd
+[33mfd465ed9[m awd
+[33m8ebbc4ba[m Merge pull request #221 from alief572/development
+[33mf54ec0d0[m Perbaikan - Print Invoice
+[33mfa12b035[m awd
+[33m30e8694f[m Merge pull request #220 from alief572/development
+[33m5650b5e9[m Perbaikan - Print Invoice
+[33m6419e953[m Merge pull request #219 from alief572/development
+[33m1a117eef[m Perbaikan - SPK Marketing
+[33me0e80aff[m awd
+[33m2198cc24[m Merge remote-tracking branch 'origin' into development
+[33mdf9cecd8[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m80dacd8a[m awd
+[33mc7e29e31[m update dev
+[33md9642025[m awd
+[33me9db48e8[m awd
+[33m8c340eca[m awd
+[33me0c0efec[m awd
+[33m493ccad1[m Merge pull request #218 from alief572/development
+[33m98e22aaf[m Perbaikan - Invoicing
+[33mb8689fe1[m awd
+[33md58ac65a[m Merge pull request #217 from alief572/development
+[33mfce1f626[m Perbaikan - Invoicing
+[33mbdeaf973[m Perbaikan
+[33mae6d1f97[m Merge pull request #216 from alief572/development
+[33mcc292fb8[m Perbaikan - Invoicing
+[33m7e5ba268[m awd
+[33m9cd0a732[m Merge pull request #215 from alief572/development
+[33m0ed77a21[m Perbaikan - Print PO
+[33m5a39e069[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mc5feb7c7[m awd
+[33mf48067a4[m Perbaikan - Control DO
+[33m08e7535c[m Perbaikan - Control DO
+[33mb8c5d22a[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m7389cf18[m Merge branch 'main' of github.com:alief572/metalsindo
+[33m2e0006b7[m Perbaikan - Penawaran
+[33mb8669976[m awd
+[33ma1c50d06[m Perbaikan - Penawaran
+[33m44f73ca6[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mbbc4e741[m Merge pull request #214 from alief572/development
+[33m9828a015[m Perbaikan - Penawaran
+[33m475bfae0[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m6c003219[m Merge pull request #213 from alief572/development
+[33m10c37e74[m Perbaikan - Control PO
+[33m27dbd7d2[m awd
+[33m106e4029[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33md23e35c9[m Merge pull request #212 from alief572/development
+[33mcc12e05f[m Perbaikan - Control PO
+[33md356e938[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m31a6862c[m awd
+[33m0c279b5d[m Merge pull request #211 from alief572/development
+[33mc71d67d2[m Perbaikan - Control PO
+[33mde278c70[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m30512aac[m Merge pull request #210 from alief572/development
+[33m8da0e814[m Perbaikan - Incoming
+[33md885d07e[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mbe323823[m Merge pull request #209 from alief572/development
+[33mb941a352[m Perbaikan - Control DO
+[33m15845452[m Merge pull request #208 from alief572/development
+[33mbe69048c[m Perbaikan - Control DO
+[33m9ceb00ae[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m382783ab[m Merge pull request #207 from alief572/development
+[33m0ec01a55[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m9e8675d0[m Perbaikan - Update GIT Ignore
+[33m5a3ceb6d[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m23d2e935[m Merge pull request #206 from alief572/development
+[33m2cdb2ee8[m Merge branch 'main' into development
+[33m2c05f7cb[m awd
+[33m016f2d65[m awd
+[33m08a86029[m Merge pull request #205 from alief572/development
+[33maae89036[m awd
+[33mc4985dc8[m update confict
+[33md80d2a8b[m Perbaikan - Purchase Order
+[33me73d1ec9[m awd
+[33m2ac4990d[m awd
+[33m3328aa47[m awd
+[33m700e79a9[m awd
+[33me6c68e3a[m Merge pull request #204 from alief572/development
+[33mf332c4c5[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m3424b356[m Perbaikan - Incoming
+[33mee1f6d6d[m Perbaikan - Incoming
+[33m95976693[m Merge pull request #203 from alief572/development
+[33mb1dea923[m Merge branch 'main' into development
+[33m1f921f4a[m Perbaikan - Adjustment Stock Material
+[33m184704d4[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mfac1664a[m Perbaikan - Control DO
+[33mfb6670cc[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mbd049241[m Perbaikan - Create INvoice
+[33m4c7cd798[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m081b0d06[m Perbaikan - Control DO
+[33mec989edb[m awd
+[33me50f1a19[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m28ccb021[m Perbaikan - Print Invoice
+[33ma4a4c48c[m awd
+[33mee73a455[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mdf95d3dd[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mddd62b29[m Perbaikan - Delivery Order
+[33mcc185994[m Revert "Revert "Perbaikan - Invoicing""
+[33m0b7e11f6[m Revert "Perbaikan - Invoicing"
+[33me5566007[m Revert "Perbaikan - Incoming"
+[33mfcd2d338[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m74d21c66[m Merge branch 'main' of github.com:alief572/metalsindo
+[33m715d91eb[m Perbaikan - Incoming
+[33ma134bb2e[m Perbaikan - Incoming
+[33mf48a483c[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m58d078d7[m Perbaikan - Control DO
+[33m4344db90[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m835e1525[m Perbaikan - Control DO
+[33m5a60579f[m Perbaikan - Delivery Order
+[33m2f923407[m Perbaikan - Delivery Order
+[33mf723c51e[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33me343e8f8[m Perbaikan - Delivery Order
+[33m285ee3e9[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m55279848[m Merge pull request #202 from alief572/development
+[33m68bd8137[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m023fe575[m Perbaikan - Invoicing
+[33m8b87440a[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mbdd9783f[m Merge pull request #201 from alief572/main
+[33m4adef055[m Merge pull request #200 from alief572/development
+[33m273704d6[m Perbaikan - Invoicing
+[33me7453e22[m Perbaikan - Control DO
+[33m5ce92b65[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m7adc44ba[m Merge pull request #199 from alief572/main
+[33m21033058[m Development - COnfirm DO
+[33mcb510ed5[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33md863ca54[m Perbaikan - Purchase Request
+[33m6cabadff[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33ma6918858[m Perbaikan - Print Penawaran
+[33m2d1b39c5[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33ma891f933[m Perbaikan - Print Penawaran
+[33m63fad503[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m4f18a0bc[m Perbaikan - Print Penawaran
+[33m8611fc1d[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33ma0c18255[m Perbaikan - Print Penawaran
+[33mfc95d11d[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m2e14a2b5[m Perbaikan - Print Penawaran
+[33ma7b6858a[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m4fa612fc[m Perbaikan - Print Penawaran
+[33m27ae05ac[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m21a4a58a[m Perbaikan - Print Penawaran
+[33m89fd01e1[m Perbaikan - Print Penawaran
+[33md33d8663[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m2319bf8e[m Perbaikan - Print Penawaran
+[33m20ee208b[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m987411b8[m Perbaikan - Print Penawaran
+[33m29f7ed88[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m4f201608[m Perbaikan - Print Penawaran
+[33m8220274d[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mcfd93d45[m Perbaikan - Print Penawaran
+[33m55d70f56[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mb7f83c61[m Perbaikan - Print Penawaran
+[33me61d9c8b[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mafa5ce04[m Perbaikan - Print Penawaran
+[33m3e3321cc[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m6d0bff73[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m5bf402c6[m Perbaikan - Incoming
+[33m60ca6ea9[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mdfb34dba[m Perbaikan - Print Invoicing
+[33m372ec8b9[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m0a635c31[m Perbaikan - Print Invoice
+[33m7b9fb7cd[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m19900ff7[m Perbaikan - Material Planning
+[33m7f7a2470[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mfdece045[m Perbaikan - Print Invoicing
+[33m6d8f0943[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33maf5cca2b[m Perbaikan - Print Invoicing
+[33ma4431209[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mc2246872[m Perbaikan - Print Invoicing
+[33mc44155fa[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m7369ec90[m Perbaikan - Print Invoicing
+[33m6ac6bf9e[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m307dacff[m Perbaikan - Invoicing
+[33mc5139b7d[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m52a00bd6[m Perbaikan - Invoicing
+[33m236d6692[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m25c387d3[m Perbaikan - Invoicing
+[33mdf2f1f0c[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33me7539cc1[m Perbaikan - Invoicing
+[33m758be317[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m53c89223[m Perbaikan - Invoicing
+[33m6d4d6ecf[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mc64d6e76[m Perbaikan - Material Planing
+[33meb9e7f18[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mbb70ded3[m Perbaikan - Warehouse Material
+[33m6e5c1760[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m574a3e36[m Perbaikan - Invoicing
+[33m89d02657[m Perbaikan - Invoicing
+[33m5bb86fa1[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m4982f74d[m Perbaikan - Invoicing
+[33m276f3009[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33ma4a819ee[m Perbaikan - Penawaran
+[33m8b55f0c4[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m2c1a0ec8[m Perbaikan - Print Invoicing
+[33m45ecfc4d[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m19f20683[m Perbaikan - Print Invoicing
+[33mbee5d38f[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mc9f814aa[m Perbaikan - Print Invoicing
+[33mea2fd668[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m3b96165a[m Perbaikan - Print Invoicing
+[33m4ebbbcd6[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mdc7168de[m Perbaikan - Warehouse FG
+[33me6bdfb29[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m7fb0f18f[m Perbaikan - Material Planning
+[33m0a48eba7[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mf9ff279c[m Perbaikan - Warehouse Stock Finish Good
+[33m09bda0c6[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33ma16c2bc4[m Perbaikan - SPK Marketing
+[33m95879b8e[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m14a82114[m Perbaikan - Invoicing
+[33mf0a15b5d[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m5e02ff24[m Perbaikan - SPK Marketing
+[33mb4d1db20[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m39996c82[m Perbaikan - Delivery Order
+[33m2a508761[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m06ca56dd[m Perbaikan - Invoicing
+[33m545fefa0[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m71583192[m Perbaikan - Invoicing
+[33m65d25046[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m6a047a93[m Perbaikan - Delivery Order
+[33m967adb9a[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33ma4c57c35[m Perbaikan - Delivery Order
+[33m19af2163[m Perbaikan - Invoicing
+[33mf3684116[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m1ae9dc6a[m Perbaikan - Delivery Order
+[33mea52b2c1[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m3688c152[m Perbaikan - Delivery Order
+[33m9550f7b0[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m84c8c77a[m Perbaikan - Delivery Order
+[33m2974a95a[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m0866291a[m Perbaikan - SPK Produksi
+[33mde4a6af8[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m3a05cb16[m Perbaikan - Invoicing
+[33m9fbc75ff[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33med2d01f8[m Perbaikan - Invoicing
+[33m19e4e836[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mbd578830[m Perbaikan - Delivery Order
+[33m06375cc5[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mdaf4164a[m Perbaikan - Retur Penjualan
+[33m47bc523c[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m4e6412f5[m Perbaikan - Retur Penjualan
+[33m62698d78[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m54fb4a56[m Perbaikan - Users
+[33mea205164[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33ma8add945[m Perbaikan - Purchase Order Non Material
+[33m76aa67bf[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m29d04717[m Perbaikan - Retur Penjualan
+[33m3547e4a1[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m0271aca2[m Merge pull request #198 from alief572/development
+[33m356153ba[m Update app_helper.php
+[33m3e14e403[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m30227fe6[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m99cb2535[m Merge pull request #197 from alief572/development
+[33m65a39fe4[m Perbaikan - Retur Penjualan
+[33m16550c9a[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m27b56bf9[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mc61e1116[m Merge pull request #196 from alief572/development
+[33m8fd0e9bd[m Perbaikan - Delivery, PO, PR, Penawaran dan SPK Marketing
+[33md0101edb[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m239af38f[m Merge pull request #195 from alief572/development
+[33m7c1f4bc3[m Update Wt_invoicing_model.php
+[33m5b44b186[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mee197b28[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m4c53407e[m Merge pull request #194 from alief572/development
+[33mf2b71504[m Update Inventory_4_model.php
+[33m71ae3b75[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m229d4090[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m099be794[m Merge pull request #193 from alief572/development
+[33m443bbbdf[m Update Retur_penjualan_model.php
+[33m20171c81[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m666ee9e6[m Merge pull request #192 from alief572/development
+[33ma18410ef[m Perbaikan
+[33ma4327060[m Update Delivery_order_model.php
+[33maf169a23[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mee968acd[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m3c732940[m Merge pull request #191 from alief572/development
+[33me6484501[m Perbaikan - Penawaran dan SPK Marketing
+[33mfe13798e[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m063f25eb[m Merge pull request #190 from alief572/development
+[33m72b0af0e[m Update Pr_model.php
+[33m48a2be71[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m41601b05[m Merge pull request #189 from alief572/development
+[33m878993aa[m Update Delivery_order_model.php
+[33m4447b0ad[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33md566026c[m Merge pull request #188 from alief572/development
+[33m71727495[m Update print2.php
+[33m848e8405[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m2d7496e0[m Merge pull request #187 from alief572/development
+[33m6b14ccdc[m Perbaikan - Print PO
+[33m99598064[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m2d1909eb[m Merge pull request #186 from alief572/development
+[33m9f392b31[m Update print2.php
+[33m2fe2004d[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m25fbb29f[m Merge pull request #185 from alief572/development
+[33mc03da040[m Perbaikan - Purchase Order
+[33m20485d9b[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mba40a0ba[m Merge pull request #184 from alief572/development
+[33m0c7f593d[m Perbaikan - PO
+[33m3cbaea50[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m08475691[m Merge pull request #183 from alief572/development
+[33m7a713a75[m Update Purchase_order.php
+[33m10217edf[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m9ceff34e[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m33e81f66[m Merge pull request #182 from alief572/development
+[33md44c3d21[m Update PrintInvoice.php
+[33m62a839f3[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m23dbaaff[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mc07de60b[m Merge pull request #181 from alief572/development
+[33m6b1fad9d[m Update PrintInvoice.php
+[33me30fee5f[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m85260b34[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m093f2352[m Merge pull request #180 from alief572/development
+[33mab15a35c[m Update Retur_penjualan.php
+[33m1da03610[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m4d83ef10[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m8845e713[m Merge pull request #179 from alief572/development
+[33m50819a7d[m Perbaikan - Retur Penjualan
+[33mfd8f89d4[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m5d10a529[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mb7ca8343[m Merge pull request #178 from alief572/development
+[33m17e17315[m Perbaikan - Retur Penjualan
+[33m8c68b271[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m33029ae0[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m0113e15a[m Merge pull request #177 from alief572/development
+[33mcb8570f7[m Perbaikan - Retur Penjualan
+[33m730b93c3[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33maa44cc2a[m Merge pull request #176 from alief572/development
+[33me852abd1[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33md85d13a7[m Update Users.php
+[33mc2b06ba8[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mb7a8e74b[m Update Users.php
+[33m6bccdcf7[m Update login_animate.php
+[33m64744567[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mb0bdb70b[m Update Users.php
+[33m9e4cbc3a[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m412bbcc7[m Update login_animate.php
+[33m7619e992[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33md184b49b[m Update Users.php
+[33m5b276782[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m25147a85[m Perbaikan - Login
+[33mf8f974da[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m5e8e9d66[m Update Auth.php
+[33m9c648653[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m12834ae5[m Update Users.php
+[33m26f4acb9[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mb171630d[m Update login_animate.php
+[33m5d10400d[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m90d93410[m Update Auth.php
+[33m724420ca[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m6cbed7df[m Update Auth.php
+[33m90134b4a[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mb7f95ad7[m Perbaikan - Login
+[33m4d13afa0[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m791d6ec1[m Perbaikan - Login
+[33m60422762[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33ma83a5f7a[m Update Users.php
+[33m81543261[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m433cc3ff[m Update Users.php
+[33m425162a0[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33me2d5c1cb[m Update Users.php
+[33me9cf62f7[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33me4d8d7c5[m Update Users.php
+[33m73ae4cdf[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m2028f07c[m Development - Google Captcha
+[33mc9bf654b[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m811cb568[m Merge pull request #175 from alief572/development
+[33mde651358[m Update Spk_marketing.php
+[33md0b84041[m awd
+[33m423b1846[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m9a83f7e2[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mf91c8d83[m Merge pull request #174 from alief572/development
+[33mbf437c79[m Perbaikan - Print PO
+[33m603dc0b8[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m1884d81a[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m39881852[m Merge pull request #173 from alief572/development
+[33m0b68daff[m Perbaikan - Print DO
+[33m2dc36c00[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m40a615f0[m Merge pull request #172 from alief572/development
+[33m692a2015[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m1a48f847[m Perbaikan - Penawaran & SPK Marketing
+[33m14a9ea9e[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m58616504[m Merge pull request #171 from alief572/development
+[33m2d481e60[m Perbaikan - PO
+[33m6f013502[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m261dc30f[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m3ae50748[m Merge pull request #170 from alief572/development
+[33m32e9b6cb[m Perbaikan - Material Planning
+[33m65bae4c2[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m72b647e4[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mbe8894bf[m Merge pull request #169 from alief572/development
+[33m0a6e5bf7[m Perbaikan - Warehouse Material
+[33mb9bfb027[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m92fd6fe3[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mc613fa21[m Merge pull request #168 from alief572/development
+[33mf5ed5e54[m Update PrintHeader2.php
+[33mc4da4c67[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m07871d1a[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m2f459fc9[m Merge pull request #167 from alief572/development
+[33m10b516ce[m Update PrintHeader2.php
+[33m2dc0ea6b[m awd
+[33m5098252d[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m0f1fc53d[m Merge pull request #166 from alief572/development
+[33m9750886c[m Update Delivery_order.php
+[33m4c498976[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m82ff9d0d[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m0a45e205[m Merge pull request #165 from alief572/development
+[33m2221fa48[m Update Delivery_order.php
+[33m9e017d36[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mbc0d1b21[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m856693bc[m Merge pull request #164 from alief572/development
+[33m0ede49ac[m Perbaikan - Delivery Order
+[33m9fc066b5[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m5298f4c8[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33me11d5e47[m Merge pull request #163 from alief572/development
+[33m9eb58b2b[m Perbaikan - Incoming
+[33m49a9b9cd[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mb515cd03[m Merge pull request #162 from alief572/development
+[33m7cfb559e[m Update Inventory_4_model.php
+[33m3d9fbf78[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m676e41b8[m awd
+[33m0bd5665c[m Merge pull request #161 from alief572/development
+[33mbdbe3cbe[m Update Incoming.php
+[33mee38946d[m Perubahan
+[33m7d2a8f7b[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m7cb5058e[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m811796e1[m Merge pull request #160 from alief572/development
+[33mb8c93453[m Perbaikan - Purchase Request
+[33me6e0d616[m Merge branch 'development' of github.com:alief572/metalsindo into main
+[33me98b73a7[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m9c4da41f[m Perbaikan - Purchase Request
+[33m6e19e0fd[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33med9049d2[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mce07e2da[m awd
+[33m98134dab[m Merge pull request #159 from alief572/development
+[33m0067f528[m Perbaikan - Purchase Request
+[33m55e661e9[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33ma8013c84[m Merge pull request #158 from alief572/development
+[33m1821469a[m Perbaikan - Metode Pembelian
+[33m6e26546f[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33ma9d4d2bb[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mdaa4023e[m Merge pull request #157 from alief572/development
+[33me6c92fe5[m Perbaikan - Metode Pembelian
+[33m9d2ca16c[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m62555404[m Merge pull request #156 from alief572/development
+[33m05205dd3[m Perbaikan - Warehouse Gudang FG
+[33medb95168[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m875ceed5[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m4c396762[m Merge pull request #155 from alief572/development
+[33m34f8b39b[m Perbaikan - Invoice
+[33m0f5de294[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m34ca03a5[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m001f3c01[m Merge pull request #154 from alief572/development
+[33m30a58e61[m Perbaikan - Print Invoice
+[33m4c8a921f[m Merge pull request #153 from alief572/development
+[33m61f2f3c6[m Perbaikan - Warehouse Material
+[33mff45cb3b[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mbe79c0b1[m Merge pull request #152 from alief572/development
+[33me22ba6f2[m Perbaikan - Warehouse Material
+[33mce4f4071[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m812694df[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m968da6c8[m Merge pull request #151 from alief572/development
+[33m01208b22[m Update PrintHeader2.php
+[33m9ea57fd2[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mfddf8fd1[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m694b6788[m Merge pull request #150 from alief572/development
+[33m32e82e46[m Update PrintInvoice.php
+[33m9cc98b02[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mb26142e8[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mac044cff[m Merge pull request #149 from alief572/development
+[33me4959c3a[m Update PrintInvoice.php
+[33m27bed58a[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m2717f5e8[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m4389b9c8[m Merge pull request #148 from alief572/development
+[33m3c29265d[m Perbaikan - Print Invoice
+[33m7090cd0e[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m89c542f6[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m3edb06c3[m Merge pull request #147 from alief572/development
+[33m8acf669d[m Update approval_po.php
+[33me8d61cc4[m Update view.php
+[33meaecbca8[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m501d77f3[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m513c7ae9[m Merge pull request #146 from alief572/development
+[33mea139609[m Update print2.php
+[33m6039cdde[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m483de9be[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m6db926e4[m Merge pull request #145 from alief572/development
+[33mf812df95[m Update Edit.php
+[33m08e727c5[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33me8ae7872[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m5d2d69a6[m Merge pull request #144 from alief572/development
+[33m89b80b4e[m Perbaikan - Incoming Material
+[33m25f6b6cc[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m02447ec3[m Update print2slitting.php
+[33m2bb1ae52[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m1e6febf5[m Update print2slitting.php
+[33m3a7c413a[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m10fd51b0[m Update print2slitting.php
+[33me2644888[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mbac5a44c[m Perbaikan - SPK Marketing
+[33mf67e2b8a[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m3de6c473[m Perbaikan - SPK Marketing
+[33mf9206234[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m8f5642ed[m Perbaikan - Print Penawaran
+[33m3cea0e4c[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m8ae1fb5a[m Perbaikan - SPK Produksi
+[33m3a72f29e[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m591593b0[m Perbaikan - Print Penawaran
+[33m9d34060f[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mded6ec19[m Perbaikan - Print Penawaran
+[33ma657a3bd[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mdb719bf7[m Perbaikan - Print Penawaran
+[33m5191b426[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mcc70fe7d[m Perbaikan - Print Penawaran
+[33m8c33ac9c[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mdbbc429f[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m508d4960[m Merge pull request #143 from alief572/development
+[33m0c6c2220[m Perbaikan - Print Penawaran
+[33m76999361[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m01da3637[m Penambahan - Penawaran
+[33m08f8bc34[m Penambahan - BOM
+[33m01e38937[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33me811a8c2[m Penambahan - Material Planning, DO, Warehouse FG
+[33m823738dd[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m8588539f[m Penambahan - Material Planning, DO, Warehouse FG
+[33mcd3aafb5[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mf2658196[m Merge pull request #142 from alief572/development
+[33m47b23d92[m Penambahan - Penawaran
+[33m566d7149[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m065904a8[m Perbaikan - Incoming Material
+[33m411af2cd[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m2588f3a0[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m8181e457[m Merge pull request #141 from alief572/development
+[33mc2c6a267[m Perbaikan - Incoming Material
+[33m19b1a961[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m2b1c38e5[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mac74cab5[m Merge pull request #140 from alief572/development
+[33m5bfa6d89[m Perbaikan - Delivery Order
+[33m3609b87a[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33meb67775b[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m60eef9a7[m Merge pull request #139 from alief572/development
+[33m006c9cc4[m Perbaikan - Penawaran
+[33m4f16bf81[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m9ab35ec7[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m9582aa7c[m Merge pull request #138 from alief572/development
+[33md45e7619[m Perbaikan - Incoming
+[33m6de43d4c[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m6c3c9d39[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m451d438d[m Merge pull request #137 from alief572/development
+[33m4562f15e[m Perbaikan - Incoming Material
+[33m442e49ec[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m192fb35f[m Merge pull request #136 from alief572/development
+[33m1d6ec0a8[m Perbaikan - Print Penawaran Slitting
+[33m40f033b0[m awd
+[33med3c5b54[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m67e9d8f1[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m7a6a12b8[m Merge pull request #135 from alief572/development
+[33m472bcae3[m Perbaikan - Penawaran Slitting
+[33m388e5831[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m4311986d[m Merge pull request #134 from alief572/development
+[33md42343fa[m Perbaikan - Edit Penawaran Slitting
+[33m34c53555[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m59f66ea9[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m5549ff47[m Merge pull request #133 from alief572/development
+[33md8f68e69[m Perbaikan - Purchase Request
+[33m3d95d7ab[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33meb4eb0be[m Merge pull request #132 from alief572/development
+[33mb56ff633[m Update PrintInvoice.php
+[33m279b551d[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m62658a62[m Merge pull request #131 from alief572/development
+[33m9d91b05d[m Update Delivery_order_model.php
+[33m8672beb7[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m43aa3a86[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mcd97f82c[m Merge pull request #130 from alief572/development
+[33m5f12872f[m Perbaikan - Delivery Order
+[33me3abd397[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m2815148e[m Merge pull request #129 from alief572/development
+[33m4e0984af[m Perbaikan - Print PO
+[33md5bf8449[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m71ce7b6b[m Merge pull request #128 from alief572/development
+[33md7f56d55[m Perbaikan - Print PO
+[33mcdd2f8c8[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mfc4a7983[m Merge pull request #127 from alief572/development
+[33m81aec998[m Perbaikan - Print PO
+[33m333d2fb0[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m79a89d1a[m Merge pull request #126 from alief572/development
+[33mc9a21781[m Perbaikan - Print PO
+[33mb9de076d[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m2fddc9da[m Merge pull request #125 from alief572/development
+[33mc2de000d[m Perbaikan - Print PO
+[33m8d84802c[m Perbaikan - Print PO
+[33mc945df95[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m67f79447[m Merge pull request #124 from alief572/development
+[33mc09e139a[m Perbaikan - Print PO
+[33m78c27fe5[m Perbaikan - Print PO
+[33me322eacc[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m7898c42a[m Merge pull request #123 from alief572/development
+[33m9cea3f75[m Merge branch 'main' into development
+[33m062d644e[m Perbaikan - Print PO
+[33m231b489c[m Perbaikan - Print PO
+[33m32d8c26e[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m1a927a42[m Perbaikan - Delivery Order
+[33mf20b3569[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mfcc051de[m Merge pull request #122 from alief572/development
+[33md572f5d3[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m43f50772[m Perbaikan - Purchase Request
+[33m1a0a8940[m Perbaikan - Purchase Request
+[33mee519271[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m3eb07f68[m Merge pull request #121 from alief572/development
+[33m72512d2d[m Update PrintInvoice.php
+[33m43d64feb[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m394d5232[m Merge pull request #120 from alief572/development
+[33m950a4270[m Update PrintInvoice.php
+[33mdb98eba8[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mcdaa63e6[m Merge pull request #119 from alief572/development
+[33m6937d623[m Update PrintInvoice.php
+[33md99c5fc9[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m493b690f[m Merge pull request #118 from alief572/development
+[33mbf8ad9d9[m Update PrintInvoice.php
+[33m15ff72b4[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m52a5f4a4[m Merge pull request #117 from alief572/development
+[33m692b6ba5[m Update PrintInvoice.php
+[33m69f88107[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m313e56a3[m Merge pull request #116 from alief572/development
+[33m6b2cf72f[m Update PrintInvoice.php
+[33m0ff0c8ea[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33ma9cacc73[m Merge pull request #115 from alief572/development
+[33md2983a36[m Update PrintInvoice.php
+[33maa44dead[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mcf9ba12b[m Merge pull request #114 from alief572/development
+[33m776aed36[m Update PrintInvoice.php
+[33m05e75dde[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m8d467919[m Merge pull request #113 from alief572/development
+[33m6007fcc9[m Update PrintInvoice.php
+[33mbb505542[m Update PrintInvoice.php
+[33m9d0ebf6a[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m7dbcc2d3[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mffb30214[m Merge pull request #112 from alief572/development
+[33m4d9caf9a[m Update PrintInvoice.php
+[33m6162a9ca[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m37314bcd[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mbef03b63[m Merge pull request #111 from alief572/development
+[33ma91a6be3[m Perbaikan - Print Invoicing
+[33mb3873ac8[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33ma4bb64cf[m Merge pull request #110 from alief572/development
+[33m3769a882[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m31179617[m Request - Purchase Request
+[33maf42ba1e[m Perbaikan - Process Checksheet
+[33m9d1221b9[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m82fad1bb[m Merge pull request #109 from alief572/development
+[33m022594e9[m Perbaikan - Penawaran
+[33m9bd672db[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m63ea4236[m Merge pull request #108 from alief572/development
+[33m5234fd64[m Perbaikan - Print Packing List
+[33m2f2ee13e[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mf9db035d[m Merge pull request #107 from alief572/development
+[33me96df104[m Perbaikan - Print Packing List
+[33m1da9b4b5[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m4470c23b[m awd
+[33mfaf9dd9d[m Merge pull request #106 from alief572/development
+[33m29254d10[m Perbaikan - Print Packing List
+[33mffabdcaa[m Merge pull request #105 from alief572/development
+[33mccb92bc4[m Perbaikan - Print Packing List
+[33meb077a04[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m5724686f[m Merge pull request #104 from alief572/development
+[33mcf4d22e1[m Update PrintPackinglist.php
+[33m27f96ce6[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m8b1226cd[m Merge pull request #103 from alief572/development
+[33mf686470a[m Update PrintPackinglist.php
+[33m21f1a0c3[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m044e1a0e[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33me9c1446d[m Merge pull request #102 from alief572/development
+[33m2f2eee6f[m Perbaikan - Print Packing List
+[33m79952bf2[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m006dfbe8[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m51bc2c8d[m Merge pull request #101 from alief572/development
+[33m90cc1c7c[m Perbaikan - SPK Marketing
+[33m0e63546b[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m691eaeb0[m awd
+[33m87d27b25[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m1e69cda8[m Merge pull request #100 from alief572/development
+[33m1d302ab0[m Perbaikan - Print Invoice
+[33me2ca1afa[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m89273299[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33me723e60a[m Merge pull request #99 from alief572/development
+[33m9a4f93ec[m Perbaikan - Print SPK Marketing
+[33m79624854[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33md84f6362[m awd
+[33m81703aa6[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33maf740e83[m Merge pull request #98 from alief572/development
+[33mffcfcca6[m Update print2.php
+[33m2f3e8e77[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m8ee03f3f[m Merge pull request #97 from alief572/development
+[33m5dc75523[m Perbaikan - Penawaran
+[33m48c61ce9[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m678de55a[m Merge pull request #96 from alief572/development
+[33m97064d2b[m Update add_inventory.php
+[33mc5841db5[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33ma84d4305[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m79592d05[m Merge pull request #95 from alief572/development
+[33m0bc23507[m Perbaikan - Master Material
+[33m5ed7354f[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m95e625dd[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m38b262a2[m Merge pull request #94 from alief572/development
+[33mbd4bd3ae[m Update edit_inventory.php
+[33mbbacb9ac[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m3eb40c27[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m00c8c7e2[m Merge pull request #93 from alief572/development
+[33ma3fc1439[m Perbaikan - Master Material
+[33mf5129b5a[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mac50d1e4[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m85e60513[m Merge pull request #92 from alief572/development
+[33mf723d69d[m Perbaikan - Incoming
+[33m61a954e5[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mee1fdbfe[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m5d32a77d[m Merge pull request #91 from alief572/development
+[33m17519cb9[m Perbaikan - Incoming
+[33mf4fa27e8[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m1253416b[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m83392b09[m Merge pull request #90 from alief572/development
+[33mf0a0644f[m Perbaikan - Master Material
+[33mb8022104[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m503b84bb[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m8a9883b7[m Merge pull request #89 from alief572/development
+[33m28c7699d[m Update add.php
+[33m4c03f9d5[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m3ada39a5[m awd
+[33m253e99d6[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33md3a349d6[m Merge pull request #88 from alief572/development
+[33ma0b1fa70[m Update .gitignore
+[33m467eb6c1[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m7a2ed773[m Create constants.php
+[33md597cd5a[m Update .gitignore
+[33m5485cebe[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m1384090f[m Merge pull request #87 from alief572/development
+[33ma05fd6bd[m Perbaikan - Master Material
+[33m83f4ca22[m test
+[33mcb07c91e[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m533dc75b[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m120bf5b7[m Merge pull request #86 from alief572/development
+[33mdf57b483[m Perbaikan - Master Material
+[33mecefc7e4[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m5c268dd2[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m154f11f5[m Merge pull request #85 from alief572/development
+[33m95b5852d[m Perbaikan - Material Planing
+[33m58275d30[m Perbaikan - Material Planing
+[33me0c91b94[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m931abaaa[m Merge pull request #84 from alief572/development
+[33m12cd66dc[m Perbaikan - Stock Material per Gudang
+[33me3e9f81b[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m6dfd3f7c[m awd
+[33m18ec6c79[m Merge pull request #83 from alief572/development
+[33m8730e1cd[m Update PrintInvoice.php
+[33m91e10adf[m Merge pull request #82 from alief572/development
+[33mc2fbfd3e[m Update PrintInvoice.php
+[33m53156e78[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m7e012ae7[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mfb849dee[m Merge pull request #81 from alief572/development
+[33m4581c575[m Update PrintInvoice.php
+[33m2e714245[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m2f67cf85[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33md8902a7f[m Merge pull request #80 from alief572/development
+[33m2b252f32[m Perbaikan - PO Material
+[33m420d9b32[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m427a4f06[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m205b9aee[m Merge pull request #79 from alief572/development
+[33m10b2d0cf[m Update view.php
+[33me39562ad[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33md03a672b[m Merge pull request #78 from alief572/development
+[33mf4bf489f[m Update view.php
+[33m78010f61[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33ma2009144[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m04b37d07[m Merge pull request #77 from alief572/development
+[33m8b93384d[m Perbaikan - PO Non Material
+[33mc8451edb[m Perbaikan - PO Non Material
+[33m676a7c28[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m4bfb3efc[m Update print2.php
+[33mb71d0927[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mee212510[m Merge pull request #76 from alief572/development
+[33m1a7ceb66[m Perbaikan - Print PO Material
+[33m3881a29a[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mc9bfdb60[m Merge pull request #75 from alief572/development
+[33mc70a1e10[m Perbaikan - Delivery Order
+[33me98e075b[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m172473f7[m Merge pull request #74 from alief572/development
+[33m7e67c5bb[m Perbaikan - Delivery Order
+[33m1a12ebaf[m Test
+[33mfd488c0e[m Merge pull request #73 from alief572/development
+[33m5b544610[m Perbaikan - Print PR Department
+[33mf0c5f380[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m7e818ad4[m Merge pull request #72 from alief572/development
+[33m4f80bc44[m Perbaikan - Print PR Department
+[33m6ad9c3f6[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m5092c4e5[m Merge pull request #71 from alief572/development
+[33m9f625a4c[m Perbaikan - Print PO Non Materail
+[33mfed030bd[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33md00986f3[m Merge pull request #70 from alief572/development
+[33mb77bde47[m Perbaikan - Print PO Non Materail
+[33m9854643e[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m751cdb70[m Merge pull request #69 from alief572/development
+[33m3553a1c2[m Perbaikan - Print PO Non Materail
+[33ma9be6dbc[m Merge pull request #68 from alief572/development
+[33m7131d092[m Perbaikan - Print SPK Marketing Slitting
+[33m5a2abcd0[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m74586ac3[m awd
+[33m4f863bfb[m Merge pull request #67 from alief572/development
+[33m87939b38[m Perbaikan - Print SPK Marketing Slitting
+[33mcd139c9e[m Perbaikan - Print Out PO Non Material
+[33m598f6412[m Perbaikan - ROS
+[33m2860d0f1[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m6309fef0[m Merge pull request #66 from alief572/development
+[33mbc68b191[m Perbaikan - PO Non Material
+[33m26744fe6[m Perbaikan - PO Non Material
+[33m627448a6[m Perbaikan - PO Non Material
+[33m1af8d6ca[m Merge pull request #65 from alief572/development
+[33mefd87d91[m Perbaikan - Print Delivery Order
+[33m4be1084a[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33med9d2fc0[m Merge pull request #64 from alief572/development
+[33m86b6a1bb[m Perbaikan - Print Delivery Order
+[33mcc107bed[m Merge pull request #63 from alief572/development
+[33m250fcc4b[m Perbaikan - Print Delivery Order
+[33md9649773[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mc942cbf6[m Merge pull request #62 from alief572/development
+[33mb25229d9[m Perbaikan - Print SPK Marketing
+[33mce93fdf2[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m01ce4529[m Perbaikan - Expense
+[33m75d16165[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m03665ef9[m Perbaikan - Expense
+[33m98365195[m Merge pull request #61 from alief572/development
+[33medec7f7d[m Perbaikan - Kasbon Input
+[33mc58e7a14[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m90032b5a[m Perbaikan - Kasbon Input
+[33m1286a5f0[m Merge pull request #60 from alief572/development
+[33m9f46e69c[m Perbaikan - Delivery
+[33m656d80af[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m3e8feb8d[m Penyesuaian - Print PO
+[33m440cb3d8[m Merge pull request #59 from alief572/development
+[33m8157d768[m Perbaikan - Request Payment
+[33m2f521a08[m Perbaikan - Request Payment
+[33md548accc[m Merge pull request #58 from alief572/development
+[33m66f93881[m Perbaikan - Delivery
+[33m6705b0a7[m Test
+[33mb1cd9687[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m5f537117[m Merge pull request #57 from alief572/development
+[33mee6159e0[m Perbaikan - Delivery
+[33mfee31762[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m9fa3563f[m Merge pull request #56 from alief572/development
+[33m2a03a876[m Perbaikan - Invoice
+[33m63028ff5[m Merge pull request #55 from alief572/development
+[33mac246478[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mc0264b03[m Perbaikan - Master Material
+[33m27cd8af8[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m30477ae6[m Merge pull request #54 from alief572/development
+[33mba863229[m Perbaikan - Koneksi
+[33m77ea6681[m Merge pull request #53 from alief572/development
+[33m1cd433bf[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m94ae0789[m Penambahan - Master Material
+[33m6035c731[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m0f682898[m Penambahan - Master Material
+[33m023c4fd7[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mc48f7a38[m Merge pull request #52 from alief572/development
+[33m06da8a26[m Perbaikan - ROS
+[33me5e5debe[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m733e1394[m Perbaikan - Incoming Material
+[33ma0bdd9ec[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mf83feec2[m Perbaikan - Ros dan Incoming
+[33m3fae2f52[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mb4ff8abe[m Perbaikan - Kasbon
+[33m1ad8290d[m Merge pull request #51 from alief572/development
+[33mc29272e1[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m2148691b[m Perbaikan - Incoming Asset
+[33m4449bc0b[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33mf1720771[m Merge pull request #50 from alief572/development
+[33mf6c950fa[m Perbaikan - Incoming Asset
+[33mf99f8095[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33md232bc97[m Merge pull request #49 from alief572/development
+[33m8286532c[m Perbaikan - Incoming Asset
+[33m6c7ca9f3[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m60123374[m Merge pull request #48 from alief572/development
+[33md3355bb5[m Perbaikan - ROS
+[33m26f1a707[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m6b64aafe[m Merge pull request #47 from alief572/development
+[33m26c090ff[m Perbaikan - Purchase Order Non Material
+[33ma22d7c05[m Merge branch 'main' of github.com:alief572/metalsindo
+[33medf6d27b[m Perbaikan - Purchase Order Non Material
+[33m051e103b[m Merge pull request #46 from alief572/development
+[33m6110fddd[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m2d0bb985[m Perbaikan - Pembayaran
+[33m7bf2cb36[m Perbaikan - Pembayaran
+[33m7a8bb535[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m08d8d212[m Perbaikan - ROS
+[33m507aca1b[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33m57f542c6[m Perbaikan - ROS
+[33m8130b4a4[m Merge pull request #45 from alief572/development
+[33mcd044f1f[m Merge branch 'development' of github.com:alief572/metalsindo into development
+[33ma2271d73[m Perbaikan - Assets
+[33m3d99aab3[m Perbaikan - Constants
+[33mec9baffb[m Perbaikan - Request Uang Muka
+[33mafca41d0[m Perbaikan - Request Uang Muka
+[33med4a4e93[m Perbaikan - Request Uang Muka
+[33m00921d31[m Perbaikan Constants
+[33m7a6bdd73[m Dev - ROS
+[33m207734c5[m Update AddHeaderSlitting.php
+[33m63d2bffc[m Merge branch 'main' of github.com:alief572/metalsindo
+[33m94dd6e1f[m Merge pull request #44 from alief572/development
+[33m11c980f2[m Perbaikan - PR Department
+[33m41af0aa0[m Update constants.php
+[33m5b65912c[m Merge branch 'main' of github.com:alief572/metalsindo
+[33m0232c023[m Update index.php
+[33m52ec2134[m Merge pull request #43 from alief572/development
+[33mf5845d9d[m Perbaikan - Purchase Order
+[33m9437d8ad[m Merge pull request #42 from alief572/development
+[33mf662405b[m Perubahan - Purchase Order
+[33m55eebb94[m Merge pull request #41 from alief572/development
+[33mef11b37f[m Perubahan - Purchase Order
+[33m50a80b20[m Merge pull request #40 from alief572/development
+[33m159e61a1[m Perbaikan - Akses Menu
+[33mce96d9d8[m Merge pull request #39 from alief572/development
+[33mda7e21d9[m Perbaikan - Incoming, Spk Marketing, Material Planning
+[33m0ad57ea1[m Merge pull request #38 from alief572/development
+[33m0d8616b3[m Perbaikan - Pengajuan Pembayaran Periodik
+[33m7dd1b883[m Merge pull request #37 from alief572/development
+[33me5d03821[m Perbaikan - Pengajuan Pembayaran Periodik
+[33mb2923671[m Perbaikan - Approval Pengajuan Pembayaran Periodik
+[33m8047bcd7[m Merge pull request #36 from alief572/development
+[33m3d70dbe4[m Merge branch 'main' into development
+[33m05d65263[m Test
+[33m85b6d60b[m Perbaikan Merger
+[33m6e50ed67[m Perbaikan Merger
+[33m641464a7[m Perbaikan - Incoming Material
+[33m2fe84b96[m Perbaikan - Receive Invoice AP
+[33medb89bf8[m Perbaikan - Receive Invoice AP
+[33m7aa7c740[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m3fbd8846[m Update index.php
+[33mac29a564[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m07944cc0[m Merge pull request #35 from alief572/development
+[33mfa986d8a[m Penambahan - Request Payment
+[33ma1887f9a[m Penambahan - Request Payment
+[33mc278fbb6[m Create constants.php
+[33md568d393[m Penambahan - Request Payment
+[33m9284998f[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m3663d620[m Update constants.php
+[33mcb256b34[m Perbaikan - Receive Invoice AP
+[33m2824e341[m Perbaikan - Update
+[33m4b4b2fb9[m Perbaikan - Constant
+[33m256bb621[m Perbaikan - Receive Invoice AP
+[33m53ba8f56[m Perbaikan - Receive Invoice AP
+[33m56b48e8e[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mda626807[m Perbaikan - Purchase Order Non Material
+[33me60d33fe[m Update 11 Nov 2024
+[33m08e3eec5[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33md2533ce7[m Merge pull request #34 from alief572/development
+[33mc5170326[m Perbaikan - Request Payment
+[33m03060ebc[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m9d679280[m Merge pull request #33 from alief572/development
+[33ma46e5f07[m Perbaikan - Request Payment
+[33mc3823bed[m test
+[33mc8512ce3[m test
+[33m09724a25[m Perbaikan - Incoming
+[33m039af252[m test
+[33m8a71c605[m Update Add.php
+[33m742cbc8e[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mba4433af[m Merge pull request #31 from alief572/development
+[33md683353b[m Merge branch 'development' of github.com:alief572/metalsindo into main
+[33m92d0c031[m Perbaikan - Approval PO Non Material
+[33m00af71ee[m Merge branch 'development' of github.com:alief572/metalsindo into main
+[33m694ebc62[m Perbaikan - PO Non Material
+[33m736937d0[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mbfc62110[m Merge pull request #30 from alief572/development
+[33m1d3785d0[m Perbaikan - Edit PO Non Material
+[33m46c4c9d3[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33md8513c1d[m Merge pull request #29 from alief572/development
+[33mb3a98ee4[m Perbaikan - Print PO Non Material
+[33m16947ddd[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m5cab191b[m test
+[33m9322bd50[m Merge pull request #28 from alief572/development
+[33m98870237[m Perbaikan - Print PO Non Material
+[33m09ae8279[m Perbaikan - Penambahan Currency di proses print PO
+[33m9ce12e39[m Rename Assets_Depreciation.php to Assets_depreciation.php
+[33mbfe161f2[m Rename Assets_Depreciation.php to Assets_depreciation.php
+[33mb28c6e1f[m Merge pull request #27 from alief572/development
+[33m77f49d5f[m Perbaikan - Penambahan Currency di proses print PO
+[33m35c47cd9[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m731f2ed4[m Merge pull request #26 from alief572/development
+[33m4adfd621[m Perbaikan - Master Asset
+[33m1a88ad1c[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mf0f41da1[m Merge pull request #25 from alief572/development
+[33md0dbe1d5[m Perbaikan - Master Asset
+[33m325e4ae7[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m162726c5[m Merge pull request #24 from alief572/development
+[33m9a42bf8b[m Perbaikan - Master Asset
+[33m918736a6[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m6473d8fa[m Merge pull request #23 from alief572/development
+[33m57b9e92a[m Perubahan - Master Asset
+[33m3130f486[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m0048a573[m Merge pull request #22 from alief572/development
+[33m0d6155f7[m Perbaikan - Akses Module Assets Category
+[33m6400c697[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m7ceb1c81[m Merge pull request #21 from alief572/development
+[33md22b7275[m Perbaikan - Akses ke module Asset Category
+[33m0c4aa469[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m0ae5b7c3[m UPdate
+[33mda203716[m Merge pull request #20 from alief572/development
+[33m1b267457[m Perbaikan - Akses menu
+[33m1819cd57[m Merge pull request #19 from alief572/development
+[33m6a6999c8[m Perbaikan - Akses menu
+[33mbeb4dd23[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m2d6ec603[m Merge pull request #18 from alief572/development
+[33m68a3f844[m Perbaikan - Print PO Non Material
+[33m418af291[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mfcdc4629[m Merge pull request #17 from alief572/development
+[33mbd37e9a7[m Perbaikan - Print PO Non Material
+[33m82b7edb3[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m0a549fe3[m Merge pull request #16 from alief572/development
+[33m2f1cf52c[m Update print2.php
+[33ma868aab9[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m66ec8e8f[m Merge pull request #15 from alief572/development
+[33m33abcd82[m Perbaikan - Print PO Non Material
+[33m997f0bde[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m4e6fb078[m Merge pull request #14 from alief572/development
+[33m7319d7bd[m Perbaikan - 4 November 2024
+[33mc663fc3e[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m42f02506[m Merge pull request #13 from alief572/development
+[33m762f3538[m Perbaikan - Request Payment - Semua COA dimunculkan dalam list
+[33m42b1b4dd[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33md795d0f2[m Merge pull request #12 from alief572/development
+[33mdb7ba49f[m Perbaikan - Input Kasbon
+[33md7e72fc0[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m39a77c33[m Merge pull request #11 from alief572/development
+[33mef5f831a[m Perbaikan - Request Payment - Semua COA dimunculkan dalam list
+[33m70d39f08[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m17f6ad4c[m Merge pull request #10 from alief572/development
+[33m5debd80d[m Dev - Receive Invoice AP
+[33me69fdca9[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mdaa85d07[m Merge pull request #9 from alief572/development
+[33m0b702a59[m Perbaikan - Request Payment - Semua COA dimunculkan dalam list
+[33mf2a15d00[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m880e94ac[m Merge pull request #8 from alief572/development
+[33m6c9a1def[m Perbaikan - Input Kasbon
+[33m8bfa7d17[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33mb46fead0[m Merge pull request #7 from alief572/development
+[33ma134e846[m Perbaikan - Input Kasbon - Ketika pilih pr, detail barang pr nya tidak muncul
+[33mbfa099a0[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m70ce60c4[m Merge pull request #6 from alief572/development
+[33mff268d74[m Perbaikan - Input Kasbon - Ketika pilih pr, detail barang pr nya tidak muncul
+[33mf0c90317[m Merge branch 'main' of github.com:alief572/metalsindo into main
+[33m46e143d3[m test
+[33m13a478a9[m Merge pull request #5 from alief572/development
+[33m6b874f59[m test
+[33m909ac77b[m Perbaikan - Input Kasbon - Ketika pilih pr, detail barang pr nya tidak muncul
+[33mda137fa4[m Merge branch 'development' of github.com:alief572/metalsindo into main
+[33m8d17afdb[m Perbaikan - 29-10-2024
+[33mdab095fc[m Merge branch 'development' of github.com:alief572/metalsindo into main
+[33m21f44efd[m Penambahan - Request Pembayaran Uang Muka
+[33m329c6e72[m Merge branch 'development' of github.com:alief572/metalsindo into main
+[33m7be98a3b[m Penambahan - Request Pembayaran Uang Muka
+[33m710c1df6[m Merge branch 'development' of github.com:alief572/metalsindo into main
+[33mea0f6452[m Perbaikan - View Kasbon
+[33m0ea9d075[m Merge branch 'development' of github.com:alief572/metalsindo into main
+[33m2ea99fc7[m Perbaikan - Expense Pettycash - Tidak perlu ada tombol untuk input kasbon
+[33m8b6fac3b[m Merge branch 'development' of github.com:alief572/metalsindo into main
+[33m7a2f0865[m Perbaikan - Input Kasbon - Hilangkan metode pembayaran karena semua kasbon harus via request payment
+[33m1b5e4b41[m Merge branch 'development' of github.com:alief572/metalsindo into main
+[33m9bec783a[m Update constants.php
+[33med77c463[m Penambahan - Master Asset
+[33mf4e750e4[m Merge pull request #4 from alief572/development
+[33m14a10d2d[m Upload .gitignore
+[33mba2faacd[m Dev - Incoming Asset
+[33m6bdd7fb0[m Update database.php
+[33m1c3c2482[m Merge pull request #3 from alief572/development
+[33mb12dc88a[m Update constants.php
+[33mf47a9fc9[m Penambahan - Module Asset
+[33ma278e46a[m Perbaikan Akses - PR Department
+[33md35a92a7[m Perbaikan Expense
+[33m65d7014f[m Perbaikan Expense
+[33m460b314c[m Perbaikan Expense
+[33m47e7cade[m Perbaikan Expense
+[33m77749acb[m Perbaikan Expense
+[33medb17785[m Perbaikan Expense
+[33m0781eb1a[m Perbaikan Expense
+[33mb0612d5a[m Penambahan kolom input Informasi Awal - Penawaran
+[33m994fae43[m Penambahan kolom input Informasi Awal - Penawaran
+[33mb280c37b[m Penambahan kolom input Informasi Awal - Penawaran
+[33mea3058d5[m Merge pull request #2 from alief572/development
+[33m147f5c51[m new Update 03-10-2024
+[33m5879cb78[m new Update 03-10-2024
+[33mb8ffe5d6[m Merge pull request #1 from alief572/development
+[33m5981db88[m New Upload
+[33m9dfe9952[m Perbaikan - Payment
+[33m457ae655[m Perbaikan - Payment
+[33m8c6f8b99[m Perbaikan - Payment
+[33me1843602[m Perbaikan
+[33m4531f706[m Perbaikan - Error pas save di module expense pettycash
+[33m21207a8a[m New Update 06 September 2024
+[33m32f69a9d[m Penambahan module non operation - 06 September 2024
+[33mf8fe30a9[m Penambahan module non operation - 06 September 2024
+[33m31227b84[m new upload 04-09-2024
+[33me3d10a92[m Dev - New Payment 04-09-2024
+[33mcd2dd99e[m New Update 02 September 2024
+[33m737bf921[m Dev - Module Metode Pembelian
+[33m4d64f5b2[m Dev - Module Metode Pembelian
+[33mc9dd52f2[m Dev - Module Metode Pembelian
+[33mf6b773ef[m Dev - Module Metode Pembelian
+[33me652835d[m Dev - Module Metode Pembelian
+[33m29b533e1[m Dev - Module Metode Pembelian
+[33m580e9d4d[m Dev - Module PR Stock da PR Department
+[33m30db0a00[m Initial commit
