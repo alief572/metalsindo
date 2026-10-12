@@ -2,54 +2,41 @@
 <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/report_spk_marketing.css') ?>">
 <div class="spk-report">
-    <nav class="spk-report-nav" aria-label="Navigasi laporan">
-        <span>Marketing <span aria-hidden="true">/</span> <strong>Laporan SPK</strong></span>
-        <div><a href="#spk-filter-title">Filter laporan</a><a href="#spk-results-title">Lihat data <span aria-hidden="true">↗</span></a></div>
-    </nav>
-    <header class="spk-report-heading">
-        <div class="spk-heading-copy">
-            <h2>Report SPK<br><span>Marketing.</span></h2>
-            <p>Telusuri detail pesanan, spesifikasi produk, dan rencana pengiriman dalam satu laporan.</p>
-        </div>
-        <div class="spk-heading-aside">
-            <div class="spk-metal-art" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-            <p>Dari pesanan<br>hingga pengiriman.</p>
-            <span>Detail produk, dalam satu pandangan.</span>
-        </div>
-    </header>
     <section class="spk-panel-shell" aria-labelledby="spk-filter-title">
     <div class="spk-panel">
-        <div class="spk-section-heading"><div><h3 id="spk-filter-title" tabindex="-1">Filter laporan</h3><p>Mulai dari periode dan customer.<br>Persempit hasil sesuai kebutuhan.</p></div></div>
+        <div class="spk-section-heading"><h2 id="spk-filter-title">Filter laporan</h2><p>Telusuri item SPK, spesifikasi produk, dan rencana pengiriman berdasarkan periode, customer, atau status approval.</p></div>
         <form id="spk-report-filters">
             <div class="spk-filter-grid">
-                <div class="form-group"><label for="spk-start">Tanggal SPK mulai</label><input id="spk-start" name="start_date" type="date" class="form-control" aria-describedby="spk-report-error"></div>
-                <div class="form-group"><label for="spk-end">Tanggal SPK sampai</label><input id="spk-end" name="end_date" type="date" class="form-control"></div>
+                <div class="form-group"><label for="spk-start">Tanggal SPK mulai</label><input id="spk-start" name="start_date" type="date" class="form-control" aria-describedby="spk-filter-hint spk-report-error"></div>
+                <div class="form-group"><label for="spk-end">Tanggal SPK sampai</label><input id="spk-end" name="end_date" type="date" class="form-control" aria-describedby="spk-filter-hint"></div>
                 <div class="form-group spk-filter-customer"><label for="spk-customer">Customer</label><select id="spk-customer" name="customer_id" class="form-control">
                     <option value="">Semua Customer</option>
                     <?php foreach ($customers as $customer): ?>
                         <option value="<?= htmlspecialchars($customer['id_customer'], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($customer['name_customer'], ENT_QUOTES, 'UTF-8') ?></option>
                     <?php endforeach; ?>
                 </select></div>
-                <div class="form-group"><label for="spk-status">Status approval</label><select id="spk-status" name="status" class="form-control"><option value="approved">Approved</option><option value="unapproved">Belum Approved</option><option value="all">Semua</option></select></div>
+                <div class="form-group"><label for="spk-status">Status approval</label><select id="spk-status" name="status" class="form-control" aria-describedby="spk-filter-hint"><option value="approved">Approved</option><option value="unapproved">Belum Approved</option><option value="all">Semua</option></select></div>
             </div>
             <div class="spk-filter-footer">
                 <div class="form-group spk-filter-search"><label for="spk-search">Nomor dokumen</label><input id="spk-search" name="search" type="search" class="form-control" placeholder="Cari nomor SPK atau PO..."></div>
                 <div class="spk-filter-actions">
                     <button type="button" id="spk-reset" class="btn spk-button-reset">Reset filter</button>
-                    <button type="submit" class="btn spk-button-primary">Tampilkan laporan<span class="spk-button-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></button>
+                    <button type="submit" class="btn spk-button-primary">Tampilkan laporan</button>
                 </div>
             </div>
         </form>
+        <p id="spk-filter-hint" class="spk-filter-hint">Kosongkan tanggal untuk semua periode. Reset filter mengembalikan status ke Approved.</p>
     </div>
     </section>
     <div id="spk-report-error" class="alert alert-danger" role="alert" style="display:none"></div>
     <section class="spk-panel-shell spk-results" aria-labelledby="spk-results-title">
     <div class="spk-panel">
         <div class="spk-results-heading">
-            <div><div class="spk-section-heading"><div><h3 id="spk-results-title" tabindex="-1">Detail SPK</h3><span id="spk-result-count" class="spk-count" aria-live="polite">Memuat...</span></div></div><p id="spk-applied-filters" class="spk-applied-filters">Semua periode · Semua Customer · Approved</p></div>
-            <button type="button" id="spk-export" class="btn spk-button-export">Export Excel<span class="spk-button-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M5 15v5h14v-5"/></svg></span></button>
+            <div class="spk-result-heading"><h2 id="spk-results-title">Detail SPK</h2><div class="spk-result-meta"><span id="spk-result-count" class="spk-count" aria-live="polite">Memuat...</span><p id="spk-applied-filters" class="spk-applied-filters">Semua periode · Semua Customer · Approved</p></div></div>
+            <button type="button" id="spk-export" class="btn spk-button-export"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 15v5h14v-5"/></svg>Export Excel</button>
         </div>
-        <div class="spk-table-toolbar"><span id="spk-load-status" role="status">Menyiapkan laporan...</span><div class="spk-density-control" role="group" aria-label="Kepadatan tabel"><span>Tampilan</span><button type="button" data-spk-density="comfortable" aria-pressed="true">Nyaman</button><button type="button" data-spk-density="compact" aria-pressed="false">Ringkas</button></div></div>
+        <div id="spk-report-note" class="spk-report-note"><p><strong>Perhatikan total per SPK:</strong> Total Qty Product (KG) diulang pada tiap item SPK yang sama; jangan dijumlahkan antaritem. Delivery Date mengikuti rencana delivery per item SPK.</p></div>
+        <div class="spk-table-toolbar"><div class="spk-table-status"><span id="spk-load-status" role="status">Menyiapkan laporan...</span><span class="spk-scroll-hint">Geser tabel untuk melihat 17 kolom</span></div><div class="spk-density-control" role="group" aria-label="Kepadatan tabel"><span>Tampilan</span><button type="button" data-spk-density="comfortable" aria-pressed="true">Nyaman</button><button type="button" data-spk-density="compact" aria-pressed="false">Ringkas</button></div></div>
         <div class="spk-table-region" role="region" aria-label="Tabel detail SPK Marketing" tabindex="0">
         <table id="spk-report-table" class="table" style="width:100%" aria-describedby="spk-report-note">
             <thead><tr class="spk-column-groups"><th colspan="6" scope="colgroup">Informasi SPK</th><th colspan="10" scope="colgroup">Spesifikasi produk / item</th><th colspan="1" scope="colgroup">Ringkasan</th></tr><tr>
@@ -57,15 +44,11 @@
             </tr></thead><tbody></tbody>
         </table>
         </div>
-        <div class="spk-scroll-hint">Geser tabel untuk melihat seluruh spesifikasi <span aria-hidden="true">↔</span></div>
-        <div id="spk-report-note" class="spk-report-note"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/></svg><p><strong>Catatan pembacaan laporan</strong>Total Qty Product (KG) adalah total per SPK yang diulang pada tiap item. Delivery Date mengikuti rencana delivery per item SPK.</p></div>
     </div>
     </section>
 </div>
 <script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
 <script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js') ?>"></script>
-<script src="<?= base_url('assets/plugins/gsap/gsap.min.js') ?>"></script>
-<script src="<?= base_url('assets/plugins/gsap/ScrollTrigger.min.js') ?>"></script>
 <script>
 $(function () {
     var form = $('#spk-report-filters');
@@ -81,23 +64,6 @@ $(function () {
         $(this).attr('aria-pressed', 'true');
         table.columns.adjust();
     });
-    // Keep report content usable when animation assets are unavailable.
-    if (window.gsap && window.ScrollTrigger) {
-        gsap.registerPlugin(ScrollTrigger);
-        var motion = gsap.matchMedia();
-        motion.add('(prefers-reduced-motion: no-preference)', function () {
-            gsap.from('.spk-report-nav, .spk-heading-copy, .spk-heading-aside', {
-                y: 16, opacity: 0, duration: .75, stagger: .1, ease: 'power3.out', clearProps: 'transform,opacity'
-            });
-            gsap.from('.spk-metal-art span', {
-                scaleY: .75, opacity: 0, transformOrigin: 'bottom', duration: 1, stagger: .08, ease: 'power3.out', clearProps: 'transform,opacity'
-            });
-            gsap.from('.spk-results', {
-                y: 20, duration: .8, ease: 'power3.out', clearProps: 'transform',
-                scrollTrigger: {trigger: '.spk-results', start: 'top 95%', once: true}
-            });
-        });
-    }
     function readFilters() {
         var filters = {};
         $.each(form.serializeArray(), function (_, field) { filters[field.name] = field.value; });
@@ -161,8 +127,8 @@ $(function () {
         },
         columnDefs: [{targets: [6, 11, 12, 13, 14, 16], className: 'text-right'}],
         language: {
-            emptyTable: 'Tidak ada data SPK Marketing untuk filter ini. Coba ubah periode atau customer.',
-            zeroRecords: 'Tidak ada item yang sesuai dengan filter.',
+            emptyTable: 'Tidak ada data SPK Marketing untuk filter ini. Ubah periode, customer, status approval, atau nomor dokumen. Reset filter kembali ke status Approved.',
+            zeroRecords: 'Tidak ada item yang sesuai. Ubah periode, customer, status approval, atau nomor dokumen. Reset filter kembali ke status Approved.',
             processing: 'Memuat laporan...', lengthMenu: 'Tampilkan _MENU_ item per halaman',
             info: 'Menampilkan _START_–_END_ dari _TOTAL_ item', infoEmpty: 'Menampilkan 0 item',
             infoFiltered: '(dari _MAX_ item keseluruhan)',
