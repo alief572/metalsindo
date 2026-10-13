@@ -5,10 +5,10 @@ class Report_lhp_slitting_model extends BF_Model
     public static function headers()
     {
         return array('No SPK Produksi','No SPK Marketing','Customer','Tanggal Produksi','Product',
-            'Width Slitting','Weight Slitting','Lot Number Slitting','Actual Weight Slitting',
+            'Width','Weight','Lot Number','Actual Weight',
             'Finishgood - Berat Aktual','Sisa Potong - Lebar Aktual','Sisa Potong - Berat Aktual',
             'Scrap Trimming+Sisa - Berat','NG Internal - Lebar','NG Internal - Berat',
-            'NG Eksternal - Lebar','NG Eksternal - Berat','Total Weight Slitting','Selisih Packing List VS Aktual');
+            'NG Eksternal - Lebar','NG Eksternal - Berat','Total Weight','Selisih Packing List VS Aktual');
     }
 
     public static function valid_date($value)
