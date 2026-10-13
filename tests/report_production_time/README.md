@@ -46,7 +46,7 @@ php scripts/register_report_production_time.php rollback --app-config=developmen
 ```
 
 Untuk deployment gunakan konfigurasi environment tujuan atau `REPORT_INSTALL_*` mengikuti skrip registrasi.
-Apply/rollback transaksional dan idempotent, memakai Report LHP Slitting sebagai anchor.
+Apply/rollback transaksional dan idempotent, memakai Report Weight Production sebagai anchor.
 Administrator mengikuti akses bawaan; role lain perlu diberi permission melalui pengaturan aplikasi.
 
 ## Batasan operasional

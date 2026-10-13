@@ -8,7 +8,7 @@ class Report_lhp_slitting extends Admin_Controller
     {
         parent::__construct();
         $this->load->model('report_lhp_slitting/Report_lhp_slitting_model', 'report_model');
-        $this->template->title('Report LHP Slitting');
+        $this->template->title('Report Weight Production');
         $this->template->page_icon('fa fa-file-text-o');
     }
 
@@ -43,7 +43,7 @@ class Report_lhp_slitting extends Admin_Controller
         $exporter = new Report_lhp_slitting_excel();
         $book = $exporter->build(Report_lhp_slitting_model::headers(),$rows);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="Report_LHP_Slitting_'.date('Ymd_His').'.xlsx"');
+        header('Content-Disposition: attachment; filename="Report_Weight_Production_'.date('Ymd_His').'.xlsx"');
         header('Cache-Control: max-age=0');
         PHPExcel_IOFactory::createWriter($book,'Excel2007')->save('php://output');
         $book->disconnectWorksheets();

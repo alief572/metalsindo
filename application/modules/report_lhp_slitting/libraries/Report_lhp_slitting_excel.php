@@ -6,7 +6,7 @@ class Report_lhp_slitting_excel
     {
         $book = new PHPExcel();
         $sheet = $book->getActiveSheet();
-        $sheet->setTitle('Report LHP Slitting (Final)');
+        $sheet->setTitle('Report Weight Production');
         $sheet->mergeCells('A1:E1')->mergeCells('F1:I1')->mergeCells('J1:R1');
         $sheet->setCellValue('A1','A. Info')->setCellValue('F1','B. Produksi')
             ->setCellValue('J1','C. Summary Produksi & Sisa')->setCellValue('S1','D. Penimbangan Mother Coil');
@@ -44,7 +44,7 @@ class Report_lhp_slitting_excel
         // Keep the visible note outside the autofilter, like the supplied Final concept.
         $noteRow = $line+1;
         $sheet->mergeCells('A'.$noteRow.':S'.$noteRow);
-        $sheet->setCellValue('A'.$noteRow,'Catatan: Satu baris = satu hasil slitting. Summary dan penimbangan diulang untuk setiap hasil dalam LHP yang sama. Jangan menjumlahkan nilai header antarbaris.');
+        $sheet->setCellValue('A'.$noteRow,'Catatan: Satu baris = satu hasil produksi. Summary dan penimbangan diulang untuk setiap hasil dalam LHP yang sama. Jangan menjumlahkan nilai header antarbaris.');
         $sheet->getStyle('A'.$noteRow)->getAlignment()->setWrapText(true);
         $sheet->getRowDimension($noteRow)->setRowHeight(32);
         return $book;

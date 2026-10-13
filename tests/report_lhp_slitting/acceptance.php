@@ -21,4 +21,7 @@ $headers=Report_lhp_slitting_model::headers();
 ob_start(); require dirname(dirname(__DIR__)).'/application/modules/report_lhp_slitting/views/index.php'; $html=ob_get_clean();
 check(substr_count($html,'scope="col"')===19 && strpos($html,'colspan="9"')!==false,'Rendered PHP view column structure');
 check(strpos($html,'$.extend({},activeFilters)')!==false && strpos($html,"orderMulti:false")!==false,'Export uses applied filters and one sorting key');
+check(strpos($html,'Tabel Report Weight Production')!==false && strpos($html,'Hasil produksi')!==false,'Report uses the new display name');
+check(Report_lhp_slitting_model::headers()[5]==='Width' && Report_lhp_slitting_model::headers()[8]==='Actual Weight'
+    && Report_lhp_slitting_model::headers()[17]==='Total Weight','Production column labels omit Slitting');
 echo "PASS acceptance: complete mapping, impossible dates/fallback, malformed controls, PHP view structure\n";

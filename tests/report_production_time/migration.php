@@ -6,12 +6,12 @@ foreach (array('menus','permissions','group_permissions','user_permissions') as 
     $schema=$db->query('SHOW CREATE TABLE '.$table)->row_array();
     $db->query(preg_replace('/^CREATE TABLE/','CREATE TEMPORARY TABLE',$schema['Create Table']));
 }
-$db->query("INSERT INTO menus (id,title,link,parent_id,permission_id,`order`,group_menu,status) VALUES (1,'Production','#',0,1,7,1,1),(2,'Report LHP Slitting','report_lhp_slitting',1,1,9,1,1),(3,'Following','following',1,1,10,1,1)");
+$db->query("INSERT INTO menus (id,title,link,parent_id,permission_id,`order`,group_menu,status) VALUES (1,'Production','#',0,1,7,1,1),(2,'Report Weight Production','report_lhp_slitting',1,1,9,1,1),(3,'Following','following',1,1,10,1,1)");
 $originalMenus=$db->query('SELECT * FROM menus ORDER BY id')->result_array();
 $registration=new Report_production_time_registration($db->connection);
 check($registration->apply()==='installed','Install');
 $menu=$db->query("SELECT * FROM menus WHERE link='report_production_time'")->row_array();
-check((int)$menu['parent_id']===1 && (int)$menu['order']===10,'Position under Report LHP Slitting');
+check((int)$menu['parent_id']===1 && (int)$menu['order']===10,'Position under Report Weight Production');
 check((int)$db->query("SELECT `order` FROM menus WHERE id=3")->row_array()['order']===11,'Shift following sibling');
 check($db->query('SELECT * FROM group_permissions')->result_array()===array() && $db->query('SELECT * FROM user_permissions')->result_array()===array(),'No non-admin grants');
 $installedMenus=$db->query('SELECT * FROM menus ORDER BY id')->result_array();

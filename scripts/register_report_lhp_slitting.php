@@ -35,7 +35,7 @@ try {
         if (strtoupper((string)$statement->fetchColumn()) !== 'INNODB') throw new RuntimeException('Registration requires transactional InnoDB table: '.$table);
     }
     $registration = new Report_lhp_slitting_registration($db);
-    echo 'Report LHP Slitting: '.$registration->$action().PHP_EOL;
+    echo 'Report Weight Production: '.$registration->$action().PHP_EOL;
 } catch (Exception $e) {
     fwrite(STDERR,$e->getMessage().PHP_EOL);
     exit(1);

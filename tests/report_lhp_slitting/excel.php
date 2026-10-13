@@ -7,7 +7,7 @@ $values=array(); foreach ($model->get_rows($all,0,null) as $row) $values[]=$mode
 $book=$exporter->build(Report_lhp_slitting_model::headers(),$values);
 $sheet=$book->getActiveSheet();
 check($sheet->getHighestColumn()==='S' && $sheet->getAutoFilter()->getRange()==='A2:S6','19 columns, 4 results');
-check($sheet->getTitle()==='Report LHP Slitting (Final)','Worksheet name');
+check($sheet->getTitle()==='Report Weight Production','Worksheet name');
 check($sheet->getCell('B3')->getValue()==='=SUM(1,2)' && $sheet->getCell('B3')->getDataType()===PHPExcel_Cell_DataType::TYPE_STRING,'Formula-looking text remains text');
 check($sheet->getCell('I3')->getValue()===null && $sheet->getCell('I4')->getValue()==0 && $sheet->getCell('I4')->getDataType()===PHPExcel_Cell_DataType::TYPE_NUMERIC,'NULL versus zero');
 check($sheet->getCell('S5')->getValue()==-10 && $sheet->getCell('D5')->getDataType()===PHPExcel_Cell_DataType::TYPE_NUMERIC,'Negative values and numeric dates');

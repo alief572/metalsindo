@@ -20,7 +20,7 @@ class Report_production_time_registration
     {
         $rows = $this->query("SELECT * FROM menus WHERE TRIM(BOTH '/' FROM link) = 'report_lhp_slitting' FOR UPDATE")->fetchAll(PDO::FETCH_ASSOC);
         if (count($rows) !== 1 || !(int)$rows[0]['parent_id'] || $rows[0]['order'] === null)
-            throw new RuntimeException('Expected one Report LHP Slitting menu with parent and order. No changes applied.');
+            throw new RuntimeException('Expected one Report Weight Production menu with parent and order. No changes applied.');
         return $rows[0];
     }
 

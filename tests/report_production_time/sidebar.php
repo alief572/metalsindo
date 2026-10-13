@@ -28,7 +28,7 @@ $html=$generator->build_menus(1);
 $progress=strpos($html,"href='/metalsindo_2/report_lhp_slitting'");
 $report=strpos($html,"href='/metalsindo_2/report_production_time'");
 if ($progress===false || $report===false || $report<=$progress || substr_count($html,"href='/metalsindo_2/report_production_time'")!==1)
-    throw new RuntimeException('Report link must render once after Report LHP Slitting on the active application database.');
+    throw new RuntimeException('Report link must render once after Report Weight Production on the active application database.');
 if (strpos(substr($html,$progress+strlen("href='/metalsindo_2/report_lhp_slitting'"),$report-$progress-strlen("href='/metalsindo_2/report_lhp_slitting'")),'href=')!==false)
     throw new RuntimeException('Another menu appears between the report links.');
-echo "PASS actual Menu_generator: admin sidebar renders Report Production Time once immediately after Report LHP Slitting\n";
+echo "PASS actual Menu_generator: admin sidebar renders Report Production Time once immediately after Report Weight Production\n";

@@ -18,6 +18,14 @@ check($registration->apply()==='already installed' && $db->query('SELECT * FROM 
 $permission=$menu['permission_id'];
 $db->query('INSERT INTO group_permissions (id_group,id_permission) VALUES (2,?)',array($permission));
 $db->query('INSERT INTO user_permissions (id_user,id_permission) VALUES (9,?)',array($permission));
+check($menu['title']==='Report Weight Production','New installations use the new report name');
+$db->query('UPDATE menus SET title=? WHERE id=?',array('Report LHP Slitting',$menu['id']));
+$db->query('UPDATE permissions SET nm_menu=? WHERE id_permission=?',array('Report LHP Slitting',$permission));
+check($registration->apply()==='renamed','Existing menu migrates to the new report name');
+check($db->query('SELECT * FROM menus ORDER BY id')->result_array()===$installedMenus,'Rename preserves menu identity/order/link');
+check($db->query('SELECT nm_menu FROM permissions WHERE id_permission=?',array($permission))->row_array()['nm_menu']==='Report Weight Production','Permission display name updated');
+check(count($db->query('SELECT * FROM group_permissions')->result_array())===1 && count($db->query('SELECT * FROM user_permissions')->result_array())===1,'Existing permission grants preserved');
+check($registration->apply()==='already installed','Rename is idempotent');
 check($registration->rollback()==='removed','Rollback');
 check($db->query('SELECT * FROM menus ORDER BY id')->result_array()===$originalMenus,'Rollback restores menu order');
 check($db->query('SELECT * FROM permissions')->result_array()===array() && $db->query('SELECT * FROM group_permissions')->result_array()===array() && $db->query('SELECT * FROM user_permissions')->result_array()===array(),'Rollback removes owned permission and grants');
@@ -25,4 +33,4 @@ check($registration->rollback()==='already removed','Idempotent rollback');
 $db->query("DELETE FROM menus WHERE link='progress_order'");
 $failed=false; try { $registration->apply(); } catch (RuntimeException $e) { $failed=true; }
 check($failed && $db->query('SELECT * FROM permissions')->result_array()===array(),'Missing anchor leaves no writes');
-echo "PASS migration: install/reinstall, dynamic position, admin-only defaults, rollback/repeat, missing anchor\n";
+echo "PASS migration: install/reinstall, legacy rename, preserved menu/order/grants, rollback/repeat, missing anchor\n";

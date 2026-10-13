@@ -29,4 +29,4 @@ $progress=strpos($html,"href='/metalsindo_2/progress_order'");
 $report=strpos($html,"href='/metalsindo_2/report_lhp_slitting'");
 if ($progress===false || $report===false || $report<=$progress || substr_count($html,"href='/metalsindo_2/report_lhp_slitting'")!==1)
     throw new RuntimeException('Report link must render once after Progress Order on the active application database.');
-echo "PASS actual Menu_generator: admin sidebar renders Report LHP Slitting once after Progress Order on application development database\n";
+echo "PASS actual Menu_generator: admin sidebar renders Report Weight Production once after Progress Order on application development database\n";
