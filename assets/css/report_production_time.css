@@ -1,0 +1,25 @@
+.production-time-report .pt-filters{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px}
+.production-time-report .pt-filters .form-group{margin:0;min-width:180px}
+.production-time-report .pt-search{flex:1;min-width:240px}
+.production-time-report .pt-actions{display:flex;gap:8px;flex-wrap:wrap}
+.production-time-report .pt-toolbar,.production-time-report .pt-controls,.production-time-report .pt-pagination{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.production-time-report .pt-toolbar p{margin:6px 0 0;color:#526470}
+.production-time-report .pt-note{padding:12px 16px;background:#f1f6f8;border-left:3px solid #195472;color:#344b59}
+.production-time-report .pt-controls{margin-bottom:12px}
+.production-time-report .pt-controls label{display:flex;align-items:center;gap:8px;margin:0}
+.production-time-report .pt-controls select{width:80px}
+.production-time-report .pt-table-scroll{overflow-x:auto;max-width:100%}
+.production-time-report #pt-table{width:100%;min-width:2300px;margin:0;table-layout:auto}
+.production-time-report #pt-table thead th{background:#195472;color:#fff;vertical-align:middle;min-width:100px}
+.production-time-report #pt-table .pt-column-groups th{background:#123e55;text-align:center}
+.production-time-report #pt-table td{vertical-align:middle;white-space:pre-line;min-width:100px}
+.production-time-report #pt-table td.pt-number{text-align:right;font-variant-numeric:tabular-nums}
+.production-time-report #pt-table td.pt-document{min-width:170px}
+.production-time-report #pt-table td.pt-description{min-width:230px}
+.production-time-report #pt-table .pt-group-start td{border-top:2px solid #7896a6}
+.production-time-report #pt-table .pt-alternate{background:#f4f8fa}
+.production-time-report #pt-table .pt-invalid{color:#a12622;background:#fff0ef}
+.production-time-report .pt-pagination{padding-top:16px}
+.production-time-report button:focus-visible,.production-time-report input:focus-visible,.production-time-report select:focus-visible,.production-time-report .pt-table-scroll:focus-visible{outline:3px solid #216b94;outline-offset:2px}
+.production-time-report [hidden]{display:none!important}
+@media(max-width:767px){.production-time-report .pt-filters .form-group{width:100%}.production-time-report .pt-actions{width:100%}.production-time-report .btn{min-height:44px}.production-time-report .pt-pagination>div{display:flex;gap:8px}}
