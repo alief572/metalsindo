@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/report_spk_marketing.css') ?>">
-<div class="spk-report">
+<div class="spk-report is-compact">
     <section class="spk-panel-shell" aria-labelledby="spk-filter-title">
     <div class="spk-panel">
         <div class="spk-section-heading"><h2 id="spk-filter-title">Filter laporan</h2><p>Telusuri item SPK, spesifikasi produk, dan rencana pengiriman berdasarkan periode, customer, atau status approval.</p></div>
@@ -36,7 +36,7 @@
             <button type="button" id="spk-export" class="btn spk-button-export"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 15v5h14v-5"/></svg>Export Excel</button>
         </div>
         <div id="spk-report-note" class="spk-report-note"><p><strong>Perhatikan total per SPK:</strong> Total Qty Product (KG) diulang pada tiap item SPK yang sama; jangan dijumlahkan antaritem. Delivery Date mengikuti rencana delivery per item SPK.</p></div>
-        <div class="spk-table-toolbar"><div class="spk-table-status"><span id="spk-load-status" role="status">Menyiapkan laporan...</span><span class="spk-scroll-hint">Geser tabel untuk melihat 17 kolom</span></div><div class="spk-density-control" role="group" aria-label="Kepadatan tabel"><span>Tampilan</span><button type="button" data-spk-density="comfortable" aria-pressed="true">Nyaman</button><button type="button" data-spk-density="compact" aria-pressed="false">Ringkas</button></div></div>
+        <div class="spk-table-toolbar"><div class="spk-table-status"><span id="spk-load-status" role="status">Menyiapkan laporan...</span><span class="spk-scroll-hint">Geser tabel untuk melihat 17 kolom</span></div></div>
         <div class="spk-table-region" role="region" aria-label="Tabel detail SPK Marketing" tabindex="0">
         <table id="spk-report-table" class="table" style="width:100%" aria-describedby="spk-report-note">
             <thead><tr class="spk-column-groups"><th colspan="6" scope="colgroup">Informasi SPK</th><th colspan="10" scope="colgroup">Spesifikasi produk / item</th><th colspan="1" scope="colgroup">Ringkasan</th></tr><tr>
@@ -57,13 +57,6 @@ $(function () {
     var requestFailed = false;
     var loadStatus = $('#spk-load-status');
     var resultCount = $('#spk-result-count');
-    $('[data-spk-density]').on('click', function () {
-        var compact = $(this).attr('data-spk-density') === 'compact';
-        $('.spk-report').toggleClass('is-compact', compact);
-        $('[data-spk-density]').attr('aria-pressed', 'false');
-        $(this).attr('aria-pressed', 'true');
-        table.columns.adjust();
-    });
     function readFilters() {
         var filters = {};
         $.each(form.serializeArray(), function (_, field) { filters[field.name] = field.value; });
