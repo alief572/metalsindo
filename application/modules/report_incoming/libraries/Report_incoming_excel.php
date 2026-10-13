@@ -4,10 +4,15 @@ class Report_incoming_excel
 {
     public function build($model,$filters,$column=8,$direction='desc')
     {
-        // The existing Docker runtime provides SQLite3. Its cache avoids one large PHP hash per cell.
-        if(!PHPExcel_Settings::setCacheStorageMethod(PHPExcel_CachedObjectStorageFactory::cache_to_sqlite3)
-            || PHPExcel_CachedObjectStorageFactory::getCacheStorageMethod()!==PHPExcel_CachedObjectStorageFactory::cache_to_sqlite3)
-            throw new RuntimeException('Cache export Excel membutuhkan extension SQLite3 dan workbook baru.');
+        // PHPTemp spills cell data to temporary storage without requiring SQLite3.
+        $cacheMethod=PHPExcel_CachedObjectStorage_SQLite3::cacheMethodIsAvailable()
+            ? PHPExcel_CachedObjectStorageFactory::cache_to_sqlite3
+            : PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp;
+        $cacheOptions=$cacheMethod===PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp
+            ? array('memoryCacheSize'=>2097152) : array();
+        if(!PHPExcel_Settings::setCacheStorageMethod($cacheMethod,$cacheOptions)
+            || PHPExcel_CachedObjectStorageFactory::getCacheStorageMethod()!==$cacheMethod)
+            throw new RuntimeException('Cache export Excel harus dikonfigurasi sebelum workbook dibuat.');
         $book=new PHPExcel(); $sheet=$book->getActiveSheet(); $sheet->setTitle('Report Incoming');
         $sheet->mergeCells('A1:S1')->setCellValue('A1','REPORT INCOMING');
         $period=$filters['start_date']!=='' || $filters['end_date']!==''
