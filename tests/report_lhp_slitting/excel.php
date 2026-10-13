@@ -11,7 +11,7 @@ check($sheet->getTitle()==='Report LHP Slitting (Final)','Worksheet name');
 check($sheet->getCell('B3')->getValue()==='=SUM(1,2)' && $sheet->getCell('B3')->getDataType()===PHPExcel_Cell_DataType::TYPE_STRING,'Formula-looking text remains text');
 check($sheet->getCell('I3')->getValue()===null && $sheet->getCell('I4')->getValue()==0 && $sheet->getCell('I4')->getDataType()===PHPExcel_Cell_DataType::TYPE_NUMERIC,'NULL versus zero');
 check($sheet->getCell('S5')->getValue()==-10 && $sheet->getCell('D5')->getDataType()===PHPExcel_Cell_DataType::TYPE_NUMERIC,'Negative values and numeric dates');
-check($sheet->getFreezePane()==='F3' && $sheet->getAutoFilter()->getRange()==='A2:S6','Freeze and autofilter');
+check($sheet->getFreezePane()==='' && $sheet->getAutoFilter()->getRange()==='A2:S6','No frozen panes and preserved autofilter');
 check(isset($sheet->getMergeCells()['A1:E1']) && isset($sheet->getMergeCells()['F1:I1']) && isset($sheet->getMergeCells()['J1:R1']),'Three merged group headers');
 check(strpos($sheet->getCell('A8')->getValue(),'Catatan:')===0,'Visible footer note outside data table');
 $temporary=tempnam(sys_get_temp_dir(),'lhp-test-');

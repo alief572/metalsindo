@@ -40,7 +40,6 @@ class Report_lhp_slitting_excel
         foreach (range(0,18) as $column) $sheet->getColumnDimension(PHPExcel_Cell::stringFromColumnIndex($column))->setWidth(20);
         foreach (array('A'=>28,'B'=>28,'C'=>40,'D'=>18,'E'=>55,'H'=>40,'S'=>28) as $column=>$width)
             $sheet->getColumnDimension($column)->setWidth($width);
-        $sheet->freezePane('F3');
         $sheet->setAutoFilter('A2:S'.max(2,$line-1));
         // Keep the visible note outside the autofilter, like the supplied Final concept.
         $noteRow = $line+1;

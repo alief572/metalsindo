@@ -11,7 +11,7 @@ $path=tempnam(sys_get_temp_dir(),'incoming_xlsx_');
 try {
     PHPExcel_IOFactory::createWriter($book,'Excel2007')->save($path); $book->disconnectWorksheets();
     $read=PHPExcel_IOFactory::load($path); $sheet=$read->getActiveSheet();
-    incoming_check($sheet->getTitle()==='Report Incoming' && $sheet->getFreezePane()==='F4','Sheet and freeze pane');
+    incoming_check($sheet->getTitle()==='Report Incoming' && $sheet->getFreezePane()==='','Sheet and no frozen panes');
     incoming_check($sheet->getAutoFilter()->getRange()==='A3:S4','Filtered one-row export');
     incoming_check($sheet->getCell('B4')->getValue()==='P2600999' && $sheet->getCell('R4')->getValue()==='CPD0661B-230926-12380-1','Text IDs survive');
     foreach(array('G4'=>380,'H4'=>264,'J4'=>265,'K4'=>265,'L4'=>-1) as $cell=>$expected)

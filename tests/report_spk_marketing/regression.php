@@ -259,7 +259,7 @@ try {
         $newBook = $exporter->build($new->headers(), array_map(array($new,'format_row'), $new->get_rows($filters)));
         check($oldBook->getActiveSheet()->toArray() === $newBook->getActiveSheet()->toArray(), 'Excel cell values changed');
         check($oldBook->getActiveSheet()->getMergeCells() === $newBook->getActiveSheet()->getMergeCells(), 'Excel header merges changed');
-        check($newBook->getActiveSheet()->getFreezePane() === 'C3', 'Excel frozen pane changed');
+        check($newBook->getActiveSheet()->getFreezePane() === '', 'Excel must not freeze panes');
         foreach ($oldBook->getActiveSheet()->getCellCollection() as $coordinate) {
             check($oldBook->getActiveSheet()->getCell($coordinate)->getDataType() === $newBook->getActiveSheet()->getCell($coordinate)->getDataType(), 'Excel cell type changed: '.$coordinate);
         }

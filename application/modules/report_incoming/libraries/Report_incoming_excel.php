@@ -53,7 +53,7 @@ class Report_incoming_excel
                 $sheet->getStyle($letter.'4:'.$letter.$last)->getNumberFormat()->setFormatCode('dd-mm-yyyy');
             $sheet->getStyle('A4:A'.$last)->getNumberFormat()->setFormatCode('0');
         }
-        $sheet->freezePane('F4'); $sheet->setAutoFilter('A3:S'.$last);
+        $sheet->setAutoFilter('A3:S'.$last);
         $note=$line+1; $sheet->mergeCells('A'.$note.':S'.$note);
         $sheet->setCellValueExplicit('A'.$note,'Catatan: Satu baris = satu detail penerimaan/lot. Total Qty Receive dan Balance adalah progress PO terkini yang diulang setiap lot; jangan dijumlahkan antarbaris. Filter tanggal tidak mengubah total receive. PIC/SJ yang ambigu ditandai Belum terverifikasi. Customer mengikuti stok historis dan dapat berubah.',PHPExcel_Cell_DataType::TYPE_STRING);
         $sheet->getStyle('A'.$note)->getAlignment()->setWrapText(true); $sheet->getRowDimension($note)->setRowHeight(45);

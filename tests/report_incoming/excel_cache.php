@@ -35,7 +35,7 @@ try {
     cache_check($sheet->getCell('L4')->getValue()==-1,'Negative quantity preserved');
     cache_check($sheet->getCell('R4')->getDataType()==='s' && $sheet->getCell('R4')->getValue()==='=1+1','Formula-like text preserved');
     cache_check($sheet->getCell('I4')->getDataType()==='n' && $sheet->getStyle('I4')->getNumberFormat()->getFormatCode()==='dd-mm-yyyy','Date format preserved');
-    cache_check($sheet->getAutoFilter()->getRange()==='A3:S4' && $sheet->getFreezePane()==='F4','Workbook layout preserved');
+    cache_check($sheet->getAutoFilter()->getRange()==='A3:S4' && $sheet->getFreezePane()==='','Workbook layout preserved');
     $read->disconnectWorksheets();
     $book=$exporter->build(new IncomingCacheSource(),array('start_date'=>'','end_date'=>'','search'=>''));
     cache_check($book->getActiveSheet()->getCell('B4')->getValue()==='000123','Repeated export works');

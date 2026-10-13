@@ -40,7 +40,6 @@ class Report_spk_marketing_excel
         $sheet->getColumnDimension('F')->setWidth(28);
         $sheet->getColumnDimension('H')->setWidth(25);
         $sheet->getColumnDimension('G')->setWidth(8);
-        $sheet->freezePane('C3');
         $sheet->setAutoFilter('A2:Q'.max(2, $line - 1));
         return $book;
     }
