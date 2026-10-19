@@ -35,3 +35,9 @@
 - Booking membutuhkan sumber snapshot relasi customer/SPK yang benar sebelum filter historis dapat dibuat.
 
 Perintah regresi: docker exec dengan BOOKING_DB_HOST=metalsindo_db dan kredensial lokal, php tests/regression/warehouse_stock_date.php; benchmark warehouse_stock_date_performance.php; node tests/regression/warehouse_stock_date_ui.js.
+
+## Perbaikan kompatibilitas ekspor tanpa SQLite3
+
+- Exporter Raw Material dan lima gudang memakai PHPTemp bawaan PHP, ambang cache sel 2097152 byte sebelum beralih ke temporary file. Pemilihan cache tetap dilakukan sebelum workbook dibuat. Tidak memasang ekstensi, mengubah php.ini, atau mengubah database/server.
+- Regresi diperkuat untuk memeriksa metode cache PHPTemp. Kegagalan lama direproduksi dengan `php -d disable_classes=SQLite3`; setelah perbaikan, ekspor semua gudang dan Raw Material lulus pada proses CLI yang sama, termasuk batch lebih dari 1000 baris, total, tanggal, dan teks formula.
+- Berkas perbaikan: dua libraries exporter, dua tes regresi, dua SPEC dan checkpoint ini. Header/format workbook, query, filter, permission dan formula safety dipertahankan.

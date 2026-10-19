@@ -8,7 +8,7 @@ Tier 3 terbatas. Hanya Gudang 1; gudang lain tetap memakai kontrak lama.
 - Grain satu baris stok sumber; ID backup tidak dikaitkan ke ID stok aktif. Kolom stok dari sumber, supplier/customer/bentuk dari master sekarang. Lookup master dikelompokkan satu baris per key untuk mencegah penggandaan.
 - Kriteria aktif=Y, id_gudang=1, sisa_spk>0 dan sisa_spk>COALESCE(delivery_book,0). Berat=sisa_spk*qty. NULL tetap kosong, tidak diganti saldo lain.
 - Tabel dan XLSX memakai resolver/filter/formatter yang sama. Respons DataTables lama ditambah stock_date, snapshot_at, available, source; tanggal menjadi kolom terakhir khusus Raw Material.
-- recordsTotal sebelum width/search; recordsFiltered dan recordsAset setelah filter. Urutan deterministik ID stok; arah di-whitelist. Ekspor semua hasil secara batch dengan SQLite3 cache dan teks eksplisit.
+- recordsTotal sebelum width/search; recordsFiltered dan recordsAset setelah filter. Urutan deterministik ID stok; arah di-whitelist. Ekspor semua hasil secara batch dengan PHPTemp cache (ambang 2 MB sebelum memakai temporary file) dan teks eksplisit; tidak memerlukan SQLite3 atau perubahan konfigurasi server.
 - Indeks backup (tgl,id_gudang), installer CLI preflight/apply/rollback hanya host lokal dan metalsindo_dev. Manifest mencatat indeks yang dibuat. DDL MySQL tidak dianggap transactional.
 - UI input tanggal/Terapkan/Reset, status waktu snapshot, error inline; state kolom lama dibatalkan bila jumlah kolom berubah. Tanggal default tidak dipulihkan dari state lama.
 

@@ -69,6 +69,7 @@ require dirname(dirname(__DIR__)).'/application/modules/stock_material/libraries
 foreach (array('=2+2','+formula','-formula','@formula') as $i=>$value) $db->query('UPDATE stock_material SET lotno=? WHERE id_stock=?',array($value,$i+1));
 $exporter=new Stock_raw_material_excel(); $filters=$model->filters(array()); $meta=$model->resolve($filters);
 $book=$exporter->build($model,$filters,$meta); $sheet=$book->getActiveSheet();
+raw_assert(PHPExcel_CachedObjectStorageFactory::getCacheStorageMethod()===PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp,'Export does not require SQLite3');
 raw_assert($sheet->getCell('I17')->getValue()===156.0,'Export total matches table across all pages');
 raw_assert($sheet->getCell('M16')->getValue()===$model->today(),'All 12 rows exported with date');
 for ($row=5;$row<=8;$row++) raw_assert($sheet->getCell('C'.$row)->getDataType()===PHPExcel_Cell_DataType::TYPE_STRING,'Formula-like code is string');
@@ -91,7 +92,7 @@ try {
     }
     raw_assert($literal==='=2+2' && $total===156.0,'Serialized XLSX literal and total');
 } finally { if (file_exists($file)) unlink($file); }
-echo "PASS complete XLSX, date, totals, SQLite3 cache and formula-safe round trip\n";
+echo "PASS complete XLSX, date, totals, PHPTemp cache and formula-safe round trip\n";
 
 $parts=array(); $bindings=array();
 for ($i=1000;$i<2001;$i++) {

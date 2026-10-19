@@ -63,6 +63,7 @@ foreach ($model->warehouses() as $warehouse=>$name) {
     $db->query('UPDATE stock_material_backup SET lotno=? WHERE id_stock=?',array('=FORMULA',$warehouse*100+10001));
     $filters=$model->filters(array('gudang'=>(string)$warehouse,'stock_date'=>'2026-10-01'));
     $meta=$model->resolve($filters); $book=$exporter->build($model,$filters,$meta);
+    booking_check(PHPExcel_CachedObjectStorageFactory::getCacheStorageMethod()===PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp,'Warehouse export does not require SQLite3');
     $sheet=$book->getActiveSheet(); $last=$warehouse===3 ? 'N' : 'M';
     booking_check($sheet->getCell('A2')->getValue()==='Tanggal stok: 2026-10-01','Excel header contains stock date without snapshot details');
     booking_check($sheet->getCell($last.'7')->getValue()==='2026-10-01','XLSX all filtered rows across pagination');

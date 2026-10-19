@@ -5,9 +5,11 @@ class Warehouse_stock_date_excel
     public function build($model,$filters,$meta,$direction='asc')
     {
         if (!class_exists('ZipArchive')) PHPExcel_Settings::setZipClass(PHPExcel_Settings::PCLZIP);
-        if (!PHPExcel_Settings::setCacheStorageMethod(PHPExcel_CachedObjectStorageFactory::cache_to_sqlite3)
-            || PHPExcel_CachedObjectStorageFactory::getCacheStorageMethod()!==PHPExcel_CachedObjectStorageFactory::cache_to_sqlite3)
-            throw new RuntimeException('SQLite3 cache diperlukan untuk ekspor stok.');
+        // PHPTemp spills cell data to temporary storage without requiring a server extension.
+        $cacheMethod=PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp;
+        if (!PHPExcel_Settings::setCacheStorageMethod($cacheMethod,array('memoryCacheSize'=>2097152))
+            || PHPExcel_CachedObjectStorageFactory::getCacheStorageMethod()!==$cacheMethod)
+            throw new RuntimeException('Cache ekspor harus dikonfigurasi sebelum workbook dibuat.');
         $names=$model->warehouses(); $headers=$model->headers($filters);
         $lastColumn=PHPExcel_Cell::stringFromColumnIndex(count($headers)-1);
         $book=new PHPExcel(); $sheet=$book->getActiveSheet(); $sheet->setTitle('Stock Gudang');
