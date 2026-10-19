@@ -1,0 +1,106 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+require_once __DIR__.'/Stock_raw_material_model.php';
+
+class Warehouse_stock_date_model extends Stock_raw_material_model
+{
+    public static function warehouses()
+    {
+        return array('2'=>'GUDANG WIP','3'=>'GUDANG FINISH GOOD','4'=>'GUDANG SCRAP','5'=>'GUDANG SUBCONT','6'=>'GUDANG NCR');
+    }
+
+    public function filters($input)
+    {
+        $filters=parent::filters($input);
+        $warehouse=isset($input['gudang']) && is_scalar($input['gudang']) ? (string)$input['gudang'] : '';
+        $names=self::warehouses();
+        if (!isset($names[$warehouse])) throw new InvalidArgumentException('Gudang tidak valid.');
+        $filters['gudang']=$warehouse;
+        return $filters;
+    }
+
+    public function headers($filters)
+    {
+        $headers=array('#','ID Material','Lot Number','Nama Material','Supplier','Width','Jumlah Item','Berat Satuan (kg)',
+            'Berat Total (kg)','Keterangan','Gudang','Customer','Tanggal Stok');
+        if ($filters['gudang']==='3') array_splice($headers,9,0,array('Total Sheet'));
+        return $headers;
+    }
+
+    private function warehouseRelation($filters, $meta, $filtered, $customer = false)
+    {
+        $sql = ' FROM '.$meta['source'].' a';
+        if ($customer || ($filtered && $filters['search'] !== ''))
+            $sql .= ' LEFT JOIN (SELECT id_customer,MAX(NULLIF(name_customer,\'\')) name_customer FROM master_customers GROUP BY id_customer) g ON g.id_customer=a.customer';
+        $sql .= ' WHERE a.id_gudang=? AND a.aktif=\'Y\' AND a.sisa_spk>0 AND a.sisa_spk>COALESCE(a.delivery_book,0)';
+        $bindings = array($filters['gudang']);
+        if ($meta['source'] === 'stock_material_backup') {
+            $sql .= ' AND a.tgl=?'; $bindings[] = $meta['snapshot_at'];
+        }
+        if ($filtered) {
+            list($predicate,$filterBindings) = $this->filterPredicate($filters);
+            $sql .= ' AND '.$predicate;
+            $bindings = array_merge($bindings,$filterBindings);
+        }
+        return array($sql,$bindings);
+    }
+
+    private function filterPredicate($filters)
+    {
+        $conditions=array(); $bindings=array();
+        if ($filters['width'] !== '') { $conditions[]='a.width=?'; $bindings[]=$filters['width']; }
+        if ($filters['search'] !== '') {
+            $parts = array();
+            foreach (array('a.lot_slitting','a.lotno','a.nama_material','a.id_category3','a.no_surat','a.customer') as $field) {
+                $parts[] = $field." LIKE ? ESCAPE '!'";
+                $bindings[] = '%'.$this->db->escape_like_str($filters['search']).'%';
+            }
+            $parts[] = "g.name_customer LIKE ? ESCAPE '!'";
+            $bindings[] = '%'.$this->db->escape_like_str($filters['search']).'%';
+            $parts[] = "? LIKE ? ESCAPE '!'";
+            $names = self::warehouses(); $bindings[] = $names[$filters['gudang']];
+            $bindings[] = '%'.$this->db->escape_like_str($filters['search']).'%';
+            $conditions[] = '('.implode(' OR ',$parts).')';
+        }
+        return array($conditions ? implode(' AND ',$conditions) : '1=1',$bindings);
+    }
+
+    public function summary($filters, $meta, $filtered = true)
+    {
+        if (!$meta['available']) return array('n'=>0,'total'=>0,'weight'=>0);
+        list($sql,$bindings) = $this->warehouseRelation($filters,$meta,false,$filtered && $filters['search'] !== '');
+        if (!$filtered || ($filters['width'] === '' && $filters['search'] === ''))
+            return $this->db->query('SELECT COUNT(*) total,COUNT(*) n,COALESCE(SUM(a.sisa_spk*a.qty),0) weight'.$sql,$bindings)->row_array();
+        // Both filtered and unfiltered counts share one scan of the selected stock batch.
+        list($predicate,$filterBindings) = $this->filterPredicate($filters);
+        return $this->db->query('SELECT COUNT(*) total,COALESCE(SUM(CASE WHEN '.$predicate.' THEN 1 ELSE 0 END),0) n,
+            COALESCE(SUM(CASE WHEN '.$predicate.' THEN a.sisa_spk*a.qty ELSE 0 END),0) weight'.$sql,
+            array_merge($filterBindings,$filterBindings,$bindings))->row_array();
+    }
+
+    public function rows($filters, $meta, $start, $length, $direction = 'asc')
+    {
+        if (!$meta['available']) return array();
+        list($sql,$bindings) = $this->warehouseRelation($filters,$meta,true,true);
+        $direction = $direction === 'desc' ? 'DESC' : 'ASC';
+        $page='SELECT a.id_stock,a.id_category3,a.lotno,a.nama_material,a.width,a.qty,a.sisa_spk,a.no_surat,a.id_gudang,a.totalweight,COALESCE(g.name_customer,a.customer) customer'.$sql
+            .' ORDER BY a.id_stock '.$direction.' LIMIT '.max(0,(int)$start).','.max(1,min(1000,(int)$length));
+        // LIMIT precedes master enrichment; duplicate legacy master keys cannot multiply stock rows.
+        return $this->db->query('SELECT a.id_stock,a.id_category3,a.lotno,a.nama_material,a.width,a.qty,a.sisa_spk,a.no_surat,a.id_gudang,a.totalweight,
+            c.maker,c.id_bentuk,c.total_weight,b.nm_bentuk,a.customer FROM ('.$page.') a
+            LEFT JOIN (SELECT id_category3,MAX(maker) maker,MAX(id_bentuk) id_bentuk,MAX(total_weight) total_weight FROM ms_inventory_category3 GROUP BY id_category3) c ON c.id_category3=a.id_category3
+            LEFT JOIN (SELECT id_bentuk,MAX(nm_bentuk) nm_bentuk FROM ms_bentuk GROUP BY id_bentuk) b ON b.id_bentuk=c.id_bentuk
+            ORDER BY a.id_stock '.$direction,$bindings)->result_array();
+    }
+
+    public function values($row, $number, $meta)
+    {
+        $values=parent::values($row,$number,$meta);
+        $names=self::warehouses(); $values[10]=$names[(string)$row['id_gudang']];
+        if ((string)$row['id_gudang']==='3') {
+            $divisor=!empty($row['total_weight']) ? $row['total_weight'] : 1;
+            $sheets=$row['id_bentuk']==='B2000002' ? ($row['totalweight']===null ? null : round($row['totalweight']/$divisor)) : 0;
+            array_splice($values,9,0,array($sheets));
+        }
+        return $values;
+    }
+}

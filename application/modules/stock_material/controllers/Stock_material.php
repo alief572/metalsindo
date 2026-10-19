@@ -64,12 +64,98 @@ class Stock_material extends Admin_Controller
 
 	public function data_side_material_grw()
 	{
+		$this->auth->restrict($this->viewPermission);
+		if ((string)$this->input->post('gudang') === '1') {
+			$this->load->model('stock_material/Stock_raw_material_model', 'raw_stock');
+			try {
+				$result = $this->raw_stock->table($this->input->post(null, false));
+			} catch (InvalidArgumentException $e) {
+				$this->output->set_status_header(400)->set_content_type('application/json')
+					->set_output(json_encode(array('error'=>$e->getMessage())));
+				return;
+			}
+			$this->output->set_content_type('application/json')->set_output(json_encode($result));
+			return;
+		}
 		$this->Serverside_model->getDataJSON_GRW();
+	}
+
+	public function export_raw_material()
+	{
+		$this->auth->restrict($this->viewPermission);
+		$this->load->model('stock_material/Stock_raw_material_model', 'raw_stock');
+		try {
+			$filters = $this->raw_stock->filters($this->input->get(null, false));
+			$meta = $this->raw_stock->resolve($filters);
+			if (!$meta['available']) {
+				show_error('Snapshot stok tanggal '.$filters['stock_date'].' belum tersedia.', 404);
+				return;
+			}
+		} catch (InvalidArgumentException $e) {
+			show_error(htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'), 400);
+			return;
+		}
+		require_once APPPATH.'libraries/PHPExcel.php';
+		require_once dirname(__DIR__).'/libraries/Stock_raw_material_excel.php';
+		$exporter = new Stock_raw_material_excel();
+		$direction = $this->input->get('direction') === 'desc' ? 'desc' : 'asc';
+		$book = $exporter->build($this->raw_stock, $filters, $meta, $direction);
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment; filename="Stock_Raw_Material_'.$filters['stock_date'].'.xlsx"');
+		header('Cache-Control: max-age=0');
+		try {
+			$writer = PHPExcel_IOFactory::createWriter($book, 'Excel2007');
+			$writer->setUseDiskCaching(true, sys_get_temp_dir());
+			$writer->save('php://output');
+		} finally { $book->disconnectWorksheets(); }
 	}
 
 	public function data_side_material_booking()
 	{
 		$this->Serverside_model->getDataJSON_booking();
+	}
+
+	public function data_warehouse_date()
+	{
+		$this->auth->restrict($this->viewPermission);
+		$this->load->model('stock_material/Warehouse_stock_date_model', 'dated_warehouse');
+		try {
+			$result=$this->dated_warehouse->table($this->input->post(null,false));
+		} catch (InvalidArgumentException $e) {
+			$this->output->set_status_header(400)->set_content_type('application/json')->set_output(json_encode(array('error'=>$e->getMessage())));
+			return;
+		}
+		$this->output->set_content_type('application/json')->set_output(json_encode($result));
+	}
+
+	public function export_warehouse_date()
+	{
+		$this->auth->restrict($this->viewPermission);
+		$this->load->model('stock_material/Warehouse_stock_date_model', 'dated_warehouse');
+		try {
+			$filters=$this->dated_warehouse->filters($this->input->get(null,false));
+			$meta=$this->dated_warehouse->resolve($filters);
+			if (!$meta['available']) {
+				show_error('Snapshot stok tanggal '.$filters['stock_date'].' belum tersedia.',404);
+				return;
+			}
+		} catch (InvalidArgumentException $e) {
+			show_error(htmlspecialchars($e->getMessage(),ENT_QUOTES,'UTF-8'),400);
+			return;
+		}
+		require_once APPPATH.'libraries/PHPExcel.php';
+		require_once dirname(__DIR__).'/libraries/Warehouse_stock_date_excel.php';
+		$exporter=new Warehouse_stock_date_excel();
+		$direction=$this->input->get('direction')==='desc' ? 'desc' : 'asc';
+		$book=$exporter->build($this->dated_warehouse,$filters,$meta,$direction);
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment; filename="Stock_Gudang_'.$filters['gudang'].'_'.$filters['stock_date'].'.xlsx"');
+		header('Cache-Control: max-age=0');
+		try {
+			$writer=PHPExcel_IOFactory::createWriter($book,'Excel2007');
+			$writer->setUseDiskCaching(true,sys_get_temp_dir());
+			$writer->save('php://output');
+		} finally { $book->disconnectWorksheets(); }
 	}
 
 

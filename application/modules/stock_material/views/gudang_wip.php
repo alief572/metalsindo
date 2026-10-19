@@ -1,188 +1,73 @@
-<?php
-    $ENABLE_ADD     = has_permission('Warehouse_material.Add');
-    $ENABLE_MANAGE  = has_permission('Warehouse_material.Manage');
-    $ENABLE_VIEW    = has_permission('Warehouse_material.View');
-    $ENABLE_DELETE  = has_permission('Warehouse_material.Delete');
-	$id_bentuk = $this->uri->segment(3);
-?>
-<style type="text/css">
-thead input {
-	width: 100%;
-}
-</style>
-<div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
-<link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css')?>">
-<div class="box">
-	<div class="box-header">
-    
-	</div>
-	<div class="box-body">
-		<div role="tabpanel" class="tab-pane active" id="standart"">
-		<div class="box-tool pull-right">
-			<br>
-			<input type='text' id='series' name='width'  class='form-control input-sm ' placeholder ='Width'>					
-							
-			<input type='hidden' id='komponen' name='panjang'  class='form-control input-sm ' placeholder ='Thickness'>
+<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
+<link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/stock_material.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/stock_material_wip.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/stock_material_date.css') ?>">
+
+<div class="stock-material-container stock-dated-wrapper stock-wip-wrapper">
+	<section class="stock-panel" aria-labelledby="wip-title">
+		<header class="stock-header">
+			<div>
+				<h1 class="stock-header-title" id="wip-title">Stock WIP</h1>
+				<p class="stock-header-desc">Persediaan material dalam proses produksi per lot di Gudang WIP.</p>
+			</div>
+			<dl class="wip-summary" aria-live="polite">
+				<div><dt>Berat total hasil filter</dt><dd><span id="wip-total-weight">Memuat…</span> <small>kg</small></dd></div>
+				<div><dt>Baris stok hasil filter</dt><dd id="wip-total-rows">Memuat…</dd></div>
+			</dl>
+		</header>
+		<form id="wip-filter-form" class="wip-toolbar" role="search">
+			<?php $this->load->view('stock_material/date_filter',array('date_prefix'=>'wip')); ?>
+			<div class="stock-form-group wip-search">
+				<label class="stock-label" for="wip-search">Cari persediaan</label>
+				<input class="stock-input" type="search" id="wip-search" placeholder="Kode material, nama, lot, dokumen, atau customer" autocomplete="off">
+			</div>
+			<div class="stock-form-group wip-width">
+				<label class="stock-label" for="series">Lebar / width (mm)</label>
+				<input class="stock-input" type="number" id="series" name="width" min="0" step="any" placeholder="Semua lebar" inputmode="decimal">
+			</div>
+			<div class="stock-date-actions">
+				<button class="btn-stock btn-stock-primary" type="button" id="wip-date-apply">Terapkan</button>
+				<button class="btn-stock btn-stock-reset" type="button" id="wip-reset">Reset filter</button>
+				<button class="btn-stock btn-stock-export" type="button" id="wip-export" disabled>Export Excel</button>
+			</div>
+		</form>
+		<p id="wip-snapshot-status" class="stock-date-status" role="status" aria-live="polite"></p>
+		<div class="wip-table-heading">
+			<h2>Rincian persediaan</h2>
+			<p id="wip-table-help">Berat dalam kg · Geser tabel untuk melihat seluruh kolom.</p>
 		</div>
-		<br><br><br>
-		<table id="example1" class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>#</th>
-					<th class='no-sort text-center'>Id Material</th>
-                    <th class='no-sort text-center'>Lot Number</th>
-                    <th class='no-sort text-center'>Nama Material</th>
-					<th class='no-sort text-center'>Supplier</th>
-                    <th class='no-sort text-center'>Width</th>
-                    <th class='no-sort text-center'>Jumlah Item</th>
-                    <th class='no-sort text-center'>Berat Satuan (kg)</th>
-                    <th class='no-sort text-center'>Berat Total (kg)</th>
-					<th class='no-sort text-center'>Keterangan</th>
-                    <th class='no-sort text-center'>Gudang</th>
-					<th class='no-sort text-center'>Customer</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-            <tfoot>
-                <tr>
-                    <th colspan="7" style="text-align:center">TOTAL KESELURUHAN</th>
-                    <th></th>
-                    <th></th>
-                    <th colspan="3"></th>
-                </tr>
-            </tfoot>
-        </table>
-	</div>
+		<div id="wip-error" class="wip-error" role="alert" hidden>
+			<span>Data stok gagal dimuat. Coba muat ulang data.</span>
+			<button class="btn-stock btn-stock-reset" type="button" id="wip-retry">Coba lagi</button>
+		</div>
+		<div id="wip-table-host" data-stock-date-host="true" data-prefix="wip" data-warehouse="2" data-title="Stock WIP" data-source="<?= htmlspecialchars(site_url('stock_material/data_warehouse_date'), ENT_QUOTES, 'UTF-8') ?>" data-export-url="<?= htmlspecialchars(site_url('stock_material/export_warehouse_date'), ENT_QUOTES, 'UTF-8') ?>">
+			<table id="example1" class="stock-table" aria-label="Persediaan WIP per lot" aria-describedby="wip-table-help">
+				<thead><tr>
+					<th scope="col">No.</th>
+					<th scope="col" class="no-sort">ID material</th>
+					<th scope="col" class="no-sort">Lot number</th>
+					<th scope="col" class="no-sort">Nama material</th>
+					<th scope="col" class="no-sort">Supplier</th>
+					<th scope="col" class="no-sort text-right">Width <span>(mm)</span></th>
+					<th scope="col" class="no-sort text-right">Jumlah item</th>
+					<th scope="col" class="no-sort text-right">Berat satuan <span>(kg)</span></th>
+					<th scope="col" class="no-sort text-right">Berat total <span>(kg)</span></th>
+					<th scope="col" class="no-sort">Keterangan</th>
+					<th scope="col" class="no-sort">Gudang</th>
+					<th scope="col" class="no-sort">Customer</th>
+					<th scope="col" class="no-sort">Tanggal Stok</th>
+				</tr></thead>
+				<tbody></tbody>
+				<tfoot><tr>
+					<th colspan="8" class="wip-total-label">Total berat hasil filter <span>Seluruh halaman</span></th>
+					<th class="total-value" id="wip-footer-weight">-</th>
+					<th colspan="4"></th>
+				</tr></tfoot>
+			</table>
+		</div>
+	</section>
 </div>
-
-
-<!-- DataTables -->
-<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js')?>"></script>
-<script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js')?>"></script>
-
-
-<script src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.html5.min.js"></script>
-
-
-<!-- page script -->
-<script type="text/javascript">
-
-    $(document).ready(function(){
-		
-		var series = $('#series').val();
-		var komponen = $('#komponen').val();
-		DataTables(series, komponen); 
-
-		
-		$(document).on('keyup','#series, #komponen', function(e){
-			e.preventDefault();
-			var series = $('#series').val();
-			var komponen = $('#komponen').val();
-			DataTables(series, komponen); 
-		});
-		
-        $('.select').select2();
-
-    	
-
-        $(document).on('click','#cetak', function(){
-            var kategori 	= $('#kategory').val();
-            var url = siteurl +'stock_material/PrintHeader/'+kategori;
-            // alert(url)
-            window.open(url, '_blank');
-        });
-  	});
-
-   function DataTables(series = null, komponen = null){
-		let total_aset	= 0;
-		let total_susut	= 0;
-		let total_sisa	= 0;
-		var dataTable = $('#example1').DataTable({
-			"serverSide": true,
-			"stateSave" : true,
-			"bAutoWidth": true,
-			"destroy"	: true,
-			"responsive": true,
-			"oLanguage": {
-				"sSearch": "<b>Live Search : </b>",
-				"sLengthMenu": "_MENU_ &nbsp;&nbsp;<b>Records Per Page</b>&nbsp;&nbsp;",
-				"sInfo": "Showing _START_ to _END_ of _TOTAL_ entries",
-				"sInfoFiltered": "(filtered from _MAX_ total entries)",
-				"sZeroRecords": "No matching records found",
-				"sEmptyTable": "No data available in table",
-				"sLoadingRecords": "Please wait - loading...",
-				"oPaginate": {
-					"sPrevious": "Prev",
-					"sNext": "Next"
-				}
-			},
-			"aaSorting"		: [[ 0, "asc" ]],
-			"columnDefs"	: [ {
-				"targets"	: 'no-sort',
-				"orderable"	: false,
-				},
-				{ className: 'text-right', targets: [5, 6, 7, 8] }
-			],
-			"dom": 'Blfrtip',
-				"buttons": [
-				{
-                "extend": 'excel',
-				}], 
-			"sPaginationType": "simple_numbers",
-			"iDisplayLength": 10,
-			"aLengthMenu": [[10, 20, 50, 100, 150], [10, 20, 50, 100, 150]],
-			"ajax":{
-				url : siteurl +'stock_material/data_side_material_grw',
-				type: "post",
-				data: function(d){
-					d.gudang = '2',
-					d.series 	= series,
-					d.komponen 	= komponen
-				},
-				cache: false,
-				error: function(){
-					$(".my-grid-error").html("");
-					$("#my-grid").append('<tbody class="my-grid-error"><tr><th colspan="3">No data found in the server</th></tr></tbody>');
-					$("#my-grid_processing").css("display","none");
-				},
-				 dataSrc: function ( data ) {
-				   total_aset = data.recordsAset;
-				   return data.data;
-				 }
-			},
-			drawCallback: function( settings ) {
-				var api = this.api();
-
-				$( api.column( 8 ).footer() ).html("<div align='right'>"+ number_format(total_aset,2) +"</div>");
-			}
-
-
-		});
-	}
-
-    function number_format (number, decimals, dec_point, thousands_sep) {
-		// Strip all characters but numerical ones.
-		number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
-		var n = !isFinite(+number) ? 0 : +number,
-			prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
-			sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
-			dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
-			s = '',
-			toFixedFix = function (n, prec) {
-				var k = Math.pow(10, prec);
-				return '' + Math.round(n * k) / k;
-			};
-		// Fix for IE parseFloat(0.55).toFixed(0) = 0;
-		s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
-		if (s[0].length > 3) {
-			s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
-		}
-		if ((s[1] || '').length < prec) {
-			s[1] = s[1] || '';
-			s[1] += new Array(prec - s[1].length + 1).join('0');
-		}
-		return s.join(dec);
-	}
-</script>
+<script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
+<script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js') ?>"></script>
+<script src="<?= base_url('assets/js/stock_material_date.js') ?>"></script>
