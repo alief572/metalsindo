@@ -1,0 +1,5 @@
+.stock-dated-wrapper .stock-date-group { flex: 0 1 180px; }
+.stock-dated-wrapper .stock-date-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin-left: auto; max-width: 100%; }
+.stock-dated-wrapper .stock-date-error { flex-basis: 100%; margin: 0; color: #a32020; font-weight: 600; }
+.stock-dated-wrapper .stock-date-status { margin: 0 0 16px; color: #385468; }
+.stock-dated-wrapper [hidden] { display: none !important; }
