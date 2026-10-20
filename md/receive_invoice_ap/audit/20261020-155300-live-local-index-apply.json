@@ -1,0 +1,91 @@
+{
+    "started_at": "2026-10-20T15:53:00+00:00",
+    "server": {
+        "database_name": "metalsindo_live",
+        "server_host": "c73f06b78ec4",
+        "server_version": "5.7.44"
+    },
+    "preflight_snapshot": "md/receive_invoice_ap/audit/20261020-155012-live-local-index-preflight.json",
+    "sql_sha256": "aa3c50e5db036e09e2eff3b42bc43a6458c14144a5a91ad00df4e98348f89b51",
+    "before_counts": {
+        "tr_receive_invoice_ap_header": 62,
+        "tr_receive_invoice_ap_detail": 561,
+        "tr_incoming": 2760,
+        "dt_incoming": 36346,
+        "dt_trans_po": 4520,
+        "tr_purchase_order": 997
+    },
+    "results": [
+        [
+            {
+                "server_host": "c73f06b78ec4",
+                "selected_database": "metalsindo_live",
+                "server_version": "5.7.44",
+                "mode": "apply",
+                "expected_database": "metalsindo_live"
+            }
+        ],
+        [
+            {
+                "TABLE_NAME": "dt_incoming",
+                "INDEX_NAME": "PRIMARY",
+                "NON_UNIQUE": "0",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id_dt_incoming",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "dt_trans_po",
+                "INDEX_NAME": "PRIMARY",
+                "NON_UNIQUE": "0",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "tr_incoming",
+                "INDEX_NAME": "PRIMARY",
+                "NON_UNIQUE": "0",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "tr_purchase_order",
+                "INDEX_NAME": "PRIMARY",
+                "NON_UNIQUE": "0",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "no_po",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "tr_receive_invoice_ap_detail",
+                "INDEX_NAME": "PRIMARY",
+                "NON_UNIQUE": "0",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "tr_receive_invoice_ap_header",
+                "INDEX_NAME": "PRIMARY",
+                "NON_UNIQUE": "0",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id_rec_inv_ap",
+                "SUB_PART": null
+            }
+        ],
+        [
+            {
+                "table_name": "tr_receive_invoice_ap_header",
+                "proposed_index": "idx_riap_header_created",
+                "columns_needed": "created_date,id_rec_inv_ap",
+                "engine": "InnoDB",
+                "equivalent_indexes": "0",
+                "named_index_rows": "0"
+            }
+        ]
+    ],
+    "status": "failed_or_partial",
+    "error_code": 1205
+}

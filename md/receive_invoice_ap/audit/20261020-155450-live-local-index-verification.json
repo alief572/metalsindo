@@ -1,0 +1,446 @@
+{
+    "captured_at": "2026-10-20T15:54:49+00:00",
+    "environment": "127.0.0.1:3307/metalsindo_live",
+    "benchmarks": {
+        "index_100": {
+            "median_ms": 31.37,
+            "samples_ms": [
+                28.65,
+                31.37,
+                47.39
+            ],
+            "total": 62,
+            "filtered": 62,
+            "returned": 62
+        },
+        "search_id": {
+            "median_ms": 118.63,
+            "samples_ms": [
+                57.1,
+                118.63,
+                130.93
+            ],
+            "total": 62,
+            "filtered": 1,
+            "returned": 1,
+            "nominal_display": "Rp / US$ 109,016.42"
+        },
+        "search_currency": {
+            "median_ms": 46.82,
+            "samples_ms": [
+                45.06,
+                46.82,
+                47.18
+            ],
+            "total": 62,
+            "filtered": 17,
+            "returned": 17
+        },
+        "sort_amount": {
+            "median_ms": 21.34,
+            "samples_ms": [
+                20.44,
+                21.34,
+                22.36
+            ],
+            "total": 62,
+            "filtered": 62,
+            "returned": 62
+        }
+    },
+    "explain": [
+        {
+            "id": "1",
+            "select_type": "PRIMARY",
+            "table": "<derived3>",
+            "partitions": null,
+            "type": "ALL",
+            "possible_keys": null,
+            "key": null,
+            "key_len": null,
+            "ref": null,
+            "rows": "62",
+            "filtered": "100.00",
+            "Extra": "Using filesort"
+        },
+        {
+            "id": "3",
+            "select_type": "DERIVED",
+            "table": "<derived6>",
+            "partitions": null,
+            "type": "ALL",
+            "possible_keys": null,
+            "key": null,
+            "key_len": null,
+            "ref": null,
+            "rows": "62",
+            "filtered": "100.00",
+            "Extra": null
+        },
+        {
+            "id": "6",
+            "select_type": "DERIVED",
+            "table": "tr_receive_invoice_ap_header",
+            "partitions": null,
+            "type": "ALL",
+            "possible_keys": null,
+            "key": null,
+            "key_len": null,
+            "ref": null,
+            "rows": "62",
+            "filtered": "100.00",
+            "Extra": "Using filesort"
+        },
+        {
+            "id": "5",
+            "select_type": "DEPENDENT SUBQUERY",
+            "table": "d",
+            "partitions": null,
+            "type": "ref",
+            "possible_keys": "idx_riap_detail_invoice",
+            "key": "idx_riap_detail_invoice",
+            "key_len": "48",
+            "ref": "h.id_rec_inv_ap",
+            "rows": "9",
+            "filtered": "100.00",
+            "Extra": "Using index condition; Using where"
+        },
+        {
+            "id": "5",
+            "select_type": "DEPENDENT SUBQUERY",
+            "table": "incoming",
+            "partitions": null,
+            "type": "ref",
+            "possible_keys": "idx_riap_incoming_header",
+            "key": "idx_riap_incoming_header",
+            "key_len": "258",
+            "ref": "metalsindo_live.d.id_incoming",
+            "rows": "1",
+            "filtered": "10.00",
+            "Extra": "Using index condition; Using where"
+        },
+        {
+            "id": "5",
+            "select_type": "DEPENDENT SUBQUERY",
+            "table": "inc",
+            "partitions": null,
+            "type": "ref",
+            "possible_keys": "idx_riap_incoming_detail",
+            "key": "idx_riap_incoming_detail",
+            "key_len": "258",
+            "ref": "metalsindo_live.d.id_incoming",
+            "rows": "13",
+            "filtered": "100.00",
+            "Extra": "Using index condition; Using where"
+        },
+        {
+            "id": "5",
+            "select_type": "DEPENDENT SUBQUERY",
+            "table": "detail_po",
+            "partitions": null,
+            "type": "ref",
+            "possible_keys": "idx_riap_po_detail",
+            "key": "idx_riap_po_detail",
+            "key_len": "516",
+            "ref": "metalsindo_live.inc.id_dt_po,metalsindo_live.inc.id_material",
+            "rows": "1",
+            "filtered": "100.00",
+            "Extra": "Using where"
+        },
+        {
+            "id": "5",
+            "select_type": "DEPENDENT SUBQUERY",
+            "table": "po",
+            "partitions": null,
+            "type": "eq_ref",
+            "possible_keys": "PRIMARY",
+            "key": "PRIMARY",
+            "key_len": "257",
+            "ref": "metalsindo_live.detail_po.no_po",
+            "rows": "1",
+            "filtered": "9.00",
+            "Extra": "Using where"
+        },
+        {
+            "id": "4",
+            "select_type": "DEPENDENT SUBQUERY",
+            "table": "amount_detail",
+            "partitions": null,
+            "type": "ref",
+            "possible_keys": "idx_riap_detail_invoice",
+            "key": "idx_riap_detail_invoice",
+            "key_len": "48",
+            "ref": "h.id_rec_inv_ap",
+            "rows": "9",
+            "filtered": "100.00",
+            "Extra": "Using index condition"
+        }
+    ],
+    "idempotent_rerun": "passed",
+    "rerun_results": [
+        [
+            {
+                "server_host": "c73f06b78ec4",
+                "selected_database": "metalsindo_live",
+                "server_version": "5.7.44",
+                "mode": "apply",
+                "expected_database": "metalsindo_live"
+            }
+        ],
+        [
+            {
+                "TABLE_NAME": "dt_incoming",
+                "INDEX_NAME": "idx_riap_incoming_detail",
+                "NON_UNIQUE": "1",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id_incoming",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "dt_incoming",
+                "INDEX_NAME": "PRIMARY",
+                "NON_UNIQUE": "0",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id_dt_incoming",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "dt_trans_po",
+                "INDEX_NAME": "idx_riap_po_detail",
+                "NON_UNIQUE": "1",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id_dt_po",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "dt_trans_po",
+                "INDEX_NAME": "idx_riap_po_detail",
+                "NON_UNIQUE": "1",
+                "SEQ_IN_INDEX": "2",
+                "COLUMN_NAME": "idmaterial",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "dt_trans_po",
+                "INDEX_NAME": "PRIMARY",
+                "NON_UNIQUE": "0",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "tr_incoming",
+                "INDEX_NAME": "idx_riap_incoming_header",
+                "NON_UNIQUE": "1",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id_incoming",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "tr_incoming",
+                "INDEX_NAME": "PRIMARY",
+                "NON_UNIQUE": "0",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "tr_purchase_order",
+                "INDEX_NAME": "PRIMARY",
+                "NON_UNIQUE": "0",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "no_po",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "tr_receive_invoice_ap_detail",
+                "INDEX_NAME": "idx_riap_detail_invoice",
+                "NON_UNIQUE": "1",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id_rec_inv_ap",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "tr_receive_invoice_ap_detail",
+                "INDEX_NAME": "PRIMARY",
+                "NON_UNIQUE": "0",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "tr_receive_invoice_ap_header",
+                "INDEX_NAME": "idx_riap_header_created",
+                "NON_UNIQUE": "1",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "created_date",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "tr_receive_invoice_ap_header",
+                "INDEX_NAME": "idx_riap_header_created",
+                "NON_UNIQUE": "1",
+                "SEQ_IN_INDEX": "2",
+                "COLUMN_NAME": "id_rec_inv_ap",
+                "SUB_PART": null
+            },
+            {
+                "TABLE_NAME": "tr_receive_invoice_ap_header",
+                "INDEX_NAME": "PRIMARY",
+                "NON_UNIQUE": "0",
+                "SEQ_IN_INDEX": "1",
+                "COLUMN_NAME": "id_rec_inv_ap",
+                "SUB_PART": null
+            }
+        ],
+        [
+            {
+                "table_name": "tr_receive_invoice_ap_header",
+                "proposed_index": "idx_riap_header_created",
+                "columns_needed": "created_date,id_rec_inv_ap",
+                "engine": "InnoDB",
+                "equivalent_indexes": "1",
+                "named_index_rows": "2"
+            }
+        ],
+        [
+            {
+                "result": "tr_receive_invoice_ap_header.idx_riap_header_created: preflight, already indexed, missing table, unsupported engine, or nothing to rollback"
+            }
+        ],
+        [
+            {
+                "table_name": "tr_receive_invoice_ap_header",
+                "proposed_index": "idx_riap_header_id",
+                "columns_needed": "id_rec_inv_ap",
+                "engine": "InnoDB",
+                "equivalent_indexes": "1",
+                "named_index_rows": "0"
+            }
+        ],
+        [
+            {
+                "result": "tr_receive_invoice_ap_header.idx_riap_header_id: preflight, already indexed, missing table, unsupported engine, or nothing to rollback"
+            }
+        ],
+        [
+            {
+                "table_name": "tr_receive_invoice_ap_detail",
+                "proposed_index": "idx_riap_detail_invoice",
+                "columns_needed": "id_rec_inv_ap",
+                "engine": "InnoDB",
+                "equivalent_indexes": "1",
+                "named_index_rows": "1"
+            }
+        ],
+        [
+            {
+                "result": "tr_receive_invoice_ap_detail.idx_riap_detail_invoice: preflight, already indexed, missing table, unsupported engine, or nothing to rollback"
+            }
+        ],
+        [
+            {
+                "table_name": "tr_incoming",
+                "proposed_index": "idx_riap_incoming_header",
+                "columns_needed": "id_incoming",
+                "engine": "InnoDB",
+                "equivalent_indexes": "1",
+                "named_index_rows": "1"
+            }
+        ],
+        [
+            {
+                "result": "tr_incoming.idx_riap_incoming_header: preflight, already indexed, missing table, unsupported engine, or nothing to rollback"
+            }
+        ],
+        [
+            {
+                "table_name": "dt_incoming",
+                "proposed_index": "idx_riap_incoming_detail",
+                "columns_needed": "id_incoming",
+                "engine": "InnoDB",
+                "equivalent_indexes": "1",
+                "named_index_rows": "1"
+            }
+        ],
+        [
+            {
+                "result": "dt_incoming.idx_riap_incoming_detail: preflight, already indexed, missing table, unsupported engine, or nothing to rollback"
+            }
+        ],
+        [
+            {
+                "table_name": "dt_trans_po",
+                "proposed_index": "idx_riap_po_detail",
+                "columns_needed": "id_dt_po,idmaterial",
+                "engine": "InnoDB",
+                "equivalent_indexes": "1",
+                "named_index_rows": "2"
+            }
+        ],
+        [
+            {
+                "result": "dt_trans_po.idx_riap_po_detail: preflight, already indexed, missing table, unsupported engine, or nothing to rollback"
+            }
+        ],
+        [
+            {
+                "table_name": "tr_purchase_order",
+                "proposed_index": "idx_riap_po_header",
+                "columns_needed": "no_po",
+                "engine": "InnoDB",
+                "equivalent_indexes": "1",
+                "named_index_rows": "0"
+            }
+        ],
+        [
+            {
+                "result": "tr_purchase_order.idx_riap_po_header: preflight, already indexed, missing table, unsupported engine, or nothing to rollback"
+            }
+        ]
+    ],
+    "indexes": [
+        {
+            "TABLE_NAME": "dt_incoming",
+            "INDEX_NAME": "idx_riap_incoming_detail",
+            "SEQ_IN_INDEX": "1",
+            "COLUMN_NAME": "id_incoming"
+        },
+        {
+            "TABLE_NAME": "dt_trans_po",
+            "INDEX_NAME": "idx_riap_po_detail",
+            "SEQ_IN_INDEX": "1",
+            "COLUMN_NAME": "id_dt_po"
+        },
+        {
+            "TABLE_NAME": "dt_trans_po",
+            "INDEX_NAME": "idx_riap_po_detail",
+            "SEQ_IN_INDEX": "2",
+            "COLUMN_NAME": "idmaterial"
+        },
+        {
+            "TABLE_NAME": "tr_incoming",
+            "INDEX_NAME": "idx_riap_incoming_header",
+            "SEQ_IN_INDEX": "1",
+            "COLUMN_NAME": "id_incoming"
+        },
+        {
+            "TABLE_NAME": "tr_receive_invoice_ap_detail",
+            "INDEX_NAME": "idx_riap_detail_invoice",
+            "SEQ_IN_INDEX": "1",
+            "COLUMN_NAME": "id_rec_inv_ap"
+        },
+        {
+            "TABLE_NAME": "tr_receive_invoice_ap_header",
+            "INDEX_NAME": "idx_riap_header_created",
+            "SEQ_IN_INDEX": "1",
+            "COLUMN_NAME": "created_date"
+        },
+        {
+            "TABLE_NAME": "tr_receive_invoice_ap_header",
+            "INDEX_NAME": "idx_riap_header_created",
+            "SEQ_IN_INDEX": "2",
+            "COLUMN_NAME": "id_rec_inv_ap"
+        }
+    ]
+}
