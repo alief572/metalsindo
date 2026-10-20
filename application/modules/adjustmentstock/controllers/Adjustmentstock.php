@@ -27,12 +27,13 @@ class Adjustmentstock extends Admin_Controller
 		$this->load->library(array('Mpdf', 'upload', 'Image_lib'));
 		$this->load->model(array(
 			'Adjustmentstock/Inventory_4_model',
+			'adjustmentstock/Adjustment_balance_model',
 			'Aktifitas/aktifitas_model',
 		));
 		$this->template->title('Manage Data Supplier');
 		$this->template->page_icon('fa fa-building-o');
 
-		date_default_timezone_set('Asia/Bangkok');
+		date_default_timezone_set('Asia/Jakarta');
 	}
 	public function index()
 	{
@@ -318,18 +319,14 @@ class Adjustmentstock extends Admin_Controller
 
 	public function AdjustNow($id)
 	{
-		$id_category3 = $this->uri->segment(3);
-		$id_data 	= $this->input->post('id');
-		$this->auth->restrict($this->viewPermission);
-		$session = $this->session->userdata('app_session');
-		$this->template->page_icon('fa fa-pencil');
-		$inventory_3 = $this->Inventory_4_model->GetMaterial($id_category3);
-		$data = [
-			'inventory_3' => $inventory_3
-		];
-		$this->template->set('results', $data);
-		$this->template->title('Add Stock');
-		$this->template->render('Adjust');
+		$this->auth->restrict($this->addPermission);
+		try {
+			$material = $this->Adjustment_balance_model->material($id);
+			$this->template->set('material', $material);
+			$this->template->render('Adjust');
+		} catch (InvalidArgumentException $e) {
+			$this->output->set_status_header(422)->set_output(htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8'));
+		}
 	}
 
 	public function delDetail()
@@ -362,481 +359,20 @@ class Adjustmentstock extends Admin_Controller
 
 		echo json_encode($status);
 	}
-	public function LotNumber()
+	public function form_options()
 	{
-		$adjus			= $_GET['adjus'];
-		$id_material	= $_GET['id_material'];
-		$lookstock 		= $this->db->query("SELECT * FROM stock_material WHERE id_category3 = '$id_material' AND (lotno != '' AND lotno IS NOT NULL)")->result();
-		if ($adjus == 'PLUS') {
-			echo "<input type='text' class='form-control' id='lotno'  name='lotno' placeholder='Lot Number Metalsindo'>";
-		} elseif ($adjus == 'MINUS') {
-			echo "<select class='form-control select2' id='id_stock'  name='id_stock' onchange='GetDataMinus()' >
-				<option>-Pilih-</option>";
-			foreach ($lookstock as $stock) {
-				echo "<option value='$stock->id_stock'>$stock->lotno</option>";
-			};
-			echo "</select>";
-		} elseif ($adjus == 'MUTASI') {
-			echo "<select class='form-control select2' id='id_stock'  name='id_stock' onchange='GetDataMutasi()'>
-				<option>-Pilih-</option>";
-			foreach ($lookstock as $stock) {
-				echo "<option value='$stock->id_stock'>$stock->lotno</option>";
-			};
-			echo "</select>";
+		$this->auth->restrict($this->addPermission);
+		try {
+			$id = $this->input->get('id_material');
+			if (!is_string($id) || $id === '' || strlen($id) > 15) throw new InvalidArgumentException('Material tidak valid.');
+			$data = $this->Adjustment_balance_model->options($id);
+			$data['status'] = 1;
+		} catch (InvalidArgumentException $e) {
+			$data = array('status'=>0, 'pesan'=>$e->getMessage());
 		}
+		$this->output->set_content_type('application/json')->set_output(json_encode($data));
 	}
-	public function HitungJumlah()
-	{
-		$total_qty			= $_GET['total_qty'];
-		$total_berat			= $_GET['total_berat'];
-		$total = $total_qty * $total_berat;
-		echo "" . $total . "";
-	}
-	public function FormPlus()
-	{
-		$id_material	= $_GET['id_material'];
-		$lookstock 		= $this->db->query("SELECT * FROM child_inven_dimensi WHERE id_category3 = '$id_material' ")->result();
-		$thickness = $lookstock[0]->nilai_dimensi;
-		$gudang 		= $this->db->query("SELECT * FROM ms_gudang")->result();
-		echo "<div class='form-group row'>
-				<div class='col-md-12'>
-				<div class='col-md-4'>
-						<div class='col-md-4'>
-							<label>Length</label>
-						</div> 
-						<div class='col-md-8'>
-			<input type='number' class='form-control' id='length'  name='length' placeholder='Length'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-4'>
-							<label>Width</label>
-						</div> 
-						<div class='col-md-8'>
-			<input type='number' class='form-control' id='width'  required name='width' placeholder='Width'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-4'>
-							<label>Thickness</label>
-						</div> 
-						<div class='col-md-8'>
-			<input type='number' class='form-control' id='thickness' value='" . $thickness . "' readonly  required name='thickness' placeholder='Thickness'>
-						</div>
-				</div>
-				</div>
-			</div>
-			<div class='form-group row'>
-				<div class='col-md-12'>
-				<div class='col-md-4'>
-						<div class='col-md-4'>
-							<label>Total Qty</label>
-						</div> 
-						<div class='col-md-8'>
-						<input type='number' class='form-control' id='total_qty'  required name='total_qty' onkeyup='HitungPlusJml()' placeholder='Total Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-4'>
-							<label>Total Berat/Qty</label>
-						</div>
-						<div class='col-md-8'>
-						<input type='number' class='form-control' id='total_berat'  required name='total_berat' onkeyup='HitungPlusJml()'  placeholder='Total Berat/Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-4'>
-							<label>Total Berat</label>
-						</div>
-						<div class='col-md-8'>
-						<input type='number' class='form-control' readonly id='total_jumlah_berat'  required name='total_jumlah_berat' placeholder='Total Berat'>
-						</div>
-				</div>
-				</div>
-			</div>
-			<div class='form-group row'>
-				<div class='col-md-12'>
-				<div class='col-md-12'>
-						<div class='col-md-2'>
-							<label>Gudang</label>
-						</div> 
-						<div class='col-md-10'>
-			<select class='form-control' id='id_gudang'  name='id_gudang' >
-				<option>-Pilih-</option>";
-		foreach ($gudang as $gudang) {
-			echo "<option value='$gudang->id_gudang'>$gudang->nama_gudang</option>";
-		};
-		echo "</select>
-						</div>
-				</div>
-				</div>
-			</div>";
-	}
-	public function FormMutasi()
-	{
 
-		$gudang 		= $this->db->query("SELECT * FROM ms_gudang")->result();
-		echo "<div class='form-group row'>
-				<div class='col-md-12' id='form_mother'>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Qty Asal</label>
-						</div> 
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='mother_qty' readonly required name='mother_qty' placeholder='Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Berat/Qty Asal</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='mother_berat' readonly required name='mother_berat' placeholder='Berat/Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Total Berat Asal</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='mother_jumlah_berat' readonly required name='mother_jumlah_berat' placeholder='Total Berat'>
-						</div>
-				</div>
-				</div>
-			</div>
-			<div class='form-group row'>
-				<div class='col-md-12'>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Qty</label>
-						</div> 
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='total_qty'  required name='total_qty' placeholder='Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Berat/Qty</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='total_berat' readonly required name='total_berat' placeholder='Berat/Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Total Berat</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='total_jumlah_berat' readonly  required name='total_jumlah_berat' placeholder='Total Berat'>
-						</div>
-				</div>
-				</div>
-			</div>
-			<div class='form-group row'>
-				<div class='col-md-12' id='form_gudang_mother'>
-			<div class='col-md-6'>
-						<div class='col-md-2'>
-							<label>Gudang Asal</label>
-						</div> 
-						<div class='col-md-10' hidden>
-			<input type='number' class='form-control' id='id_gudang' readonly required name='id_gudang' placeholder='Gudang Asal'>
-						</div>
-						<div class='col-md-10'>
-			<input type='number' class='form-control' id='nama_gudang' readonly required name='nama_gudang' placeholder='Gudang Asal'>
-						</div>
-				</div>
-				<div class='col-md-6'>
-						<div class='col-md-2'>
-							<label>Gudang Tujuan</label>
-						</div> 
-						<div class='col-md-10'>
-			<select class='form-control' id='id_gudang_baru'  name='id_gudang_baru' >
-				<option>-Pilih-</option>";
-		foreach ($gudang as $gudang) {
-			echo "<option value='$gudang->id_gudang'>$gudang->nama_gudang</option>";
-		};
-		echo "</select>
-						</div>
-				</div>
-				</div>
-			</div>";
-	}
-	public function FormMinus()
-	{
-
-		$gudang 		= $this->db->query("SELECT * FROM ms_gudang")->result();
-		echo "<div class='form-group row'>
-				<div class='col-md-12' id='form_mother'>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Qty Asal</label>
-						</div> 
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='mother_qty' readonly required name='mother_qty' placeholder='Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Berat/Qty Asal</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='mother_berat' readonly required name='mother_berat' placeholder='Berat/Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Total Berat Asal</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='mother_jumlah_berat' readonly required name='mother_jumlah_berat' placeholder='Total Berat'>
-						</div>
-				</div>
-				</div>
-			</div>
-			<div class='form-group row'>
-				<div class='col-md-12'>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Qty</label>
-						</div> 
-						<div class='col-md-7' >
-						<input type='number' class='form-control' id='total_qty'  required name='total_qty' placeholder='Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Berat/Qty</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='total_berat' readonly required name='total_berat' placeholder='Berat/Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Total Berat</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='total_jumlah_berat' readonly  required name='total_jumlah_berat' placeholder='Total Berat'>
-						</div>
-				</div>
-				</div>
-			</div>
-			<div class='form-group row'>
-				<div class='col-md-12'>
-			<div class='col-md-12' id='form_gudang_mother'>
-						<div class='col-md-2'>
-							<label>Gudang Asal</label>
-						</div> 
-						<div class='col-md-10' hidden>
-			<input type='number' class='form-control' id='id_gudang' readonly required name='id_gudang' placeholder='Gudang Asal'>
-						</div>
-						<div class='col-md-10'>
-			<input type='number' class='form-control' id='nama_gudang' readonly required name='nama_gudang' placeholder='Gudang Asal'>
-						</div>
-				</div>
-				</div>
-			</div>";
-	}
-	public function AmbilDataMutasi()
-	{
-		$id_stock		= $_GET['id_stock'];
-		$stocklama 		= $this->db->query("SELECT * FROM stock_material WHERE id_stock='$id_stock'")->result();
-		$gudanglama		= $this->db->query("SELECT * FROM ms_gudang WHERE id_gudang='" . $stocklama[0]->id_gudang . "'")->result();
-		$gudang 		= $this->db->query("SELECT * FROM ms_gudang")->result();
-		echo "<div class='form-group row'>
-				<div class='col-md-12' id='form_mother'>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Qty Asal</label>
-						</div> 
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='mother_qty' value='" . $stocklama[0]->qty . "' readonly required name='mother_qty' placeholder='Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Berat/Qty Asal</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='mother_berat' value='" . $stocklama[0]->weight . "' readonly required name='mother_berat' placeholder='Berat/Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Total Berat Asal</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='mother_jumlah_berat' value='" . $stocklama[0]->totalweight . "' readonly required name='mother_jumlah_berat' placeholder='Total Berat'>
-						</div>
-				</div>
-				</div>
-			</div>
-			<div class='form-group row' hidden>
-				<div class='col-md-12'>
-						<div class='col-md-7' >
-						<input type='number' class='form-control' value='" . $stocklama[0]->length . "' id='length'  required name='length' placeholder='Qty'>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' value='" . $stocklama[0]->width . "' id='width' readonly required name='width' placeholder='Berat/Qty'>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' value='" . $stocklama[0]->thickness . "' id='thickness' readonly  required name='thickness' placeholder='Total Berat'>
-						</div>
-						<div class='col-md-7'>
-						<input type='text' class='form-control' value='" . $stocklama[0]->lotno . "' id='lotno' readonly  required name='lotno' placeholder='Total Berat'>
-						</div>
-				</div>
-			</div>
-			<div class='form-group row'>
-				<div class='col-md-12'>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Qty</label>
-						</div> 
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='total_qty'  required name='total_qty' onkeyup='HitungJumlahMinus()' placeholder='Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Berat/Qty</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='total_berat' value='" . $stocklama[0]->weight . "' readonly required name='total_berat' placeholder='Berat/Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Total Berat</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='total_jumlah_berat' readonly  required name='total_jumlah_berat' placeholder='Total Berat'>
-						</div>
-				</div>
-				</div>
-			</div>
-			<div class='form-group row'>
-				<div class='col-md-12' id='form_gudang_mother'>
-			<div class='col-md-6'>
-						<div class='col-md-2'>
-							<label>Gudang Asal</label>
-						</div> 
-						<div class='col-md-10' hidden>
-			<input type='text' class='form-control' id='id_gudang' value='" . $stocklama[0]->id_gudang . "' readonly required name='id_gudang' placeholder='Gudang Asal'>
-						</div>
-						<div class='col-md-10'>
-			<input type='text' class='form-control' id='nama_gudang' value='" . $gudanglama[0]->nama_gudang . "'  readonly required name='nama_gudang' placeholder='Gudang Asal'>
-						</div>
-				</div>
-				<div class='col-md-6'>
-						<div class='col-md-2'>
-							<label>Gudang Tujuan</label>
-						</div> 
-						<div class='col-md-10'>
-			<select class='form-control' id='id_gudang_baru'  name='id_gudang_baru' >
-				<option>-Pilih-</option>";
-		foreach ($gudang as $gudang) {
-			echo "<option value='$gudang->id_gudang'>$gudang->nama_gudang</option>";
-		};
-		echo "</select>
-						</div>
-				</div>
-				</div>
-			</div>";
-	}
-	public function AmbilDataMinus()
-	{
-		$id_stock		= $_GET['id_stock'];
-		$stocklama 		= $this->db->query("SELECT * FROM stock_material WHERE id_stock='$id_stock'")->result();
-		$gudanglama		= $this->db->query("SELECT * FROM ms_gudang WHERE id_gudang='" . $stocklama[0]->id_gudang . "'")->result();
-		echo "<div class='form-group row'>
-				<div class='col-md-12' id='form_mother'>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Qty Asal</label>
-						</div> 
-						<div class='col-md-7'>
-						<input type='number' class='form-control' value='" . $stocklama[0]->qty . "' id='mother_qty' readonly required name='mother_qty' placeholder='Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Berat/Qty Asal</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' value='" . $stocklama[0]->weight . "' id='mother_berat' readonly required name='mother_berat' placeholder='Berat/Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Total Berat Asal</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' value='" . $stocklama[0]->totalweight . "' id='mother_jumlah_berat' readonly required name='mother_jumlah_berat' placeholder='Total Berat'>
-						</div>
-				</div>
-				</div>
-			</div>
-			<div class='form-group row' hidden>
-				<div class='col-md-12'>
-						<div class='col-md-7' >
-						<input type='number' class='form-control' value='" . $stocklama[0]->length . "' id='length'  required name='length' placeholder='Qty'>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' value='" . $stocklama[0]->width . "' id='width' readonly required name='width' placeholder='Berat/Qty'>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' value='" . $stocklama[0]->thickness . "' id='thickness' readonly  required name='thickness' placeholder='Total Berat'>
-						</div>
-						<div class='col-md-7'>
-						<input type='text' class='form-control' value='" . $stocklama[0]->lotno . "' id='lotno' readonly  required name='lotno' placeholder='Total Berat'>
-						</div>
-				</div>
-			</div>
-			<div class='form-group row'>
-				<div class='col-md-12'>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Qty</label>
-						</div> 
-						<div class='col-md-7' >
-						<input type='number' class='form-control' id='total_qty'  required name='total_qty' onkeyup='HitungJumlahMinus()' placeholder='Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Berat/Qty</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='total_berat' value='" . $stocklama[0]->weight . "' readonly required name='total_berat' placeholder='Berat/Qty'>
-						</div>
-				</div>
-				<div class='col-md-4'>
-						<div class='col-md-5'>
-							<label>Total Berat</label>
-						</div>
-						<div class='col-md-7'>
-						<input type='number' class='form-control' id='total_jumlah_berat' readonly  required name='total_jumlah_berat' placeholder='Total Berat'>
-						</div>
-				</div>
-				</div>
-			</div>
-			<div class='form-group row'>
-				<div class='col-md-12'>
-			<div class='col-md-12' id='form_gudang_mother'>
-						<div class='col-md-2'>
-							<label>Gudang Asal</label>
-						</div> 
-						<div class='col-md-10' hidden>
-			<input type='text' class='form-control' id='id_gudang' value='" . $stocklama[0]->id_gudang . "' readonly required name='id_gudang' placeholder='Gudang Asal'>
-						</div>
-						<div class='col-md-10'>
-			<input type='text' class='form-control' id='nama_gudang' value='" . $gudanglama[0]->nama_gudang . "' readonly required name='nama_gudang' placeholder='Gudang Asal'>
-						</div>
-				</div>
-				</div>
-			</div>";
-	}
 	public function PrintHeader()
 	{
 		ob_clean();
@@ -885,441 +421,25 @@ class Adjustmentstock extends Admin_Controller
 	public function SavePlus()
 	{
 		$this->auth->restrict($this->addPermission);
-		$post = $this->input->post();
-		$adjustment = $post['adjustment'];
-		$id_gudang = $post['id_gudang'];
-		$carigudang = $this->db->query("SELECT * FROM ms_gudang WHERE id_gudang ='" . $id_gudang . "' ")->result();
-		$nama_gudang = $carigudang[0]->nama_gudang;
-		$code = $this->Inventory_4_model->generate_id();
-		$this->db->trans_begin();
-		if ($adjustment == 'PLUS') {
-			$historical = [
-				'id_transaksi'			=> $code,
-				'id_material'			=> $post['id_material'],
-				'nama_material'			=> $post['nama_material'],
-				'id_bentuk'				=> $post['id_bentuk'],
-				'nama_bentuk'			=> $post['nama_bentuk'],
-				'adjustment'			=> $post['adjustment'],
-				'lotno'					=> $post['lotno'],
-				'note'					=> $post['note'],
-				'length'				=> $post['length'],
-				'width'					=> $post['width'],
-				'thickness'				=> $post['thickness'],
-				'total_qty'				=> $post['total_qty'],
-				'total_berat'			=> $post['total_berat'],
-				'total_jumlah_berat'	=> $post['total_jumlah_berat'],
-				'id_gudang'				=> $post['id_gudang'],
-				'nama_gudang'			=> $nama_gudang,
-				'tanggal_transaksi'		=> date('Y-m-d'),
-				'user'					=> $this->auth->user_id()
-			];
-			$this->db->insert('adjustment_stock', $historical);
-
-			$data = [
-				'id_category3'			=> $post['id_material'],
-				'nama_material'			=> $post['nama_material'],
-				'width'					=> $post['width'],
-				'lotno'					=> $post['lotno'],
-				'qty'					=> $post['total_qty'],
-				'id_bentuk'				=> $post['id_bentuk'],
-				'length'				=> $post['length'],
-				'thickness'				=> $post['thickness'],
-				'weight'				=> $post['total_berat'],
-				'totalweight'			=> $post['total_jumlah_berat'],
-				'aktif'					=> 'Y',
-				'id_gudang'				=> $post['id_gudang'],
-				'created_on'			=> date('Y-m-d H:i:s'),
-				'created_by'			=> $this->auth->user_id()
-			];
-			$this->db->insert('stock_material', $data);
-
-			$this->db->select('a.*');
-			$this->db->from('warehouse_stock a');
-			$this->db->where('a.id_material', $post['id_material']);
-			$this->db->where('a.id_gudang', $post['id_gudang']);
-			$query_stock = $this->db->get();
-
-			$get_material = $this->Inventory_4_model->get_material_by_id($post['id_material']);
-			$get_warehouse = $this->Inventory_4_model->get_warehouse_by_id($post['id_gudang']);
-
-			if ($query_stock->num_rows() > 0) {
-				$data_stock = $query_stock->row();
-
-				$arr_update_stock = [
-					'qty_stock' => ($data_stock->qty_stock + $post['total_jumlah_berat'])
-				];
-
-				$this->db->update('warehouse_stock', $arr_update_stock, ['id_material' => $post['id_material'], 'id_gudang' => $post['id_gudang']]);
-
-				$arr_kartu_stock = [
-					'id_material' => $post['id_material'],
-					'idmaterial' => $post['id_material'],
-					'nm_material' => $get_material->nama,
-					'id_gudang' => $post['id_gudang'],
-					'kd_gudang' => $get_warehouse->wh_name,
-					'id_gudang_ke' => $post['id_gudang'],
-					'kd_gudang_ke' => $get_warehouse->wh_name,
-					'qty_stock_awal' => $data_stock->qty_stock,
-					'qty_stock_akhir' => ($data_stock->qty_stock + $post['total_jumlah_berat']),
-					'no_ipp' => $code,
-					'jumlah_mat' => $post['total_jumlah_berat'],
-					'ket' => 'Adjustment Plus',
-					'update_by' => $this->auth->user_id(),
-					'update_date' => date('Y-m-d H:i:s'),
-					'jenis_transaksi' => 'Adjustment Plus'
-				];
-
-				$this->db->insert('warehouse_history', $arr_kartu_stock);
-			} else {
-
-				$arr_warehouse_stock = [
-					'id_material' => $post['id_material'],
-					'idmaterial' => $post['id_material'],
-					'nm_material' => $get_material->nama,
-					'id_gudang' => $post['id_gudang'],
-					'kd_gudang' => $get_warehouse->wh_name,
-					'qty_stock' => $post['total_jumlah_berat'],
-					'update_by' => $this->auth->user_id(),
-					'update_date' => date('Y-m-d H:i:s')
-				];
-
-				$this->db->insert('warehouse_stock', $arr_warehouse_stock);
-
-				$arr_kartu_stock = [
-					'id_material' => $post['id_material'],
-					'idmaterial' => $post['id_material'],
-					'nm_material' => $get_material->nama,
-					'id_gudang' => $post['id_gudang'],
-					'kd_gudang' => $get_warehouse->wh_name,
-					'id_gudang_ke' => $post['id_gudang'],
-					'kd_gudang_ke' => $get_warehouse->wh_name,
-					'qty_stock_akhir' => $post['total_jumlah_berat'],
-					'no_ipp' => $code,
-					'jumlah_mat' => $post['total_jumlah_berat'],
-					'ket' => 'Adjustment Plus',
-					'update_by' => $this->auth->user_id(),
-					'update_date' => date('Y-m-d H:i:s'),
-					'jenis_transaksi' => 'Adjustment Plus'
-				];
-
-				$this->db->insert('warehouse_history', $arr_kartu_stock);
-			}
-		} elseif ($adjustment == 'MINUS') {
-			$historical = [
-				'id_transaksi'			=> $code,
-				'id_material'			=> $post['id_material'],
-				'nama_material'			=> $post['nama_material'],
-				'id_bentuk'				=> $post['id_bentuk'],
-				'nama_bentuk'			=> $post['nama_bentuk'],
-				'adjustment'			=> $post['adjustment'],
-				'id_stock'				=> $post['id_stock'],
-				'lotno'					=> $post['lotno'],
-				'note'					=> $post['note'],
-				'length'				=> $post['length'],
-				'width'					=> $post['width'],
-				'thickness'				=> $post['thickness'],
-				'mother_qty'			=> $post['mother_qty'],
-				'mother_berat'			=> $post['mother_berat'],
-				'mother_jumlah_berat'	=> $post['mother_jumlah_berat'],
-				'total_qty'				=> $post['total_qty'],
-				'total_berat'			=> $post['total_berat'],
-				'total_jumlah_berat'	=> $post['total_jumlah_berat'],
-				'id_gudang'				=> $post['id_gudang'],
-				'nama_gudang'			=> $post['nama_gudang'],
-				'tanggal_transaksi'		=> date('Y-m-d'),
-				'user'					=> $this->auth->user_id()
-			];
-			$this->db->insert('adjustment_stock', $historical);
-			$mother_qty		= $post['mother_qty'];
-			$total_qty		= $post['total_qty'];
-			$id_stock		= $post['id_stock'];
-			$total_berat	= $post['total_berat'];
-			$hasil			= $mother_qty - $total_qty;
-			$jtotalberat 	= $hasil * $total_berat;
-			if ($hasil < 1) {
-				$this->db->delete('stock_material', array('id_stock' => $id_stock));
-			} else {
-				$data1 = [
-					'id_category3'			=> $post['id_material'],
-					'nama_material'			=> $post['nama_material'],
-					'width'					=> $post['width'],
-					'lotno'					=> $post['lotno'],
-					'qty'					=> $hasil,
-					'id_bentuk'				=> $post['id_bentuk'],
-					'length'				=> $post['length'],
-					'thickness'				=> $post['thickness'],
-					'weight'				=> $post['total_berat'],
-					'totalweight'			=> $jtotalberat,
-					'aktif'					=> 'Y',
-					'id_gudang'				=> $post['id_gudang'],
-					'created_on'			=> date('Y-m-d H:i:s'),
-					'created_by'			=> $this->auth->user_id()
-				];
-				$this->db->where('id_stock', $id_stock)->update("stock_material", $data1);
-			};
-
-			$this->db->select('a.*');
-			$this->db->from('warehouse_stock a');
-			$this->db->where('a.id_material', $post['id_material']);
-			$this->db->where('a.id_gudang', $post['id_gudang']);
-			$query_stock = $this->db->get();
-
-			$get_material = $this->Inventory_4_model->get_material_by_id($post['id_material']);
-			$get_warehouse = $this->Inventory_4_model->get_warehouse_by_id($post['id_gudang']);
-
-			$data_stock = $query_stock->row();
-
-			$arr_update_stock = [
-				'qty_stock' => ($data_stock->qty_stock - $post['total_jumlah_berat'])
-			];
-
-			$this->db->update('warehouse_stock', $arr_update_stock, ['id_material' => $post['id_material'], 'id_gudang' => $post['id_gudang']]);
-
-			$arr_kartu_stock = [
-				'id_material' => $post['id_material'],
-				'idmaterial' => $post['id_material'],
-				'nm_material' => $get_material->nama,
-				'id_gudang' => $post['id_gudang'],
-				'kd_gudang' => $get_warehouse->wh_name,
-				'id_gudang_ke' => $post['id_gudang'],
-				'kd_gudang_ke' => $get_warehouse->wh_name,
-				'qty_stock_awal' => $data_stock->qty_stock,
-				'qty_stock_akhir' => ($data_stock->qty_stock - $post['total_jumlah_berat']),
-				'no_ipp' => $code,
-				'jumlah_mat' => $post['total_jumlah_berat'],
-				'ket' => 'Adjustment Minus',
-				'update_by' => $this->auth->user_id(),
-				'update_date' => date('Y-m-d H:i:s'),
-				'jenis_transaksi' => 'Adjustment Minus'
-			];
-
-			$this->db->insert('warehouse_history', $arr_kartu_stock);
-		} elseif ($adjustment == 'MUTASI') {
-			$id_gudang_baru		= $post['id_gudang_baru'];
-			$carigudangbaru = $this->db->query("SELECT * FROM ms_gudang WHERE id_gudang ='" . $id_gudang_baru . "' ")->result();
-			$nama_gudang_baru = $carigudangbaru[0]->nama_gudang;
-			$historical = [
-				'id_transaksi'			=> $code,
-				'id_material'			=> $post['id_material'],
-				'nama_material'			=> $post['nama_material'],
-				'id_bentuk'				=> $post['id_bentuk'],
-				'nama_bentuk'			=> $post['nama_bentuk'],
-				'adjustment'			=> $post['adjustment'],
-				'id_stock'				=> $post['id_stock'],
-				'lotno'					=> $post['lotno'],
-				'note'					=> $post['note'],
-				'length'				=> $post['length'],
-				'width'					=> $post['width'],
-				'thickness'				=> $post['thickness'],
-				'mother_qty'			=> $post['mother_qty'],
-				'mother_berat'			=> $post['mother_berat'],
-				'mother_jumlah_berat'	=> $post['mother_jumlah_berat'],
-				'total_qty'				=> $post['total_qty'],
-				'total_berat'			=> $post['total_berat'],
-				'total_jumlah_berat'	=> $post['total_jumlah_berat'],
-				'id_gudang'				=> $post['id_gudang'],
-				'id_gudang_baru'		=> $post['id_gudang_baru'],
-				'nama_gudang_baru'		=> $nama_gudang_baru,
-				'nama_gudang'			=> $post['nama_gudang'],
-				'tanggal_transaksi'		=> date('Y-m-d'),
-				'user'					=> $this->auth->user_id()
-			];
-			$this->db->insert('adjustment_stock', $historical);
-			$mother_qty		= $post['mother_qty'];
-			$total_qty		= $post['total_qty'];
-			$id_stock		= $post['id_stock'];
-			$total_berat	= $post['total_berat'];
-			$hasil			= $mother_qty - $total_qty;
-			$jtotalberat 	= $hasil * $total_berat;
-			if ($hasil < 1) {
-				$this->db->delete('stock_material', array('id_stock' => $id_stock));
-				$data = [
-					'id_category3'			=> $post['id_material'],
-					'nama_material'			=> $post['nama_material'],
-					'width'					=> $post['width'],
-					'lotno'					=> $post['lotno'],
-					'qty'					=> $post['total_qty'],
-					'id_bentuk'				=> $post['id_bentuk'],
-					'length'				=> $post['length'],
-					'thickness'				=> $post['thickness'],
-					'weight'				=> $post['total_berat'],
-					'totalweight'			=> $post['total_jumlah_berat'],
-					'aktif'					=> 'Y',
-					'id_gudang'				=> $post['id_gudang_baru'],
-					'sisa_spk' => $post['total_jumlah_berat'],
-					'created_on'			=> date('Y-m-d H:i:s'),
-					'created_by'			=> $this->auth->user_id()
-				];
-				$this->db->insert('stock_material', $data);
-			} else {
-				$data1 = [
-					'id_category3'			=> $post['id_material'],
-					'nama_material'			=> $post['nama_material'],
-					'width'					=> $post['width'],
-					'lotno'					=> $post['lotno'],
-					'qty'					=> $hasil,
-					'id_bentuk'				=> $post['id_bentuk'],
-					'length'				=> $post['length'],
-					'thickness'				=> $post['thickness'],
-					'weight'				=> $post['total_berat'],
-					'totalweight'			=> $jtotalberat,
-					'aktif'					=> 'Y',
-					'id_gudang'				=> $post['id_gudang'],
-					'sisa_spk' => $jtotalberat,
-					'created_on'			=> date('Y-m-d H:i:s'),
-					'created_by'			=> $this->auth->user_id()
-				];
-				$this->db->where('id_stock', $id_stock)->update("stock_material", $data1);
-				$data = [
-					'id_category3'			=> $post['id_material'],
-					'nama_material'			=> $post['nama_material'],
-					'width'					=> $post['width'],
-					'lotno'					=> $post['lotno'],
-					'qty'					=> $post['total_qty'],
-					'id_bentuk'				=> $post['id_bentuk'],
-					'length'				=> $post['length'],
-					'thickness'				=> $post['thickness'],
-					'weight'				=> $post['total_berat'],
-					'totalweight'			=> $post['total_jumlah_berat'],
-					'aktif'					=> 'Y',
-					'id_gudang'				=> $post['id_gudang_baru'],
-					'sisa_spk' => $post['total_jumlah_berat'],
-					'created_on'			=> date('Y-m-d H:i:s'),
-					'created_by'			=> $this->auth->user_id()
-				];
-				$this->db->insert('stock_material', $data);
-			};
-
-			$this->db->select('a.*');
-			$this->db->from('warehouse_stock a');
-			$this->db->where('a.id_material', $post['id_material']);
-			$this->db->where('a.id_gudang', $post['id_gudang']);
-			$query_stock = $this->db->get();
-
-			$this->db->select('a.id');
-			$this->db->from('warehouse_stock a');
-			$this->db->where('a.id_material', $post['id_material']);
-			$this->db->where('a.id_gudang', $post['id_gudang_baru']);
-			$query_stock_baru = $this->db->get();
-
-			$get_material = $this->Inventory_4_model->get_material_by_id($post['id_material']);
-			$get_warehouse = $this->Inventory_4_model->get_warehouse_by_id($post['id_gudang']);
-			$get_warehouse_baru = $this->Inventory_4_model->get_warehouse_by_id($post['id_gudang_baru']);
-
-			$data_stock = $query_stock->row();
-			$data_stock_baru = $query_stock_baru->row();
-
-			$arr_update_stock_dari = [
-				'qty_stock' => ($data_stock->qty_stock - $post['total_jumlah_berat'])
-			];
-			$this->db->update('warehouse_stock', $arr_update_stock_dari, ['id_material' => $post['id_material'], 'id_gudang' => $post['id_gudang']]);
-
-			if ($query_stock_baru->num_rows() > 0) {
-				$this->db->update('warehouse_stock', ['qty_stock' => ($data_stock_baru->qty_stock + $post['total_jumlah_baru'])], ['id_material' => $post['id_material'], 'id_gudang' => $post['id_gudang_baru']]);
-			} else {
-				$arr_insert_stock_baru = [
-					'id_material' => $post['id_material'],
-					'idmaterial' => $post['id_material'],
-					'nm_material' => $get_material->nama,
-					'id_gudang' => $post['id_gudang_baru'],
-					'kd_gudang' => $get_warehouse_baru->wh_name,
-					'qty_stock' => $post['total_jumlah_berat'],
-					'update_by' => $this->auth->user_id(),
-					'update_date' => date('Y-m-d H:i:s')
-				];
-
-				$this->db->insert('warehouse_stock', $arr_insert_stock_baru);
-			}
-
-			$arr_kartu_stock_dari = [
-				'id_material' => $post['id_material'],
-				'idmaterial' => $post['id_material'],
-				'nm_material' => $get_material->nama,
-				'id_gudang' => $post['id_gudang'],
-				'kd_gudang' => $get_warehouse->wh_name,
-				'id_gudang_dari' => $post['id_gudang'],
-				'kd_gudang_dari' => $get_warehouse->wh_name,
-				'id_gudang_ke' => $post['id_gudang_baru'],
-				'kd_gudang_ke' => $get_warehouse_baru->wh_name,
-				'qty_stock_awal' => $data_stock->qty_stock,
-				'qty_stock_akhir' => ($data_stock->qty_stock - $post['total_jumlah_berat']),
-				'qty_booking_awal' => $data_stock->qty_booking,
-				'qty_booking_akhir' => $data_stock->qty_booking,
-				'no_ipp' => $code,
-				'jumlah_mat' => $post['total_jumlah_berat'],
-				'ket' => 'Adjustment Mutasi dari ' . $get_warehouse->wh_name . ' -> ' . $get_warehouse_baru->name,
-				'jenis_transaksi' => 'Adjustment Mutasi (-)',
-				'update_by' => $this->auth->user_id(),
-				'update_date' => date('Y-m-d H:i:s')
-			];
-
-			$this->db->insert('warehouse_history', $arr_kartu_stock_dari);
-
-			if ($query_stock_baru->num_rows() > 0) {
-				$arr_kartu_stock_ke = [
-					'id_material' => $post['id_material'],
-					'idmaterial' => $post['id_material'],
-					'nm_material' => $get_material->nama,
-					'id_gudang' => $post['id_gudang_baru'],
-					'kd_gudang' => $get_warehouse_baru->wh_name,
-					'id_gudang_dari' => $post['id_gudang'],
-					'kd_gudang_dari' => $get_warehouse->wh_name,
-					'id_gudang_ke' => $post['id_gudang_baru'],
-					'kd_gudang_ke' => $get_warehouse_baru->wh_name,
-					'qty_stock_awal' => $data_stock_baru->qty_stock,
-					'qty_stock_akhir' => ($data_stock_baru->qty_stock + $post['total_jumlah_berat']),
-					'qty_booking_awal' => $data_stock_baru->qty_booking,
-					'qty_booking_akhir' => $data_stock_baru->qty_booking,
-					'no_ipp' => $code,
-					'jumlah_mat' => $post['total_jumlah_berat'],
-					'ket' => 'Adjustment Mutasi dari ' . $get_warehouse->wh_name . ' -> ' . $get_warehouse_baru->name,
-					'jenis_transaksi' => 'Adjustment Mutasi (-)',
-					'update_by' => $this->auth->user_id(),
-					'update_date' => date('Y-m-d H:i:s')
-				];
-			} else {
-				$arr_kartu_stock_ke = [
-					'id_material' => $post['id_material'],
-					'idmaterial' => $post['id_material'],
-					'nm_material' => $get_material->nama,
-					'id_gudang' => $post['id_gudang_baru'],
-					'kd_gudang' => $get_warehouse_baru->wh_name,
-					'id_gudang_dari' => $post['id_gudang'],
-					'kd_gudang_dari' => $get_warehouse->wh_name,
-					'id_gudang_ke' => $post['id_gudang_baru'],
-					'kd_gudang_ke' => $get_warehouse_baru->wh_name,
-					'qty_stock_akhir' => $post['total_jumlah_berat'],
-					'no_ipp' => $code,
-					'jumlah_mat' => $post['total_jumlah_berat'],
-					'ket' => 'Adjustment Mutasi dari ' . $get_warehouse->wh_name . ' -> ' . $get_warehouse_baru->name,
-					'jenis_transaksi' => 'Adjustment Mutasi (+)',
-					'update_by' => $this->auth->user_id(),
-					'update_date' => date('Y-m-d H:i:s')
-				];
-			}
-
-			$this->db->insert('warehouse_history', $arr_kartu_stock_ke);
+		if ($this->input->method() !== 'post') {
+			$this->output->set_status_header(405)->set_content_type('application/json')->set_output(json_encode(array('status'=>0,'pesan'=>'Gunakan metode POST.')));
+			return;
 		}
-		if ($this->db->trans_status() === FALSE) {
-			$this->db->trans_rollback();
-			$status	= array(
-				'pesan'		=> 'Gagal Save Item. Thanks ...',
-				'code'	=> $id_inventory,
-				'status'	=> 0
-
-			);
-		} else {
-			$this->db->trans_commit();
-			$status	= array(
-				'pesan'		=> 'Success Save Item. invenThanks ...',
-				'code'	=> $id_inventory,
-				'status'	=> 1
-
-			);
+		try {
+			$code = $this->Adjustment_balance_model->save($this->input->post(), $this->auth->user_id());
+			$data = array('status'=>1,'pesan'=>'Adjustment stok berhasil disimpan.','code'=>$code);
+		} catch (InvalidArgumentException $e) {
+			$data = array('status'=>0,'pesan'=>$e->getMessage());
+		} catch (Exception $e) {
+			log_message('error', 'Adjustment Stock: '.$e->getMessage());
+			$data = array('status'=>0,'pesan'=>'Adjustment gagal disimpan. Muat ulang saldo dan coba lagi.');
 		}
-
-		echo json_encode($status);
+		if ($this->config->item('csrf_protection')) {
+			$data['csrf'] = array('name'=>$this->security->get_csrf_token_name(),'hash'=>$this->security->get_csrf_hash());
+		}
+		$this->output->set_content_type('application/json')->set_output(json_encode($data));
 	}
+
 	public function saveEditInventory()
 	{
 		$this->auth->restrict($this->addPermission);
@@ -1750,6 +870,7 @@ class Adjustmentstock extends Admin_Controller
 
 	public function history_datatable()
 	{
+		$this->auth->restrict($this->viewPermission);
 		// Inputan POST dari Datatables
 		$draw = $this->input->post('draw', true);
 		$length = $this->input->post('length', true);
@@ -1757,7 +878,7 @@ class Adjustmentstock extends Admin_Controller
 		$search = $this->input->post('search', true)['value'];
 
 		// Query utama untuk mendapatkan data
-		$this->db->select('a.id_transaksi, a.tanggal_transaksi, a.id_material, a.nama_material, a.adjustment, a.nama_gudang, a.nama_gudang_baru, a.note, a.total_berat');
+		$this->db->select('a.id_transaksi, a.tanggal_transaksi, a.id_material, a.nama_material, a.adjustment, a.nama_gudang, a.nama_gudang_baru, a.note, a.total_qty, a.total_jumlah_berat');
 		$this->db->from('adjustment_stock a');
 
 		// Hitung total records sebelum filtering
@@ -1804,7 +925,8 @@ class Adjustmentstock extends Admin_Controller
 				'adjustment' => $row['adjustment'],
 				'gudang' => $gudang,
 				'keterangan' => $row['note'],
-				'jumlah_stock' => $row['total_berat']
+				'qty' => $row['total_qty'],
+				'jumlah_stock' => $row['total_jumlah_berat']
 			];
 		}
 		// Output dalam format JSON
@@ -1820,6 +942,7 @@ class Adjustmentstock extends Admin_Controller
 
 	public function adjust_datatable()
 	{
+		$this->auth->restrict($this->viewPermission);
 		// Inputan POST dari Datatables
 		$draw = $this->input->post('draw', true);
 		$length = $this->input->post('length', true);
@@ -1876,7 +999,7 @@ class Adjustmentstock extends Admin_Controller
 			$get_total_stock = $this->Inventory_4_model->get_total_stock($row['id_category3']);
 			$jumlah_stok = !empty($get_total_stock->total_stock) ? $get_total_stock->total_stock : '0';
 
-			$action = '<a class="btn btn-primary btn-sm edit" href="javascript:void(0)" title="Add Adjustment" data-id_inventory3="' . $row['id_category3'] . '"><i class="fa fa-edit"></i></a>';
+			$action = '<button type="button" class="btn btn-primary edit" data-id_inventory3="' . htmlspecialchars($row['id_category3'], ENT_QUOTES, 'UTF-8') . '">Adjustment</button>';
 
 			$data_result[] = [
 				'no' => $no++,
