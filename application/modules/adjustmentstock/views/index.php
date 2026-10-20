@@ -1,31 +1,30 @@
 <?php
-$ENABLE_ADD     = has_permission('Adjustmentstock.Add');
-$ENABLE_MANAGE  = has_permission('Adjustmentstock.Manage');
-$ENABLE_VIEW    = has_permission('Adjustmentstock.View');
-$ENABLE_DELETE  = has_permission('Adjustmentstock.Delete');
+$ENABLE_ADD     = has_permission('Adjustment_Stock.Add');
+$ENABLE_MANAGE  = has_permission('Adjustment_Stock.Manage');
+$ENABLE_VIEW    = has_permission('Adjustment_Stock.View');
+$ENABLE_DELETE  = has_permission('Adjustment_Stock.Delete');
 $id_bentuk = $this->uri->segment(3);
 ?>
-<style type="text/css">
-	thead input {
-		width: 100%;
-	}
-</style>
-<div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
+<link rel="stylesheet" href="<?= base_url('assets/css/adjustmentstock.css') ?>">
+<div class="adjustmentstock-page">
+<p class="adjustmentstock-page-intro">Koreksi Qty dan berat material, atau pindahkan stok antargudang.</p>
 <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="<?= base_url('assets/plugins/select2/select2.min.css') ?>" rel="stylesheet" />
 
-<div class="nav-tabs-supplier">
+<div class="adjustmentstock-tabs">
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="#history" data-toggle="tab" aria-expanded="true">History Adjustment Stock</a></li>
-		<li><a href="#adjust" data-toggle="tab" aria-expanded="true">Add Adjust</a></li>
+		<li class="active"><a href="#history" data-toggle="tab" aria-expanded="true">Riwayat adjustment</a></li>
+		<li><a href="#adjust" data-toggle="tab" aria-expanded="false">Tambah adjustment</a></li>
 	</ul>
 </div>
 
 <div class="tab-content">
 	<div class="tab-pane active" id="history">
-		<div class="box">
+		<div class="box adjustmentstock-table-panel">
 
 			<div class="box-body">
+				<h2 class="adjustmentstock-panel-title">Riwayat perubahan stok</h2>
+				<p class="adjustmentstock-panel-help">Telusuri Qty, berat, gudang, dan alasan setiap adjustment.</p>
 				<table id="exampleaa" class="table table-bordered table-striped">
 					<thead>
 						<tr>
@@ -36,7 +35,8 @@ $id_bentuk = $this->uri->segment(3);
 							<th>Adjust</th>
 							<th>Gudang</th>
 							<th>Keterangan</th>
-							<th>Jumlah Stock</th>
+							<th>Qty Adjustment</th>
+							<th>Total Berat (kg)</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -48,21 +48,23 @@ $id_bentuk = $this->uri->segment(3);
 		</div>
 	</div>
 	<div class="tab-pane" id="adjust">
-		<div class="box">
+		<div class="box adjustmentstock-table-panel">
 
 			<div class="box-body">
+				<h2 class="adjustmentstock-panel-title">Pilih material untuk adjustment</h2>
+				<p class="adjustmentstock-panel-help">Cari material, lalu pilih Adjustment untuk menentukan lot dan nilai perubahan.</p>
 				<table id="examplebb" class="table table-bordered table-striped">
 					<thead>
 						<tr>
 							<th width="5">#</th>
-							<th>FERROUS / NON FERROUS</th>
+							<th>Jenis material</th>
 							<th>ID</th>
-							<th>Detail Nama Material</th>
-							<th>Bentuk Material</th>
+							<th>Nama material</th>
+							<th>Bentuk</th>
 							<th>Supplier</th>
-							<th>Jumlah Stok</th>
-							<?php if ($ENABLE_MANAGE) : ?>
-								<th width="13%">Action</th>
+							<th>Berat stok (kg)</th>
+							<?php if ($ENABLE_ADD) : ?>
+								<th class="adjustmentstock-actions-column">Tindakan</th>
 							<?php endif; ?>
 						</tr>
 					</thead>
@@ -75,48 +77,24 @@ $id_bentuk = $this->uri->segment(3);
 		</div>
 	</div>
 </div>
-<!-- awal untuk modal dialog -->
-<!-- Modal -->
-<div class="modal modal-primary" id="dialog-rekap" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-lg">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-				<h4 class="modal-title" id="myModalLabel"><span class="fa fa-file-pdf-o"></span>&nbsp;Rekap Data Customer</h4>
-			</div>
-			<div class="modal-body" id="MyModalBody">
-				...
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">
-					<span class="glyphicon glyphicon-remove"></span> Close</button>
-			</div>
-		</div>
-	</div>
+<div class="modal fade adjustmentstock-modal" id="dialog-popup" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="adjustmentstock-modal-title">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Tutup form adjustment"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title" id="adjustmentstock-modal-title">Adjustment Stock</h2>
+                <p>Saldo diperbarui setelah adjustment disimpan.</p>
+            </div>
+            <div class="modal-body" id="ModalView" aria-live="polite"></div>
+        </div>
+    </div>
 </div>
-
-<div class="modal modal-default fade" id="dialog-popup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-lg">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-				<h4 class="modal-title" id="myModalLabel"><span class="fa fa-users"></span>&nbsp;Adjustment Stock</h4>
-			</div>
-			<div class="modal-body" id="ModalView">
-				...
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-danger" data-dismiss="modal">
-					<span class="glyphicon glyphicon-remove"></span> Close</button>
-			</div>
-		</div>
-	</div>
 </div>
 
 <!-- DataTables -->
 <script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
 <script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js') ?>"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="<?= base_url('assets/plugins/select2/select2.full.min.js') ?>"></script>
 
 <!-- page script -->
 <script type="text/javascript">
@@ -129,9 +107,12 @@ $id_bentuk = $this->uri->segment(3);
 		});
 	});
 
-	$(document).on('click', '.edit', function(e) {
+	$(document).on('click', '.adjustmentstock-page .edit', function(e) {
+		e.preventDefault();
+		$('#dialog-popup').modal('show');
+		$('#ModalView').text('Memuat form adjustment…');
 		var id = $(this).data('id_inventory3');
-		$("#head_title").html("<i class='fa fa-list-alt'></i><b>Edit Inventory</b>");
+
 		$.ajax({
 			type: 'POST',
 			url: siteurl + 'adjustmentstock/AdjustNow/' + id,
@@ -139,7 +120,8 @@ $id_bentuk = $this->uri->segment(3);
 				$("#dialog-popup").modal();
 				$("#ModalView").html(data);
 
-			}
+			},
+            error: function() { $('#ModalView').text('Form adjustment belum dapat dimuat. Tutup form dan pilih material kembali.'); }
 		})
 	});
 
@@ -280,9 +262,31 @@ $id_bentuk = $this->uri->segment(3);
 		$("#form-area").hide();
 	});
 
+    function adjustmentNumber(data, type, decimals, formatted) {
+        if (type !== 'display') return data;
+        if (data == null || data === '') return '—';
+        var value = Number(formatted ? String(data).replace(/,/g, '') : data);
+        return Number.isFinite(value) ? value.toLocaleString('id-ID', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) : '—';
+    }
+    function adjustmentTableLanguage(subject, placeholder) {
+        return {
+            processing: 'Memuat ' + subject + '…', search: 'Cari', searchPlaceholder: placeholder,
+            lengthMenu: 'Tampilkan _MENU_ baris', info: '_START_–_END_ dari _TOTAL_ data',
+            infoEmpty: 'Belum ada data ditampilkan', infoFiltered: '(dari _MAX_ data)',
+            emptyTable: 'Belum ada ' + subject + ' tercatat.',
+            zeroRecords: 'Tidak ada hasil yang cocok. Ubah atau kosongkan pencarian.',
+            paginate: { previous: 'Sebelumnya', next: 'Berikutnya', first: 'Awal', last: 'Akhir' }
+        };
+    }
+    $('.adjustmentstock-tabs a[data-toggle="tab"]').on('shown.bs.tab', function () {
+        $('#exampleaa,#examplebb').each(function () { $(this).DataTable().columns.adjust(); });
+    });
 	function datatable_history() {
 		$('#exampleaa').DataTable({
 			serverSide: true,
+			scrollX: true,
+			autoWidth: false,
+			language: adjustmentTableLanguage('riwayat adjustment', 'Cari transaksi, material, atau keterangan'),
 			processing: true,
 			orderCellsTop: true,
 			fixedHeader: true,
@@ -294,6 +298,7 @@ $id_bentuk = $this->uri->segment(3);
 				type: 'POST',
 				dataType: 'json'
 			},
+			columnDefs: [{ targets: 7, className: 'adjustmentstock-number', render: function (data, type) { return adjustmentNumber(data, type, 0, false); } }, { targets: 8, className: 'adjustmentstock-number', render: function (data, type) { return adjustmentNumber(data, type, 2, false); } }, { targets: '_all', render: function (data, type) { return type === 'display' ? $('<span>').text(data == null ? '' : data).html() : data; } }],
 			columns: [{
 					data: 'no'
 				},
@@ -316,6 +321,9 @@ $id_bentuk = $this->uri->segment(3);
 					data: 'keterangan'
 				},
 				{
+					data: 'qty'
+				},
+				{
 					data: 'jumlah_stock'
 				}
 			]
@@ -325,6 +333,10 @@ $id_bentuk = $this->uri->segment(3);
 	function datatable_adjust() {
 		$('#examplebb').DataTable({
 			serverSide: true,
+			scrollX: true,
+			autoWidth: false,
+			language: adjustmentTableLanguage('material', 'Cari nama material, bentuk, atau jenis'),
+			columnDefs: [{ targets: [6], className: 'adjustmentstock-number', render: function (data, type) { return adjustmentNumber(data, type, 2, true); } }],
 			processing: true,
 			orderCellsTop: true,
 			fixedHeader: true,
@@ -356,10 +368,10 @@ $id_bentuk = $this->uri->segment(3);
 				},
 				{
 					data: 'jumlah_stok'
-				},
-				{
-					data: 'action'
 				}
+				<?php if ($ENABLE_ADD): ?>,
+				{ data: 'action' }
+				<?php endif; ?>
 			]
 		});
 	}
