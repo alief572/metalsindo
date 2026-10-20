@@ -13,6 +13,80 @@ class Receive_invoice_ap_model extends BF_Model
     $this->ENABLE_DELETE  = has_permission('Receive_Invoice_AP.Delete');
   }
 
+  public function get_index_data($search, $start, $length, $order = array())
+  {
+    // Legacy PO columns are latin1; symbols and formatted amounts must share UTF-8.
+    $currency_code = 'UPPER(TRIM(CONVERT(po.matauang USING utf8))) COLLATE utf8_general_ci';
+    $formatted_amount = 'CONVERT(FORMAT(invoice_amount, 2) USING utf8) COLLATE utf8_general_ci';
+    $columns = array(1 => 'id_rec_inv_ap', 2 => 'no_invoice', 3 => 'nm_suplier', 4 => 'invoice_amount');
+    $column = isset($order['column']) ? (int) $order['column'] : -1;
+    $sort = isset($columns[$column]) ? $columns[$column] : 'created_date';
+    $direction = isset($order['dir']) && strtolower($order['dir']) === 'asc' ? 'ASC' : 'DESC';
+    if (!isset($columns[$column])) $direction = 'DESC';
+    $start = max(0, (int) $start);
+    $length = (int) $length;
+    if ($length < -1 || $length === 0) $length = 10;
+    $total = $this->db->query('SELECT COUNT(*) AS total FROM tr_receive_invoice_ap_header')->row();
+
+    // Paginate headers before any detail lookup on ordinary index loads.
+    $page_first = $search === '' && $sort !== 'invoice_amount' && $length !== -1;
+    $header_source = 'tr_receive_invoice_ap_header';
+    if ($page_first) {
+      $header_source = '(SELECT * FROM tr_receive_invoice_ap_header ORDER BY '
+        . $sort . ' ' . $direction . ', id_rec_inv_ap DESC LIMIT ' . $length . ' OFFSET ' . $start . ')';
+    }
+    // Correlated lookups use only the invoice IDs selected above, without global GROUP BY.
+    $base = "SELECT h.*, COALESCE((
+        SELECT SUM(amount_detail.total_nilai) FROM tr_receive_invoice_ap_detail amount_detail
+        WHERE amount_detail.id_rec_inv_ap = h.id_rec_inv_ap
+      ), 0) + COALESCE(h.ppn, 0) AS invoice_amount,
+      (SELECT GROUP_CONCAT(DISTINCT CASE " . $currency_code . "
+          WHEN 'IDR' THEN 'Rp' WHEN 'RP' THEN 'Rp' WHEN 'USD' THEN 'US$'
+          WHEN 'SGD' THEN 'S$' WHEN 'EUR' THEN '€' WHEN 'JPY' THEN '¥'
+          WHEN 'CNY' THEN 'CN¥' WHEN 'GBP' THEN '£'
+          ELSE " . $currency_code . " END)
+        FROM tr_receive_invoice_ap_detail d
+        JOIN tr_incoming incoming ON incoming.id_incoming = d.id_incoming
+        JOIN dt_incoming inc ON inc.id_incoming = incoming.id_incoming
+        JOIN dt_trans_po detail_po ON detail_po.id_dt_po = inc.id_dt_po
+          AND detail_po.idmaterial = inc.id_material
+        JOIN tr_purchase_order po ON po.no_po = detail_po.no_po
+        WHERE d.id_rec_inv_ap = h.id_rec_inv_ap
+          AND incoming.id_suplier = h.id_suplier AND po.id_suplier = h.id_suplier
+          AND po.matauang IS NOT NULL AND TRIM(po.matauang) <> ''
+      ) AS currency_labels FROM " . $header_source . " h";
+
+    $display = "SELECT amounts.*, CASE WHEN currency_labels IS NULL
+        THEN CONCAT(" . $formatted_amount . ", ' (mata uang belum tersedia)')
+        ELSE CONCAT(REPLACE(currency_labels, ',', ' / '), ' ', " . $formatted_amount . ")
+        END AS nominal_display FROM (" . $base . ") amounts";
+    $where = '';
+    $params = array();
+    if ($search !== '') {
+      $where = " WHERE (id_rec_inv_ap LIKE ? ESCAPE '!' OR no_invoice LIKE ? ESCAPE '!'
+        OR nm_suplier LIKE ? ESCAPE '!' OR nominal_display LIKE ? ESCAPE '!'
+        OR CAST(invoice_amount AS CHAR) LIKE ? ESCAPE '!')";
+      $term = '%' . $this->db->escape_like_str($search) . '%';
+      $params = array($term, $term, $term, $term, $term);
+    }
+
+    $filtered = $search === '' ? $total : $this->db->query(
+      'SELECT COUNT(*) AS total FROM (' . $display . ') listing' . $where, $params
+    )->row();
+    $sql = 'SELECT * FROM (' . $display . ') listing' . $where
+      . ' ORDER BY ' . $sort . ' ' . $direction . ', id_rec_inv_ap DESC';
+    if (!$page_first && $length !== -1) {
+      $sql .= ' LIMIT ? OFFSET ?';
+      $params[] = $length;
+      $params[] = $start;
+    }
+    return array(
+      'rows' => $this->db->query($sql, $params)->result(),
+      'total' => (int) $total->total,
+      'filtered' => (int) $filtered->total
+    );
+  }
+
   public function get_data($table, $where_field = '', $where_value = '')
   {
     if ($where_field != '' && $where_value != '') {

@@ -107,48 +107,22 @@ class Receive_invoice_ap extends Admin_Controller
 
   public function get_data_incoming()
   {
-    $draw = $this->input->post('draw');
-    $start = $this->input->post('start');
-    $length = $this->input->post('length');
+    $this->auth->restrict($this->viewPermission);
+    $draw = (int) $this->input->post('draw');
+    $start = max(0, (int) $this->input->post('start'));
+    $length = (int) $this->input->post('length');
+    if ($length < -1 || $length === 0) $length = 10;
     $search = $this->input->post('search');
+    $term = is_array($search) && isset($search['value']) && is_scalar($search['value'])
+      ? trim((string) $search['value']) : '';
+    $order = $this->input->post('order');
+    $order = is_array($order) && isset($order[0]) && is_array($order[0]) ? $order[0] : array();
+    $listing = $this->Receive_invoice_ap_model->get_index_data($term, $start, $length, $order);
 
-    $this->db->select('a.*');
-    $this->db->from('tr_receive_invoice_ap_header a');
-    if (!empty($search)) {
-      $this->db->group_start();
-      $this->db->or_like('a.no_invoice', $search['value'], 'both');
-      $this->db->or_like('a.nm_suplier', $search['value'], 'both');
-      $this->db->group_end();
-    }
-    $this->db->order_by('a.created_date', 'desc');
-    $this->db->limit($length, $start);
-
-    $get_data = $this->db->get();
-
-    $this->db->select('a.*');
-    $this->db->from('tr_receive_invoice_ap_header a');
-    if (!empty($search)) {
-      $this->db->group_start();
-      $this->db->or_like('a.no_invoice', $search['value'], 'both');
-      $this->db->or_like('a.nm_suplier', $search['value'], 'both');
-      $this->db->group_end();
-    }
-    $this->db->order_by('a.created_date', 'desc');
-
-    $get_data_all = $this->db->get();
-
-    $hasil = [];
-
-    $no = ($start + 1);
-    foreach ($get_data->result() as $item) {
-
-      $this->db->select('SUM(a.total_nilai) as nominal_invoice');
-      $this->db->from('tr_receive_invoice_ap_detail a');
-      $this->db->where('a.id_rec_inv_ap', $item->id_rec_inv_ap);
-      $get_nominal_invoice = $this->db->get()->row();
-
-      $nominal_invoice = (!empty($get_nominal_invoice->nominal_invoice)) ? $get_nominal_invoice->nominal_invoice : 0;
-      $nominal_invoice += (isset($item->ppn) ? $item->ppn : 0);
+    $hasil = array();
+    $no = $start + 1;
+    foreach ($listing['rows'] as $item) {
+      $nominal_display = htmlspecialchars($item->nominal_display, ENT_QUOTES, 'UTF-8');
 
       $btn_view = '<a href="' . base_url('receive_invoice_ap/view/' . $item->id_rec_inv_ap) . '" class="btn btn-sm btn-info" title="View Receiving Invoice"><i class="fa fa-eye"></i></a>';
 
@@ -169,7 +143,7 @@ class Receive_invoice_ap extends Admin_Controller
         'no_receive_invoice' => $item->id_rec_inv_ap,
         'no_invoice' => $item->no_invoice,
         'nm_suplier' => $item->nm_suplier,
-        'nominal_invoice' => number_format($nominal_invoice, 2),
+        'nominal_invoice' => $nominal_display,
         'option' => $option
       ];
 
@@ -178,8 +152,8 @@ class Receive_invoice_ap extends Admin_Controller
 
     echo json_encode([
       'draw' => intval($draw),
-      'recordsTotal' => $get_data_all->num_rows(),
-      'recordsFiltered' => $get_data_all->num_rows(),
+      'recordsTotal' => $listing['total'],
+      'recordsFiltered' => $listing['filtered'],
       'data' => $hasil
     ]);
   }
