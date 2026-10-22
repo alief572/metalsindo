@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alur Proses Penawaran sampai SPK Marketing</title>
+<!-- @formatter:off -->
+<!-- prettier-ignore -->
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Tahoma,sans-serif;background:#f0f2f5;color:#1a1a2e;line-height:1.7;padding:40px 20px}.container{max-width:1100px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.08);padding:50px 60px}h1{font-size:26px;color:#1a1a2e;border-bottom:3px solid #4361ee;padding-bottom:15px;margin-bottom:10px}.subtitle{color:#636e72;margin-bottom:30px;font-size:14px}h2{font-size:20px;color:#4361ee;margin-top:45px;margin-bottom:16px;padding-left:12px;border-left:4px solid #4361ee}h3{font-size:16px;color:#2d3436;margin-top:25px;margin-bottom:10px}p,li{margin-bottom:10px;font-size:15px}ul,ol{padding-left:24px;margin:10px 0 16px}table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}th,td{border:1px solid #dee2e6;padding:9px 12px;text-align:left;vertical-align:top}th{background:#4361ee;color:#fff;font-weight:600;font-size:12px}tr:nth-child(even){background:#f8f9fa}.info{background:#e3f2fd;border-left:4px solid #2196f3;padding:14px 18px;margin:16px 0;border-radius:4px}.warn{background:#fff3e0;border-left:4px solid #ff9800;padding:14px 18px;margin:16px 0;border-radius:4px}.danger{background:#ffebee;border-left:4px solid #f44336;padding:14px 18px;margin:16px 0;border-radius:4px}.success{background:#e8f5e9;border-left:4px solid #4caf50;padding:14px 18px;margin:16px 0;border-radius:4px}pre{background:#1e1e2e;color:#cdd6f4;padding:18px;border-radius:8px;overflow-x:auto;font-size:12px;line-height:1.5;margin:14px 0;white-space:pre}code{background:#e9ecef;padding:2px 6px;border-radius:4px;font-size:12px;color:#e83e8c}.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600}.badge-open{background:#fff9c4;color:#f57f17}.badge-green{background:#c8e6c9;color:#2e7d32}.badge-red{background:#ffcdd2;color:#c62828}.toc{background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:20px 28px;margin:20px 0 35px}.toc h3{margin-top:0;color:#4361ee}.toc ol{padding-left:20px}.toc li{margin-bottom:5px}.toc a{color:#4361ee;text-decoration:none}.toc a:hover{text-decoration:underline}hr{border:none;border-top:2px dashed #dee2e6;margin:40px 0}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}.card{border:1px solid #dee2e6;border-radius:8px;padding:16px}.card h4{font-size:14px;margin-bottom:8px;color:#4361ee}.step{background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:16px 20px;margin:12px 0;border-left:4px solid #4361ee}.step h4{color:#4361ee;font-size:15px;margin-bottom:8px}@media(max-width:768px){.container{padding:24px 20px}.grid2{grid-template-columns:1fr}}@media print{body{background:#fff;padding:0}.container{box-shadow:none;padding:20px}}</style>
+</head>
+<body>
+<div class="container">
+<h1>&#128221; Alur Proses Penawaran sampai SPK Marketing</h1>
+<p class="subtitle">Modul Penawaran &amp; SPK Marketing &bull; Dokumentasi Analisa Alur</p>
+
+<table>
+<tr><th width="180">Item</th><th>Detail</th></tr>
+<tr><td>Modul Terkait</td><td><code>application/modules/penawaran</code> &amp; <code>application/modules/spk_marketing</code></td></tr>
+<tr><td>Framework</td><td>CodeIgniter 3 (HMVC / MX), base controller <code>Admin_Controller</code></td></tr>
+<tr><td>Scope</td><td>Dari pembuatan penawaran harga, approval, cetak, sampai menjadi SPK Marketing &amp; revisi</td></tr>
+<tr><td>Tabel Inti</td><td><code>tr_penawaran</code>, <code>child_penawaran</code>, <code>tr_spk_marketing</code>, <code>dt_spkmarketing</code>, <code>dt_spkmarketing_loading</code></td></tr>
+</table>
+
+<div class="toc">
+<h3>Daftar Isi</h3>
+<ol>
+<li><a href="#s1">Gambaran Besar Alur</a></li>
+<li><a href="#s2">Tahap 1 &mdash; Pembuatan Penawaran</a></li>
+<li><a href="#s3">Perhitungan Harga Penawaran</a></li>
+<li><a href="#s4">Tahap 2 &mdash; Transisi ke SPK Marketing</a></li>
+<li><a href="#s5">Tahap 3 &mdash; Status, Close &amp; Revisi</a></li>
+<li><a href="#s6">Diagram Sequence</a></li>
+<li><a href="#s7">State Machine</a></li>
+<li><a href="#s8">Struktur Data (ERD Ringkas)</a></li>
+<li><a href="#s9">Endpoint Penting</a></li>
+<li><a href="#s10">Catatan Teknis &amp; Risiko</a></li>
+</ol>
+</div>
+
+<hr>
+
+<h2 id="s1">1. Gambaran Besar Alur</h2>
+<p>Proses penjualan dimulai dari <strong>Penawaran (Quotation)</strong> ke customer, lalu bila disepakati dilanjutkan menjadi <strong>SPK Marketing</strong> (Surat Perintah Kerja Marketing) sebagai dasar perintah kerja ke produksi.</p>
+<pre>
+PENAWARAN (Quotation)                          SPK MARKETING
+---------------------                          -------------
+1. Buat Header Penawaran
+2. Tambah Item + Hitung Harga
+3. (Opsional) Approval Harga
+4. Cetak Surat Penawaran        ------------->  5. Buat SPK dari Penawaran
+                                                6. Pilih item "deal" + input PO
+                                                7. Simpan -> perintah kerja
+                                                8. (Opsional) Revisi SPK
+</pre>
+<div class="info"><strong>Relasi penghubung:</strong> <code>tr_spk_marketing.no_penawaran = tr_penawaran.no_penawaran</code>. Satu penawaran dapat menurunkan satu atau lebih SPK Marketing.</div>
+
+<hr>
+
+<h2 id="s2">2. Tahap 1 &mdash; Pembuatan Penawaran</h2>
+<p>Dikelola oleh controller <code>penawaran/Penawaran.php</code>.</p>
+
+<div class="step">
+<h4>Langkah 1 &mdash; Buat Header Penawaran</h4>
+<p><code>addHeader</code> &rarr; <code>SaveNewHeader</code>. Sales memilih customer, PIC, sales, mata uang, valid until, terms of payment, exclude VAT, pengiriman, dan note.</p>
+<ul>
+<li><code>no_penawaran</code> di-generate otomatis: <code>P</code> + tahun(2 digit) + urut 5 digit (contoh <code>P2500001</code>)</li>
+<li><code>no_surat</code> di-generate: <code>MKT-SPK/{yy}/{romawi_bulan}/{urut4}</code></li>
+<li>Disimpan ke <code>tr_penawaran</code> dengan <code>status = 'N'</code> (Open)</li>
+</ul>
+</div>
+
+<div class="step">
+<h4>Langkah 2 &mdash; Tambah Item / Detail Penawaran</h4>
+<p><code>addPenawaran</code> &rarr; <code>saveNewPenawaran</code>. Pilih material (kategori 3), bentuk, thickness, density, dimensi (length/width), forecast. Harga dihitung lalu disimpan ke <code>child_penawaran</code>.</p>
+<p>Mendukung material tipe <strong>Sheet</strong> (<code>id_bentuk = B2000002</code>) dengan field <code>price_sheet</code> &amp; <code>qty_sheet</code>.</p>
+</div>
+
+<div class="step">
+<h4>Langkah 3 &mdash; (Opsional) Approval Harga</h4>
+<p><code>FormApproval</code> &rarr; <code>SaveAprrovePenawaran</code>. Mengubah <code>status_approval = 1</code>, mencatat approver &amp; waktu.</p>
+</div>
+
+<div class="step">
+<h4>Langkah 4 &mdash; Cetak Surat Penawaran</h4>
+<p><code>PrintHeader</code> (PDF) atau <code>PrintHeaderWord</code> (Word) sebagai dokumen penawaran ke customer.</p>
+</div>
+
+<hr>
+
+<h2 id="s3">3. Perhitungan Harga Penawaran</h2>
+<p>Harga per item dihitung pada fungsi <code>hitung_komisi()</code>:</p>
+<pre>
+profit = bottom &times; (persen_profit / 100)
+harga  = bottom + komisi + profit
+</pre>
+<table>
+<tr><th>Komponen</th><th>Keterangan</th></tr>
+<tr><td><code>bottom</code></td><td>Bottom price / dasar harga material (dari pricelist)</td></tr>
+<tr><td><code>komisi</code></td><td>Komisi nominal yang diinput</td></tr>
+<tr><td><code>profit</code></td><td>Persentase profit, otomatis dari <code>ms_profit_material</code> berdasar alloy &amp; range berat (forecast)</td></tr>
+</table>
+
+<h3>Konversi ke USD</h3>
+<pre>
+harga_dolar = harga_penawaran / nominal_kurs_terpilih
+</pre>
+<table>
+<tr><th>Pilihan Kurs (<code>kurs_terpakai</code>)</th><th>Sumber Nilai</th></tr>
+<tr><td><code>spot</code></td><td>Kurs terbaru dari <code>mata_uang</code> (kode IDR)</td></tr>
+<tr><td><code>10</code></td><td>AVG kurs 10 hari terakhir dari <code>perubahan_kurs</code></td></tr>
+<tr><td><code>30</code></td><td>AVG kurs bulan sebelumnya dari <code>perubahan_kurs</code></td></tr>
+<tr><td>lainnya</td><td>nominal = 1 (tanpa konversi)</td></tr>
+</table>
+<div class="info">Pricelist dibedakan: <strong>Ferrous</strong> (<code>I2000001</code> &rarr; <code>ms_pricelistfr</code>) dan <strong>Non-Ferrous</strong> (<code>I2000002</code> &rarr; <code>ms_pricelistnfr</code>, menampilkan LME 10 hari / 30 hari / SPOT).</div>
+
+<hr>
+
+<h2 id="s4">4. Tahap 2 &mdash; Transisi ke SPK Marketing</h2>
+<p>Dikelola oleh controller <code>spk_marketing/Spk_marketing.php</code>. Inilah titik kunci perpindahan dari penawaran ke SPK.</p>
+
+<div class="step">
+<h4>Langkah 5 &mdash; Buka Form SPK</h4>
+<p><code>addHeader</code> hanya menampilkan customer yang memiliki penawaran berstatus Open (<code>status = 'N'</code>):</p>
+<pre>
+SELECT ... FROM tr_penawaran a
+JOIN child_penawaran c ON c.no_penawaran = a.no_penawaran
+WHERE a.status = 'N' AND c.id_bentuk &lt;&gt; 'B2000002'   -- non-sheet
+</pre>
+<p>Tersedia 3 varian form:</p>
+<table>
+<tr><th>Varian</th><th>Controller</th><th>Kriteria</th></tr>
+<tr><td>Reguler</td><td><code>addHeader</code></td><td>Item non-sheet (<code>id_bentuk &lt;&gt; B2000002</code>)</td></tr>
+<tr><td>Sheet</td><td><code>addHeader_Sheet</code></td><td>Item sheet (<code>id_bentuk = B2000002</code>)</td></tr>
+<tr><td>Slitting</td><td><code>addHeaderSlitting</code></td><td>Tipe slitting (&rarr; <code>SaveNewHeaderSlitting</code>)</td></tr>
+</table>
+</div>
+
+<div class="step">
+<h4>Langkah 6 &mdash; Tarik Item &amp; Pilih Deal</h4>
+<p><code>GetPenawaran</code> (AJAX) menarik seluruh <code>child_penawaran</code> dari nomor penawaran terpilih. Marketing <strong>mencentang item yang deal</strong>, lalu mengisi <code>no_po</code>, <code>tgl_po</code>, <code>plan_cust</code>, harga deal, diskon, qty, berat, dan delivery date.</p>
+</div>
+
+<div class="step">
+<h4>Langkah 7 &mdash; Simpan SPK</h4>
+<p><code>SaveNewHeader</code> menjalankan:</p>
+<ol>
+<li>Generate <code>id_spkmarketing</code> &amp; <code>no_surat</code></li>
+<li>INSERT ke <code>tr_spk_marketing</code> (header: customer, no_penawaran, no_po, tgl_po, plan_cust, type, total_discount)</li>
+<li>LOOP item &mdash; <strong>hanya yang dicentang deal</strong> yang disimpan: <code>if (empty($dp[deal])) continue;</code></li>
+<li>INSERT ke <code>dt_spkmarketing</code> (<code>deal=1</code>, <code>status_lanjutan=1</code>)</li>
+<li>INSERT salinan ke <code>dt_spkmarketing_loading</code> (basis proses loading/delivery)</li>
+</ol>
+</div>
+
+<div class="success">Setelah SPK tersimpan, pada list penawaran, penawaran tersebut otomatis menjadi badge <span class="badge badge-green">Closed</span> karena relasi <code>spkmarketing != NULL</code>.</div>
+
+<hr>
+
+<h2 id="s5">5. Tahap 3 &mdash; Status, Close &amp; Revisi</h2>
+
+<h3>Status Penawaran (badge di list)</h3>
+<table>
+<tr><th>Badge</th><th>Kondisi</th><th>Arti</th></tr>
+<tr><td><span class="badge badge-open">Open</span></td><td><code>status='N'</code> &amp; belum ada SPK</td><td>Bisa edit, close, atau dibuat SPK</td></tr>
+<tr><td><span class="badge badge-green">Closed</span></td><td><code>spkmarketing != NULL</code></td><td>Sudah menurunkan SPK Marketing</td></tr>
+<tr><td><span class="badge badge-red">Closed</span></td><td><code>status='Y'</code> tanpa SPK</td><td>Ditutup manual via Close Penawaran</td></tr>
+</table>
+
+<h3>Close Penawaran</h3>
+<p><code>modal_closing_penawaran</code> &rarr; <code>close_penawaran</code>: set <code>status = 'Y'</code> + keterangan. Dipakai bila penawaran tidak dilanjutkan.</p>
+
+<h3>Alur Revisi (setelah SPK ada)</h3>
+<table>
+<tr><th>Aksi</th><th>Fungsi</th><th>Efek</th></tr>
+<tr><td>Ajukan Revisi</td><td><code>revisi</code> &rarr; <code>SavePengajuanRevisi</code></td><td><code>status_revisi = 1</code> (menunggu)</td></tr>
+<tr><td>Approval Revisi</td><td><code>ApprovalRevisi</code> &rarr; <code>SaveApprovalRevisi</code></td><td><code>status_revisi = 2</code> (setuju) / <code>3</code> (tolak)</td></tr>
+</table>
+<div class="info">Fungsi <code>revisiHeader</code> di SPK menggabungkan (merge) item SPK lama dengan item baru dari penawaran berdasarkan <code>id_child_penawaran</code>. Item baru ditandai <code>is_new</code>.</div>
+
+<hr>
+
+<h2 id="s6">6. Diagram Sequence (Penawaran &rarr; SPK)</h2>
+<pre>
+Sales/Marketing     Penawaran(Ctrl)        DB                       SPK Marketing(Ctrl)
+   |                     |                  |                             |
+   |-- addHeader ------->|                  |                             |
+   |                     |- SaveNewHeader ->| INSERT tr_penawaran         |
+   |                     |  (status='N')    |   (no_penawaran, no_surat)  |
+   |                     |                  |                             |
+   |-- addPenawaran ---->|                  |                             |
+   |                     |- saveNewPenawaran| INSERT child_penawaran      |
+   |                     |  (hitung harga)  |                             |
+   |                     |                  |                             |
+   |-- (opsional) ------>|                  |                             |
+   |   approval harga    |- SaveAprrove --->| UPDATE status_approval=1    |
+   |                     |                  |                             |
+   |-- cetak PDF/Word -->|- PrintHeader --->| (output surat penawaran)    |
+   |                     |                  |                             |
+   |-- buat SPK ---------------------------------------------------------->| addHeader
+   |                     |                  | SELECT tr_penawaran          |  (status='N')
+   |                     |                  |   WHERE status='N'           |
+   |-- pilih penawaran ------------------------------------------------->  | GetPenawaran (AJAX)
+   |                     |                  | SELECT child_penawaran       |
+   |-- centang deal + PO ----------------------------------------------->  | SaveNewHeader
+   |                     |                  | INSERT tr_spk_marketing      |
+   |                     |                  | INSERT dt_spkmarketing       |
+   |                     |                  | INSERT dt_spkmarketing_loading
+   |                     |                  |                             |
+   |   (penawaran kini "Closed/hijau")                                     |
+</pre>
+
+<hr>
+
+<h2 id="s7">7. State Machine</h2>
+
+<h3>State Penawaran</h3>
+<pre>
+                 SaveNewHeader
+   [ * ] ------------------------------> (OPEN / status='N')
+                                              |
+             close_penawaran                  |  SaveNewHeader (SPK dibuat)
+         +------------------+-----------------+--------------------+
+         v                  v                                      v
+ (CLOSED manual /   (ada SPK: spkmarketing != NULL)          tetap OPEN
+  status='Y')              |
+                           |  revisi (SavePengajuanRevisi)
+                           v
+                 (status_revisi = 1  -> menunggu)
+                           |
+         SaveApprovalRevisi |
+         +------------------+------------------+
+         v                                     v
+ status_revisi = 2 (disetujui)       status_revisi = 3 (ditolak)
+</pre>
+
+<h3>State Item SPK</h3>
+<pre>
+       SaveNewHeader (item dicentang deal)
+ [ * ] -----------------------------------> dt_spkmarketing (deal=1, status_lanjutan=1)
+                                                     |
+                                                     |  (duplikasi otomatis)
+                                                     v
+                                          dt_spkmarketing_loading  -> proses Loading/DO
+</pre>
+
+<hr>
+
+<h2 id="s8">8. Struktur Data (ERD Ringkas)</h2>
+<pre>
++------------------+        +----------------------+
+|  tr_penawaran    | 1    * |  tr_spk_marketing    |
+| PK no_penawaran  |--------| PK id_spkmarketing   |
+|    status (N/Y)  |        |    no_penawaran (FK) |
+|    status_revisi |        |    no_po, tgl_po     |
++--------+---------+        |    type, total_disc  |
+         | 1                +----------+-----------+
+         |                             | 1
+         | *                           |
++--------v---------+                 * |
+| child_penawaran  | 1         +-------v------------+
+| PK id_child_...  |-----------|  dt_spkmarketing   |
++--------+---------+   (id_child_penawaran)         |
+         | *                  |   deal(1)           |
+         |                    |   harga_deal        |
++--------v--------------+   * |   nominal_discount  |
+| ms_inventory_category3|-----+---------+-----------+
+| PK id_category3       |               | (duplikasi saat insert)
++-----------------------+               v
+                              +-------------------------+
+                              | dt_spkmarketing_loading |
+                              +-------------------------+
+</pre>
+
+<h3>Tabel &amp; Fungsi Ringkas</h3>
+<table>
+<tr><th>Tabel</th><th>Peran</th></tr>
+<tr><td><code>tr_penawaran</code></td><td>Header penawaran (customer, sales, status, revisi)</td></tr>
+<tr><td><code>child_penawaran</code></td><td>Item penawaran (material, dimensi, harga, kurs)</td></tr>
+<tr><td><code>tr_spk_marketing</code></td><td>Header SPK (no_po, tgl_po, plan_cust, type, total_discount)</td></tr>
+<tr><td><code>dt_spkmarketing</code></td><td>Item SPK yang deal (harga_deal, diskon, qty, berat, delivery)</td></tr>
+<tr><td><code>dt_spkmarketing_loading</code></td><td>Salinan item SPK untuk proses loading / delivery</td></tr>
+</table>
+
+<hr>
+
+<h2 id="s9">9. Endpoint Penting</h2>
+
+<h3>Modul Penawaran</h3>
+<table>
+<tr><th>URL</th><th>Fungsi</th></tr>
+<tr><td><code>penawaran/index</code></td><td>List penawaran</td></tr>
+<tr><td><code>penawaran/SaveNewHeader</code></td><td>Simpan header baru (generate nomor)</td></tr>
+<tr><td><code>penawaran/saveNewPenawaran</code></td><td>Tambah item detail</td></tr>
+<tr><td><code>penawaran/hitung_komisi</code></td><td>Hitung harga (bottom+komisi+profit)</td></tr>
+<tr><td><code>penawaran/cari_pricelist</code></td><td>Ambil book price / LME material</td></tr>
+<tr><td><code>penawaran/SaveAprrovePenawaran</code></td><td>Approval harga</td></tr>
+<tr><td><code>penawaran/close_penawaran</code></td><td>Close penawaran (<code>status='Y'</code>)</td></tr>
+<tr><td><code>penawaran/SavePengajuanRevisi</code> / <code>SaveApprovalRevisi</code></td><td>Ajukan &amp; approve revisi</td></tr>
+<tr><td><code>penawaran/PrintHeader</code> / <code>PrintHeaderWord</code></td><td>Cetak PDF / Word</td></tr>
+</table>
+
+<h3>Modul SPK Marketing</h3>
+<table>
+<tr><th>URL</th><th>Fungsi</th></tr>
+<tr><td><code>spk_marketing/index</code></td><td>List SPK</td></tr>
+<tr><td><code>spk_marketing/addHeader</code> / <code>addHeader_Sheet</code> / <code>addHeaderSlitting</code></td><td>Form SPK (reguler / sheet / slitting)</td></tr>
+<tr><td><code>spk_marketing/GetPenawaran</code></td><td>Tarik item penawaran untuk dipilih deal</td></tr>
+<tr><td><code>spk_marketing/SaveNewHeader</code></td><td>Simpan SPK + item deal</td></tr>
+<tr><td><code>spk_marketing/EditHeader</code> / <code>revisiHeader</code></td><td>Edit &amp; revisi SPK</td></tr>
+<tr><td><code>spk_marketing/PrintHeader</code></td><td>Cetak PDF SPK</td></tr>
+</table>
+
+<hr>
+
+<h2 id="s10">10. Catatan Teknis &amp; Risiko</h2>
+<div class="warn"><strong>Penomoran bersama:</strong> <code>generate_code()</code> mengambil <code>MAX(id_spkmarketing)</code> dari <code>tr_spk_marketing</code>. Baik <code>no_penawaran</code> maupun <code>id_spkmarketing</code> berprefix <code>P</code> sehingga urutan dipakai bersama antar kedua modul.</div>
+<div class="danger"><strong>SQL Injection:</strong> Banyak query masih memakai string concatenation (<code>"... '$id'"</code>). Jika melakukan perubahan di area ini, gunakan query binding / active record.</div>
+<div class="warn"><strong>Array key tanpa kutip:</strong> Di <code>SaveNewHeader</code> SPK, key array ditulis tanpa tanda kutip (<code>$dp[deal]</code>, <code>$dp[id_child_penawaran]</code>). Ini akan memunculkan warning pada PHP versi baru; sebaiknya gunakan string key (<code>$dp['deal']</code>).</div>
+<div class="info"><strong>Diskon:</strong> Perhitungan diskon lebih detail dibahas pada dokumen <code>analysis/analisa_diskon_manual_create_invoice.html</code>.</div>
+
+<hr>
+<p class="subtitle">Dokumentasi ini dibuat berdasarkan analisa kode pada modul <code>penawaran</code> dan <code>spk_marketing</code>. Dokumentasi markdown lengkap tersedia di <code>md/penawaran/</code> dan <code>md/spk_marketing/</code>.</p>
+
+</div>
+</body>
+</html>

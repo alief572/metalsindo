@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alur Material Planning sampai Laporan Hasil Produksi (LHP)</title>
+<!-- @formatter:off -->
+<!-- prettier-ignore -->
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Tahoma,sans-serif;background:#f0f2f5;color:#1a1a2e;line-height:1.7;padding:40px 20px}.container{max-width:1100px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,.08);padding:50px 60px}h1{font-size:26px;color:#1a1a2e;border-bottom:3px solid #4361ee;padding-bottom:15px;margin-bottom:10px}.subtitle{color:#636e72;margin-bottom:30px;font-size:14px}h2{font-size:20px;color:#4361ee;margin-top:45px;margin-bottom:16px;padding-left:12px;border-left:4px solid #4361ee}h3{font-size:16px;color:#2d3436;margin-top:25px;margin-bottom:10px}p,li{margin-bottom:10px;font-size:15px}ul,ol{padding-left:24px;margin:10px 0 16px}table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}th,td{border:1px solid #dee2e6;padding:9px 12px;text-align:left;vertical-align:top}th{background:#4361ee;color:#fff;font-weight:600;font-size:12px}tr:nth-child(even){background:#f8f9fa}.info{background:#e3f2fd;border-left:4px solid #2196f3;padding:14px 18px;margin:16px 0;border-radius:4px}.warn{background:#fff3e0;border-left:4px solid #ff9800;padding:14px 18px;margin:16px 0;border-radius:4px}.danger{background:#ffebee;border-left:4px solid #f44336;padding:14px 18px;margin:16px 0;border-radius:4px}.success{background:#e8f5e9;border-left:4px solid #4caf50;padding:14px 18px;margin:16px 0;border-radius:4px}pre{background:#1e1e2e;color:#cdd6f4;padding:18px;border-radius:8px;overflow-x:auto;font-size:12px;line-height:1.5;margin:14px 0;white-space:pre}code{background:#e9ecef;padding:2px 6px;border-radius:4px;font-size:12px;color:#e83e8c}.badge{display:inline-block;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:600}.badge-open{background:#fff9c4;color:#f57f17}.badge-green{background:#c8e6c9;color:#2e7d32}.badge-red{background:#ffcdd2;color:#c62828}.badge-blue{background:#bbdefb;color:#1565c0}.toc{background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:20px 28px;margin:20px 0 35px}.toc h3{margin-top:0;color:#4361ee}.toc ol{padding-left:20px}.toc li{margin-bottom:5px}.toc a{color:#4361ee;text-decoration:none}.toc a:hover{text-decoration:underline}hr{border:none;border-top:2px dashed #dee2e6;margin:40px 0}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}.card{border:1px solid #dee2e6;border-radius:8px;padding:16px}.card h4{font-size:14px;margin-bottom:8px;color:#4361ee}.step{background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:16px 20px;margin:12px 0;border-left:4px solid #4361ee}.step h4{color:#4361ee;font-size:15px;margin-bottom:8px}.stage{display:inline-block;background:#4361ee;color:#fff;border-radius:6px;padding:2px 10px;font-size:12px;font-weight:600;margin-right:6px}@media(max-width:768px){.container{padding:24px 20px}.grid2{grid-template-columns:1fr}}@media print{body{background:#fff;padding:0}.container{box-shadow:none;padding:20px}}</style>
+</head>
+<body>
+<div class="container">
+<h1>&#127981; Alur Material Planning sampai Laporan Hasil Produksi (LHP)</h1>
+<p class="subtitle">Modul Material Planning, SPK Produksi, SPK Aktual, Progress Order &amp; Report LHP Slitting</p>
+
+<table>
+<tr><th width="180">Item</th><th>Detail</th></tr>
+<tr><td>Modul Terlibat</td><td><code>material_planing</code> &rarr; <code>spk_produksi</code> &rarr; <code>spk_aktual</code> &rarr; <code>progress_order</code> / <code>report_lhp_slitting</code></td></tr>
+<tr><td>Framework</td><td>CodeIgniter 3 (HMVC / MX), base controller <code>Admin_Controller</code></td></tr>
+<tr><td>Hulu (sumber)</td><td>Modul <strong>SPK Marketing</strong> (<code>dt_spkmarketing</code>)</td></tr>
+<tr><td>Hilir (output)</td><td>Laporan Hasil Produksi (LHP) &amp; Progress Order</td></tr>
+<tr><td>Tabel Inti</td><td><code>dt_spkmarketing</code>, <code>tr_spk_produksi</code>, <code>dt_spk_produksi</code>, <code>tr_spk_aktual</code>, <code>dt_spk_aktual</code>, <code>tr_spk_aktual_fg</code>, <code>dt_spk_aktual_detail_fg</code></td></tr>
+</table>
+
+<div class="info"><strong>Catatan modul aktif:</strong> Terdapat banyak varian modul (<code>spk_produksi2/3</code>, <code>spk_aktual2..5</code>, <code>material_planing2</code>, <code>*_bckp</code>, <code>*_syam</code>, <code>*_experiment</code>). Dokumen ini fokus pada modul <strong>utama/aktif</strong>: <code>material_planing</code>, <code>spk_produksi</code>, <code>spk_aktual</code>, <code>progress_order</code>, <code>report_lhp_slitting</code>.</div>
+
+<div class="toc">
+<h3>Daftar Isi</h3>
+<ol>
+<li><a href="#s1">Gambaran Besar Alur</a></li>
+<li><a href="#s2">Tahap 1 &mdash; Material Planning</a></li>
+<li><a href="#s3">Tahap 2 &mdash; SPK Produksi</a></li>
+<li><a href="#s4">Tahap 3 &mdash; SPK Aktual (Realisasi) &amp; Input LHP</a></li>
+<li><a href="#s5">Tahap 4 &mdash; Progress Order &amp; Report LHP</a></li>
+<li><a href="#s6">Field Penghubung Antar Modul</a></li>
+<li><a href="#s7">Diagram Sequence End-to-End</a></li>
+<li><a href="#s8">State Machine &amp; Status</a></li>
+<li><a href="#s9">Struktur Data (ERD Ringkas)</a></li>
+<li><a href="#s10">Perhitungan LHP</a></li>
+<li><a href="#s11">Catatan Teknis &amp; Risiko</a></li>
+</ol>
+</div>
+
+<hr>
+
+<h2 id="s1">1. Gambaran Besar Alur</h2>
+<p>Setelah <strong>SPK Marketing</strong> dibuat (lihat dokumen <code>alur_penawaran_sampai_spk_marketing.html</code>), item yang deal masuk ke proses perencanaan material sampai dicatat realisasinya dalam Laporan Hasil Produksi.</p>
+<pre>
+SPK MARKETING          MATERIAL PLANNING       SPK PRODUKSI        SPK AKTUAL           LAPORAN
+(dt_spkmarketing)  ->  (perencanaan +      ->  (perintah kerja ->  (realisasi +    ->  (LHP +
+  item deal=1           approval planning)      produksi)           input LHP)          progress)
+</pre>
+<table>
+<tr><th>Tahap</th><th>Modul</th><th>Peran</th></tr>
+<tr><td><span class="stage">1</span></td><td><code>material_planing</code></td><td>Menentukan sumber pemenuhan order: ceklist stok Finish Good (Kirim/Booking) vs sisa yang harus diproduksi (Raw), lalu approval planning</td></tr>
+<tr><td><span class="stage">2</span></td><td><code>spk_produksi</code></td><td>Menerbitkan SPK Produksi dari material/stock, alokasi potongan material</td></tr>
+<tr><td><span class="stage">3</span></td><td><code>spk_aktual</code></td><td>Mencatat realisasi produksi + menginput LHP (finishgood, scrap, NG)</td></tr>
+<tr><td><span class="stage">4</span></td><td><code>progress_order</code> / <code>report_lhp_slitting</code></td><td>Tracking progress order &amp; laporan hasil produksi (export Excel)</td></tr>
+</table>
+
+<hr>
+
+<h2 id="s2">2. Tahap 1 &mdash; Material Planning</h2>
+<p>Controller: <code>material_planing/Material_planing.php</code>, model <code>Inventory_4_model</code>. Tahap ini menentukan <strong>dari mana kebutuhan material sebuah order akan dipenuhi</strong>: apakah dari stok Finish Good (FG) yang sudah ada, atau harus diproduksi dari Raw Material. Inilah inti dari "apa yang di-ceklist saat planning".</p>
+
+<h3>2.1. Daftar Item yang Masuk Planning</h3>
+<p>List planning dibaca dari <strong>database view</strong> <code>view_material_planning</code> (model <code>get_data_material_planning()</code>, DataTables server-side). Item yang muncul adalah order dari SPK Marketing dengan kriteria:</p>
+<pre>
+deal = '1'  AND  status_close_planning = 'OPN'  AND  approved = '1'
+</pre>
+<p>Tiap baris menampilkan: No SPK Marketing, Customer, Kode &amp; No Alloy material, thickness, width, length, delivery date, total weight (kebutuhan order), total sheet, dan jumlah FG yang sudah di-booking.</p>
+
+<table>
+<tr><th>Tombol per Baris</th><th>Fungsi</th><th>Efek</th></tr>
+<tr><td><span class="badge badge-open">Lihat Stock</span> (<code>.edit</code>)</td><td><code>EditHeader</code></td><td>Membuka form planning berisi daftar stok untuk di-<strong>ceklist</strong></td></tr>
+<tr><td><span class="badge badge-blue">Create PR</span></td><td><code>purchase_request/add_pr/{id}</code></td><td>Buat Purchase Request bila material perlu dibeli</td></tr>
+<tr><td><span class="badge badge-green">Approve</span> (<code>.delete</code>)</td><td><code>Approve</code></td><td>Set <code>dt_spkmarketing.status_lanjutan = 2</code> (siap produksi)</td></tr>
+<tr><td><span class="badge badge-red">Close</span> (<code>.tutup</code>)</td><td><code>Tutup</code></td><td>Set <code>dt_spkmarketing.status_close_planning = 'CLS'</code> &mdash; hanya muncul bila <code>status_lanjutan = 2</code></td></tr>
+</table>
+
+<h3>2.2. Form Planning &mdash; Apa yang Di-ceklist</h3>
+<p>Saat menekan <strong>Lihat Stock</strong>, form <code>EditHeader</code> menampilkan data order (No SPK, Alloy, Total SPK Marketing dalam Kg, Proses PO-PR, Width) lalu <strong>tiga kelompok stok</strong> untuk material yang sama (<code>id_category3</code>):</p>
+<table>
+<tr><th>Kelompok</th><th>Sumber Query (<code>stock_material</code>)</th><th>Bisa di-ceklist?</th></tr>
+<tr><td><strong>MATERIAL (Raw)</strong></td><td><code>id_gudang='1'</code> (gudang raw material), <code>width &gt; 0</code></td><td>Tidak &mdash; hanya informasi stok raw</td></tr>
+<tr><td><strong>FINISH GOOD</strong></td><td><code>id_gudang='3'</code>, <code>width &gt;= width_order</code>, <code>sisa_spk &gt; 0</code>, sisa belum habis dibooking</td><td><strong>Ya</strong> &mdash; ini yang di-ceklist</td></tr>
+<tr><td><strong>BOOKING</strong></td><td><code>id_gudang='3'</code> (dinonaktifkan/comment di view)</td><td>Tidak aktif</td></tr>
+</table>
+
+<p>Pada tabel <strong>FINISH GOOD</strong>, setiap baris stok FG punya <strong>dua checkbox</strong>:</p>
+<table>
+<tr><th>Checkbox</th><th>Field</th><th>Arti</th></tr>
+<tr><td><span class="badge badge-blue">Kirim</span></td><td><code>detail[n][id2]</code> (class <code>chk_personal2</code>)</td><td>Stok FG dipakai untuk <strong>dikirim</strong> ke customer. Memperbarui <code>booking</code> <strong>dan</strong> <code>delivery_book</code></td></tr>
+<tr><td><span class="badge badge-green">Booking</span></td><td><code>detail[n][id]</code> (class <code>chk_personal</code>)</td><td>Stok FG hanya di-<strong>booking</strong> (dialokasikan) untuk order ini. Memperbarui <code>booking</code> saja</td></tr>
+</table>
+
+<div class="info"><strong>Perhitungan real-time saat men-ceklist</strong> (JS <code>changeChecked()</code>):
+<pre>
+TOTAL PAKAI FINISHGOOD = &Sigma; berat stok FG yang dicentang (Kirim + Booking)
+TOTAL SPK MARKETING    = qty order (total_weight)
+TOTAL PAKAI RAW        = TOTAL SPK MARKETING - TOTAL PAKAI FINISHGOOD
+</pre>
+Artinya: makin banyak FG yang dicentang, makin kecil kebutuhan Raw Material yang harus diproduksi. Sisa (<em>TOTAL PAKAI RAW</em>) inilah yang nantinya diterbitkan menjadi SPK Produksi. Validasi: minimal satu checkbox harus dipilih sebelum Save.</div>
+
+<h3>2.3. Saat Save (SaveEditHeaderNew)</h3>
+<p>Submit form mengirim ke <code>SaveEditHeaderNew</code>. Untuk setiap baris FG yang dicentang:</p>
+<ol>
+<li>INSERT ke <code>stock_material_customer</code> &mdash; mencatat alokasi FG ke customer/order: <code>id_stock</code>, <code>id_customer</code>, <code>berat</code>, <code>width</code>, <code>qty</code>, <code>weight</code>, <code>id_dt_spkmarketing</code>, <code>keterangan</code>, <code>sts_over='1'</code></li>
+<li>UPDATE <code>stock_material</code> &mdash; menambah <code>booking</code> (dan <code>delivery_book</code> bila checkbox "Kirim"), serta mencatat <code>customer</code>, <code>no_surat</code>, <code>id_dt_spkmarketing</code></li>
+</ol>
+<p>Checkbox <strong>Kirim</strong> (<code>id2</code>) diproses lebih dulu dan mencakup booking + delivery; checkbox <strong>Booking</strong> (<code>id</code>) hanya menambah booking. Keduanya memakai batch insert/update untuk menghindari query N+1.</p>
+
+<h3>2.4. Approval &amp; Penutupan Planning</h3>
+<div class="step">
+<h4>Approve()</h4>
+<p>Set <code>dt_spkmarketing.status_lanjutan = 2</code> &mdash; menandai order sudah direncanakan &amp; siap lanjut ke SPK Produksi.</p>
+</div>
+<div class="step">
+<h4>Close()</h4>
+<p>Set <code>dt_spkmarketing.status_lanjutan = 3</code> (menutup item pada alur lanjutan).</p>
+</div>
+<div class="step">
+<h4>Tutup()</h4>
+<p>Set <code>dt_spkmarketing.status_close_planning = 'CLS'</code> &mdash; mengeluarkan item dari daftar planning (karena list hanya menampilkan <code>status_close_planning = 'OPN'</code>).</p>
+</div>
+
+<table>
+<tr><th>Field</th><th>Nilai</th><th>Arti</th></tr>
+<tr><td><code>deal</code></td><td><code>1</code></td><td>Item deal dari SPK Marketing (prasyarat masuk planning)</td></tr>
+<tr><td><code>approved</code></td><td><code>1</code></td><td>Sudah di-approve untuk masuk planning</td></tr>
+<tr><td><code>status_close_planning</code></td><td><code>OPN</code> / <code>CLS</code></td><td>Open (tampil di list) / Closed (tersembunyi)</td></tr>
+<tr><td><code>status_lanjutan</code></td><td><code>1</code> / <code>2</code> / <code>3</code></td><td>Baru / siap produksi (Approve) / ditutup (Close)</td></tr>
+</table>
+
+<div class="info"><strong>Ringkasan "apa yang di-ceklist":</strong> yang dicentang adalah <strong>baris stok Finish Good</strong> pada form Lihat Stock, dengan pilihan <em>Kirim</em> (langsung dipakai + delivery) atau <em>Booking</em> (dialokasikan). Ceklist ini menentukan berapa kebutuhan order yang dipenuhi dari FG dan berapa sisanya (<em>TOTAL PAKAI RAW</em>) yang harus diproduksi lewat SPK Produksi.</div>
+
+<hr>
+
+<h2 id="s3">3. Tahap 2 &mdash; SPK Produksi <span class="badge badge-red">Paling Kompleks</span></h2>
+<p>Controller: <code>spk_produksi/Spk_produksi.php</code>. Ini tahap paling rumit karena menggabungkan: (a) pemilihan coil/stock raw material, (b) perencanaan pemotongan (slitting) satu coil induk menjadi beberapa coil anak untuk banyak order, (c) <strong>alokasi potongan material via JSON</strong> yang menjaga agar satu coil bisa dipakai beberapa SPK tanpa dobel pakai, dan (d) approval yang <strong>memindahkan material antar gudang</strong> serta membuat stok hasil baru.</p>
+
+<div class="warn"><strong>Konsep kunci &mdash; Gudang (id_gudang):</strong>
+<table>
+<tr><th>id_gudang</th><th>Arti</th></tr>
+<tr><td><code>1</code></td><td>Raw Material (coil induk / mother coil, belum diproses)</td></tr>
+<tr><td><code>2</code></td><td>Material sedang/akan diproses (hasil approval SPK produksi)</td></tr>
+<tr><td><code>3</code></td><td>Finish Good (FG) &mdash; hasil jadi, bisa dibooking di Material Planning</td></tr>
+</table>
+</div>
+
+<h3>3.1. Pemilihan Coil (Stock) &mdash; dengan Cek Sisa Potongan</h3>
+<p>Saat membuka form (<code>addHeader</code>), coil raw yang tersedia dicari lewat <code>FindingStock</code>:</p>
+<pre>
+SELECT * FROM stock_material
+WHERE id_category3 = {id_material}
+  AND id_gudang = '1' AND aktif = 'Y'
+  AND ISNULL(on_proses)     -- belum sedang diproses SPK lain
+  AND sisa_spk > 0          -- masih ada sisa berat yang bisa dipakai
+</pre>
+<p>Untuk tiap coil, sistem membaca kolom <code>detail_potongan</code> (JSON) dan menjumlahkan berat yang <strong>sudah dipakai SPK lain</strong>. Coil hanya ditawarkan bila <code>weight &gt; jumlah_berat_terpakai</code>. Inilah mekanisme agar satu coil induk bisa dibagi ke beberapa SPK tanpa melebihi berat fisiknya.</p>
+
+<h3>3.2. Memilih Item Order &amp; Perhitungan Balance</h3>
+<p>Tombol "tambah baris" memanggil <code>GetSpk</code> yang menampilkan dropdown order dari SPK Marketing yang eligible:</p>
+<pre>
+SELECT ... FROM dt_spkmarketing a JOIN tr_spk_marketing b ...
+WHERE a.id_material = {id_material}
+  AND a.deal = '1'
+  AND b.status_approve = '1'
+  AND a.status_lanjutan = '2'   -- sudah di-approve di Material Planning
+  AND close_do = 'N'
+</pre>
+<p>Ketika sebuah order dipilih (<code>CariDetail</code>), 3 kolom dihitung otomatis per order:</p>
+<table>
+<tr><th>Kolom</th><th>Fungsi</th><th>Rumus / Sumber</th></tr>
+<tr><td>Total Order</td><td><code>CariTotalorder</code></td><td><code>qty_produk</code> dari <code>dt_spkmarketing</code> (kebutuhan order)</td></tr>
+<tr><td>Total Produksi</td><td><code>CariTotalproduksi</code></td><td><code>SUM(dt_spk_produksi.totalwidth)</code> WHERE <code>no_surat = id_dt_spkmarketing</code> (yang sudah pernah diproduksi)</td></tr>
+<tr><td>Stok FG</td><td><code>CariStokfg</code></td><td><code>SUM(stock_material.totalweight)</code> material sama di gudang FG (id_gudang=3)</td></tr>
+</table>
+<div class="info">Kombinasi <em>Total Order</em> vs <em>Total Produksi</em> vs <em>Stok FG</em> membantu perencana menentukan berapa berat lagi yang perlu diproduksi dari coil ini, menghindari over-produksi.</div>
+
+<h3>3.3. Perencanaan Slitting (perhitungan di form)</h3>
+<p>Untuk tipe <strong>slitting</strong>, satu coil induk (mother) dipotong menjadi beberapa coil anak. Beberapa fungsi bantu menghitung di sisi form:</p>
+<table>
+<tr><th>Fungsi</th><th>Perhitungan</th></tr>
+<tr><td><code>HitungPisau</code></td><td>Jumlah pisau = (qty coil + 1) &times; 2</td></tr>
+<tr><td><code>GetPotongan</code></td><td>Potongan pinggir: thickness &gt; 0.2 &rarr; 1, selainnya &rarr; 2</td></tr>
+<tr><td><code>HitungTPanjang</code> / <code>HitungTBerat</code></td><td>Total panjang &amp; berat = panjang &times; density &times; lebar &times; thickness</td></tr>
+<tr><td><code>HitungJPisau</code> / <code>HitungJMother</code></td><td>Akumulasi jumlah pisau &amp; jumlah coil induk terpakai</td></tr>
+</table>
+<p>Hasilnya mengisi field header: <code>planning_proses_width</code>, <code>planning_proses_weight</code>, <code>efisiensi_width</code>, <code>efisiensi_weight</code>, <code>sisa_kg</code>, <code>scrap_sisa</code>, <code>kg_process</code>, <code>count_m</code>, <code>length</code>.</p>
+
+<h3>3.4. Simpan (SaveNewHeader) &mdash; Inti Alokasi Potongan</h3>
+<p>Penomoran: <code>id_spkproduksi</code> = <code>P{yy}{urut5}</code>, <code>no_surat</code> via <code>BuatNomor()</code>. Tipe ditentukan dari <code>$post['tipe']</code> (slitting/reguler). Langkahnya:</p>
+<ol>
+<li><strong>INSERT <code>tr_spk_produksi</code></strong> (header): material, lotno, weight, thickness, width, proses slitting, efisiensi, sisa, <code>status_approve='1'</code>, <code>id_tr_spk_produksi = {code}-1</code>, <code>no_urut=1</code></li>
+<li><strong>INSERT <code>dt_tr_spk_produksi</code></strong> (header detail per coil induk)</li>
+<li><strong>Loop item order</strong> &rarr; build array <code>dt</code> (customer, thickness, weight, qtycoil, width, totalwidth, totalpanjang, delivery, <code>no_surat = id_dt_spkmarketing</code>, <code>checked</code> = 1 jika item dicentang)</li>
+<li><strong>Hitung ulang <code>detail_potongan</code> (JSON)</strong>: baca potongan lama dari coil, pertahankan potongan milik SPK lain (<code>kode != code</code>), tambahkan potongan baru milik SPK ini (berat = <code>totalweigthproses</code>). Hasil di-<code>json_encode</code>.</li>
+<li><strong>UPDATE <code>stock_material</code></strong> coil induk: <code>detail_potongan</code> (JSON baru), <code>sisa_potongan</code> (total akumulasi berat terpakai), <code>on_proses='Y'</code>, <code>sisa_spk</code> (sisa berat)</li>
+<li><strong>DELETE + INSERT batch <code>dt_spk_produksi</code></strong> (ganti detail item)</li>
+</ol>
+<pre>
+// Struktur satu elemen detail_potongan (JSON di stock_material)
+{ "kode": "{id_spkproduksi}", "id_stock": "{id coil}", "berat": {kg terpakai}, "id_gudang": 1 }
+</pre>
+<div class="info"><strong>Kenapa pakai JSON potongan?</strong> Satu coil induk fisik bisa dipotong untuk beberapa SPK produksi berbeda. <code>detail_potongan</code> menyimpan rincian siapa memakai berapa, sehingga <code>sisa_potongan</code> / <code>sisa_spk</code> selalu akurat dan coil tidak dipakai melebihi beratnya. Ini alasan utama logikanya kompleks.</div>
+
+<h3>3.5. Varian: Reguler, Slitting, Booking</h3>
+<table>
+<tr><th>Varian</th><th>Alur</th><th>Keterangan</th></tr>
+<tr><td>Reguler / Slitting</td><td><code>addHeader</code> &rarr; <code>SaveNewHeader</code></td><td>Dari coil raw (gudang 1). Field <code>type</code> membedakan reguler vs slitting</td></tr>
+<tr><td>Booking</td><td><code>addHeaderBooking</code> &rarr; <code>SaveNewHeaderBooking</code> &rarr; <code>Approve_Booking</code></td><td>Memakai stok yang sudah di-booking Material Planning (<code>stock_material_customer</code>, <code>sts_over=1</code>, <code>status_lanjutan=2</code>, <code>proses='OPN'</code>)</td></tr>
+</table>
+
+<h3>3.6. Approval SPK Produksi &mdash; Pemindahan Gudang &amp; Stok Hasil</h3>
+<p><code>Approve()</code> (dan <code>Approve_new()</code> untuk alur <code>dt_tr_spk_produksi</code>) melakukan manipulasi stok yang rumit:</p>
+<ol>
+<li>Set header <code>status_approve = 2</code> dan <code>id_stock_app = MAX(id_stock)+1</code> (referensi ke stok hasil yang akan dibuat)</li>
+<li>Baca ulang <code>detail_potongan</code> coil. Potongan milik SPK ini ditandai <code>id_gudang = 2</code> (sedang diproses), potongan SPK lain tetap <code>id_gudang = 1</code>. Berat potongan SPK ini dipakai sebagai <code>beratstock</code>.</li>
+<li><strong>Jika <code>qty &lt;= 1</code></strong> (coil tinggal 1): update <code>detail_potongan</code> coil + <strong>INSERT stok hasil baru</strong> ke <code>stock_material</code> dengan <code>id_gudang='2'</code>, <code>qty='1'</code>, berat = potongan.</li>
+<li><strong>Jika <code>qty &gt; 1</code></strong> (coil banyak): kurangi <code>qty</code> coil induk sebanyak 1, lalu INSERT stok hasil baru (<code>id_gudang='2'</code>) untuk coil yang dipecah.</li>
+</ol>
+<div class="step">
+<h4>RejectToProduksi()</h4>
+<p>Membatalkan/mengembalikan: set <code>status_approve='1'</code>, reset <code>input1/input2='0'</code>, simpan <code>reason</code>; mengembalikan <code>stock_material</code> (<code>sisa_potongan=NULL</code>, <code>detail_potongan=NULL</code>, <code>sisa_spk=weight</code>, <code>on_proses=NULL</code>), dan menandai stok hasil (<code>id_stock_app</code>) sebagai <code>deleted</code> (dikembalikan ke gudang 1).</p>
+</div>
+
+<h3>3.7. Ringkasan Fungsi &amp; Efek</h3>
+<table>
+<tr><th>Fungsi</th><th>Tabel ditulis</th><th>Efek Utama</th></tr>
+<tr><td><code>FindingStock</code></td><td>&mdash; (baca)</td><td>Tawarkan coil raw yang masih punya sisa (cek JSON potongan)</td></tr>
+<tr><td><code>GetSpk</code> / <code>CariDetail</code></td><td>&mdash; (baca)</td><td>Ambil item order eligible + hitung order/produksi/stok FG</td></tr>
+<tr><td><code>SaveNewHeader</code></td><td><code>tr_spk_produksi</code>, <code>dt_tr_spk_produksi</code>, <code>dt_spk_produksi</code>, <code>stock_material</code></td><td>Terbitkan SPK + tulis JSON potongan + set <code>on_proses='Y'</code></td></tr>
+<tr><td><code>Approve</code> / <code>Approve_new</code></td><td><code>tr_spk_produksi</code>, <code>dt_tr_spk_produksi</code>, <code>stock_material</code></td><td><code>status_approve=2</code> + pindah gudang potongan (1&rarr;2) + INSERT stok hasil</td></tr>
+<tr><td><code>Approve_Booking</code></td><td><code>tr/dt_tr_spk_produksi</code>, <code>stock_material</code></td><td>Approval alur booking stok FG</td></tr>
+<tr><td><code>RejectToProduksi</code></td><td><code>tr_spk_produksi</code>, <code>dt_tr_spk_produksi</code>, <code>stock_material</code></td><td>Kembalikan material + hapus stok hasil</td></tr>
+</table>
+
+<div class="danger"><strong>Titik rawan:</strong> konsistensi <code>detail_potongan</code> (JSON) adalah inti modul ini. Setiap perubahan pada Save/Approve/Reject <strong>harus</strong> menjaga agar jumlah berat seluruh potongan tidak melebihi <code>weight</code> coil, dan status gudang (1/2/3) sinkron. Kesalahan di sini menyebabkan stok "hantu" atau dobel-pakai coil.</div>
+
+<hr>
+
+<h2 id="s4">4. Tahap 3 &mdash; SPK Aktual (Realisasi) &amp; Input LHP <span class="badge badge-red">Detail</span></h2>
+<p>Tahap ini mencatat <strong>hasil nyata produksi</strong> (actual) dari sebuah coil yang sudah diproses. Inti LHP adalah membuat <strong>"neraca berat"</strong>: berat coil induk yang masuk harus bisa dipertanggungjawabkan ke dalam beberapa keluaran (Finish Good, sisa, scrap, NG internal, NG eksternal, lost/selisih). LHP juga mencatat waktu/proses produksi.</p>
+<div class="info"><strong>Dua controller sejak awal:</strong>
+<ul>
+<li><code>spk_aktual/Spk_aktual.php</code> &mdash; SPK Aktual <strong>reguler</strong> (menulis <code>tr_spk_aktual</code>).</li>
+<li><code>spk_aktual_slitting/Spk_aktual_slitting.php</code> (&amp; <code>...slitting2.php</code>) &mdash; SPK Aktual <strong>slitting</strong> (menulis <code>tr_spk_aktual_fg</code> / <code>dt_spk_aktual_detail_fg</code>). <strong>Inilah sumber Report LHP Slitting.</strong></li>
+</ul>
+Struktur field keduanya mirip; penjelasan di bawah memakai alur reguler sebagai acuan dan berlaku analog untuk slitting (dengan nama tabel bersuffiks <code>_fg</code>).</div>
+
+<h3>4.1. Tiga Dokumen dalam Satu Tahap</h3>
+<table>
+<tr><th>Dokumen</th><th>Fungsi</th><th>Tabel</th><th>Flag Status</th></tr>
+<tr><td>Input Realisasi (Aktual)</td><td><code>EditHeader</code> &rarr; <code>SaveEditHeader</code></td><td><code>tr_spk_aktual</code>, <code>dt_spk_aktual</code>, <code>dt_spk_aktual_detail</code>, <code>stock_material_temp</code></td><td><code>input1 = 1</code></td></tr>
+<tr><td>Input LHP (Jam/Proses)</td><td><code>TambahLHP</code> / <code>FormLHP</code> &rarr; <code>SaveLHP</code></td><td><code>dt_spk_produksi_lph</code></td><td><code>input2 = 1</code></td></tr>
+<tr><td>Approval LHP Produksi</td><td><code>ApproveLHPProduksi</code></td><td><code>stock_material</code> (final), <code>tr/dt_tr_spk_produksi</code></td><td><code>status_approve = 3</code></td></tr>
+</table>
+
+<h3>4.2. Input Realisasi &mdash; Neraca Berat (SaveEditHeader)</h3>
+<p>Saat operator mengisi hasil produksi, data header realisasi disimpan ke <code>tr_spk_aktual</code> dengan puluhan field. Yang terpenting adalah komponen "neraca berat":</p>
+<table>
+<tr><th>Komponen</th><th>Field (tr_spk_aktual)</th><th>Arti</th></tr>
+<tr><td>Finish Good</td><td><code>lfinishgood</code> / <code>bfinishgood</code></td><td>Lebar &amp; berat produk jadi (hasil utama)</td></tr>
+<tr><td>Sisa potong</td><td><code>lsisa_aktual</code> / <code>bsisa_aktual</code></td><td>Lebar &amp; berat sisa coil yang masih bisa dipakai lagi</td></tr>
+<tr><td>Scrap</td><td><code>lscrap_aktual</code> / <code>bscrap_aktual</code>, <code>coil_scrap</code></td><td>Lebar/berat buangan (trimming + sisa tak terpakai)</td></tr>
+<tr><td>NG Internal</td><td><code>lebar_ng_in</code> / <code>berat_ng_in</code> (+ JSON <code>in_*</code>, upload)</td><td>Reject karena proses internal (bisa banyak baris &rarr; JSON + upload bukti)</td></tr>
+<tr><td>NG Eksternal</td><td><code>lebar_ng_ek</code> / <code>berat_ng_ek</code> (+ JSON <code>ek_*</code>, upload)</td><td>Reject dari customer</td></tr>
+<tr><td>Selisih / Lost</td><td><code>difference</code>, <code>ng_packinglist</code></td><td>Selisih berat packing list vs aktual (material "hilang")</td></tr>
+<tr><td>Total slitting</td><td><code>tweightslitting</code>, <code>baktualmother</code></td><td>Total berat seluruh hasil &amp; berat aktual coil induk</td></tr>
+</table>
+
+<div class="info"><strong>Konsep neraca:</strong>
+<pre>
+Berat Coil Induk (mother)
+  = Finish Good + Sisa Potong + Scrap + NG Internal + NG Eksternal + Lost/Selisih
+</pre>
+LHP memastikan seluruh berat material dapat ditelusuri ke salah satu keluaran di atas. Selisih yang tidak wajar muncul sebagai <code>difference</code> / <code>ng_packinglist</code>.</div>
+
+<h3>4.3. Pemecahan Hasil ke Stock (stock_material_temp)</h3>
+<p>Setiap keluaran produksi di-INSERT ke tabel sementara <code>stock_material_temp</code> dengan <code>id_gudang</code> berbeda sebagai penanda jenisnya:</p>
+<table>
+<tr><th>id_gudang</th><th>Jenis Keluaran</th><th>Berat dari field</th></tr>
+<tr><td><code>3</code></td><td>Finish Good (per lot slitting)</td><td><code>totalaktual</code> per baris item</td></tr>
+<tr><td><code>4</code></td><td>Scrap</td><td><code>bscrap_aktual</code></td></tr>
+<tr><td><code>6</code></td><td>NG Packing List (selisih PL)</td><td><code>ng_packinglist1</code></td></tr>
+<tr><td><code>7</code></td><td>Lost / Difference</td><td><code>difference</code></td></tr>
+<tr><td><code>8</code></td><td>NG Internal</td><td><code>berat_ng_in</code></td></tr>
+<tr><td><code>9</code></td><td>NG Eksternal</td><td><code>berat_ng_ek</code></td></tr>
+<tr><td>(sama coil)</td><td>Sisa potong (lot baru <code>.A</code>)</td><td><code>bsisa_aktual</code></td></tr>
+</table>
+<p>Detail per item produk (lot slitting, qty aktual, berat, lebar, delivery) disimpan ke <code>dt_spk_aktual</code> (ringkas) dan <code>dt_spk_aktual_detail</code> (rinci per lot). Item FG baru (bila <code>slitting != 'Y'</code>) juga disiapkan sebagai stok FG (<code>id_gudang=3</code>) di temp.</p>
+<p>Di akhir <code>SaveEditHeader</code>: set <code>input1='1'</code> pada <code>tr_spk_produksi</code> &amp; <code>dt_tr_spk_produksi</code> (menandai realisasi sudah diinput).</p>
+
+<h3>4.4. Input LHP (Jam &amp; Proses Produksi) &mdash; SaveLHP</h3>
+<p>Lewat <code>TambahLHP</code> / <code>FormLHP</code>, operator mengisi urutan proses produksi beserta waktunya. <code>SaveLHP</code> menyimpan ke <code>dt_spk_produksi_lph</code> per proses:</p>
+<table>
+<tr><th>Field</th><th>Arti</th></tr>
+<tr><td><code>id_spk_aktual</code></td><td>Referensi ke SPK produksi/aktual</td></tr>
+<tr><td><code>namaproses</code> / <code>id_proses</code></td><td>Nama &amp; ID tahap proses (mis. slitting, cutting)</td></tr>
+<tr><td><code>start</code> / <code>finish</code></td><td>Jam mulai &amp; selesai (format H:i)</td></tr>
+<tr><td><code>total</code></td><td>Durasi proses</td></tr>
+<tr><td><code>keterangan</code></td><td>Catatan</td></tr>
+</table>
+<p>Jika satu coil (<code>id_stock</code>) dipakai beberapa SPK produksi, <code>SaveLHP</code> menyalin data proses ke semua <code>id_spkproduksi</code> terkait, lalu set <code>input2='1'</code> pada <code>tr_spk_produksi</code> &amp; <code>dt_tr_spk_produksi</code>.</p>
+<div class="info">Data jam proses ini menjadi dasar laporan <strong>Production Time / Cycle Time</strong> (modul <code>report_production_time</code>, <code>cycletime</code>).</div>
+
+<h3>4.5. Approval LHP Produksi (ApproveLHPProduksi) &mdash; Finalisasi Stok</h3>
+<p>Setelah realisasi &amp; LHP lengkap, approval memindahkan seluruh keluaran dari <code>stock_material_temp</code> ke <code>stock_material</code> (stok permanen), dikelompokkan per gudang:</p>
+<ol>
+<li>Ambil data temp per <code>id_gudang</code> (1, 3, 4, 6, 7, 8, 9) untuk <code>id_spkproduksi</code> ini</li>
+<li>Coil induk (<code>id_stock</code> asal) di-set <strong>habis</strong>: <code>qty=0</code>, <code>weight=0</code>, <code>totalweight=0</code>, <code>id_gudang='2'</code> (karena isinya sudah terpecah menjadi keluaran)</li>
+<li>INSERT batch ke <code>stock_material</code>: Finish Good (gudang 3, siap dijual/kirim), scrap (4), NG (6/8/9), sisa, dengan <code>no_surat</code> &amp; <code>keterangan = id_spkproduksi</code> sebagai jejak</li>
+<li>Set <code>status_approve = 3</code> pada <code>tr_spk_produksi</code> &amp; <code>dt_tr_spk_produksi</code> (LHP final/approved)</li>
+</ol>
+<div class="success">Setelah approval: <strong>Finish Good resmi masuk ke gudang (id_gudang=3)</strong> dan bisa dibooking kembali oleh Material Planning atau dikirim ke customer. Lingkaran material (coil induk &rarr; produk + sisa + scrap + NG) tertutup.</div>
+
+<h3>4.6. Sumber Data Report LHP</h3>
+<p>Laporan hasil produksi (modul <code>report_lhp_slitting</code>) membaca data finishgood dari pasangan tabel:</p>
+<pre>
+FROM dt_spk_aktual_detail_fg d
+JOIN tr_spk_aktual_fg h
+  ON h.id_spk_aktual = d.id_spk_aktual
+ AND h.id_dt_spkaktualdetail = d.id_dt_spkaktualdetail
+</pre>
+<div class="warn"><strong>Penting &mdash; dua jalur SPK Aktual:</strong>
+<ul>
+<li><strong>SPK Aktual reguler</strong> (<code>spk_aktual/Spk_aktual.php</code>, <code>SaveEditHeader</code>) menulis ke <code>tr_spk_aktual</code> / <code>dt_spk_aktual_detail</code>.</li>
+<li><strong>SPK Aktual Slitting</strong> (<code>spk_aktual_slitting/Spk_aktual_slitting.php</code> &amp; <code>Spk_aktual_slitting2.php</code>) menulis ke <code>tr_spk_aktual_fg</code> / <code>dt_spk_aktual_detail_fg</code>.</li>
+</ul>
+<strong>Report LHP Slitting membaca dari tabel <code>*_fg</code></strong>, sehingga laporan ini sebenarnya bersumber dari modul <code>spk_aktual_slitting</code>, bukan dari <code>spk_aktual</code> reguler. Modul <code>report_production_time</code> menggabungkan keduanya (<code>UNION</code> antara <code>tr_spk_aktual</code> dan <code>tr_spk_aktual_fg</code>). Perhatikan pembedaan ini saat mengubah alur LHP.</div>
+
+<hr>
+
+<h2 id="s5">5. Tahap 4 &mdash; Progress Order &amp; Report LHP</h2>
+
+<h3>Progress Order</h3>
+<p>Controller <code>progress_order/Progress_order.php</code>, model <code>Progress_order_model</code>. Menghitung progres per item order dengan menggabungkan beberapa sumber:</p>
+<pre>
+qty_booking   = SUM(stock_material_customer.berat)   WHERE id_dt_spkmarketing = item
+qty_aktual    = SUM(dt_spk_aktual.qtyaktual)         WHERE no_surat = id_dt_spkmarketing
+qty_produksi  = SUM(dt_spk_produksi.totalwidth)      WHERE no_surat = id_dt_spkmarketing
+
+stock         = qty_aktual + qty_booking
+balance_stock = totalwidth (qty order) - stock
+balance_order = qty_produksi - balance_stock
+</pre>
+<div class="info">Progress Order menjadi jembatan monitoring: membandingkan qty order (dari SPK Marketing), qty produksi (SPK Produksi), dan qty aktual (SPK Aktual) dalam satu tampilan.</div>
+
+<h3>Report LHP Slitting</h3>
+<p>Controller <code>report_lhp_slitting/Report_lhp_slitting.php</code>, model <code>Report_lhp_slitting_model</code>. Laporan dibaca dari:</p>
+<pre>
+FROM dt_spk_aktual_detail_fg d
+JOIN tr_spk_aktual_fg h
+  ON h.id_spk_aktual = d.id_spk_aktual
+ AND h.id_dt_spkaktualdetail = d.id_dt_spkaktualdetail
+</pre>
+<p>Fitur: filter rentang tanggal produksi + pencarian, DataTables server-side (<code>get_data</code>), dan <strong>export Excel</strong> (<code>export_excel</code>). Kolom laporan:</p>
+<table>
+<tr><th>#</th><th>Kolom</th><th>Sumber</th></tr>
+<tr><td>1</td><td>No SPK Produksi</td><td><code>h.no_surat_produksi</code></td></tr>
+<tr><td>2</td><td>No SPK Marketing</td><td><code>d.no_surat</code></td></tr>
+<tr><td>3</td><td>Customer</td><td><code>d.namacustomer</code></td></tr>
+<tr><td>4</td><td>Tanggal Produksi</td><td><code>h.date_production</code> / <code>h.tgl_produksi</code></td></tr>
+<tr><td>5</td><td>Product</td><td><code>d.nmmaterial</code> / <code>h.nama_material</code></td></tr>
+<tr><td>6&ndash;8</td><td>Width, Weight, Lot Number</td><td><code>d.weight</code>, <code>d.width</code>, <code>d.lot_slitting</code></td></tr>
+<tr><td>9</td><td>Actual Weight</td><td><code>d.totalaktual</code></td></tr>
+<tr><td>10&ndash;13</td><td>Finishgood, Sisa potong (lebar/berat), Scrap</td><td><code>h.bfinishgood</code>, <code>h.lsisa_aktual</code>, <code>h.bsisa_aktual</code>, <code>h.bscrap_aktual</code></td></tr>
+<tr><td>14&ndash;17</td><td>NG Internal &amp; Eksternal (lebar/berat)</td><td><code>h.lebar_ng_in</code>, <code>h.berat_ng_in</code>, <code>h.lebar_ng_ek</code>, <code>h.berat_ng_ek</code></td></tr>
+<tr><td>18</td><td>Total Weight</td><td><code>h.tweightslitting</code></td></tr>
+<tr><td>19</td><td>Selisih Packing List vs Aktual</td><td><code>h.ng_packinglist</code></td></tr>
+</table>
+
+<hr>
+
+<h2 id="s6">6. Field Penghubung Antar Modul</h2>
+<p>Satu "benang merah" (<code>id_dt_spkmarketing</code>) menghubungkan order dari SPK Marketing sampai realisasi produksi:</p>
+<table>
+<tr><th>Dari</th><th>Field</th><th>Ke</th><th>Field</th></tr>
+<tr><td><code>tr_spk_marketing</code></td><td><code>id_spkmarketing</code></td><td><code>dt_spkmarketing</code></td><td><code>id_spkmarketing</code></td></tr>
+<tr><td><code>dt_spkmarketing</code></td><td><code>id_dt_spkmarketing</code></td><td><code>dt_spk_produksi</code></td><td><code>no_surat</code></td></tr>
+<tr><td><code>tr_spk_produksi</code></td><td><code>id_spkproduksi</code> / <code>no_surat_produksi</code></td><td><code>tr_spk_aktual</code> / <code>tr_spk_aktual_fg</code></td><td><code>no_surat_produksi</code></td></tr>
+<tr><td><code>dt_spk_produksi</code></td><td><code>no_surat</code></td><td><code>dt_spk_aktual</code></td><td><code>no_surat</code></td></tr>
+<tr><td><code>tr_spk_aktual_fg</code></td><td><code>id_spk_aktual</code> + <code>id_dt_spkaktualdetail</code></td><td><code>dt_spk_aktual_detail_fg</code></td><td><code>id_spk_aktual</code> + <code>id_dt_spkaktualdetail</code></td></tr>
+<tr><td><code>dt_spkmarketing</code></td><td><code>id_dt_spkmarketing</code></td><td><code>tr_progess_order</code></td><td><code>id_dt_spkmarketing</code></td></tr>
+</table>
+
+<hr>
+
+<h2 id="s7">7. Diagram Sequence End-to-End</h2>
+<pre>
+Marketing      Material Planning     SPK Produksi        SPK Aktual           Report LHP
+   |                  |                    |                   |                     |
+   |-- SPK Marketing->|                    |                   |                     |
+   |  (dt_spkmarketing|                    |                   |                     |
+   |   deal=1)        |                    |                   |                     |
+   |                  |-- Read item ------>|                   |                     |
+   |                  |   (deal=1)         |                   |                     |
+   |                  |-- Approve -------->| status_lanjutan=2 |                     |
+   |                  |                    |                   |                     |
+   |                  |         |-- addHeader / SaveNewHeader ->| tr_spk_produksi    |
+   |                  |         |  (pilih stock + item order)   | dt_spk_produksi    |
+   |                  |         |  UPDATE stock_material        |                     |
+   |                  |         |-- Approve ------------------->| status_approve +    |
+   |                  |         |                               | stock hasil (gd 2)  |
+   |                  |         |                    |-- addHeader / SaveNewHeader -->| tr_spk_aktual
+   |                  |         |                    |  (dari SPK Produksi)           | dt_spk_aktual
+   |                  |         |                    |-- EditHeader (input aktual) -->| qtyaktual,scrap,NG
+   |                  |         |                    |-- SaveLHP -------------------->| dt_spk_produksi_lph
+   |                  |         |                    |-- Approve / ApproveLHP ------->| tr_spk_aktual_fg
+   |                  |         |                    |                                | dt_spk_aktual_detail_fg
+   |                  |         |                    |                    |-- Query -->| JOIN fg + detail_fg
+   |                  |         |                    |                    |-- Export ->| Excel / DataTables
+   |                  |         |                    |                    |
+   |   (Progress Order memantau: qty order vs produksi vs aktual)         |
+</pre>
+
+<hr>
+
+<h2 id="s8">8. State Machine &amp; Status</h2>
+
+<h3>Status Item (dt_spkmarketing) di Material Planning</h3>
+<pre>
+ [dari SPK Marketing: deal=1, approved=1, status_close_planning='OPN']
+        |
+        v
+  status_lanjutan = 1  (baru / belum diproses)
+        |
+        |  Material Planning: Approve()
+        v
+  status_lanjutan = 2  (siap produksi)  -------> dipakai SPK Produksi
+        |
+        |  Close()                         Tutup()
+        v                                     |
+  status_lanjutan = 3  (ditutup lanjutan)     v
+                              status_close_planning = 'CLS'
+                              (keluar dari daftar planning)
+</pre>
+<p>Dua mekanisme penutupan yang berbeda:</p>
+<ul>
+<li><code>Close()</code> &rarr; <code>status_lanjutan = 3</code> (menutup alur lanjutan item).</li>
+<li><code>Tutup()</code> &rarr; <code>status_close_planning = 'CLS'</code> (menghapus item dari daftar planning, karena list hanya menampilkan <code>'OPN'</code>).</li>
+</ul>
+
+<h3>Status SPK Produksi (tr_spk_produksi.status_approve)</h3>
+<table>
+<tr><th>Nilai</th><th>Arti</th><th>Efek pada stock_material</th></tr>
+<tr><td><code>1</code></td><td>Tersimpan dari <code>SaveNewHeader</code> (menunggu approve)</td><td>Coil induk: <code>on_proses='Y'</code>, JSON <code>detail_potongan</code> ditulis (potongan di gudang 1)</td></tr>
+<tr><td><code>2</code></td><td>Approved (<code>Approve</code> / <code>Approve_new</code>)</td><td>Potongan SPK ini pindah ke gudang 2; INSERT stok hasil baru (<code>id_gudang='2'</code>); <code>id_stock_app</code> di-set</td></tr>
+<tr><td>(reject)</td><td><code>RejectToProduksi</code></td><td>Material dikembalikan: <code>detail_potongan=NULL</code>, <code>sisa_spk=weight</code>, <code>on_proses=NULL</code>; stok hasil di-<code>deleted</code> (balik gudang 1)</td></tr>
+</table>
+<p>Flag tambahan: <code>on_proses='Y'</code> (material sedang diproses), <code>input2='1'</code> (LHP sudah diinput), <code>sts_over</code> (selesai), <code>id_stock_app</code> (referensi stok hasil potongan).</p>
+<pre>
+  SaveNewHeader                 Approve()
+  (status_approve=1)  --------> (status_approve=2)
+  coil induk:                   potongan SPK ini: gudang 1 -> 2
+  on_proses='Y'                 + INSERT stok hasil (gudang 2)
+  JSON detail_potongan                |
+        ^                             | RejectToProduksi()
+        |_____________________________|
+          (kembalikan material + hapus stok hasil)
+</pre>
+
+<h3>Status SPK Aktual</h3>
+<p>Realisasi dicatat bertahap: buat header &rarr; input aktual (<code>EditHeader</code>) &rarr; input LHP (<code>SaveLHP</code>) &rarr; approve (<code>Approve</code> / <code>ApproveLHPProduksi</code>). Setelah approve, data FG masuk ke <code>tr_spk_aktual_fg</code> / <code>dt_spk_aktual_detail_fg</code> untuk laporan.</p>
+
+<hr>
+
+<h2 id="s9">9. Struktur Data (ERD Ringkas)</h2>
+<pre>
+                              (dari SPK Marketing)
+                      +-----------------------------+
+                      |       dt_spkmarketing        |
+                      | PK id_dt_spkmarketing        |
+                      |    deal, status_lanjutan     |
+                      +--------------+---------------+
+                                     | no_surat
+                                     v
++--------------------+      +--------------------------+
+|  tr_spk_produksi   | 1  * |     dt_spk_produksi      |
+| PK id_spkproduksi  |------| PK id_dt_spkproduksi     |
+|    no_surat        |      |    no_surat (-> dt_spkmkt)|
+|    status_approve  |      |    totalwidth (qty)      |
+|    id_stock -------+--+   +------------+-------------+
++--------------------+  |                | no_surat
+         |              |  (update)      v
+         | no_surat_produksi    +--------------------+
+         v              +------>|   dt_spk_aktual    |
++--------------------+         | PK id_dt_spkaktual |
+|   tr_spk_aktual    | 1     * |    no_surat        |
+| PK id_spk_aktual   |---------|    qtyaktual       |
++--------------------+         |    scrap/NG/fg     |
+         |                     +--------------------+
+         | (approve LHP)
+         v
++---------------------+ 1   * +----------------------------+
+|  tr_spk_aktual_fg   |-------| dt_spk_aktual_detail_fg    |
+| PK id_spk_aktual    |       | FK id_spk_aktual           |
+|    no_surat_produksi|       |    id_dt_spkaktualdetail   |
+|    bfinishgood,scrap|       |    totalaktual, lot_slitting|
+|    NG in/ek, ...    |       +-------------+--------------+
++---------------------+                     |
+                                            v
+                               +---------------------------+
+                               |  REPORT LHP SLITTING      |
+                               |  (JOIN fg + detail_fg)    |
+                               +---------------------------+
+
+   stock_material / stock_material_customer  --> dipakai SPK Produksi & Progress Order
+   tr_progess_order  --> gabungan qty order / produksi / aktual (Progress Order)
+</pre>
+
+<h3>Tabel &amp; Peran Ringkas</h3>
+<table>
+<tr><th>Tabel</th><th>Peran</th></tr>
+<tr><td><code>dt_spkmarketing</code></td><td>Item order dari SPK Marketing (sumber planning)</td></tr>
+<tr><td><code>tr_spk_produksi</code> / <code>dt_tr_spk_produksi</code></td><td>Header SPK produksi + detail header (slitting/reguler)</td></tr>
+<tr><td><code>dt_spk_produksi</code></td><td>Item order yang diproduksi (penghubung ke dt_spkmarketing via no_surat)</td></tr>
+<tr><td><code>tr_spk_aktual</code> / <code>dt_spk_aktual</code></td><td>Header &amp; detail realisasi produksi (qty aktual, scrap, NG)</td></tr>
+<tr><td><code>dt_spk_produksi_lph</code></td><td>Detail proses LHP (nama proses, start/finish, durasi)</td></tr>
+<tr><td><code>tr_spk_aktual_fg</code> / <code>dt_spk_aktual_detail_fg</code></td><td>Data finishgood hasil produksi &mdash; sumber Report LHP</td></tr>
+<tr><td><code>stock_material</code> / <code>stock_material_customer</code></td><td>Stok material &amp; stok FG customer (booking)</td></tr>
+<tr><td><code>tr_progess_order</code></td><td>Tracking progress order</td></tr>
+</table>
+
+<hr>
+
+<h2 id="s10">10. Perhitungan LHP (Slitting) &mdash; Neraca Berat</h2>
+<p>LHP slitting mengukur hasil pemotongan satu coil induk menjadi beberapa produk + sisa. Prinsipnya adalah <strong>neraca berat</strong>: berat coil masuk harus = jumlah seluruh keluaran.</p>
+<pre>
+            Berat Coil Induk (mother coil)
+                       |
+   +-------+-----------+------------+-----------+-----------+----------+
+   v       v           v            v           v           v          v
+Finish   Sisa        Scrap +      NG          NG          Lost /
+Good     Potong      Trimming     Internal    Eksternal   Selisih PL
+(gd 3)   (gd sama)   (gd 4)       (gd 8)      (gd 9)      (gd 6/7)
+
+Neraca:
+  Berat Coil Induk = Finishgood + Sisa Potong + Scrap + NG In + NG Ek + Lost
+</pre>
+<table>
+<tr><th>Komponen</th><th>Field</th><th>Gudang temp</th><th>Keterangan</th></tr>
+<tr><td>Finish Good</td><td><code>lfinishgood</code> / <code>bfinishgood</code></td><td><code>3</code></td><td>Produk jadi (yield utama) &mdash; masuk stok FG</td></tr>
+<tr><td>Sisa Potong</td><td><code>lsisa_aktual</code> / <code>bsisa_aktual</code></td><td>sama coil (lot <code>.A</code>)</td><td>Masih bisa dipakai order lain</td></tr>
+<tr><td>Scrap + Trimming</td><td><code>lscrap_aktual</code> / <code>bscrap_aktual</code></td><td><code>4</code></td><td>Buangan</td></tr>
+<tr><td>NG Internal</td><td><code>lebar_ng_in</code> / <code>berat_ng_in</code></td><td><code>8</code></td><td>Reject internal (ada bukti upload)</td></tr>
+<tr><td>NG Eksternal</td><td><code>lebar_ng_ek</code> / <code>berat_ng_ek</code></td><td><code>9</code></td><td>Reject dari customer</td></tr>
+<tr><td>Selisih PL / Lost</td><td><code>ng_packinglist</code> / <code>difference</code></td><td><code>6</code> / <code>7</code></td><td>Selisih packing list vs aktual (material "hilang")</td></tr>
+<tr><td>Total Weight</td><td><code>tweightslitting</code></td><td>&mdash;</td><td>Total berat seluruh hasil (untuk cek neraca)</td></tr>
+</table>
+<div class="info"><strong>Indikator efisiensi / yield:</strong> rasio <code>Finishgood / Berat Coil Induk</code> menunjukkan efisiensi produksi. Field <code>efisiensi_width</code> / <code>efisiensi_weight</code> (dari SPK Produksi) + selisih aktual pada LHP dipakai untuk analisa yield. Kolom <code>ng_packinglist</code> menyoroti selisih yang perlu investigasi.</div>
+
+<hr>
+
+<h2 id="s11">11. Catatan Teknis &amp; Risiko</h2>
+<div class="warn"><strong>Banyak modul varian:</strong> <code>spk_produksi2/3</code>, <code>spk_aktual2..5</code>, <code>material_planing2</code>, dan versi <code>_bckp</code>/<code>_syam</code>/<code>_experiment</code>. Pastikan perubahan dilakukan pada modul <strong>aktif</strong> saja agar tidak salah target.</div>
+<div class="danger"><strong>SQL Injection:</strong> Banyak query masih menggunakan string concatenation langsung (<code>"... '$id'"</code>). Modul <code>report_lhp_slitting</code> adalah pengecualian baik &mdash; sudah memakai query binding &amp; validasi filter.</div>
+<div class="warn"><strong>Array key tanpa kutip:</strong> Di <code>SaveNewHeader</code> (SPK Produksi &amp; Aktual) key array ditulis tanpa kutip (<code>$used[no_surat]</code>). Berpotensi warning di PHP modern; gunakan string key.</div>
+<div class="info"><strong>detail_potongan JSON:</strong> Alokasi potongan material disimpan sebagai JSON di <code>stock_material.detail_potongan</code>. Perubahan pada logika potongan harus menjaga konsistensi JSON ini saat SPK dibuat, di-approve, atau di-reject.</div>
+<div class="warn"><strong>Tanggal legacy:</strong> Report LHP menangani tanggal "nol/invalid" MySQL lama dengan guard <code>YEAR()&gt;0 AND MONTH()&gt;0 ...</code> dan fallback <code>date_production</code> &rarr; <code>tgl_produksi</code>. Pertahankan guard ini saat menambah kolom tanggal.</div>
+
+<hr>
+<p class="subtitle">Dokumentasi ini dibuat berdasarkan analisa kode pada modul <code>material_planing</code>, <code>spk_produksi</code>, <code>spk_aktual</code>, <code>progress_order</code>, dan <code>report_lhp_slitting</code>. Melengkapi dokumen alur sebelumnya: <code>analysis/alur_penawaran_sampai_spk_marketing.html</code>.</p>
+
+</div>
+</body>
+</html>
