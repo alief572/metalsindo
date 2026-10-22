@@ -14,10 +14,10 @@ if (!defined('BASEPATH')) {
 class Adjustmentstock extends Admin_Controller
 {
 	//Permission
-	protected $viewPermission 	= 'Adjustment_Stock.View';
-	protected $addPermission  	= 'Adjustment_Stock.Add';
-	protected $managePermission = 'Adjustment_Stock.Manage';
-	protected $deletePermission = 'Adjustment_Stock.Delete';
+	protected $viewPermission 	= 'Adjustment.View';
+	protected $addPermission  	= 'Adjustment.Add';
+	protected $managePermission = 'Adjustment.Manage';
+	protected $deletePermission = 'Adjustment.Delete';
 
 
 	public function __construct()
