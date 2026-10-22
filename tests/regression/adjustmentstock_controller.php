@@ -41,7 +41,7 @@ $controller->input->verb='get'; $controller->SavePlus();
 controller_check($controller->output->status===405 && $controller->Adjustment_balance_model->calls===0,'GET save cannot mutate');
 $controller->input->verb='post'; $controller->SavePlus(); $response=json_decode($controller->output->body,true);
 controller_check($response['status']===1 && $response['code']==='A261000001' && $response['csrf']['hash']==='rotated','Compatible success JSON and rotated CSRF');
-controller_check($controller->auth->permission==='Adjustment_Stock.Add','Save Add permission');
+controller_check($controller->auth->permission==='Adjustment.Add','Save Add permission');
 $controller->Adjustment_balance_model->error=new InvalidArgumentException('Saldo tidak cukup'); $controller->SavePlus();
 $response=json_decode($controller->output->body,true);
 controller_check($response['status']===0 && $response['pesan']==='Saldo tidak cukup' && isset($response['csrf']),'Validation JSON permits retry with fresh CSRF');
@@ -53,10 +53,10 @@ $controller->input->values=array('id_material'=>array('MAT')); $before=$controll
 $controller->form_options(); $response=json_decode($controller->output->body,true);
 controller_check($response['status']===0 && $controller->Adjustment_balance_model->calls===$before,'Options array injection rejected');
 $controller->auth->allowed=false;
-foreach (array('SavePlus'=>'Adjustment_Stock.Add','form_options'=>'Adjustment_Stock.Add','history_datatable'=>'Adjustment_Stock.View','adjust_datatable'=>'Adjustment_Stock.View') as $method=>$permission) {
+foreach (array('SavePlus'=>'Adjustment.Add','form_options'=>'Adjustment.Add','history_datatable'=>'Adjustment.View','adjust_datatable'=>'Adjustment.View') as $method=>$permission) {
     try { $controller->$method(); throw new LogicException('Missing permission guard'); }
     catch (RuntimeException $e) { controller_check($e->getMessage()==='denied' && $controller->auth->permission===$permission,'Permission required before model/DB access'); }
 }
 try { $controller->AdjustNow('MAT'); throw new LogicException('Missing modal guard'); }
-catch (RuntimeException $e) { controller_check($e->getMessage()==='denied' && $controller->auth->permission==='Adjustment_Stock.Add','Modal Add permission'); }
+catch (RuntimeException $e) { controller_check($e->getMessage()==='denied' && $controller->auth->permission==='Adjustment.Add','Modal Add permission'); }
 echo "PASS adjustment controller: permission guards, POST-only save, JSON, validation, error handling and CSRF renewal\n";
