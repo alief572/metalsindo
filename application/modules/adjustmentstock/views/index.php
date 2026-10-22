@@ -1,8 +1,8 @@
 <?php
-$ENABLE_ADD     = has_permission('Adjustment_Stock.Add');
-$ENABLE_MANAGE  = has_permission('Adjustment_Stock.Manage');
-$ENABLE_VIEW    = has_permission('Adjustment_Stock.View');
-$ENABLE_DELETE  = has_permission('Adjustment_Stock.Delete');
+$ENABLE_ADD     = has_permission('Adjustment.Add') || has_permission('Adjustment_Stock.Add');
+$ENABLE_MANAGE  = has_permission('Adjustment.Manage') || has_permission('Adjustment_Stock.Manage');
+$ENABLE_VIEW    = has_permission('Adjustment.View') || has_permission('Adjustment_Stock.View');
+$ENABLE_DELETE  = has_permission('Adjustment.Delete') || has_permission('Adjustment_Stock.Delete');
 $id_bentuk = $this->uri->segment(3);
 ?>
 <link rel="stylesheet" href="<?= base_url('assets/css/adjustmentstock.css') ?>">
@@ -287,6 +287,7 @@ $id_bentuk = $this->uri->segment(3);
 			scrollX: true,
 			autoWidth: false,
 			language: adjustmentTableLanguage('riwayat adjustment', 'Cari transaksi, material, atau keterangan'),
+			searchDelay: 400,
 			processing: true,
 			orderCellsTop: true,
 			fixedHeader: true,
@@ -335,7 +336,8 @@ $id_bentuk = $this->uri->segment(3);
 			serverSide: true,
 			scrollX: true,
 			autoWidth: false,
-			language: adjustmentTableLanguage('material', 'Cari nama material, bentuk, atau jenis'),
+			language: adjustmentTableLanguage('material', 'Cari nama material, ID, bentuk, jenis, atau supplier'),
+			searchDelay: 400,
 			columnDefs: [{ targets: [6], className: 'adjustmentstock-number', render: function (data, type) { return adjustmentNumber(data, type, 2, true); } }],
 			processing: true,
 			orderCellsTop: true,

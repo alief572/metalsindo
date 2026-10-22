@@ -875,32 +875,49 @@ class Adjustmentstock extends Admin_Controller
 		$draw = $this->input->post('draw', true);
 		$length = $this->input->post('length', true);
 		$start = $this->input->post('start', true);
-		$search = $this->input->post('search', true)['value'];
+		$search_post = $this->input->post('search');
+		$search = is_array($search_post) && isset($search_post['value']) ? trim($search_post['value']) : '';
+
+		// Hitung total records sebelum filtering
+		$count_all_records = $this->db->count_all('adjustment_stock');
 
 		// Query utama untuk mendapatkan data
 		$this->db->select('a.id_transaksi, a.tanggal_transaksi, a.id_material, a.nama_material, a.adjustment, a.nama_gudang, a.nama_gudang_baru, a.note, a.total_qty, a.total_jumlah_berat');
 		$this->db->from('adjustment_stock a');
 
-		// Hitung total records sebelum filtering
-		$count_all_records = $this->db->count_all_results('', false);
-
 		// Filtering berdasarkan pencarian
 		if (!empty($search)) {
 			$this->db->group_start();
 			$this->db->like('a.id_transaksi', $search);
+			$this->db->or_like('a.id_material', $search);
+			$this->db->or_like('a.tanggal_transaksi', $search);
 			$this->db->or_like('a.nama_material', $search);
 			$this->db->or_like('a.adjustment', $search);
 			$this->db->or_like('a.nama_gudang', $search);
 			$this->db->or_like('a.nama_gudang_baru', $search);
 			$this->db->or_like('a.note', $search);
 			$this->db->group_end();
+			$count_filtered_records = $this->db->count_all_results('', false);
+		} else {
+			$count_filtered_records = $count_all_records;
 		}
 
-		// Hitung total records setelah filtering
-		$count_filtered_records = $this->db->count_all_results('', false);
+		// Whitelist sorting kolom
+		$order_index = isset($_POST['order'][0]['column']) ? (int)$_POST['order'][0]['column'] : 2;
+		$order_dir = (isset($_POST['order'][0]['dir']) && strtolower($_POST['order'][0]['dir']) === 'asc') ? 'ASC' : 'DESC';
+		$columns = [
+			1 => 'a.id_transaksi',
+			2 => 'a.tanggal_transaksi',
+			3 => 'a.nama_material',
+			4 => 'a.adjustment',
+			5 => 'a.nama_gudang',
+			6 => 'a.note',
+			7 => 'a.total_qty',
+			8 => 'a.total_jumlah_berat'
+		];
+		$order_col = isset($columns[$order_index]) ? $columns[$order_index] : 'a.tanggal_transaksi';
+		$this->db->order_by($order_col, $order_dir);
 
-		// Pengurutan dan pembatasan data
-		$this->db->order_by('a.tanggal_transaksi', 'DESC');
 		$this->db->limit($length, $start);
 		$query = $this->db->get();
 		$data = $query->result_array();
@@ -915,6 +932,8 @@ class Adjustmentstock extends Admin_Controller
 				$gudang = $row['nama_gudang'];
 			} elseif ($row['adjustment'] == 'MUTASI') {
 				$gudang = $row['nama_gudang'] . ' -> ' . $row['nama_gudang_baru'];
+			} else {
+				$gudang = $row['nama_gudang'];
 			}
 
 			$data_result[] = [
@@ -947,39 +966,61 @@ class Adjustmentstock extends Admin_Controller
 		$draw = $this->input->post('draw', true);
 		$length = $this->input->post('length', true);
 		$start = $this->input->post('start', true);
-		$search = $this->input->post('search', true)['value'];
+		$search_post = $this->input->post('search');
+		$search = is_array($search_post) && isset($search_post['value']) ? trim($search_post['value']) : '';
 
-		// Query utama untuk mendapatkan data
-		$this->db->select('a.*, b.nama as nama_type, c.nama as nama_category1,f.nm_bentuk as nm_bentuk, d.nama as nama_category2, e.nilai_dimensi as nilai_dimensi');
+		// Hitung total record aktif tanpa filter
+		$count_all_records = $this->db->where('deleted', '0')->count_all_results('ms_inventory_category3');
+
+		// Query dasar dengan join 1:1 dan subquery supplier untuk mencegah row explosion
+		$supplier_subquery = '(SELECT cs.id_category3, GROUP_CONCAT(DISTINCT ms.name_suplier SEPARATOR ", ") AS supplier_names FROM child_inven_suplier cs JOIN master_supplier ms ON ms.id_suplier = cs.id_suplier GROUP BY cs.id_category3) sup';
+
 		$this->db->from('ms_inventory_category3 a');
-		$this->db->join('ms_inventory_type b', 'b.id_type=a.id_type');
-		$this->db->join('ms_inventory_category1 c', 'c.id_category1 =a.id_category1');
-		$this->db->join('ms_inventory_category2 d', 'd.id_category2 =a.id_category2');
-		$this->db->join('child_inven_dimensi e', 'e.id_category3 =a.id_category3');
-		$this->db->join('ms_bentuk f', 'f.id_bentuk =a.id_bentuk');
+		$this->db->join('ms_inventory_type b', 'b.id_type = a.id_type', 'left');
+		$this->db->join('ms_inventory_category1 c', 'c.id_category1 = a.id_category1', 'left');
+		$this->db->join('ms_inventory_category2 d', 'd.id_category2 = a.id_category2', 'left');
+		$this->db->join('ms_bentuk f', 'f.id_bentuk = a.id_bentuk', 'left');
+		$this->db->join($supplier_subquery, 'sup.id_category3 = a.id_category3', 'left');
 		$this->db->where('a.deleted', '0');
 
-		// Hitung total records sebelum filtering
-		$count_all_records = $this->db->count_all_results('', false);
-
-		// Filtering berdasarkan pencarian
+		// Filtering pencarian komprehensif
 		if (!empty($search)) {
 			$this->db->group_start();
-			$this->db->like('a.nama', $search);
-			$this->db->or_like('b.nama', $search);
+			$this->db->like('a.id_category3', $search);
+			$this->db->or_like('a.nama', $search);
 			$this->db->or_like('c.nama', $search);
 			$this->db->or_like('d.nama', $search);
+			$this->db->or_like('b.nama', $search);
 			$this->db->or_like('f.nm_bentuk', $search);
-			$this->db->or_like('e.nilai_dimensi', $search);
+			$this->db->or_like('sup.supplier_names', $search);
+			$this->db->or_like('a.maker', $search);
+			$this->db->or_like('a.spek', $search);
+			$this->db->or_like('a.thickness', $search);
 			$this->db->group_end();
+			$count_filtered_records = $this->db->count_all_results('', false);
+		} else {
+			$count_filtered_records = $count_all_records;
 		}
 
-		// Hitung total records setelah filtering
-		$count_filtered_records = $this->db->count_all_results('', false);
+		// Ambil data dengan total stok
+		$stock_subquery = '(SELECT id_category3, SUM(totalweight) AS total_stock FROM stock_material GROUP BY id_category3) stk';
+		$this->db->select('a.id_category3, a.nama, c.nama as nama_category1, f.nm_bentuk, sup.supplier_names, COALESCE(stk.total_stock, 0) as jumlah_stok', false);
+		$this->db->join($stock_subquery, 'stk.id_category3 = a.id_category3', 'left');
 
-		// Pengurutan dan pembatasan data
-		$this->db->group_by('a.id_category3');
-		$this->db->order_by('a.created_on', 'DESC');
+		// Whitelist sorting kolom
+		$order_index = isset($_POST['order'][0]['column']) ? (int)$_POST['order'][0]['column'] : 0;
+		$order_dir = (isset($_POST['order'][0]['dir']) && strtolower($_POST['order'][0]['dir']) === 'asc') ? 'ASC' : 'DESC';
+		$columns = [
+			1 => 'c.nama',
+			2 => 'a.id_category3',
+			3 => 'a.nama',
+			4 => 'f.nm_bentuk',
+			5 => 'sup.supplier_names',
+			6 => 'stk.total_stock'
+		];
+		$order_col = isset($columns[$order_index]) ? $columns[$order_index] : 'a.created_on';
+		$this->db->order_by($order_col, $order_dir);
+
 		$this->db->limit($length, $start);
 		$query = $this->db->get();
 		$data = $query->result_array();
@@ -988,25 +1029,17 @@ class Adjustmentstock extends Admin_Controller
 		$no = (int)$start + 1;
 		$data_result = [];
 		foreach ($data as $row) {
-			$this->db->select('a.*, b.name_suplier as nama_supplier');
-			$this->db->from('child_inven_suplier a');
-			$this->db->join('master_supplier b', 'b.id_suplier =a.id_suplier');
-			$this->db->where('a.id_category3', $row['id_category3']);
-			$suppliers = $this->db->get()->result_array();
-			$supplier_names = array_column($suppliers, 'nama_supplier');
-			$supplier_list = implode(', ', $supplier_names);
-
-			$get_total_stock = $this->Inventory_4_model->get_total_stock($row['id_category3']);
-			$jumlah_stok = !empty($get_total_stock->total_stock) ? $get_total_stock->total_stock : '0';
+			$supplier_list = !empty($row['supplier_names']) ? $row['supplier_names'] : '-';
+			$jumlah_stok = !empty($row['jumlah_stok']) ? (float)$row['jumlah_stok'] : 0;
 
 			$action = '<button type="button" class="btn btn-primary edit" data-id_inventory3="' . htmlspecialchars($row['id_category3'], ENT_QUOTES, 'UTF-8') . '">Adjustment</button>';
 
 			$data_result[] = [
 				'no' => $no++,
-				'ferrous_nonferrous' => $row['nama_category1'],
+				'ferrous_nonferrous' => !empty($row['nama_category1']) ? $row['nama_category1'] : '-',
 				'id' => $row['id_category3'],
 				'detail_nama_material' => $row['nama'],
-				'bentuk_material' => $row['nm_bentuk'],
+				'bentuk_material' => !empty($row['nm_bentuk']) ? $row['nm_bentuk'] : '-',
 				'supplier' => $supplier_list,
 				'jumlah_stok' => number_format($jumlah_stok, 2),
 				'action' => $action
