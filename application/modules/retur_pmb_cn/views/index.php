@@ -12,16 +12,18 @@ $ENABLE_DELETE  = has_permission('Retur_Credit_Note.Delete');
 </style>
 <div id='alert_edit' class="alert alert-success alert-dismissable" style="padding: 15px; display: none;"></div>
 <link rel="stylesheet" href="https://cdn.datatables.net/2.3.7/css/dataTables.dataTables.min.css">
+<link rel="stylesheet" href="<?= base_url('assets/css/retur_pmb_cn.css') ?>">
 
-<div class="box">
+<div class="box retur-pmb-cn-wrapper">
 	<div class="box-body">
-		<a href="<?= base_url('retur_pmb_cn/list_retur') ?>" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> Add CN</a>
-		<br><br>
+		<div class="retur-pmb-cn-toolbar">
+			<a href="<?= base_url('retur_pmb_cn/list_retur') ?>" class="btn retur-pmb-cn-button retur-pmb-cn-add"><i class="fa fa-plus" aria-hidden="true"></i> Tambah DN</a>
+		</div>
 		<table id="table_retur_dn" class="table table-bordered table-striped">
 			<thead>
 				<tr>
 					<th class="text-center">#</th>
-					<th class="text-center">No. CN</th>
+					<th class="text-center">No. DN</th>
                     <th class="text-center">Nama Supplier</th>
                     <th class="text-center">Nomor PO</th>
                     <th class="text-center">Alasan Retur</th>

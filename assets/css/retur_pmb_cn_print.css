@@ -1,0 +1,39 @@
+.sj-print {
+    font-family: arial;
+    font-size: 11px;
+    color: #111111;
+}
+.sj-print table { width: 100%; border-collapse: collapse; }
+.sj-print .sj-company { font-size: 17px; margin-bottom: 12px; }
+.sj-print .sj-company td { vertical-align: middle; }
+.sj-print .sj-title td {
+    background-color: #c2c2c2;
+    text-align: center;
+    padding: 16px 0;
+    font-size: 16px;
+    font-weight: bold;
+}
+.sj-print .sj-number { text-align: center; margin: 14px 0 4px; font-size: 13px; }
+.sj-print .sj-address td { padding: 2px; vertical-align: top; }
+.sj-print .sj-recipient td { border: 1px solid #111111; }
+.sj-print .sj-instruction { margin: 20px 0 12px; }
+.sj-print .sj-detail { font-size: 9px; }
+.sj-print .sj-detail th {
+    background-color: #1c5675;
+    color: #ffffff;
+    padding: 8px 2px;
+    border: 1px solid #c4cbd1;
+    text-align: center;
+    vertical-align: middle;
+}
+.sj-print .sj-detail td {
+    padding: 7px 2px;
+    border: 1px solid #c4cbd1;
+    vertical-align: middle;
+}
+.sj-print .sj-right { text-align: right; }
+.sj-print .sj-center { text-align: center; }
+.sj-print .sj-totals td { background-color: #f7f8fa; }
+.sj-print .sj-signatures { text-align: center; font-size: 11px; }
+.sj-print .sj-signatures td { padding: 2px; vertical-align: top; }
+.sj-print .sj-sign-space { height: 85px; }
