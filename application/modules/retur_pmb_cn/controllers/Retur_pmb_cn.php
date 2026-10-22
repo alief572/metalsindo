@@ -327,13 +327,15 @@ class Retur_pmb_cn extends Admin_Controller
 	{
 		$btn_view = '';
 		$btn_print = '';
+		$btn_print_sj = '';
 		if (has_permission($this->viewPermission)) {
-			$btn_view = '<a href="' . base_url('retur_pmb_cn/view/' . $item->id) . '" class="btn btn-sm btn-info" title="View DN"><i class="fa fa-eye"></i></a>';
+			$btn_view = '<a href="' . base_url('retur_pmb_cn/view/' . $item->id) . '" class="btn retur-pmb-cn-button retur-pmb-cn-view" title="View DN"><i class="fa fa-eye" aria-hidden="true"></i> Detail</a>';
 
-			$btn_print = '<a href="' . base_url('retur_pmb_cn/print_dn/' . $item->id) . '" class="btn btn-sm btn-primary" target="_blank" title="Print DN"><i class="fa fa-print"></i></a>';
+			$btn_print = '<a href="' . base_url('retur_pmb_cn/print_dn/' . $item->id) . '" class="btn retur-pmb-cn-button retur-pmb-cn-print-dn" target="_blank" rel="noopener" title="Print DN"><i class="fa fa-print" aria-hidden="true"></i> Print DN</a>';
+			$btn_print_sj = '<a href="' . base_url('retur_pmb_cn/print_sj/' . rawurlencode($item->id)) . '" class="btn retur-pmb-cn-button retur-pmb-cn-print-sj" target="_blank" rel="noopener" title="Print Surat Jalan"><i class="fa fa-truck" aria-hidden="true"></i> Print SJ</a>';
 		}
 
-		$action = $btn_view . ' ' . $btn_print;
+		$action = $btn_view === '' ? ' ' : '<div class="retur-pmb-cn-actions">' . $btn_view . $btn_print . $btn_print_sj . '</div>';
 
 		return $action;
 	}
@@ -363,6 +365,33 @@ class Retur_pmb_cn extends Admin_Controller
 		$this->template->set($data);
 		$this->template->title('View DN Retur Pembelian');
 		$this->template->render('view');
+	}
+
+	public function print_sj($id_dn = null)
+	{
+		$this->auth->restrict($this->viewPermission);
+		if (!is_scalar($id_dn) || !ctype_digit((string) $id_dn) || (int) $id_dn < 1) {
+			show_error('Nomor ID Debit Note tidak valid.', 404);
+			return;
+		}
+		$header = $this->Retur_pmb_cn_model->get_dn_header($id_dn);
+		if (empty($header) || !empty($header->deleted_by)) {
+			show_error('Debit Note tidak ditemukan atau sudah dihapus.', 404);
+			return;
+		}
+		$retur_header = !empty($header->id_retur) ? $this->Retur_pmb_cn_model->get_retur_header($header->id_retur) : null;
+		if (empty($retur_header) || !empty($retur_header->deleted_by)) {
+			show_error('Transaksi retur pembelian terkait tidak ditemukan atau sudah dihapus.', 404);
+			return;
+		}
+		$data = $this->Retur_pmb_cn_model->get_sj_print_data($header, $retur_header);
+		$html = $this->load->view('print_sj', $data, true);
+		require_once FCPATH . 'assets/html2pdf/html2pdf/html2pdf.class.php';
+		$pdf = new HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(10, 8, 10, 8));
+		$pdf->pdf->SetDisplayMode('fullpage');
+		$pdf->WriteHTML($html);
+		$filename = 'Surat_Jalan_' . preg_replace('/[^A-Za-z0-9_-]/', '_', $header->no_surat) . '.pdf';
+		$pdf->Output($filename, 'I');
 	}
 
 	public function print_dn($id_dn)
