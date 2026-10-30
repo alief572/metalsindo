@@ -165,8 +165,8 @@ class Inventory_2 extends Admin_Controller
 		        
                 $header1 =  array(
 							'id_category1'	 	=> $code,
-							'id_type'		    => $h1[inventory_1],
-							'nama'		        => $h1[nm_inventory],
+							'id_type'		    => $h1['inventory_1'],
+							'nama'		        => $h1['nm_inventory'],
 							'aktif'				=> 'aktif',
 							'created_on'		=> date('Y-m-d H:i:s'),
 							'created_by'		=> $this->auth->user_id(),
@@ -186,7 +186,7 @@ class Inventory_2 extends Admin_Controller
 		       	       
               $data1 =  array(
 			                    'id_category1'=>$code, 
-								'name_compotition'=>$d1[name_compotition],
+								'name_compotition'=>$d1['name_compotition'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $session['id_user'], 
@@ -225,8 +225,8 @@ class Inventory_2 extends Admin_Controller
 		$numb1++;	
 		        $produk = $_POST['hd1']['1']['id_inventory'];
                 $header1 =  array(
-							'id_type'		    => $h1[inventory_1],
-							'nama'		        => $h1[nm_inventory],
+							'id_type'		    => $h1['inventory_1'],
+							'nama'		        => $h1['nm_inventory'],
 							'modified_on'		=> date('Y-m-d H:i:s'),
 							'modified_by'		=> $this->auth->user_id(),
 							'deleted'			=> '0' 
@@ -243,7 +243,7 @@ class Inventory_2 extends Admin_Controller
 		      $code = $_POST['hd1']['1']['id_inventory'];    
               $data1 =  array(
 			                    'id_category1'=>$code, 
-								'name_compotition'=>$d1[name_compotition],
+								'name_compotition'=>$d1['name_compotition'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $session['id_user'], 
@@ -258,7 +258,7 @@ class Inventory_2 extends Admin_Controller
 		
 		      $info = $d2['id_compotition'];    
               $data2 =  array(
-								'name_compotition'=>$d2[name_compotition],
+								'name_compotition'=>$d2['name_compotition'],
 								'deleted' =>'0',
 							    'modified_on' => date('Y-m-d H:i:s'),
 								'modified_by' => $session['id_user'], 

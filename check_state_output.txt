@@ -1,0 +1,65 @@
+=== CHECKING DIRECTORIES ===
+
+1. Contents of /assets/:
+  [DIR] adminlte
+  [FILE] autoNumeric.js
+  [DIR] chosen_v1.8.7
+  [DIR] crcl
+  [DIR] css
+  [DIR] datatables
+  [FILE] daterangepicker.css
+  [FILE] daterangepicker.js
+  [DIR] dist
+  [DIR] expense
+  [DIR] file_ba
+  [DIR] files
+  [DIR] fonts
+  [DIR] foto
+  [DIR] html2pdf
+  [FILE] html2pdf.7z
+  [FILE] html2pdf.zip
+  [DIR] images
+  [DIR] img
+  [DIR] jquery-ui-1.12.1
+  [DIR] js
+  [DIR] login
+  [DIR] mpdf
+  [DIR] plugins
+
+2. Contents of /application/libraries/:
+  [FILE] Libexcel.php
+  [DIR] MPDF57
+  [DIR] MPDF572
+  [DIR] MPDF57xxx
+  [DIR] MPDF717
+  [FILE] MY_Form_validation.php
+  [FILE] Menu_generator.php
+  [FILE] Mpdf.php
+  [FILE] Mpdf.php.bak
+  [DIR] PHPExcel
+  [FILE] PHPExcel.php
+  [DIR] PHPExcel_NEW
+  [FILE] Template.php
+  [FILE] index.html
+  [FILE] ssp.class.php
+  [FILE] ssp.php
+
+3. Checking Mpdf.php in application/libraries/:
+  Mpdf.php exists! Size: 1314222 bytes
+  First 15 lines:
+<?php
+
+// ******************************************************************************
+// Software: mPDF, Unicode-HTML Free PDF generator                              *
+// Version:  5.7.1     based on                                                   *
+//           FPDF by Olivier PLATHEY                                            *
+//           HTML2FPDF by Renato Coelho                                         *
+// Date:     2013-09-01                                                         *
+// Author:   Ian Back <ianb@bpm1.com>                                           *
+// License:  GPL                                                                *
+//                                                                              *
+// Changes:  See changelog.txt                                                  *
+// ******************************************************************************
+
+
+

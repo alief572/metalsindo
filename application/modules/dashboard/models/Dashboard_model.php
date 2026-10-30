@@ -128,7 +128,4 @@ class Dashboard_model extends BF_Model
         }
         return false;
     }
-
-
-    
 }

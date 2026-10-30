@@ -4,6 +4,10 @@ class grad {
 
 var $mpdf = null;
 
+function __construct(&$mpdf) {
+	$this->mpdf = $mpdf;
+}
+
 function grad(&$mpdf) {
 	$this->mpdf = $mpdf;
 }
@@ -368,10 +372,10 @@ function Gradient($x, $y, $w, $h, $type, $stops=array(), $colorspace='RGB', $coo
 	for($i=0;$i<count($stops);$i++) {
 		// mPDF 5.3.74
 		if ($colorspace == 'CMYK') {
-			$this->mpdf->gradients[$n]['stops'][$i]['col'] = sprintf('%.3F %.3F %.3F %.3F', (ord($stops[$i]['col']{1})/100), (ord($stops[$i]['col']{2})/100), (ord($stops[$i]['col']{3})/100), (ord($stops[$i]['col']{4})/100));
+			$this->mpdf->gradients[$n]['stops'][$i]['col'] = sprintf('%.3F %.3F %.3F %.3F', (ord($stops[$i]['col'][1])/100), (ord($stops[$i]['col'][2])/100), (ord($stops[$i]['col'][3])/100), (ord($stops[$i]['col'][4])/100));
 		}
 		else if ($colorspace == 'Gray') {
-			$this->mpdf->gradients[$n]['stops'][$i]['col'] = sprintf('%.3F', (ord($stops[$i]['col']{1})/255));
+			$this->mpdf->gradients[$n]['stops'][$i]['col'] = sprintf('%.3F', (ord($stops[$i]['col'][1])/255));
 		}
 		else {
 			$this->mpdf->gradients[$n]['stops'][$i]['col'] = sprintf('%.3F %.3F %.3F', (ord($stops[$i]['col']{1})/255), (ord($stops[$i]['col']{2})/255), (ord($stops[$i]['col']{3})/255));

@@ -253,9 +253,7 @@ class MX_Loader extends CI_Loader
 
 		list($path, $_plugin) = Modules::find($plugin . '_pi', $this->_module, 'plugins/');
 
-		if ($path === FALSE && ! is_file($_plugin = APPPATH . 'plugins/' . $_plugin . EXT)) {
-			show_error("Unable to locate the plugin file: {$_plugin}");
-		}
+		if ($path === FALSE) return parent::plugin($plugin);
 
 		Modules::load_file($_plugin, $path);
 		$this->_ci_plugins[$plugin] = TRUE;
@@ -279,12 +277,17 @@ class MX_Loader extends CI_Loader
 			$view = $_view;
 		}
 
-		// Kita hapus pemanggilan _ci_prepare_view_vars karena di CI 3 terbaru sudah tidak ada/berubah
 		return $this->_ci_load(array(
 			'_ci_view' => $view,
-			'_ci_vars' => $this->_ci_object_to_array($vars),
+			'_ci_vars' => $this->_ci_prepare_view_vars($vars),
 			'_ci_return' => $return
 		));
+	}
+
+	/** Backward compatibility for older CI methods **/
+	public function _ci_object_to_array($object)
+	{
+		return is_object($object) ? get_object_vars($object) : $object;
 	}
 
 	protected function &_ci_get_component($component)
@@ -385,33 +388,29 @@ class MX_Loader extends CI_Loader
 			}
 		}
 
-		/* autoload helpers, plugins, languages */
-		foreach (array('helper', 'plugin', 'language') as $type) {
-			if (isset($autoload[$type])) {
-				foreach ($autoload[$type] as $item) {
-					$this->$type($item);
-				}
+		/* autoload helpers */
+		if (isset($autoload['helper'])) {
+			foreach ($autoload['helper'] as $helper) {
+				$this->helper($helper);
 			}
 		}
 
-		// Autoload drivers
+		/* autoload language */
+		if (isset($autoload['language'])) {
+			foreach ($autoload['language'] as $lang) {
+				$this->language($lang);
+			}
+		}
+
+		/* autoload drivers */
 		if (isset($autoload['drivers'])) {
-			foreach ($autoload['drivers'] as $item => $alias) {
-				(is_int($item)) ? $this->driver($alias) : $this->driver($item, $alias);
+			foreach ($autoload['drivers'] as $driver) {
+				$this->driver($driver);
 			}
 		}
 
-		/* autoload database & libraries */
+		/* autoload libraries */
 		if (isset($autoload['libraries'])) {
-			if (in_array('database', $autoload['libraries'])) {
-				/* autoload database */
-				if (! $db = CI::$APP->config->item('database')) {
-					$this->database();
-					$autoload['libraries'] = array_diff($autoload['libraries'], array('database'));
-				}
-			}
-
-			/* autoload libraries */
 			foreach ($autoload['libraries'] as $library => $alias) {
 				(is_int($library)) ? $this->library($alias) : $this->library($library, NULL, $alias);
 			}
@@ -427,11 +426,8 @@ class MX_Loader extends CI_Loader
 		/* autoload module controllers */
 		if (isset($autoload['modules'])) {
 			foreach ($autoload['modules'] as $controller) {
-				($controller != $this->_module) && $this->module($controller);
+				$this->module($controller);
 			}
 		}
 	}
 }
-
-/** load the CI class for Modular Separation **/
-(class_exists('CI', FALSE)) or require dirname(__FILE__) . '/Ci.php';

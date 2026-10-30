@@ -1,0 +1,33 @@
+=== TESTING APPLICATION/LIBRARIES/MPDF57 AND MPDF572 ===
+
+--- Scanning MPDF57 ---
+FILE WITH ISSUES: D:\xampp85\htdocs\metalsindo/application/libraries/MPDF57\classes\barcode.php
+  Curly: 17 found (e.g. $code at line 582)
+FILE WITH ISSUES: D:\xampp85\htdocs\metalsindo/application/libraries/MPDF57\classes\gif.php
+  Curly: 1 found (e.g. $lpData at line 434)
+FILE WITH ISSUES: D:\xampp85\htdocs\metalsindo/application/libraries/MPDF57\classes\grad.php
+  Curly: 23 found (e.g. $col at line 530)
+FILE WITH ISSUES: D:\xampp85\htdocs\metalsindo/application/libraries/MPDF57\classes\otl.php
+  Curly: 8 found (e.g. $dict at line 2853)
+FILE WITH ISSUES: D:\xampp85\htdocs\metalsindo/application/libraries/MPDF57\classes\svg.php
+  Curly: 33 found (e.g. $col at line 1095)
+FILE WITH ISSUES: D:\xampp85\htdocs\metalsindo/application/libraries/MPDF57\mpdf.php
+  Curly: 98 found (e.g. $col at line 2856)
+  Each: 5 found (each() at line 9666, each() at line 11461, each() at line 28213, each() at line 28215, each() at line 32356)
+Total PHP files in MPDF57: 364. Files with issues: 6.
+
+--- Scanning MPDF572 ---
+FILE WITH ISSUES: D:\xampp85\htdocs\metalsindo/application/libraries/MPDF572\classes\barcode.php
+  Curly: 17 found (e.g. $code at line 582)
+FILE WITH ISSUES: D:\xampp85\htdocs\metalsindo/application/libraries/MPDF572\classes\gif.php
+  Curly: 1 found (e.g. $lpData at line 434)
+FILE WITH ISSUES: D:\xampp85\htdocs\metalsindo/application/libraries/MPDF572\classes\grad.php
+  Curly: 23 found (e.g. $col at line 530)
+FILE WITH ISSUES: D:\xampp85\htdocs\metalsindo/application/libraries/MPDF572\classes\otl.php
+  Curly: 8 found (e.g. $dict at line 2853)
+FILE WITH ISSUES: D:\xampp85\htdocs\metalsindo/application/libraries/MPDF572\classes\svg.php
+  Curly: 33 found (e.g. $col at line 1095)
+FILE WITH ISSUES: D:\xampp85\htdocs\metalsindo/application/libraries/MPDF572\mpdf.php
+  Curly: 98 found (e.g. $col at line 2856)
+  Each: 5 found (each() at line 9666, each() at line 11461, each() at line 28213, each() at line 28215, each() at line 32356)
+Total PHP files in MPDF572: 364. Files with issues: 6.
