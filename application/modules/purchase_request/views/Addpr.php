@@ -321,8 +321,19 @@
             type:"GET",
             url:siteurl+'purchase_request/CariBentuk',
             data:"idmaterial="+idmaterial+"&id="+id,
-            success:function(html){
-               $("#bentuk_"+id).html(html);
+            dataType:'json',
+            success:function(result){
+               $("#bentuk_"+id).html(result.html);
+               if ($('#dt_width_'+id).hasClass('autoNumeric')) {
+                   $('#dt_width_'+id).autoNumeric('set', result.width);
+               } else {
+                   $('#dt_width_'+id).val(result.width);
+               }
+               if ($('#dt_length_'+id).hasClass('autoNumeric')) {
+                   $('#dt_length_'+id).autoNumeric('set', result.length);
+               } else {
+                   $('#dt_length_'+id).val(result.length);
+               }
             }
         });
 		$.ajax({
