@@ -50,6 +50,7 @@
                             </a>
                             </div>
                             <?php
+                              $parent = isset($parent) && is_array($parent) ? $parent : array();
                               $parent[0]	= 'Select An Option(NONE)';
                 							echo form_dropdown('parent_id',$parent, set_value('parent_id', isset($data->parent_id) ? $data->parent_id : 'selected'), array('id'=>'parent_id','class'=>'form-control parent_id'));
               							?>
@@ -67,6 +68,7 @@
                             </div>
                             <select class="form-control input select2 group_menu" name="group_menu" id="group_menu">
                               <option value="">Select An Option(NONE)</option>
+                              <?php $datgroupmenu = isset($datgroupmenu) && is_array($datgroupmenu) ? $datgroupmenu : array(); ?>
                               <?php for ($i=1; $i<=count($datgroupmenu); $i++){ ?>
                                 <option value="<?=$i?>" <?=(isset($data->group_menu)&&$i==$data->group_menu)?"selected":""?>><?=($datgroupmenu[$i]=="Back End")?"Show":"Hidden"?></option>
                               <?php } ?>
@@ -133,6 +135,7 @@
                           </a>
                         </div>
                         <?php
+                        $permission = isset($permission) && is_array($permission) ? $permission : array();
                         $permission[0]	= 'Select An Option';
                         echo form_dropdown('permission_id',$permission,set_value('permission_id', isset($data->permission_id) ? $data->permission_id : 'selected'), array('id'=>'permission_id','class'=>'form-control permission_id'));
                         ?>
