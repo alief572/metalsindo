@@ -1,0 +1,59 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Tulis uji eksplorasi bug condition (query stok tanpa filter)": [
+      {
+        "executionId": "022a99cd-0e70-410c-8826-1831c6feb1a3",
+        "chatSessionId": "sess_dde055ce-8a70-46f4-ac14-0ce4cee7709b",
+        "timestamp": 1793694924424
+      },
+      {
+        "executionId": "022a99cd-0e70-410c-8826-1831c6feb1a3",
+        "chatSessionId": "sess_dde055ce-8a70-46f4-ac14-0ce4cee7709b",
+        "timestamp": 1793694967385
+      }
+    ],
+    "2. Tulis uji properti pelestarian (SEBELUM mengimplementasikan perbaikan)": [
+      {
+        "executionId": "022a99cd-0e70-410c-8826-1831c6feb1a3",
+        "chatSessionId": "sess_dde055ce-8a70-46f4-ac14-0ce4cee7709b",
+        "timestamp": 1793694930418
+      }
+    ],
+    "3.1 Terapkan filter query stok terfilter pada addHeader()": [
+      {
+        "executionId": "022a99cd-0e70-410c-8826-1831c6feb1a3",
+        "chatSessionId": "sess_dde055ce-8a70-46f4-ac14-0ce4cee7709b",
+        "timestamp": 1793694940423
+      }
+    ],
+    "3.2 Tangani header lama yang mereferensikan stok totalweight = 0 (pencegahan regresi)": [
+      {
+        "executionId": "022a99cd-0e70-410c-8826-1831c6feb1a3",
+        "chatSessionId": "sess_dde055ce-8a70-46f4-ac14-0ce4cee7709b",
+        "timestamp": 1793694947483
+      }
+    ],
+    "3.3 Verifikasi uji eksplorasi bug condition sekarang lolos": [
+      {
+        "executionId": "022a99cd-0e70-410c-8826-1831c6feb1a3",
+        "chatSessionId": "sess_dde055ce-8a70-46f4-ac14-0ce4cee7709b",
+        "timestamp": 1793694950948
+      }
+    ],
+    "3.4 Verifikasi uji pelestarian tetap lolos": [
+      {
+        "executionId": "022a99cd-0e70-410c-8826-1831c6feb1a3",
+        "chatSessionId": "sess_dde055ce-8a70-46f4-ac14-0ce4cee7709b",
+        "timestamp": 1793694953989
+      }
+    ],
+    "4. Checkpoint - Pastikan semua uji lolos": [
+      {
+        "executionId": "022a99cd-0e70-410c-8826-1831c6feb1a3",
+        "chatSessionId": "sess_dde055ce-8a70-46f4-ac14-0ce4cee7709b",
+        "timestamp": 1793694956392
+      }
+    ]
+  }
+}

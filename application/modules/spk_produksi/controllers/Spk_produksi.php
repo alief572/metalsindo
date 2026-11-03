@@ -74,7 +74,7 @@ class Spk_produksi extends Admin_Controller
 		$penawaran 	= $this->Inventory_4_model->get_data('tr_penawaran');
 		//$stock 		= $this->Inventory_4_model->get_data('stock_material');
 
-		$stock		= $this->db->query("SELECT a.* FROM stock_material a")->result();
+		$stock		= $this->db->query("SELECT a.* FROM stock_material a WHERE a.totalweight > 0 AND id_gudang = 1")->result();
 		$karyawan 	= $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted);
 		$material 	= $this->Inventory_4_model->get_data_category3();
 		$mata_uang 	= $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted);

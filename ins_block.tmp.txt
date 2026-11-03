@@ -1,0 +1,12 @@
+﻿// Jaga opsi lot terpilih untuk header lama yang stoknya sudah habis (totalweight = 0)
+if (!empty($header) && !empty($header[0]->id_stock)) {
+$idStockHeader = $header[0]->id_stock;
+$adaDiStock = false;
+foreach ($stock as $rowStock) {
+if ($rowStock->id_stock == $idStockHeader) { $adaDiStock = true; break; }
+}
+if (!$adaDiStock) {
+$stockRef = $this->db->query("SELECT a.* FROM stock_material a WHERE a.id_stock = " . $this->db->escape($idStockHeader))->result();
+if (!empty($stockRef)) { $stock = array_merge($stock, $stockRef); }
+}
+}
