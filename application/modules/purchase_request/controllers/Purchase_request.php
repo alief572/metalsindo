@@ -660,7 +660,7 @@ class Purchase_request extends Admin_Controller
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
 			$numb1++;
-			$materials = $this->db->query("SELECT a.*, b.nama as alloy, c.nm_bentuk as bentuk FROM ms_inventory_category3 as a JOIN ms_inventory_category2 as b ON a.id_category2 = b.id_category2 JOIN ms_bentuk as c ON a.id_bentuk = c.id_bentuk WHERE a.id_category3 = '" . $used[idmaterial] . "' AND a.deleted = '0'  ")->result();
+			$materials = $this->db->query("SELECT a.*, b.nama as alloy, c.nm_bentuk as bentuk FROM ms_inventory_category3 as a JOIN ms_inventory_category2 as b ON a.id_category2 = b.id_category2 JOIN ms_bentuk as c ON a.id_bentuk = c.id_bentuk WHERE a.id_category3 = '" . $used['idmaterial'] . "' AND a.deleted = '0'  ")->result();
 			foreach ($materials as $material) {
 				if ($material->id_bentuk == 'B2000001') {
 					$dimensi = $this->db->query("SELECT * FROM child_inven_dimensi WHERE id_category3 = '$material->id_category3' AND id_dimensi = '22' ")->result();
@@ -713,18 +713,18 @@ class Purchase_request extends Admin_Controller
 				'id_dt_pr'				=> $code . '-' . $numb1,
 				'idameter'			=> $idameter,
 				'odameter'			=> $odameter,
-				'idmaterial'			=> $used[idmaterial],
+				'idmaterial'			=> $used['idmaterial'],
 				'nama_material'			=> $nama_material,
-				'bentuk'				=> $used[bentuk],
-				'id_bentuk'				=> $used[idbentuk],
-				'qty'			=> $used[qty],
-				'weight'			=> $used[weight],
-				'totalweight'			=> str_replace(',', '', $used[totalweight]),
-				'width'			=> str_replace(',', '', $used[width]),
-				'length'			=> str_replace(',', '', $used[length]),
-				'suplier'			=> $used[suplier],
-				'tanggal'			=> $used[tanggal],
-				'keterangan'			=> $used[keterangan],
+				'bentuk'				=> $used['bentuk'],
+				'id_bentuk'				=> $used['idbentuk'],
+				'qty'			=> $used['qty'],
+				'weight'			=> $used['weight'],
+				'totalweight'			=> str_replace(',', '', $used['totalweight']),
+				'width'			=> str_replace(',', '', $used['width']),
+				'length'			=> str_replace(',', '', $used['length']),
+				'suplier'			=> $used['suplier'],
+				'tanggal'			=> $used['tanggal'],
+				'keterangan'			=> $used['keterangan'],
 				'qty_sheet' => $qty_sheet,
 				'weight_sheet' => $weight_sheet
 			);
@@ -772,7 +772,7 @@ class Purchase_request extends Admin_Controller
 		foreach ($_POST['dt'] as $used) {
 			$numb1++;
 
-			$materials = $this->db->query("SELECT a.*, b.nama as alloy, c.nm_bentuk as bentuk FROM ms_inventory_category3 as a INNER JOIN ms_inventory_category2 as b ON a.id_category2 = b.id_category2 INNER JOIN ms_bentuk as c ON a.id_bentuk = c.id_bentuk WHERE a.id_category3 = '" . $used[idmaterial] . "' AND a.deleted = '0'  ")->result();
+			$materials = $this->db->query("SELECT a.*, b.nama as alloy, c.nm_bentuk as bentuk FROM ms_inventory_category3 as a INNER JOIN ms_inventory_category2 as b ON a.id_category2 = b.id_category2 INNER JOIN ms_bentuk as c ON a.id_bentuk = c.id_bentuk WHERE a.id_category3 = '" . $used['idmaterial'] . "' AND a.deleted = '0'  ")->result();
 			foreach ($materials as $material) {
 				if ($material->id_bentuk == 'B2000001') {
 					$dimensi = $this->db->query("SELECT * FROM child_inven_dimensi WHERE id_category3 = '$material->id_category3' AND id_dimensi = '22' ")->result();
@@ -822,20 +822,20 @@ class Purchase_request extends Admin_Controller
 			$dt =  array(
 				'no_pr'					=> $code,
 				'id_dt_pr'				=> $code . '-' . $numb1,
-				'idmaterial'			=> $used[idmaterial],
+				'idmaterial'			=> $used['idmaterial'],
 				'nama_material'			=> $nama_material,
-				'bentuk'				=> $used[bentuk],
-				'id_bentuk'				=> $used[idbentuk],
+				'bentuk'				=> $used['bentuk'],
+				'id_bentuk'				=> $used['idbentuk'],
 				'idameter'				=> $idameter,
 				'odameter'				=> $odameter,
-				'qty'				=> $used[qty],
-				'weight'			=> $used[weight],
-				'totalweight'		=> str_replace(',', '', $used[totalweight]),
-				'width'			=> str_replace(',', '', $used[width]),
-				'length'			=> str_replace(',', '', $used[length]),
-				'suplier'			=> $used[suplier],
-				'tanggal'			=> $used[tanggal],
-				'keterangan'		=> $used[keterangan],
+				'qty'				=> $used['qty'],
+				'weight'			=> $used['weight'],
+				'totalweight'		=> str_replace(',', '', $used['totalweight']),
+				'width'			=> str_replace(',', '', $used['width']),
+				'length'			=> str_replace(',', '', $used['length']),
+				'suplier'			=> $used['suplier'],
+				'tanggal'			=> $used['tanggal'],
+				'keterangan'		=> $used['keterangan'],
 				'qty_sheet' => $qty_sheet,
 				'weight_sheet' => $weight_sheet
 			);
@@ -1016,19 +1016,19 @@ class Purchase_request extends Admin_Controller
 		foreach ($_POST['hd1'] as $h1) {
 			$numb1++;
 			$header1 =  array(
-				'id_type'		        => $h1[inventory_1],
-				'id_category1'		    => $h1[inventory_2],
-				'id_category2'		    => $h1[inventory_3],
-				'nama'		        	=> $h1[nm_inventory],
-				'maker'		        	=> $h1[maker],
-				'density'		        => $h1[density],
-				'hardness'		        => $h1[hardness],
-				'id_bentuk'		        => $h1[id_bentuk],
-				'id_surface'		    => $h1[id_surface],
-				'mountly_forecast'		=> $h1[mountly_forecast],
-				'safety_stock'		    => $h1[safety_stock],
-				'order_point'		    => $h1[order_point],
-				'maksimum'		    	=> $h1[maksimum],
+				'id_type'		        => $h1['inventory_1'],
+				'id_category1'		    => $h1['inventory_2'],
+				'id_category2'		    => $h1['inventory_3'],
+				'nama'		        	=> $h1['nm_inventory'],
+				'maker'		        	=> $h1['maker'],
+				'density'		        => $h1['density'],
+				'hardness'		        => $h1['hardness'],
+				'id_bentuk'		        => $h1['id_bentuk'],
+				'id_surface'		    => $h1['id_surface'],
+				'mountly_forecast'		=> $h1['mountly_forecast'],
+				'safety_stock'		    => $h1['safety_stock'],
+				'order_point'		    => $h1['order_point'],
+				'maksimum'		    	=> $h1['maksimum'],
 				'aktif'					=> 'aktif',
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
@@ -1046,9 +1046,9 @@ class Purchase_request extends Admin_Controller
 				$numb2++;
 				$data1 =  array(
 					'id_category3' => $id,
-					'id_suplier' => $d1[id_supplier],
-					'lead' => $d1[lead],
-					'minimum' => $d1[minimum],
+					'id_suplier' => $d1['id_supplier'],
+					'lead' => $d1['lead'],
+					'minimum' => $d1['minimum'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1066,8 +1066,8 @@ class Purchase_request extends Admin_Controller
 				$numb3++;
 				$comp =  array(
 					'id_category3' => $id,
-					'id_compotition' => $c1[id_compotition],
-					'nilai_compotition' => $c1[jumlah_kandungan],
+					'id_compotition' => $c1['id_compotition'],
+					'nilai_compotition' => $c1['jumlah_kandungan'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1085,8 +1085,8 @@ class Purchase_request extends Admin_Controller
 				$numb4++;
 				$dms =  array(
 					'id_category3' => $id,
-					'id_dimensi' => $dm[id_dimensi],
-					'nilai_dimensi' => $dm[nilai_dimensi],
+					'id_dimensi' => $dm['id_dimensi'],
+					'nilai_dimensi' => $dm['nilai_dimensi'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1216,19 +1216,19 @@ class Purchase_request extends Admin_Controller
 			$numb1++;
 
 			$header1 =  array(
-				'id_type'		        => $h1[inventory_1],
-				'id_category1'		    => $h1[inventory_2],
-				'id_category2'		    => $h1[inventory_3],
-				'nama'		        	=> $h1[nm_inventory],
-				'maker'		        	=> $h1[maker],
-				'density'		        => $h1[density],
-				'hardness'		        => $h1[hardness],
-				'id_bentuk'		        => $h1[id_bentuk],
-				'id_surface'		    => $h1[id_surface],
-				'mountly_forecast'		=> $h1[mountly_forecast],
-				'safety_stock'		    => $h1[safety_stock],
-				'order_point'		    => $h1[order_point],
-				'maksimum'		    	=> $h1[maksimum],
+				'id_type'		        => $h1['inventory_1'],
+				'id_category1'		    => $h1['inventory_2'],
+				'id_category2'		    => $h1['inventory_3'],
+				'nama'		        	=> $h1['nm_inventory'],
+				'maker'		        	=> $h1['maker'],
+				'density'		        => $h1['density'],
+				'hardness'		        => $h1['hardness'],
+				'id_bentuk'		        => $h1['id_bentuk'],
+				'id_surface'		    => $h1['id_surface'],
+				'mountly_forecast'		=> $h1['mountly_forecast'],
+				'safety_stock'		    => $h1['safety_stock'],
+				'order_point'		    => $h1['order_point'],
+				'maksimum'		    	=> $h1['maksimum'],
 				'aktif'					=> 'aktif',
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
@@ -1245,9 +1245,9 @@ class Purchase_request extends Admin_Controller
 				$numb2++;
 				$data1 =  array(
 					'id_category3' => $code,
-					'id_suplier' => $d1[id_supplier],
-					'lead' => $d1[lead],
-					'minimum' => $d1[minimum],
+					'id_suplier' => $d1['id_supplier'],
+					'lead' => $d1['lead'],
+					'minimum' => $d1['minimum'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1263,8 +1263,8 @@ class Purchase_request extends Admin_Controller
 				$numb3++;
 				$comp =  array(
 					'id_category3' => $code,
-					'id_compotition' => $c1[id_compotition],
-					'nilai_compotition' => $c1[jumlah_kandungan],
+					'id_compotition' => $c1['id_compotition'],
+					'nilai_compotition' => $c1['jumlah_kandungan'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1280,8 +1280,8 @@ class Purchase_request extends Admin_Controller
 				$numb4++;
 				$dms =  array(
 					'id_category3' => $code,
-					'id_dimensi' => $dm[id_dimensi],
-					'nilai_dimensi' => $dm[nilai_dimensi],
+					'id_dimensi' => $dm['id_dimensi'],
+					'nilai_dimensi' => $dm['nilai_dimensi'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1319,19 +1319,19 @@ class Purchase_request extends Admin_Controller
 			$numb1++;
 
 			$header1 =  array(
-				'id_type'		        => $h1[inventory_1],
-				'id_category1'		    => $h1[inventory_2],
-				'id_category2'		    => $h1[inventory_3],
-				'nama'		        	=> $h1[nm_inventory],
-				'maker'		        	=> $h1[maker],
-				'density'		        => $h1[density],
-				'hardness'		        => $h1[hardness],
-				'id_bentuk'		        => $h1[id_bentuk],
-				'id_surface'		    => $h1[id_surface],
-				'mountly_forecast'		=> $h1[mountly_forecast],
-				'safety_stock'		    => $h1[safety_stock],
-				'order_point'		    => $h1[order_point],
-				'maksimum'		    	=> $h1[maksimum],
+				'id_type'		        => $h1['inventory_1'],
+				'id_category1'		    => $h1['inventory_2'],
+				'id_category2'		    => $h1['inventory_3'],
+				'nama'		        	=> $h1['nm_inventory'],
+				'maker'		        	=> $h1['maker'],
+				'density'		        => $h1['density'],
+				'hardness'		        => $h1['hardness'],
+				'id_bentuk'		        => $h1['id_bentuk'],
+				'id_surface'		    => $h1['id_surface'],
+				'mountly_forecast'		=> $h1['mountly_forecast'],
+				'safety_stock'		    => $h1['safety_stock'],
+				'order_point'		    => $h1['order_point'],
+				'maksimum'		    	=> $h1['maksimum'],
 				'aktif'					=> 'aktif',
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
@@ -1347,9 +1347,9 @@ class Purchase_request extends Admin_Controller
 				$numb2++;
 				$data1 =  array(
 					'id_category3' => $id,
-					'id_suplier' => $d1[id_supplier],
-					'lead' => $d1[lead],
-					'minimum' => $d1[minimum],
+					'id_suplier' => $d1['id_supplier'],
+					'lead' => $d1['lead'],
+					'minimum' => $d1['minimum'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1365,8 +1365,8 @@ class Purchase_request extends Admin_Controller
 				$numb3++;
 				$comp =  array(
 					'id_category3' => $id,
-					'id_compotition' => $c1[id_compotition],
-					'nilai_compotition' => $c1[jumlah_kandungan],
+					'id_compotition' => $c1['id_compotition'],
+					'nilai_compotition' => $c1['jumlah_kandungan'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1382,8 +1382,8 @@ class Purchase_request extends Admin_Controller
 				$numb4++;
 				$dms =  array(
 					'id_category3' => $id,
-					'id_dimensi' => $dm[id_dimensi],
-					'nilai_dimensi' => $dm[nilai_dimensi],
+					'id_dimensi' => $dm['id_dimensi'],
+					'nilai_dimensi' => $dm['nilai_dimensi'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
