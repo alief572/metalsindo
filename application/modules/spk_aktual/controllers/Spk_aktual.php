@@ -214,11 +214,14 @@ class Spk_aktual extends Admin_Controller
 			$dt_spk = $this->db->query("SELECT a.*, b.name_customer as name_customer FROM dt_spk_produksi as a LEFT JOIN master_customers as b on a.idcustomer = b.id_customer where a.id_spkproduksi = '" . $id . "' AND a.checked = '1' ")->result();
 		}
 
-		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran');
-		$stock = $this->Inventory_4_model->get_data('stock_material');
-		$karyawan = $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted);
-		$material = $this->Inventory_4_model->get_data_category3();
-		$mata_uang = $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted);
+		// Data ini tidak dipakai oleh view EditHeader/EditHeader2/EditHeader3,
+		// dibatasi (limit) agar tidak menarik seluruh isi tabel dan menghabiskan memori PHP
+		$limit = 100;
+		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran', '', '', $limit);
+		$stock = $this->Inventory_4_model->get_data('stock_material', '', '', $limit);
+		$karyawan = $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted, $limit);
+		$material = $this->Inventory_4_model->get_data_category3($limit);
+		$mata_uang = $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted, $limit);
 
 		// print_r($dt_spk);
 		// exit;
@@ -255,11 +258,13 @@ class Spk_aktual extends Admin_Controller
 		$deleted = '0';
 		$tr_spk = $this->Inventory_4_model->get_data('dt_tr_spk_produksi', 'id_spkproduksi', $idlhp);
 		$dt_spk = $this->db->query("SELECT a.*, b.name_customer as name_customer FROM dt_spk_produksi as a LEFT JOIN master_customers as b on a.idcustomer = b.id_customer where a.id_tr_spk_produksi = '" . $id . "' AND a.checked = '1' ")->result();
-		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran');
-		$stock = $this->Inventory_4_model->get_data('stock_material');
-		$karyawan = $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted);
-		$material = $this->Inventory_4_model->get_data_category3();
-		$mata_uang = $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted);
+		// Tidak dipakai view TambahLHP, dibatasi agar hemat memori
+		$limit = 100;
+		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran', '', '', $limit);
+		$stock = $this->Inventory_4_model->get_data('stock_material', '', '', $limit);
+		$karyawan = $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted, $limit);
+		$material = $this->Inventory_4_model->get_data_category3($limit);
+		$mata_uang = $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted, $limit);
 
 		$detailLHP = $this->db->get_where('dt_spk_produksi_lph', array('id_spk_aktual' => $idlhp))->result_array();
 
@@ -333,11 +338,13 @@ class Spk_aktual extends Admin_Controller
 		$deleted = '0';
 		$tr_spk = $this->Inventory_4_model->get_data('tr_spk_produksi', 'id_spkproduksi', $id);
 		$dt_spk = $this->Inventory_4_model->get_data('dt_spk_produksi', 'id_spkproduksi', $id);
-		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran');
-		$stock = $this->Inventory_4_model->get_data('stock_material');
-		$karyawan = $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted);
-		$material = $this->Inventory_4_model->get_data_category3();
-		$mata_uang = $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted);
+		// Tidak dipakai view ViewHeader, dibatasi agar hemat memori
+		$limit = 100;
+		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran', '', '', $limit);
+		$stock = $this->Inventory_4_model->get_data('stock_material', '', '', $limit);
+		$karyawan = $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted, $limit);
+		$material = $this->Inventory_4_model->get_data_category3($limit);
+		$mata_uang = $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted, $limit);
 		$data = [
 			'tr_spk'	=> $tr_spk,
 			'dt_spk'	=> $dt_spk,
@@ -3266,11 +3273,13 @@ class Spk_aktual extends Admin_Controller
 			$dt_spk = $this->db->query("SELECT a.*, b.name_customer as name_customer FROM dt_spk_produksi as a LEFT JOIN master_customers as b on a.idcustomer = b.id_customer where a.id_tr_spk_produksi = '" . $id . "' AND a.checked = '1' ")->result();
 		}
 
-		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran');
-		$stock = $this->Inventory_4_model->get_data('stock_material');
-		$karyawan = $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted);
-		$material = $this->Inventory_4_model->get_data_category3();
-		$mata_uang = $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted);
+		// Tidak dipakai view EditHeader_new*, dibatasi agar hemat memori
+		$limit = 100;
+		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran', '', '', $limit);
+		$stock = $this->Inventory_4_model->get_data('stock_material', '', '', $limit);
+		$karyawan = $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted, $limit);
+		$material = $this->Inventory_4_model->get_data_category3($limit);
+		$mata_uang = $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted, $limit);
 
 		// print_r($dt_spk);
 		// exit;

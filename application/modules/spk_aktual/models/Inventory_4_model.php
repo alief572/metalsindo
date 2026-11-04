@@ -129,7 +129,7 @@ class Inventory_4_model extends BF_Model
 		$query = $this->db->get();
 		return $query->result();
 	}
-	public function get_data_category3()
+	public function get_data_category3($limit = null)
 	{
 		$search = "a.deleted='0'";
 		$this->db->select('a.*, b.nama as nama_type, c.nama as nama_category1, d.nama as nama_category2, e.nilai_dimensi as thickness');
@@ -139,6 +139,9 @@ class Inventory_4_model extends BF_Model
 		$this->db->join('ms_inventory_category2 d', 'd.id_category2 =a.id_category2');
 		$this->db->join('child_inven_dimensi e', 'e.id_category3 =a.id_category3');
 		$this->db->where($search);
+		if ($limit !== null) {
+			$this->db->limit((int) $limit);
+		}
 		$query = $this->db->get();
 		return $query->result();
 	}
@@ -239,8 +242,11 @@ class Inventory_4_model extends BF_Model
 			->result();
 	}
 
-	public function get_data($table, $where_field = '', $where_value = '')
+	public function get_data($table, $where_field = '', $where_value = '', $limit = null)
 	{
+		if ($limit !== null) {
+			$this->db->limit((int) $limit);
+		}
 		if ($where_field != '' && $where_value != '') {
 			$query = $this->db->get_where($table, array($where_field => $where_value));
 		} else {
