@@ -1983,38 +1983,38 @@ class Spk_produksi extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[no_surat])) {
+			if (!empty($used['no_surat'])) {
 				$numb1++;
-				$checked = (!empty($used[id])) ? 1 : 0;
-				if ($used[no_surat] == 'nonspk') {
-					$idcustomer  = $used[idcustomer];
+				$checked = (!empty($used['id'])) ? 1 : 0;
+				if ($used['no_surat'] == 'nonspk') {
+					$idcustomer  = $used['idcustomer'];
 					$cust        = $this->db->query("SELECT name_customer FROM master_customers WHERE id_customer='$idcustomer'")->row();
 					$customer    = $cust->name_customer;
 				} else {
-					$customer = $used[namacustomer];
+					$customer = $used['namacustomer'];
 				}
 
 				$dt[] =  array(
 					'id_spkproduksi'		=> $code,
-					'no_surat'				=> $used[no_surat],
+					'no_surat'				=> $used['no_surat'],
 					'id_dt_spkproduksi'		=> $code . '-1' . '-' . $numb1,
-					'idcustomer'			=> $used[idcustomer],
-					'nmmaterial'		    => $used[nmmaterial],
+					'idcustomer'			=> $used['idcustomer'],
+					'nmmaterial'		    => $used['nmmaterial'],
 					'namacustomer'		    => $customer,
-					'thickness'		    	=> $used[thickness],
-					'weight'		        => $used[weight],
-					'qtycoil'		        => $used[qtycoil],
-					'width'					=> $used[weight2],
-					'width_akhir'			=> $used[weight3],
-					'totalwidth'		    => $used[totalwidth],
-					'totalpanjang'		    => $used[totalpanjang],
-					'delivery'				=> $used[delivery],
-					'keterangan'			=> $used[keterangan],
+					'thickness'		    	=> $used['thickness'],
+					'weight'		        => $used['weight'],
+					'qtycoil'		        => $used['qtycoil'],
+					'width'					=> $used['weight2'],
+					'width_akhir'			=> $used['weight3'],
+					'totalwidth'		    => $used['totalwidth'],
+					'totalpanjang'		    => $used['totalpanjang'],
+					'delivery'				=> $used['delivery'],
+					'keterangan'			=> $used['keterangan'],
 					'checked'				=> $checked,
 					'id_tr_spk_produksi'    => $code . '-1',
-					'part_number'			=> $used[part_number],
-					'qty_coil'			    => $used[qty_coil],
-					'estimasi'			    => $used[estimasi]
+					'part_number'			=> $used['part_number'],
+					'qty_coil'			    => $used['qty_coil'],
+					'estimasi'			    => $used['estimasi']
 				);
 			}
 		}
@@ -2200,33 +2200,33 @@ class Spk_produksi extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[no_surat])) {
+			if (!empty($used['no_surat'])) {
 				$numb1++;
-				$checked = (!empty($used[id])) ? 1 : 0;
+				$checked = (!empty($used['id'])) ? 1 : 0;
 
-				if ($used[no_surat] == 'nonspk') {
-					$idcustomer  = $used[idcustomer];
+				if ($used['no_surat'] == 'nonspk') {
+					$idcustomer  = $used['idcustomer'];
 					$cust        = $this->db->query("SELECT name_customer FROM master_customers WHERE id_customer='$idcustomer'")->row();
 					$customer    = $cust->name_customer;
 				} else {
-					$customer = $used[namacustomer];
+					$customer = $used['namacustomer'];
 				}
 
 				$dt[] =  array(
 					'id_spkproduksi'		    => $code2,
-					'no_surat'				=> $used[no_surat],
+					'no_surat'				=> $used['no_surat'],
 					'id_dt_spkproduksi'		=> $code . '-' . $numb1,
-					'idcustomer'			=> $used[idcustomer],
-					'nmmaterial'		    => $used[nmmaterial],
+					'idcustomer'			=> $used['idcustomer'],
+					'nmmaterial'		    => $used['nmmaterial'],
 					'namacustomer'		    => $customer,
-					'thickness'		    	=> $used[thickness],
-					'weight'		        => $used[weight],
-					'qtycoil'		        => $used[qtycoil],
-					'width'					=> $used[weight2],
-					'totalwidth'		    => $used[totalwidth],
-					'totalpanjang'		    => $used[totalpanjang],
-					'delivery'				=> $used[delivery],
-					'keterangan'			=> $used[keterangan],
+					'thickness'		    	=> $used['thickness'],
+					'weight'		        => $used['weight'],
+					'qtycoil'		        => $used['qtycoil'],
+					'width'					=> $used['weight2'],
+					'totalwidth'		    => $used['totalwidth'],
+					'totalpanjang'		    => $used['totalpanjang'],
+					'delivery'				=> $used['delivery'],
+					'keterangan'			=> $used['keterangan'],
 					'checked'				=> $checked,
 					'id_tr_spk_produksi'    => $code
 				);
@@ -2389,34 +2389,34 @@ class Spk_produksi extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[no_surat])) {
+			if (!empty($used['no_surat'])) {
 				$numb1++;
-				$checked = (!empty($used[id])) ? 1 : 0;
+				$checked = (!empty($used['id'])) ? 1 : 0;
 
-				if ($used[no_surat] == 'nonspk') {
-					$idcustomer  = $used[idcustomer];
+				if ($used['no_surat'] == 'nonspk') {
+					$idcustomer  = $used['idcustomer'];
 					$cust        = $this->db->query("SELECT name_customer FROM master_customers WHERE id_customer='$idcustomer'")->row();
 					$customer    = $cust->name_customer;
 				} else {
-					$customer = $used[namacustomer];
+					$customer = $used['namacustomer'];
 				}
 
 				$dt[] =  array(
 					'id_spkproduksi'		=> $code,
-					'no_surat'				=> $used[no_surat],
+					'no_surat'				=> $used['no_surat'],
 					'id_dt_spkproduksi'		=> $code . '-' . $numb1,
-					'idcustomer'			=> $used[idcustomer],
-					'nmmaterial'		    => $used[nmmaterial],
+					'idcustomer'			=> $used['idcustomer'],
+					'nmmaterial'		    => $used['nmmaterial'],
 					'namacustomer'		    => $customer,
-					'thickness'		    	=> $used[thickness],
-					'weight'		        => $used[weight],
-					'qtycoil'		        => $used[qtycoil],
-					'width'					=> $used[weight2],
-					'totalwidth'		    => $used[totalwidth],
-					'delivery'				=> $used[delivery],
+					'thickness'		    	=> $used['thickness'],
+					'weight'		        => $used['weight'],
+					'qtycoil'		        => $used['qtycoil'],
+					'width'					=> $used['weight2'],
+					'totalwidth'		    => $used['totalwidth'],
+					'delivery'				=> $used['delivery'],
 					'checked'				=> $checked,
 					'id_tr_spk_produksi'	=> $kodebaru,
-					'keterangan'	        => $used[keterangan],
+					'keterangan'	        => $used['keterangan'],
 				);
 			}
 		}
@@ -2564,22 +2564,22 @@ class Spk_produksi extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[no_surat])) {
+			if (!empty($used['no_surat'])) {
 				$numb1++;
-				$checked = (!empty($used[id])) ? 1 : 0;
+				$checked = (!empty($used['id'])) ? 1 : 0;
 				$dt[] =  array(
 					'id_spkproduksi'		=> $code,
-					'no_surat'				=> $used[no_surat],
+					'no_surat'				=> $used['no_surat'],
 					'id_dt_spkproduksi'		=> $code . '-' . $numb1,
-					'idcustomer'			=> $used[idcustomer],
-					'nmmaterial'		    => $used[nmmaterial],
-					'namacustomer'		    => $used[namacustomer],
-					'thickness'		    	=> $used[thickness],
-					'weight'		        => $used[weight],
-					'qtycoil'		        => $used[qtycoil],
-					'width'					=> $used[weight2],
-					'totalwidth'		    => $used[totalwidth],
-					'delivery'				=> $used[delivery],
+					'idcustomer'			=> $used['idcustomer'],
+					'nmmaterial'		    => $used['nmmaterial'],
+					'namacustomer'		    => $used['namacustomer'],
+					'thickness'		    	=> $used['thickness'],
+					'weight'		        => $used['weight'],
+					'qtycoil'		        => $used['qtycoil'],
+					'width'					=> $used['weight2'],
+					'totalwidth'		    => $used['totalwidth'],
+					'delivery'				=> $used['delivery'],
 					'checked'				=> $checked
 				);
 			}
@@ -2661,16 +2661,16 @@ class Spk_produksi extends Admin_Controller
 			$numb1++;
 			$dt =  array(
 				'id_spkproduksi'		=> $code,
-				'no_surat'				=> $used[no_surat],
+				'no_surat'				=> $used['no_surat'],
 				'id_dt_spkproduksi'		=> $code . '-' . $numb1,
-				'idcustomer'			=> $used[idcustomer],
-				'nmmaterial'		    => $used[nmmaterial],
-				'thickness'		    	=> $used[thickness],
-				'weight'		        => $used[weight],
-				'qtycoil'		        => $used[qtycoil],
-				'width'					=> $used[width],
-				'totalwidth'		    => $used[totalwidth],
-				'delivery'				=> $used[delivery]
+				'idcustomer'			=> $used['idcustomer'],
+				'nmmaterial'		    => $used['nmmaterial'],
+				'thickness'		    	=> $used['thickness'],
+				'weight'		        => $used['weight'],
+				'qtycoil'		        => $used['qtycoil'],
+				'width'					=> $used['width'],
+				'totalwidth'		    => $used['totalwidth'],
+				'delivery'				=> $used['delivery']
 			);
 			$this->db->insert('dt_spk_produksi', $dt);
 		}
@@ -2729,18 +2729,18 @@ class Spk_produksi extends Admin_Controller
 			$stokpakai =  array(
 				'id_shearing'		    	=> $code,
 				'id_used_syock_penawaran'	=> $code . '-' . $numb1,
-				'idstk'		    			=> $use[idstk],
-				'lotno'		        		=> $use[lotno],
-				'namamaterial'		        => $use[namamaterial],
-				'weight'		        	=> $use[weight],
-				'density'		        	=> $use[density],
-				'hasilpanjang'		        => $use[hasilpanjang],
-				'width'		    			=> $use[width],
-				'lebarcc'					=> $use[lebarcc],
-				'jumlahcc'		    		=> $use[jumlahcc],
-				'sisapotongan'		    	=> $use[sisapotongan],
-				'qty'		    			=> $use[qty],
-				'jmlpisau'		    		=> $use[jmlpisau]
+				'idstk'		    			=> $use['idstk'],
+				'lotno'		        		=> $use['lotno'],
+				'namamaterial'		        => $use['namamaterial'],
+				'weight'		        	=> $use['weight'],
+				'density'		        	=> $use['density'],
+				'hasilpanjang'		        => $use['hasilpanjang'],
+				'width'		    			=> $use['width'],
+				'lebarcc'					=> $use['lebarcc'],
+				'jumlahcc'		    		=> $use['jumlahcc'],
+				'sisapotongan'		    	=> $use['sisapotongan'],
+				'qty'		    			=> $use['qty'],
+				'jmlpisau'		    		=> $use['jmlpisau']
 			);
 			$this->db->insert('dt_penawaran_shearing_used', $stokpakai);
 		}
@@ -2844,19 +2844,19 @@ class Spk_produksi extends Admin_Controller
 		foreach ($_POST['hd1'] as $h1) {
 			$numb1++;
 			$header1 =  array(
-				'id_type'		        => $h1[inventory_1],
-				'id_category1'		    => $h1[inventory_2],
-				'id_category2'		    => $h1[inventory_3],
-				'nama'		        	=> $h1[nm_inventory],
-				'maker'		        	=> $h1[maker],
-				'density'		        => $h1[density],
-				'hardness'		        => $h1[hardness],
-				'id_bentuk'		        => $h1[id_bentuk],
-				'id_surface'		    => $h1[id_surface],
-				'mountly_forecast'		=> $h1[mountly_forecast],
-				'safety_stock'		    => $h1[safety_stock],
-				'order_point'		    => $h1[order_point],
-				'maksimum'		    	=> $h1[maksimum],
+				'id_type'		        => $h1['inventory_1'],
+				'id_category1'		    => $h1['inventory_2'],
+				'id_category2'		    => $h1['inventory_3'],
+				'nama'		        	=> $h1['nm_inventory'],
+				'maker'		        	=> $h1['maker'],
+				'density'		        => $h1['density'],
+				'hardness'		        => $h1['hardness'],
+				'id_bentuk'		        => $h1['id_bentuk'],
+				'id_surface'		    => $h1['id_surface'],
+				'mountly_forecast'		=> $h1['mountly_forecast'],
+				'safety_stock'		    => $h1['safety_stock'],
+				'order_point'		    => $h1['order_point'],
+				'maksimum'		    	=> $h1['maksimum'],
 				'aktif'					=> 'aktif',
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
@@ -2874,9 +2874,9 @@ class Spk_produksi extends Admin_Controller
 				$numb2++;
 				$data1 =  array(
 					'id_category3' => $id,
-					'id_suplier' => $d1[id_supplier],
-					'lead' => $d1[lead],
-					'minimum' => $d1[minimum],
+					'id_suplier' => $d1['id_supplier'],
+					'lead' => $d1['lead'],
+					'minimum' => $d1['minimum'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -2894,8 +2894,8 @@ class Spk_produksi extends Admin_Controller
 				$numb3++;
 				$comp =  array(
 					'id_category3' => $id,
-					'id_compotition' => $c1[id_compotition],
-					'nilai_compotition' => $c1[jumlah_kandungan],
+					'id_compotition' => $c1['id_compotition'],
+					'nilai_compotition' => $c1['jumlah_kandungan'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -2913,8 +2913,8 @@ class Spk_produksi extends Admin_Controller
 				$numb4++;
 				$dms =  array(
 					'id_category3' => $id,
-					'id_dimensi' => $dm[id_dimensi],
-					'nilai_dimensi' => $dm[nilai_dimensi],
+					'id_dimensi' => $dm['id_dimensi'],
+					'nilai_dimensi' => $dm['nilai_dimensi'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -3049,19 +3049,19 @@ class Spk_produksi extends Admin_Controller
 			$numb1++;
 
 			$header1 =  array(
-				'id_type'		        => $h1[inventory_1],
-				'id_category1'		    => $h1[inventory_2],
-				'id_category2'		    => $h1[inventory_3],
-				'nama'		        	=> $h1[nm_inventory],
-				'maker'		        	=> $h1[maker],
-				'density'		        => $h1[density],
-				'hardness'		        => $h1[hardness],
-				'id_bentuk'		        => $h1[id_bentuk],
-				'id_surface'		    => $h1[id_surface],
-				'mountly_forecast'		=> $h1[mountly_forecast],
-				'safety_stock'		    => $h1[safety_stock],
-				'order_point'		    => $h1[order_point],
-				'maksimum'		    	=> $h1[maksimum],
+				'id_type'		        => $h1['inventory_1'],
+				'id_category1'		    => $h1['inventory_2'],
+				'id_category2'		    => $h1['inventory_3'],
+				'nama'		        	=> $h1['nm_inventory'],
+				'maker'		        	=> $h1['maker'],
+				'density'		        => $h1['density'],
+				'hardness'		        => $h1['hardness'],
+				'id_bentuk'		        => $h1['id_bentuk'],
+				'id_surface'		    => $h1['id_surface'],
+				'mountly_forecast'		=> $h1['mountly_forecast'],
+				'safety_stock'		    => $h1['safety_stock'],
+				'order_point'		    => $h1['order_point'],
+				'maksimum'		    	=> $h1['maksimum'],
 				'aktif'					=> 'aktif',
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
@@ -3078,9 +3078,9 @@ class Spk_produksi extends Admin_Controller
 				$numb2++;
 				$data1 =  array(
 					'id_category3' => $code,
-					'id_suplier' => $d1[id_supplier],
-					'lead' => $d1[lead],
-					'minimum' => $d1[minimum],
+					'id_suplier' => $d1['id_supplier'],
+					'lead' => $d1['lead'],
+					'minimum' => $d1['minimum'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -3096,8 +3096,8 @@ class Spk_produksi extends Admin_Controller
 				$numb3++;
 				$comp =  array(
 					'id_category3' => $code,
-					'id_compotition' => $c1[id_compotition],
-					'nilai_compotition' => $c1[jumlah_kandungan],
+					'id_compotition' => $c1['id_compotition'],
+					'nilai_compotition' => $c1['jumlah_kandungan'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -3113,8 +3113,8 @@ class Spk_produksi extends Admin_Controller
 				$numb4++;
 				$dms =  array(
 					'id_category3' => $code,
-					'id_dimensi' => $dm[id_dimensi],
-					'nilai_dimensi' => $dm[nilai_dimensi],
+					'id_dimensi' => $dm['id_dimensi'],
+					'nilai_dimensi' => $dm['nilai_dimensi'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -3153,19 +3153,19 @@ class Spk_produksi extends Admin_Controller
 			$numb1++;
 
 			$header1 =  array(
-				'id_type'		        => $h1[inventory_1],
-				'id_category1'		    => $h1[inventory_2],
-				'id_category2'		    => $h1[inventory_3],
-				'nama'		        	=> $h1[nm_inventory],
-				'maker'		        	=> $h1[maker],
-				'density'		        => $h1[density],
-				'hardness'		        => $h1[hardness],
-				'id_bentuk'		        => $h1[id_bentuk],
-				'id_surface'		    => $h1[id_surface],
-				'mountly_forecast'		=> $h1[mountly_forecast],
-				'safety_stock'		    => $h1[safety_stock],
-				'order_point'		    => $h1[order_point],
-				'maksimum'		    	=> $h1[maksimum],
+				'id_type'		        => $h1['inventory_1'],
+				'id_category1'		    => $h1['inventory_2'],
+				'id_category2'		    => $h1['inventory_3'],
+				'nama'		        	=> $h1['nm_inventory'],
+				'maker'		        	=> $h1['maker'],
+				'density'		        => $h1['density'],
+				'hardness'		        => $h1['hardness'],
+				'id_bentuk'		        => $h1['id_bentuk'],
+				'id_surface'		    => $h1['id_surface'],
+				'mountly_forecast'		=> $h1['mountly_forecast'],
+				'safety_stock'		    => $h1['safety_stock'],
+				'order_point'		    => $h1['order_point'],
+				'maksimum'		    	=> $h1['maksimum'],
 				'aktif'					=> 'aktif',
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
@@ -3181,9 +3181,9 @@ class Spk_produksi extends Admin_Controller
 				$numb2++;
 				$data1 =  array(
 					'id_category3' => $id,
-					'id_suplier' => $d1[id_supplier],
-					'lead' => $d1[lead],
-					'minimum' => $d1[minimum],
+					'id_suplier' => $d1['id_supplier'],
+					'lead' => $d1['lead'],
+					'minimum' => $d1['minimum'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -3199,8 +3199,8 @@ class Spk_produksi extends Admin_Controller
 				$numb3++;
 				$comp =  array(
 					'id_category3' => $id,
-					'id_compotition' => $c1[id_compotition],
-					'nilai_compotition' => $c1[jumlah_kandungan],
+					'id_compotition' => $c1['id_compotition'],
+					'nilai_compotition' => $c1['jumlah_kandungan'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -3216,8 +3216,8 @@ class Spk_produksi extends Admin_Controller
 				$numb4++;
 				$dms =  array(
 					'id_category3' => $id,
-					'id_dimensi' => $dm[id_dimensi],
-					'nilai_dimensi' => $dm[nilai_dimensi],
+					'id_dimensi' => $dm['id_dimensi'],
+					'nilai_dimensi' => $dm['nilai_dimensi'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -3603,27 +3603,27 @@ class Spk_produksi extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[no_surat])) {
+			if (!empty($used['no_surat'])) {
 				$numb1++;
-				$checked = (!empty($used[id])) ? 1 : 0;
+				$checked = (!empty($used['id'])) ? 1 : 0;
 				$dt[] =  array(
 					'id_spkproduksi'		=> $code,
-					'no_surat'				=> $used[no_surat],
+					'no_surat'				=> $used['no_surat'],
 					'id_dt_spkproduksi'		=> $code . '-1' . '-' . $numb1,
-					'idcustomer'			=> $used[idcustomer],
-					'nmmaterial'		    => $used[nmmaterial],
-					'namacustomer'		    => $used[namacustomer],
-					'thickness'		    	=> $used[thickness],
-					'weight'		        => $used[weight],
-					'qtycoil'		        => $used[qtycoil],
-					'width'					=> $used[weight2],
-					'totalwidth'		    => $used[totalwidth],
-					'totalpanjang'		    => $used[totalpanjang],
-					'delivery'				=> $used[delivery],
-					'keterangan'			=> $used[keterangan],
+					'idcustomer'			=> $used['idcustomer'],
+					'nmmaterial'		    => $used['nmmaterial'],
+					'namacustomer'		    => $used['namacustomer'],
+					'thickness'		    	=> $used['thickness'],
+					'weight'		        => $used['weight'],
+					'qtycoil'		        => $used['qtycoil'],
+					'width'					=> $used['weight2'],
+					'totalwidth'		    => $used['totalwidth'],
+					'totalpanjang'		    => $used['totalpanjang'],
+					'delivery'				=> $used['delivery'],
+					'keterangan'			=> $used['keterangan'],
 					'checked'				=> $checked,
 					'id_tr_spk_produksi'    => $code . '-1',
-					'part_number'		    => $used[part_number]
+					'part_number'		    => $used['part_number']
 				);
 			}
 		}
