@@ -1280,22 +1280,22 @@ class Incoming extends Admin_Controller
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
 			$numb1++;
-			if (empty($used[qtyrecive])) {
+			if (empty($used['qtyrecive'])) {
 			} else {
 				$dt =  array(
 					'id_data'			=> $id_data,
 					'id_incoming'			=> $no_surat,
 					'id_dt_incoming'		=> $no_surat . '-' . $numb1,
-					'id_dt_po'					=> $used[iddtpo],
-					'id_material'			=> $used[idmaterial],
-					'tgl_datang'			=> $used[tanggal],
-					'nama_material'			=> $used[namamaterial],
-					'length'				=> $used[length],
-					'width'					=> $used[width],
-					'weight'				=> $used[weight],
-					'qty_order'			=> $used[qtyorder],
-					'qty_recive'			=> $used[qtyrecive],
-					'lotno'					=> $used[loto]
+					'id_dt_po'					=> $used['iddtpo'],
+					'id_material'			=> $used['idmaterial'],
+					'tgl_datang'			=> $used['tanggal'],
+					'nama_material'			=> $used['namamaterial'],
+					'length'				=> $used['length'],
+					'width'					=> $used['width'],
+					'weight'				=> $used['weight'],
+					'qty_order'			=> $used['qtyorder'],
+					'qty_recive'			=> $used['qtyrecive'],
+					'lotno'					=> $used['loto']
 				);
 				$this->db->insert('dt_incoming', $dt);
 			};
@@ -1308,7 +1308,7 @@ class Incoming extends Admin_Controller
 			$bentuk		 = $querybentuk[0]->id_bentuk;
 			$querythickness 	= $this->db->query("SELECT * FROM child_inven_dimensi WHERE id_category3 = '" . $id_material . "' ")->result();
 			$thickness		 	= $querythickness[0]->nilai_dimensi;
-			if (empty($used[qtyrecive])) {
+			if (empty($used['qtyrecive'])) {
 			} else {
 				$stok =  array(
 					'id_category3'			=> $used['idmaterial'],
@@ -1370,22 +1370,22 @@ class Incoming extends Admin_Controller
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
 			$numb1++;
-			if (empty($used[qtyrecive])) {
+			if (empty($used['qtyrecive'])) {
 			} else {
 				$dt =  array(
 					'id_data'				=> $id_data,
 					'id_incoming'			=> $no_surat,
 					'id_dt_incoming'		=> $no_surat . '-' . $numb1,
-					'id_dt_po'				=> $used[iddtpo],
-					'id_material'			=> $used[idmaterial],
-					'tgl_datang'			=> $used[tanggal],
-					'nama_material'			=> $used[namamaterial],
-					'length'				=> $used[length],
-					'width'					=> $used[width],
-					'weight'				=> $used[weight],
-					'qty_order'				=> $used[qtyorder],
-					'qty_recive'			=> $used[qtyrecive],
-					'lotno'					=> $used[loto]
+					'id_dt_po'				=> $used['iddtpo'],
+					'id_material'			=> $used['idmaterial'],
+					'tgl_datang'			=> $used['tanggal'],
+					'nama_material'			=> $used['namamaterial'],
+					'length'				=> $used['length'],
+					'width'					=> $used['width'],
+					'weight'				=> $used['weight'],
+					'qty_order'				=> $used['qtyorder'],
+					'qty_recive'			=> $used['qtyrecive'],
+					'lotno'					=> $used['loto']
 				);
 				$this->db->insert('dt_incoming', $dt);
 			};
@@ -1398,7 +1398,7 @@ class Incoming extends Admin_Controller
 			$bentuk		 = $querybentuk[0]->id_bentuk;
 			$querythickness 	= $this->db->query("SELECT * FROM child_inven_dimensi WHERE id_category3 = '" . $id_material . "' ")->result();
 			$thickness		 	= $querythickness[0]->nilai_dimensi;
-			if (empty($used[qtyrecive])) {
+			if (empty($used['qtyrecive'])) {
 			} else {
 				$stok =  array(
 					'id_category3'			=> $used['idmaterial'],
@@ -1471,20 +1471,20 @@ class Incoming extends Admin_Controller
 			$dt =  array(
 				'no_po'					=> $code,
 				'id_dt_po'				=> $code . '-' . $numb1,
-				'idpr'					=> $used[idpr],
-				'idmaterial'			=> $used[idmaterial],
-				'namamaterial'			=> $used[namamaterial],
-				'description'			=> $used[description],
-				'qty'					=> $used[qty],
-				'width'					=> $used[width],
-				'totalwidth'			=> $used[totalwidth],
-				'hargasatuan'			=> $used[hargasatuan],
-				'lebar'					=> $used[lebar],
-				'panjang'				=> $used[panjang],
-				'diskon'				=> $used[diskon],
-				'pajak'					=> $used[pajak],
-				'jumlahharga'			=> $used[jumlahharga],
-				'note'					=> $used[note],
+				'idpr'					=> $used['idpr'],
+				'idmaterial'			=> $used['idmaterial'],
+				'namamaterial'			=> $used['namamaterial'],
+				'description'			=> $used['description'],
+				'qty'					=> $used['qty'],
+				'width'					=> $used['width'],
+				'totalwidth'			=> $used['totalwidth'],
+				'hargasatuan'			=> $used['hargasatuan'],
+				'lebar'					=> $used['lebar'],
+				'panjang'				=> $used['panjang'],
+				'diskon'				=> $used['diskon'],
+				'pajak'					=> $used['pajak'],
+				'jumlahharga'			=> $used['jumlahharga'],
+				'note'					=> $used['note'],
 			);
 			$this->db->insert('dt_trans_po', $dt);
 		}
@@ -1809,19 +1809,19 @@ class Incoming extends Admin_Controller
 		foreach ($_POST['hd1'] as $h1) {
 			$numb1++;
 			$header1 =  array(
-				'id_type'		        => $h1[inventory_1],
-				'id_category1'		    => $h1[inventory_2],
-				'id_category2'		    => $h1[inventory_3],
-				'nama'		        	=> $h1[nm_inventory],
-				'maker'		        	=> $h1[maker],
-				'density'		        => $h1[density],
-				'hardness'		        => $h1[hardness],
-				'id_bentuk'		        => $h1[id_bentuk],
-				'id_surface'		    => $h1[id_surface],
-				'mountly_forecast'		=> $h1[mountly_forecast],
-				'safety_stock'		    => $h1[safety_stock],
-				'order_point'		    => $h1[order_point],
-				'maksimum'		    	=> $h1[maksimum],
+				'id_type'		        => $h1['inventory_1'],
+				'id_category1'		    => $h1['inventory_2'],
+				'id_category2'		    => $h1['inventory_3'],
+				'nama'		        	=> $h1['nm_inventory'],
+				'maker'		        	=> $h1['maker'],
+				'density'		        => $h1['density'],
+				'hardness'		        => $h1['hardness'],
+				'id_bentuk'		        => $h1['id_bentuk'],
+				'id_surface'		    => $h1['id_surface'],
+				'mountly_forecast'		=> $h1['mountly_forecast'],
+				'safety_stock'		    => $h1['safety_stock'],
+				'order_point'		    => $h1['order_point'],
+				'maksimum'		    	=> $h1['maksimum'],
 				'aktif'					=> 'aktif',
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
@@ -1839,9 +1839,9 @@ class Incoming extends Admin_Controller
 				$numb2++;
 				$data1 =  array(
 					'id_category3' => $id,
-					'id_suplier' => $d1[id_supplier],
-					'lead' => $d1[lead],
-					'minimum' => $d1[minimum],
+					'id_suplier' => $d1['id_supplier'],
+					'lead' => $d1['lead'],
+					'minimum' => $d1['minimum'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1859,8 +1859,8 @@ class Incoming extends Admin_Controller
 				$numb3++;
 				$comp =  array(
 					'id_category3' => $id,
-					'id_compotition' => $c1[id_compotition],
-					'nilai_compotition' => $c1[jumlah_kandungan],
+					'id_compotition' => $c1['id_compotition'],
+					'nilai_compotition' => $c1['jumlah_kandungan'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -1878,8 +1878,8 @@ class Incoming extends Admin_Controller
 				$numb4++;
 				$dms =  array(
 					'id_category3' => $id,
-					'id_dimensi' => $dm[id_dimensi],
-					'nilai_dimensi' => $dm[nilai_dimensi],
+					'id_dimensi' => $dm['id_dimensi'],
+					'nilai_dimensi' => $dm['nilai_dimensi'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -2009,19 +2009,19 @@ class Incoming extends Admin_Controller
 			$numb1++;
 
 			$header1 =  array(
-				'id_type'		        => $h1[inventory_1],
-				'id_category1'		    => $h1[inventory_2],
-				'id_category2'		    => $h1[inventory_3],
-				'nama'		        	=> $h1[nm_inventory],
-				'maker'		        	=> $h1[maker],
-				'density'		        => $h1[density],
-				'hardness'		        => $h1[hardness],
-				'id_bentuk'		        => $h1[id_bentuk],
-				'id_surface'		    => $h1[id_surface],
-				'mountly_forecast'		=> $h1[mountly_forecast],
-				'safety_stock'		    => $h1[safety_stock],
-				'order_point'		    => $h1[order_point],
-				'maksimum'		    	=> $h1[maksimum],
+				'id_type'		        => $h1['inventory_1'],
+				'id_category1'		    => $h1['inventory_2'],
+				'id_category2'		    => $h1['inventory_3'],
+				'nama'		        	=> $h1['nm_inventory'],
+				'maker'		        	=> $h1['maker'],
+				'density'		        => $h1['density'],
+				'hardness'		        => $h1['hardness'],
+				'id_bentuk'		        => $h1['id_bentuk'],
+				'id_surface'		    => $h1['id_surface'],
+				'mountly_forecast'		=> $h1['mountly_forecast'],
+				'safety_stock'		    => $h1['safety_stock'],
+				'order_point'		    => $h1['order_point'],
+				'maksimum'		    	=> $h1['maksimum'],
 				'aktif'					=> 'aktif',
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
@@ -2038,9 +2038,9 @@ class Incoming extends Admin_Controller
 				$numb2++;
 				$data1 =  array(
 					'id_category3' => $code,
-					'id_suplier' => $d1[id_supplier],
-					'lead' => $d1[lead],
-					'minimum' => $d1[minimum],
+					'id_suplier' => $d1['id_supplier'],
+					'lead' => $d1['lead'],
+					'minimum' => $d1['minimum'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -2056,8 +2056,8 @@ class Incoming extends Admin_Controller
 				$numb3++;
 				$comp =  array(
 					'id_category3' => $code,
-					'id_compotition' => $c1[id_compotition],
-					'nilai_compotition' => $c1[jumlah_kandungan],
+					'id_compotition' => $c1['id_compotition'],
+					'nilai_compotition' => $c1['jumlah_kandungan'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -2073,8 +2073,8 @@ class Incoming extends Admin_Controller
 				$numb4++;
 				$dms =  array(
 					'id_category3' => $code,
-					'id_dimensi' => $dm[id_dimensi],
-					'nilai_dimensi' => $dm[nilai_dimensi],
+					'id_dimensi' => $dm['id_dimensi'],
+					'nilai_dimensi' => $dm['nilai_dimensi'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -2112,19 +2112,19 @@ class Incoming extends Admin_Controller
 			$numb1++;
 
 			$header1 =  array(
-				'id_type'		        => $h1[inventory_1],
-				'id_category1'		    => $h1[inventory_2],
-				'id_category2'		    => $h1[inventory_3],
-				'nama'		        	=> $h1[nm_inventory],
-				'maker'		        	=> $h1[maker],
-				'density'		        => $h1[density],
-				'hardness'		        => $h1[hardness],
-				'id_bentuk'		        => $h1[id_bentuk],
-				'id_surface'		    => $h1[id_surface],
-				'mountly_forecast'		=> $h1[mountly_forecast],
-				'safety_stock'		    => $h1[safety_stock],
-				'order_point'		    => $h1[order_point],
-				'maksimum'		    	=> $h1[maksimum],
+				'id_type'		        => $h1['inventory_1'],
+				'id_category1'		    => $h1['inventory_2'],
+				'id_category2'		    => $h1['inventory_3'],
+				'nama'		        	=> $h1['nm_inventory'],
+				'maker'		        	=> $h1['maker'],
+				'density'		        => $h1['density'],
+				'hardness'		        => $h1['hardness'],
+				'id_bentuk'		        => $h1['id_bentuk'],
+				'id_surface'		    => $h1['id_surface'],
+				'mountly_forecast'		=> $h1['mountly_forecast'],
+				'safety_stock'		    => $h1['safety_stock'],
+				'order_point'		    => $h1['order_point'],
+				'maksimum'		    	=> $h1['maksimum'],
 				'aktif'					=> 'aktif',
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
@@ -2140,9 +2140,9 @@ class Incoming extends Admin_Controller
 				$numb2++;
 				$data1 =  array(
 					'id_category3' => $id,
-					'id_suplier' => $d1[id_supplier],
-					'lead' => $d1[lead],
-					'minimum' => $d1[minimum],
+					'id_suplier' => $d1['id_supplier'],
+					'lead' => $d1['lead'],
+					'minimum' => $d1['minimum'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -2158,8 +2158,8 @@ class Incoming extends Admin_Controller
 				$numb3++;
 				$comp =  array(
 					'id_category3' => $id,
-					'id_compotition' => $c1[id_compotition],
-					'nilai_compotition' => $c1[jumlah_kandungan],
+					'id_compotition' => $c1['id_compotition'],
+					'nilai_compotition' => $c1['jumlah_kandungan'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -2175,8 +2175,8 @@ class Incoming extends Admin_Controller
 				$numb4++;
 				$dms =  array(
 					'id_category3' => $id,
-					'id_dimensi' => $dm[id_dimensi],
-					'nilai_dimensi' => $dm[nilai_dimensi],
+					'id_dimensi' => $dm['id_dimensi'],
+					'nilai_dimensi' => $dm['nilai_dimensi'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -2419,7 +2419,7 @@ class Incoming extends Admin_Controller
 			}
 
 
-			$qtyterima   = $used[width_recive];
+			$qtyterima   = $used['width_recive'];
 
 			if ($post['pengiriman'] == 'lcl') {
 				$biayalog 	= (0.2 * $qtyterima) * $kurs;
@@ -2438,9 +2438,9 @@ class Incoming extends Admin_Controller
 
 
 
-			$id_dt_po 	= $used[id_dt_po];
-			$width       = $used[width];
-			$idmat       = $used[idmaterial];
+			$id_dt_po 	= $used['id_dt_po'];
+			$width       = $used['width'];
+			$idmat       = $used['idmaterial'];
 
 			$po 			= $this->db->query("SELECT * FROM dt_trans_po WHERE id_dt_po='$id_dt_po'")->row();
 			$hargasatuan = $po->hargasatuan;
@@ -2490,15 +2490,15 @@ class Incoming extends Admin_Controller
 			$costbook       = $costbook1;
 			$dt =  array(
 				'id_data'				=> $id_data,
-				'id_dt_po'				=> $used[id_dt_po],
-				'id_material'			=> $used[idmaterial],
-				'nama_material'			=> $used[nama_material],
-				'thickness'				=> $used[thickness],
-				'density'				=> $used[density],
-				'width'					=> $used[width],
-				'qty_order'				=> $used[qty_order],
-				'qty_recive'			=> $used[width_recive],
-				'lotno'					=> $used[lotno],
+				'id_dt_po'				=> $used['id_dt_po'],
+				'id_material'			=> $used['idmaterial'],
+				'nama_material'			=> $used['nama_material'],
+				'thickness'				=> $used['thickness'],
+				'density'				=> $used['density'],
+				'width'					=> $used['width'],
+				'qty_order'				=> $used['qty_order'],
+				'qty_recive'			=> $used['width_recive'],
+				'lotno'					=> $used['lotno'],
 				'kurs'					=> $kurs,
 				'harga_beli_satuan'	    => $hargasatuan,
 				'total_harga_beli'	    => $total_harga_barang,
@@ -2531,7 +2531,7 @@ class Incoming extends Admin_Controller
 			} else {
 
 				$dtcost =  array(
-					'id_category3'			=> $used[idmaterial],
+					'id_category3'			=> $used['idmaterial'],
 					'costbook_lama'		    => $costbooklama,
 					'nilai_costbook'		=> $costbook,
 					'width'					=> $width,
