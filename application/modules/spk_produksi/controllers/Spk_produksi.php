@@ -3418,8 +3418,10 @@ class Spk_produksi extends Admin_Controller
 		$this->template->page_icon('fa fa-pencil');
 		$aktif = 'active';
 		$deleted = '0';
-		$penawaran 	= $this->Inventory_4_model->get_data('tr_penawaran');
-		$stock 		= $this->Inventory_4_model->get_data('stock_material');
+		// Jangan load seluruh tabel (tr_penawaran / stock_material) -> memory exhausted.
+		// Dropdown lot diisi via AJAX Caristock(); saat edit cukup stock yang terpilih.
+		$penawaran 	= [];
+		$stock 		= [];
 		$karyawan 	= $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted);
 
 		$material 	= $this->db
@@ -3446,6 +3448,11 @@ class Spk_produksi extends Admin_Controller
 		$stok	= [];
 		if (!empty($header)) {
 			$stok	= $this->db->get_where('stock_material', array('id_category3' => $header[0]->id_material, 'id_gudang' => '1'))->result_array();
+			// Untuk mode edit, tampilkan hanya lot dari material yang sama (bukan seluruh tabel)
+			$stock	= $this->db
+				->select('id_stock, lotno')
+				->get_where('stock_material', array('id_category3' => $header[0]->id_material))
+				->result();
 		}
 
 		$data = [
