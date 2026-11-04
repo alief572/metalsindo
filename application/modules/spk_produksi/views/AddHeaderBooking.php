@@ -714,7 +714,8 @@
             data:"jumlah="+jumlah+"&id_stock="+id_stock+"&id_material="+id_material+"&thickness="+thickness+"&nama_material="+nama_material,
             success:function(html){
                $("#list_spk").append(html);
-			   $('.select').select2();
+			   // Init hanya select di baris terakhir yang baru ditambah
+			   $("#list_spk tr:last .select").select2();
             }
         });
     }
@@ -856,7 +857,8 @@
             data:"id_material="+id_material,
             success:function(html){
                $("#lotnumbe_slot").html(html);
-			   $('.select').select2();
+			   // Init hanya select lot yang baru, jangan re-init #id_material (ribuan option)
+			   $("#lotnumbe_slot .select").select2();
             }
         });
 
