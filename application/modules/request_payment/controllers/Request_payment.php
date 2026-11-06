@@ -301,7 +301,15 @@ class Request_payment extends Admin_Controller
 		/* Expense */
 		if (isset($type) && $type == 'expense') {
 			$data 			= $this->db->get_where('tr_expense', ['id' => $id])->row();
-			$data_detail	= $this->db->get_where('tr_expense_detail', ['no_doc' => $data->no_doc, 'id_kasbon' => null])->result();
+			// id_kasbon bisa NULL atau string kosong ('') pada data lama
+			$data_detail	= $this->db
+				->where('no_doc', $data->no_doc)
+				->group_start()
+				->where('id_kasbon IS NULL', null, false)
+				->or_where('id_kasbon', '')
+				->group_end()
+				->get('tr_expense_detail')
+				->result();
 		}
 
 		/* Kasbon */
