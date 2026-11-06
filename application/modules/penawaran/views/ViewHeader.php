@@ -110,7 +110,7 @@ foreach ($results['header'] as $header) {
 												<tr>
 													<td>FAX</td>
 													<td>:</td>
-													<td><? if (empty($header->fax)) {
+													<td><?php if (empty($header->fax)) {
 															echo "-";
 														} else {
 															echo "$header->fax";
@@ -129,7 +129,7 @@ foreach ($results['header'] as $header) {
 						</center>
 					</td>
 				</tr>
-				<tr><? 
+				<tr><?php
 					if ($header->mata_uang == 'USD') { ?>
 						<td colspan="2">
 							<table class="col-sm-12" border="1">
