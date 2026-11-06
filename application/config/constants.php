@@ -84,5 +84,10 @@ defined('EXIT_DATABASE')       or define('EXIT_DATABASE', 8); // database error
 defined('EXIT__AUTO_MIN')      or define('EXIT__AUTO_MIN', 9); // lowest automatically-assigned error code
 defined('EXIT__AUTO_MAX')      or define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
+// Kompatibilitas PHP 8+: kode lama memakai order_by('kolom', DESC) tanpa tanda kutip.
+// PHP 8 melempar Error untuk bare constant, jadi definisikan secara eksplisit.
+defined('DESC') or define('DESC', 'DESC');
+defined('ASC')  or define('ASC', 'ASC');
+
 define('DBACC', 'gl_metalsindo_live');
 define('DBERP', 'metalsindo_live');
