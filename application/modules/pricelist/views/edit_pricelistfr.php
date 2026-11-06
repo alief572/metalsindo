@@ -98,7 +98,7 @@
 									    <label for="customer">interest(%)</label>
 									    </div>
 									    <div class="col-md-6">
-										<?
+										<?php
 											foreach($results['interest'] as $interest){
 										?>
 					<input type="text" class="form-control" id="interest" value="<?= $interest->presentase_rate?>" required name="interest" readonly placeholder="Operating Cost (%)">
