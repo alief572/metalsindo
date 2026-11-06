@@ -256,9 +256,11 @@
 									<tbody id="list_spk">
 									<?php $loop=0;
 									
+									// Query sama untuk semua baris, cukup sekali
+									$nosurat_list = $this->db->query("SELECT a.id_dt_spkmarketing, b.no_surat as no_surat FROM dt_spkmarketing as a INNER JOIN tr_spk_marketing as b ON a.id_spkmarketing = b.id_spkmarketing WHERE a.id_material='$id_material' ")->result();
 									
 									foreach ($results['detail'] as $dt_spk){$loop++; 
-										$nosurat = $this->db->query("SELECT a.*, b.no_surat as no_surat FROM dt_spkmarketing as a INNER JOIN tr_spk_marketing as b ON a.id_spkmarketing = b.id_spkmarketing WHERE a.id_material='$id_material' ")->result();
+										$nosurat = $nosurat_list;
 										$cheked = ($dt_spk->checked == '1')?'checked':'';
 										$readonly = ($dt_spk->no_surat == 'nonspk')?'':'readonly';
 										
@@ -285,9 +287,9 @@
 											<th>$loop</th>
 											<th><select id='used_no_surat_$loop' name='dt[$loop][no_surat]' onchange='CariDetail($loop)' class='form-control input-sm select'>
 											<option value='nonspk'>Non SPK</option>";
-											foreach($nosurat as $nosurat){
-												$select = $dt_spk->no_surat == $nosurat->id_dt_spkmarketing ? 'selected' : '';
-											echo"<option value='$nosurat->id_dt_spkmarketing' $select>$nosurat->no_surat</option>";
+											foreach($nosurat as $ns){
+												$select = $dt_spk->no_surat == $ns->id_dt_spkmarketing ? 'selected' : '';
+											echo"<option value='$ns->id_dt_spkmarketing' $select>$ns->no_surat</option>";
 											}
 										echo"</select></th>
 											<th id='idcust_$loop' hidden><input type='text' class='form-control' 	value='$dt_spk->idcustomer' 	readonly id='used_idcustomer_$loop' required name='dt[$loop][idcustomer]'></th>

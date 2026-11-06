@@ -164,38 +164,30 @@ class Spk_produksi extends Admin_Controller
 		$this->template->page_icon('fa fa-pencil');
 		$aktif = 'active';
 		$deleted = '0';
-		$penawaran 	= $this->Inventory_4_model->get_data('tr_penawaran');
-		//$stock 		= $this->Inventory_4_model->get_data('stock_material');
-
-		$stock		= $this->db->query("SELECT a.* FROM stock_material a")->result();
-		$karyawan 	= $this->Inventory_4_model->get_data('ms_karyawan', 'deleted', $deleted);
+		// Hindari load seluruh tabel (penawaran, karyawan, mata_uang, stock_material)
+		// karena tidak dipakai di view dan menyebabkan memory exhausted.
 		$material 	= $this->Inventory_4_model->get_data_category3();
-		$mata_uang 	= $this->Inventory_4_model->get_data('mata_uang', 'deleted', $deleted);
 
 		$header = $this->db->get_where('tr_spk_produksi', array('id_spkproduksi' => $id))->result();
 
 		$header2 = $this->db->get_where('dt_tr_spk_produksi', array('id_spkproduksi' => $id))->result();
 
-
 		$detail = $this->db->get_where('dt_spk_produksi', array('id_spkproduksi' => $id))->result();
-		if (!empty($view)) {
-			$detail = $this->db->get_where('dt_spk_produksi', array('id_spkproduksi' => $id))->result();
-		}
-		$stok	= [];
+
+		// View hanya butuh id_stock & lotno, dibatasi pada material SPK ini
+		$stock = [];
 		if (!empty($header)) {
-			$stok	= $this->db->get_where('stock_material', array('id_category3' => $header[0]->id_material, 'id_gudang' => '1'))->result_array();
+			$stock = $this->db->select('id_stock, lotno')
+				->get_where('stock_material', array('id_category3' => $header[0]->id_material))
+				->result();
 		}
 
 		$data = [
-			'penawaran' => $penawaran,
 			'stock' => $stock,
-			'karyawan' => $karyawan,
 			'material' => $material,
-			'mata_uang' => $mata_uang,
 			'header' => $header,
 			'header2' => $header2,
 			'detail' => $detail,
-			'stok' => $stok,
 			'view' => $view
 		];
 		$this->template->set('results', $data);
