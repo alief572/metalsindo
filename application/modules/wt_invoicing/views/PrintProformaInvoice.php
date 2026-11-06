@@ -308,7 +308,7 @@ $tgl = date('d-F-Y', strtotime($header->tgl_do));
 			<td align="right"><?= number_format($detail->harga_satuan,2) ?></td>
 			<td align="right"><?= number_format($detail->total_harga,2) ?></td>
 			</tr>
-			<?php}?>
+			<?php } ?>
 	</tbody>
 	<tfoot>
 	        
