@@ -222,7 +222,7 @@ $dp2 =$this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so'
 				<table width='380' align="center">
 				<tr><td width='70' align="left">Sold To</td><td width='10' align="left">:</td><td width='300' align="left"><?=$customer->name_customer?></td></tr>
 				<tr><td width='70' align="left"></td><td width='10' align="left"></td><td width='310' align="left"><?=$customer->address_office?></td></tr>
-				<tr><td width='70' align="left"></td><td width='10' align="left"></td><td width='300' align="left">Telp. <?=$customer->telephone?>  Fax.<?phpif(empty($header->fax)){echo"-";}else{echo"$header->fax";}  ?></td></tr>
+				<tr><td width='70' align="left"></td><td width='10' align="left"></td><td width='300' align="left">Telp. <?=$customer->telephone?>  Fax.<?php if(empty($header->fax)){echo"-";}else{echo"$header->fax";}  ?></td></tr>
 				<tr><td width='70' align="left"></td><td width='10' align="left"></td><td width='300' align="left">Att.&nbsp; Keuangan</td></tr>
 				</table>
 				</td>
@@ -340,7 +340,7 @@ $dp2 =$this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so'
 			<td align="center"><?= $bentuk ?></td>					
 			
 			</tr>
-			<?php}?>
+			<?php } ?>
 	</tbody>
 	<tfoot>
 	        
@@ -423,7 +423,7 @@ $dp2 =$this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so'
 			<td align="center"><?= $bentuk2 ?></td>					
 			
 			</tr>
-			<?php}?>
+			<?php } ?>
 	</tbody>
 	<tfoot>
 	        

@@ -874,12 +874,16 @@ class Wt_invoicing_model extends BF_Model
     $length = (int) $this->input->post('length');
     $search = $this->input->post('search');
 
-    $this->db->from('view_efaktur_invoice');
-    $this->db->where('stat_efaktur', 0);
+    if ($length <= 0) {
+      $length = 10;
+    }
 
-    // Hitung Valid Records (NPWP tidak kosong, untuk keperluan check-all state)
-    // $this->db->where('npwp !=', '');
-    // $this->db->where('npwp IS NOT NULL', null, false);
+    // Tidak memakai view_efaktur_invoice: view tsb meng-agregasi seluruh stock_material
+    // sebelum LIMIT sehingga timeout. Paging dilakukan langsung di tr_invoice,
+    // lalu DPP/PPN dihitung hanya untuk invoice di halaman aktif (rumus sama dengan view).
+    $this->db->from('tr_invoice inv');
+    $this->db->join('master_customers cust', 'inv.id_customer = cust.id_customer');
+    $this->db->where('inv.stat_efaktur', 0);
 
     // Total tanpa filter
     $count_all = $this->db->count_all_results('', false);
@@ -888,26 +892,43 @@ class Wt_invoicing_model extends BF_Model
     if (!empty($search['value'])) {
       $val = $search['value'];
       $this->db->group_start();
-      $this->db->like('no_invoice', $val);
-      $this->db->or_like('nama_customer', $val);
-      $this->db->or_like('term', $val);
-      $this->db->or_like('nomor_do', $val);
-      $this->db->or_like('tgl_invoice', $val);
+      $this->db->like('inv.no_surat', $val);
+      $this->db->or_like('cust.name_customer', $val);
+      $this->db->or_like('inv.note', $val);
+      $this->db->or_like('inv.no_do', $val);
+      $this->db->or_like('inv.tgl_invoice', $val);
       $this->db->group_end();
     }
 
     // Total setelah filter
-    $count_filtered = $this->db->count_all_results('', false);
+    $count_filtered = !empty($search['value'])
+      ? $this->db->count_all_results('', false)
+      : $count_all;
 
+    // Filter NPWP di-comment, jadi sama dengan $count_filtered
+    $count_valid = $count_filtered;
 
-    $count_valid = $this->db->count_all_results('', false);
-
-    // Ambil data
+    // Ambil data halaman aktif
     $rows = $this->db
-      ->order_by('tgl_invoice', 'DESC')
+      ->select('inv.no_invoice AS id_invoice, inv.id_do, inv.no_surat AS no_invoice, cust.npwp,
+                UPPER(cust.name_customer) AS nama_customer, inv.note AS term,
+                inv.no_do AS nomor_do, inv.tgl_invoice, inv.stat_efaktur, inv.id_customer', false)
+      ->order_by('inv.tgl_invoice', 'DESC')
       ->limit($length, $start)
       ->get()
       ->result_array();
+
+    $totals = $this->_efaktur_total_awal($rows);
+
+    foreach ($rows as &$row) {
+      $total_awal        = isset($totals[$row['id_invoice']]) ? (float) $totals[$row['id_invoice']] : 0;
+      $dpp               = ceil(11 / 12 * $total_awal);
+      $ppn               = $dpp * 0.12;
+      $row['nilai_dpp']     = $dpp;
+      $row['nilai_ppn']     = $ppn;
+      $row['nilai_invoice'] = $dpp + $ppn;
+    }
+    unset($row);
 
     $no   = $start;
     $data = array_map(function ($item) use (&$no) {
@@ -943,6 +964,65 @@ class Wt_invoicing_model extends BF_Model
       'totalValid'      => $count_valid,
       'data'            => $data,
     ];
+  }
+
+  /**
+   * Hitung total_awal (sebelum DPP 11/12) per invoice, hanya untuk invoice yang diberikan.
+   * Logika sama dengan subquery `ds` di view_efaktur_invoice:
+   * - bentuk sheet (B2000002): harga_satuan * total qty_sheet dari stock_material
+   * - lainnya: qty_invoice * harga_satuan
+   *
+   * @param array $rows baris tr_invoice (wajib berisi id_invoice & id_do)
+   * @return array [no_invoice => total_awal]
+   */
+  private function _efaktur_total_awal(array $rows)
+  {
+    if (empty($rows)) {
+      return [];
+    }
+
+    $invoice_ids = array_values(array_unique(array_column($rows, 'id_invoice')));
+    $do_ids      = array_values(array_filter(array_unique(array_column($rows, 'id_do')), 'strlen'));
+
+    $inv_ph = implode(',', array_fill(0, count($invoice_ids), '?'));
+    $binds  = [];
+
+    if (!empty($do_ids)) {
+      $do_ph    = implode(',', array_fill(0, count($do_ids), '?'));
+      $stk_join = "LEFT JOIN (
+          SELECT stk.no_kirim, child.id_material, SUM(stk.qty_sheet) AS total_qty_sheet
+          FROM stock_material stk
+          JOIN dt_delivery_order_child child ON stk.lotno = child.lotno
+          WHERE stk.no_kirim IN ($do_ph)
+          GROUP BY stk.no_kirim, child.id_material
+        ) stk_sum ON stk_sum.id_material = id_inv.id_category3
+                 AND stk_sum.no_kirim = main_inv.id_do";
+      $binds    = $do_ids;
+      $qty_expr = "IFNULL(stk_sum.total_qty_sheet, 0)";
+    } else {
+      $stk_join = '';
+      $qty_expr = '0';
+    }
+
+    $sql = "SELECT id_inv.no_invoice,
+                   SUM(CASE WHEN cat.id_bentuk = 'B2000002'
+                            THEN id_inv.harga_satuan * $qty_expr
+                            ELSE id_inv.qty_invoice * id_inv.harga_satuan END) AS total_awal
+            FROM tr_invoice_detail id_inv
+            JOIN tr_invoice main_inv ON main_inv.no_invoice = id_inv.no_invoice
+            LEFT JOIN ms_inventory_category3 cat ON cat.id_category3 = id_inv.id_category3
+            $stk_join
+            WHERE id_inv.no_invoice IN ($inv_ph)
+            GROUP BY id_inv.no_invoice";
+
+    $binds = array_merge($binds, $invoice_ids);
+
+    $result = [];
+    foreach ($this->db->query($sql, $binds)->result_array() as $r) {
+      $result[$r['no_invoice']] = $r['total_awal'];
+    }
+
+    return $result;
   }
 
   public function list_efaktur()

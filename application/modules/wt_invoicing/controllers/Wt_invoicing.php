@@ -2895,6 +2895,27 @@ class Wt_invoicing extends Admin_Controller
 		set_time_limit(0);
 		ini_set('memory_limit', '1024M');
 
+		// Catat fatal error ke application/logs supaya penyebab HTTP 500 terlihat
+		register_shutdown_function(function () {
+			$err = error_get_last();
+			if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR], true)) {
+				log_message('error', 'export_coretax_excel FATAL: ' . $err['message'] . ' @ ' . $err['file'] . ':' . $err['line']);
+			}
+		});
+
+		try {
+			$this->_export_coretax_excel_build();
+		} catch (\Throwable $e) {
+			log_message('error', 'export_coretax_excel EXCEPTION: ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine());
+			while (ob_get_level()) {
+				ob_end_clean();
+			}
+			show_error('Gagal generate file E-Faktur: ' . $e->getMessage(), 500);
+		}
+	}
+
+	private function _export_coretax_excel_build()
+	{
 		$this->load->library("PHPExcel");
 
 		$invoices_data = $this->session->userdata('export_data_temp');
@@ -2992,7 +3013,7 @@ class Wt_invoicing extends Admin_Controller
 			$this->db->where('a.no_surat', $invoice['no_invoice']);
 			$get_invoice = $this->db->get()->row_array();
 
-			$tipe_invoice = ($get_invoice['type'] == 'slitting') ? 'Jasa Slitting' : '';
+			$tipe_invoice = (isset($get_invoice['type']) && $get_invoice['type'] == 'slitting') ? 'Jasa Slitting' : '';
 
 			$tanggal_faktur_formatted = date('d/m/Y', strtotime($invoice['tanggal_invoice']));
 			$NPWP = preg_replace("/[^0-9]/", "", $invoice['npwp']);
@@ -3042,7 +3063,10 @@ class Wt_invoicing extends Admin_Controller
 			$rowFaktur++;
 
 			// Data untuk Sheet Detail Faktur
-			foreach ($invoice['items'] as $item) {
+			foreach (($invoice['items'] ?? []) as $item) {
+
+				$item['tobe_size'] = $item['tobe_size'] ?? '';
+				$item['kode_coretax'] = $item['kode_coretax'] ?? ($item['kode_barang'] ?? '');
 
 				$nama_barang = (!empty($tipe_invoice)) ? $tipe_invoice . ' ' . $item['nama_barang'] : $item['nama_barang'];
 
