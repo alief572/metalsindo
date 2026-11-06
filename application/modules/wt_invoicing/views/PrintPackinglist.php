@@ -247,7 +247,7 @@
 								<tr>
 									<td width='70' align="left"></td>
 									<td width='10' align="left"></td>
-									<td width='300' align="left">Telp. <?= $customer->telephone ?> Fax.<? if (empty($header->fax)) {
+									<td width='300' align="left">Telp. <?= $customer->telephone ?> Fax.<?php if (empty($header->fax)) {
 																											echo "-";
 																										} else {
 																											echo "$header->fax";
@@ -426,7 +426,7 @@
 					<td align="center"><?= $bentuk ?></td>
 
 				</tr>
-			<? } ?>
+			<?php } ?>
 		</tbody>
 		<tfoot>
 

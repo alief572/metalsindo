@@ -285,7 +285,7 @@ $dp2 = $this->db->query("SELECT * FROM wt_plan_tagih WHERE no_so='$header->no_so
 							<tr>
 								<td width='70' align="left"></td>
 								<td width='10' align="left"></td>
-								<td width='300' align="left">Telp. <?= $customer->telephone ?> Fax.<? if (empty($header->fax)) {
+								<td width='300' align="left">Telp. <?= $customer->telephone ?> Fax.<?php if (empty($header->fax)) {
 																										echo "-";
 																									} else {
 																										echo "$header->fax";

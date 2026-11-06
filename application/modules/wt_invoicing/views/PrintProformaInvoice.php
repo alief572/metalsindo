@@ -215,7 +215,7 @@ $tgl = date('d-F-Y', strtotime($header->tgl_do));
 				<table width='380' align="center">
 				<tr><td width='70' align="left">Sold To</td><td width='10' align="left">:</td><td width='300' align="left"><?=$customer->name_customer?></td></tr>
 				<tr><td width='70' align="left"></td><td width='10' align="left"></td><td width='310' align="left"><?=$customer->address_office?></td></tr>
-				<tr><td width='70' align="left"></td><td width='10' align="left"></td><td width='300' align="left">Telp. <?=$customer->telephone?>  Fax.<?if(empty($header->fax)){echo"-";}else{echo"$header->fax";}  ?></td></tr>
+				<tr><td width='70' align="left"></td><td width='10' align="left"></td><td width='300' align="left">Telp. <?=$customer->telephone?>  Fax.<?phpif(empty($header->fax)){echo"-";}else{echo"$header->fax";}  ?></td></tr>
 				<tr><td width='70' align="left"></td><td width='10' align="left"></td><td width='300' align="left">Att.&nbsp; Keuangan</td></tr>
 				</table>
 				</td>
@@ -308,7 +308,7 @@ $tgl = date('d-F-Y', strtotime($header->tgl_do));
 			<td align="right"><?= number_format($detail->harga_satuan,2) ?></td>
 			<td align="right"><?= number_format($detail->total_harga,2) ?></td>
 			</tr>
-			<?}?>
+			<?php}?>
 	</tbody>
 	<tfoot>
 	        
