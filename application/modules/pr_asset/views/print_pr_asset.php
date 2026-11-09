@@ -176,40 +176,35 @@
 
 <body>
 
-	<table class="gridtable2" border="0">
+	<table style="width: 100%;">
 		<tr>
-			<td style="text-align:left;">
-				<img src='<?= 'assets/images/ori_logo2.png'; ?>' alt="" width="75" height="95">
+			<td style="width: 10%;"><img src='assets/images/logo_metalsindo.jpeg' height='30'></td>
+			<td style="width: 40%; vertical-align: middle;">
+				<h5>PT METALSINDO PACIFIC</h5>
 			</td>
-			<td align="right" width="630">
-				<br>
-				Jl. Pembangunan II <br>
-				Kel. Batusari, <br>
-				Kec. Batuceper, <br>
-				Kota Tangerang Postal <br>
-				Code 15122 <br>
-				Indonesia
-
-			</td>
+			<td style="width: 50%; text-align: right;"><img src='assets/img/ISO_9001V1.jpg' height='30'></td>
 		</tr>
 	</table>
-	<hr>
-	<div style='display:block; border-color:none; background-color:#c2c2c2;' align='center'>
-		<h3>PR ASSET</h3>
+
+	<div style='background-color:#c2c2c2; padding: 5px; text-align: center;'>
+		<b style="font-size: 14px;">PR ASSET</b>
 	</div>
-	<br>
 
-	<table class="gridtableX" width="100%">
+	<table style="width: 100%; margin-top: 10px;">
 		<tr>
-			<td width="50">No. PR</td>
-			<td align="center">:</td>
-			<td width="100" align="right"><?= $result[0]['no_pr'] ?></td>
-			<td width="220"></td>
-			<td width="50">PR Date</td>
-			<td align="center">:</td>
-			<td width="100" align="right"><?= date('d F Y', strtotime($result_header['tgl_pr'])) ?></td>
+			<td style="width: 50%; font-size: 10px; line-height: 1.4;">
+				Address<br>
+				Jl. Jababeka XIV, Blok J no. 10 H<br>
+				Cikarang Industrial Estate, Bekasi 17530<br>
+				Phone : (62-21) 89831726734 / Fax : (62-21) 89831866
+			</td>
+			<td style="width: 50%; text-align: right; font-size: 10px; vertical-align: top;">
+				<b>PR No :</b> <?= $result[0]['no_pr'] ?> <br>
+				<b>PR Date :</b> <?= date('d F Y', strtotime($result_header['tgl_pr'])) ?>
+			</td>
 		</tr>
 	</table>
+	<br>
 
 	<table class='gridtable' id="" width="100%" cellpadding='0' cellspacing='0' style='vertical-align:top;min-width: 400px !important; max-width: 750px !important;'>
 		<tr>

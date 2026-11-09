@@ -1313,7 +1313,8 @@ if (!defined('__CLASS_HTML2PDF__')) {
             $infos=@getimagesize($src);
 
             // if the image does not exist, or can not be loaded
-            if (count($infos)<2) {
+            // PHP 8: getimagesize() returns false on failure, count(false) throws TypeError
+            if (!is_array($infos) || count($infos)<2) {
                 // if the test is activ => exception
                 if ($this->_testIsImage) {
                     throw new HTML2PDF_exception(6, $src);
