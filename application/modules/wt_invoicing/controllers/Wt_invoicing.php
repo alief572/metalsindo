@@ -233,6 +233,15 @@ class Wt_invoicing extends Admin_Controller
 		$detail    = $this->Wt_invoicing_model->CariSPK($id);
 		//$alamat    = $this->Wt_invoicing_model->getAlamatSO($plan->no_so);
 		$hdso      = $this->Wt_invoicing_model->get_data('tr_spk_marketing', 'id_spkmarketing', $id);
+		// Proforma tidak memiliki plan tagih, gunakan nilai default
+		$spk  = !empty($header) ? $header[0] : null;
+		$plan = (object) [
+			'id_plan_tagih' => '',
+			'id_top'        => $spk->id_top ?? '',
+			'payment'       => '',
+			'keterangan'    => '',
+			'persentase'    => 100,
+		];
 		$data = [
 			'customers' => $customers,
 			'karyawan' => $karyawan,
