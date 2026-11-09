@@ -54,26 +54,33 @@
 					$gambar = '';
 					if (!empty($data_detail)) {
 						foreach ($data_detail as $record) {
-							$i++; ?>
+							$i++;
+							// Normalisasi nilai kosong ('' / NULL) menjadi 0 agar aman di PHP 8
+							$r_bensin  = (float) $record->bensin;
+							$r_tol     = (float) $record->tol;
+							$r_parkir  = (float) $record->parkir;
+							$r_lainnya = (float) $record->lainnya;
+							$r_km      = (float) $record->km_akhir - (float) $record->km_awal;
+							?>
 							<tr>
 								<td><?= tgl_indo($record->tgl_doc); ?></td>
 								<td><?= $record->nopol; ?></td>
 								<td><?= $record->keperluan; ?></td>
 								<td><?= $record->rute; ?></td>
-								<td align="right"><?= number_format($record->bensin); ?></td>
-								<td align="right"><?= number_format($record->km_akhir - $record->km_awal); ?></td>
+								<td align="right"><?= number_format($r_bensin); ?></td>
+								<td align="right"><?= number_format($r_km); ?></td>
 								<td></td>
-								<td align="right"><?= number_format($record->tol + $record->parkir); ?></td>
-								<td align="right"><?= number_format($record->lainnya); ?></td>
-								<td align="right"><?= number_format($record->bensin + $record->tol + $record->parkir + $record->lainnya); ?></td>
+								<td align="right"><?= number_format($r_tol + $r_parkir); ?></td>
+								<td align="right"><?= number_format($r_lainnya); ?></td>
+								<td align="right"><?= number_format($r_bensin + $r_tol + $r_parkir + $r_lainnya); ?></td>
 								<td align="right"><?= ($record->keterangan); ?></td>
 							</tr>
 					<?php
-							$total_bensin = ($total_bensin + ($record->bensin));
-							$total_tol = ($total_tol + ($record->tol));
-							$total_parkir = ($total_parkir + ($record->parkir));
-							$total_km = ($total_km + ($record->km_akhir - $record->km_awal));
-							$lainnya = ($lainnya + $record->lainnya);
+							$total_bensin += $r_bensin;
+							$total_tol += $r_tol;
+							$total_parkir += $r_parkir;
+							$total_km += $r_km;
+							$lainnya += $r_lainnya;
 							if ($record->doc_file != '') {
 								if (strpos($record->doc_file, 'pdf', 0) > 1) {
 									$gambar .= '<div class="col-md-12">
