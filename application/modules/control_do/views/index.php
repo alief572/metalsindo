@@ -770,7 +770,7 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 		var no_spk = $('select[name="filter_no_spk"]').val();
 		var customer = $('select[name="filter_customer"]').val();
 
-		var url = siteurl + active_controller + 'download_excel?tahun=' + tahun + '&bulan=' + bulan + '&no_do=' + no_do + '&no_spk=' + no_spk + '&customer=' + customer;
+		var url = siteurl + active_controller + 'download_excel?tahun=' + encodeURIComponent(tahun || '') + '&bulan=' + encodeURIComponent(bulan || '') + '&no_do=' + encodeURIComponent(no_do || '') + '&no_spk=' + encodeURIComponent(no_spk || '') + '&customer=' + encodeURIComponent(customer || '');
 
 		window.open(url, '_blank');
 	}
@@ -782,7 +782,7 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 		var no_spk = $('select[name="filter_scrap_no_spk"]').val();
 		var customer = $('select[name="filter_scrap_customer"]').val();
 
-		var url = siteurl + active_controller + 'download_excel_scrap?tahun=' + tahun + '&bulan=' + bulan + '&no_do=' + no_do + '&no_spk=' + no_spk + '&customer=' + customer;
+		var url = siteurl + active_controller + 'download_excel_scrap?tahun=' + encodeURIComponent(tahun || '') + '&bulan=' + encodeURIComponent(bulan || '') + '&no_do=' + encodeURIComponent(no_do || '') + '&no_spk=' + encodeURIComponent(no_spk || '') + '&customer=' + encodeURIComponent(customer || '');
 
 		window.open(url, '_blank');
 	}
