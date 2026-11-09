@@ -2033,13 +2033,19 @@ class Purchase_order_non_material extends Admin_Controller
 			}
 
 			if ($data['header'][0]->tipe == 'pr depart') {
-				$get_tgl_dibutuhkan = $this->db->select('a.tgl_dibutuhkan')->from('rutin_non_planning_header a')->where_in('a.no_pr', $list_no_pr)->order_by('a.id', 'asc')->limit(1)->get()->row();
+				$get_tgl_dibutuhkan = null;
+				if (!empty($list_no_pr)) {
+					$get_tgl_dibutuhkan = $this->db->select('a.tgl_dibutuhkan')->from('rutin_non_planning_header a')->where_in('a.no_pr', $list_no_pr)->order_by('a.id', 'asc')->limit(1)->get()->row();
+				}
 
 				$data['tgl_dibutuhkan'] = (!empty($get_tgl_dibutuhkan)) ? $get_tgl_dibutuhkan->tgl_dibutuhkan : '';
 			}
 
 			if ($data['header'][0]->tipe == 'pr asset') {
-				$get_tgl_dibutuhkan = $this->db->select('a.tgl_dibutuhkan')->from('tran_pr_detail a')->where_in('a.no_pr', $list_no_pr)->order_by('a.id', 'asc')->limit(1)->get()->row();
+				$get_tgl_dibutuhkan = null;
+				if (!empty($list_no_pr)) {
+					$get_tgl_dibutuhkan = $this->db->select('a.tgl_dibutuhkan')->from('tran_pr_detail a')->where_in('a.no_pr', $list_no_pr)->order_by('a.id', 'asc')->limit(1)->get()->row();
+				}
 
 				$data['tgl_dibutuhkan'] = (!empty($get_tgl_dibutuhkan)) ? $get_tgl_dibutuhkan->tgl_dibutuhkan : '';
 			}
@@ -2102,7 +2108,10 @@ class Purchase_order_non_material extends Admin_Controller
 				}
 			}
 
-			$get_tgl_dibutuhkan = $this->db->select('a.tgl_dibutuhkan')->from('material_planning_base_on_produksi a')->where_in('a.no_pr', $list_no_pr)->order_by('a.id', 'asc')->limit(1)->get()->row();
+			$get_tgl_dibutuhkan = null;
+			if (!empty($list_no_pr)) {
+				$get_tgl_dibutuhkan = $this->db->select('a.tgl_dibutuhkan')->from('material_planning_base_on_produksi a')->where_in('a.no_pr', $list_no_pr)->order_by('a.id', 'asc')->limit(1)->get()->row();
+			}
 
 			$data['tgl_dibutuhkan'] = (!empty($get_tgl_dibutuhkan)) ? $get_tgl_dibutuhkan->tgl_dibutuhkan : '';
 
@@ -2136,7 +2145,7 @@ class Purchase_order_non_material extends Admin_Controller
 
 		$get_terms = $this->db->select('a.keterangan')->from('tr_top_po a')->where('a.no_po', $id)->order_by('a.id', 'asc')->limit(1)->get()->row();
 
-		$data['terms'] = $get_terms->keterangan;
+		$data['terms'] = (!empty($get_terms)) ? $get_terms->keterangan : '';
 
 
 
