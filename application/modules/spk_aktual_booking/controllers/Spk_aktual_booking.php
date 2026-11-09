@@ -57,11 +57,9 @@ class Spk_aktual_booking extends Admin_Controller
 		$aktif = 'active';
 		$deleted = '0';
 		$id2 = substr($id,0,8);
-		$penawaran 	= $this->Inventory_4_model->get_data('tr_penawaran');
-		$stock 		= $this->Inventory_4_model->get_data('stock_material');
-		$karyawan 	= $this->Inventory_4_model->get_data('ms_karyawan','deleted',$deleted);
+		// penawaran, stock (seluruh tabel), karyawan, mata_uang tidak dipakai di view AddHeader
+		// dan menyebabkan memory exhausted, jadi tidak di-load.
 		$material 	= $this->Inventory_4_model->get_data_category3();
-		$mata_uang 	= $this->Inventory_4_model->get_data('mata_uang','deleted',$deleted);
 
 		$header = $this->db->get_where('dt_tr_spk_produksi',array('id_tr_spk_produksi'=>$id))->result();
 		$aktual = $this->db->get_where('tr_spk_aktual',array('id_spk_aktual'=>$id))->result();
@@ -75,11 +73,7 @@ class Spk_aktual_booking extends Admin_Controller
 		}
 		
 		$data = [
-			'penawaran' => $penawaran,
-			'stock' => $stock,
-			'karyawan' => $karyawan,
 			'material' => $material,
-			'mata_uang' => $mata_uang,
 			'header' => $header,
 			'aktual' => $aktual,
 			'detail' => $detail,
@@ -3193,23 +3187,11 @@ public function deletePenawaran(){
 		$dt_spk =$this->db->query("SELECT a.*, b.name_customer as name_customer FROM dt_spk_produksi as a LEFT JOIN master_customers as b on a.idcustomer = b.id_customer where a.id_tr_spk_produksi = '".$id."' AND a.checked = '1' ")->result();
 		}
 		
-		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran');
-		$stock = $this->Inventory_4_model->get_data('stock_material');
-		$karyawan = $this->Inventory_4_model->get_data('ms_karyawan','deleted',$deleted);
-		$material = $this->Inventory_4_model->get_data_category3();
-		$mata_uang = $this->Inventory_4_model->get_data('mata_uang','deleted',$deleted);
-		
-		 // print_r($dt_spk);
-		 // exit;
-		
+		// Data master (penawaran, stock, karyawan, material, mata_uang) tidak dipakai
+		// oleh view EditHeader_new*, jadi tidak di-load agar tidak memory exhausted.
 		$data = [
 			'tr_spk'	=> $tr_spk,
 			'dt_spk'	=> $dt_spk,
-			'penawaran' => $penawaran,
-			'stock' => $stock,
-			'karyawan' => $karyawan,
-			'material' => $material,
-			'mata_uang' => $mata_uang,
 		];
         $this->template->set('results', $data);
         $this->template->title('Aktual Produksi');

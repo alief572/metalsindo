@@ -217,23 +217,11 @@ class Spk_aktual_slitting extends Admin_Controller
 		// $dt_spk =$this->db->query("SELECT a.*, b.name_customer as name_customer FROM dt_spk_produksi as a LEFT JOIN master_customers as b on a.idcustomer = b.id_customer where a.id_spkproduksi = '".$id."' AND a.checked = '1' ")->result();
 		}
 		
-		$penawaran = $this->Inventory_4_model->get_data('tr_penawaran');
-		$stock = $this->Inventory_4_model->get_data('stock_material');
-		$karyawan = $this->Inventory_4_model->get_data('ms_karyawan','deleted',$deleted);
-		$material = $this->Inventory_4_model->get_data_category3();
-		$mata_uang = $this->Inventory_4_model->get_data('mata_uang','deleted',$deleted);
-		
-		 // print_r($dt_spk);
-		 // exit;
-		
+		// Data master (penawaran, stock, karyawan, material, mata_uang) tidak dipakai
+		// oleh view EditHeader*, jadi tidak di-load agar tidak memory exhausted.
 		$data = [
 			'tr_spk'	=> $tr_spk,
-			'dt_spk'	=> $dt_spk,
-			'penawaran' => $penawaran,
-			'stock' => $stock,
-			'karyawan' => $karyawan,
-			'material' => $material,
-			'mata_uang' => $mata_uang,
+			'dt_spk'	=> isset($dt_spk) ? $dt_spk : [],
 		];
         $this->template->set('results', $data);
         $this->template->title('Aktual Produksi');
