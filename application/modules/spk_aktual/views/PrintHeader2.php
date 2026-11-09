@@ -86,13 +86,13 @@
 </table>
 <table id="tables" border="0" width='100%' align="center" cellpadding="2" cellspacing="0">
 	<tr>
-	<td width="200" align="center">Material Name</td>
-	<td width="50" align="center">THICK</td>
-	<td width="50" align="center">WIDTH</td>
-	<td width="50" align="center">*QTY (kg)</td>
-	<td width="50" align="center">QTY (COIL) </td>
-	<td width="200" align="center">LOT NO.</td>
-	<td width="100" align="center">SUPPLIER</td>
+	<td width="28%" align="center">Material Name</td>
+	<td width="8%" align="center">THICK</td>
+	<td width="8%" align="center">WIDTH</td>
+	<td width="9%" align="center">*QTY (kg)</td>
+	<td width="9%" align="center">QTY (COIL) </td>
+	<td width="24%" align="center">LOT NO.</td>
+	<td width="14%" align="center">SUPPLIER</td>
 </tr>
 	<tr>
 	<td align="center"><?= $tr_spk->nama_material ?></td>

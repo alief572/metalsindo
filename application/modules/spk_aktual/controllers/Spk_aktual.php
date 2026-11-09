@@ -127,7 +127,8 @@ class Spk_aktual extends Admin_Controller
 		$this->load->view('PrintHeader2', $data);
 		$html = ob_get_contents();
 		require_once('./assets/html2pdf/html2pdf/html2pdf.class.php');
-		$html2pdf = new HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(0, 0, 0, 0));
+		// margin 10mm (kiri, atas, kanan, bawah) supaya tabel tidak melebar keluar halaman
+		$html2pdf = new HTML2PDF('P', 'A4', 'en', true, 'UTF-8', array(10, 10, 10, 10));
 		$html2pdf->pdf->SetDisplayMode('fullpage');
 		$html2pdf->WriteHTML($html);
 		ob_end_clean();
