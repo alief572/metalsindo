@@ -727,6 +727,18 @@ class Penawaran extends Admin_Controller
 		endforeach;
 		echo "</select>";
 	}
+
+	/**
+	 * Konversi harga (IDR) ke dolar. Input boleh berformat ribuan ("1,250,000") atau kosong.
+	 * Mengembalikan 0 bila kurs kosong/nol agar tidak terjadi TypeError / DivisionByZeroError (PHP 8).
+	 */
+	private function _hitung_dolar($harga, $kurs)
+	{
+		$harga = (float) str_replace(',', '', (string) $harga);
+		$kurs  = (float) str_replace(',', '', (string) $kurs);
+		return $kurs > 0 ? $harga / $kurs : 0;
+	}
+
 	public function saveNewPenawaran()
 	{
 		$this->auth->restrict($this->addPermission);
@@ -766,7 +778,7 @@ class Penawaran extends Admin_Controller
 
 
 		if ($nominal != '' || $nominal != 0) {
-			$dolar = $post['harga_penawaran'] / $nominal;
+			$dolar = $this->_hitung_dolar($post['harga_penawaran'], $nominal);
 
 			$data = [
 				'id_child_penawaran'	=> $code,
@@ -859,7 +871,7 @@ class Penawaran extends Admin_Controller
 
 
 		if ($nominal != '' || $nominal != 0) {
-			$dolar = $post['harga_penawaran'] / $nominal;
+			$dolar = $this->_hitung_dolar($post['harga_penawaran'], $nominal);
 
 			$data = [
 				'id_child_penawaran'	=> $code,
@@ -1145,7 +1157,7 @@ class Penawaran extends Admin_Controller
 			$kurs	= $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE MONTH(tanggal_ubah) =  '$blnkmrn' AND YEAR(tanggal_ubah) = '$yearkemaren' AND kode_kurs='IDR' ")->result();
 			$nominal = $kurs[0]->nominal;
 		} else {
-			$noinal = '1';
+			$nominal = '1';
 		}
 
 		$get_barang = $this->Inventory_4_model->get_category3($post['id_category3']);
@@ -1167,7 +1179,7 @@ class Penawaran extends Admin_Controller
 		}
 
 		$id = $post['id_child_penawaran'];
-		$dolar = $post['harga_penawaran'] / $nominal;
+		$dolar = $this->_hitung_dolar($post['harga_penawaran'], $nominal);
 		$data = [
 			'id_category3'			=> $post['id_category3'],
 			'bentuk_material'		=> $post['bentuk_material'],
@@ -1251,10 +1263,10 @@ class Penawaran extends Admin_Controller
 			$kurs	= $this->db->query("SELECT AVG(nominal) as nominal FROM perubahan_kurs WHERE MONTH(tanggal_ubah) =  '$blnkmrn' AND YEAR(tanggal_ubah) = '$yearkemaren' AND kode_kurs='IDR' ")->result();
 			$nominal = $kurs[0]->nominal;
 		} else {
-			$noinal = '1';
+			$nominal = '1';
 		}
 		$id = $post['id_child_penawaran'];
-		$dolar = $post['harga_penawaran'] / $nominal;
+		$dolar = $this->_hitung_dolar($post['harga_penawaran'], $nominal);
 		$data = [
 			'id_category3'			=> $post['id_category3'],
 			'bentuk_material'		=> $post['bentuk_material'],
