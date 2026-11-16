@@ -418,7 +418,7 @@ class Incoming extends Admin_Controller
 
 
 
-			$roll = substr($idroll->id_roll, -3) + 1;
+			$roll = (int) substr((string) ($idroll->id_roll ?? ''), -3) + 1;
 			$idroll = $id_material . "-" . str_pad($roll, 3, "0", STR_PAD_LEFT);
 
 			$no++;
