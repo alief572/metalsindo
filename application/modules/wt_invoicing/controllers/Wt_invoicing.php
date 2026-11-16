@@ -585,31 +585,31 @@ class Wt_invoicing extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[id_material])) {
+			if (!empty($used['id_material'])) {
 				$numb1++;
 				$dt[] =  array(
 
-					'id_penawaran_detail' => $used[id_penawaran],
+					'id_penawaran_detail' => $used['id_penawaran'],
 					'no_penawaran'		=> $post['no_penawaran'],
 					'no_so'				=> $post['no_so'],
 					'no_invoice'			=> $code,
-					'id_category3'		=> $used[id_material],
-					'nama_produk'	    => $used[nama_produk],
-					'qty_invoice'	    => $used[qty_so],
-					'qty'			    => $used[qty],
-					'harga_satuan'		=> str_replace(',', '', $used[harga_satuan]),
-					'stok_tersedia'		=> $used[stok_tersedia],
-					'potensial_loss'		=> $used[potensial_loss],
-					'diskon'		        => $used[diskon],
-					'freight_cost'		=> str_replace(',', '', $used[freight_cost]),
-					'total_harga'	    =>  str_replace(',', '', $used[total_harga]),
-					'tgl_delivery'	    => $used[tgl_delivery],
+					'id_category3'		=> $used['id_material'],
+					'nama_produk'	    => $used['nama_produk'],
+					'qty_invoice'	    => $used['qty_so'],
+					'qty'			    => $used['qty'],
+					'harga_satuan'		=> str_replace(',', '', $used['harga_satuan']),
+					'stok_tersedia'		=> $used['stok_tersedia'],
+					'potensial_loss'		=> $used['potensial_loss'],
+					'diskon'		        => $used['diskon'],
+					'freight_cost'		=> str_replace(',', '', $used['freight_cost']),
+					'total_harga'	    =>  str_replace(',', '', $used['total_harga']),
+					'tgl_delivery'	    => $used['tgl_delivery'],
 					'created_on'			=> date('Y-m-d H:i:s'),
 					'created_by'			=> $this->auth->user_id(),
-					'nilai_diskon'		=> str_replace(',', '', $used[nilai_diskon]),
+					'nilai_diskon'		=> str_replace(',', '', $used['nilai_diskon']),
 					'id_invoice'		 	=> $id,
-					'original_size'		=> str_replace(',', '', $used[original_size]),
-					'tobe_size'	        =>  str_replace(',', '', $used[tobe_size]),
+					'original_size'		=> str_replace(',', '', $used['original_size']),
+					'tobe_size'	        =>  str_replace(',', '', $used['tobe_size']),
 				);
 			}
 		}
@@ -772,31 +772,31 @@ class Wt_invoicing extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[id_material])) {
+			if (!empty($used['id_material'])) {
 				$numb1++;
 				$dt[] =  array(
 
-					'id_penawaran_detail' => $used[id_penawaran],
+					'id_penawaran_detail' => $used['id_penawaran'],
 					'no_penawaran'		=> $post['no_penawaran'],
 					'no_so'				=> $post['no_so'],
 					'no_invoice'			=> $code,
-					'id_category3'		=> $used[id_material],
-					'nama_produk'	    => $used[nama_produk],
-					'qty_invoice'	    => $used[qty_so],
-					'qty'			    => $used[qty],
-					'harga_satuan'		=> str_replace(',', '', $used[harga_satuan]),
-					'stok_tersedia'		=> $used[stok_tersedia],
-					'potensial_loss'		=> $used[potensial_loss],
-					'diskon'		        => $used[diskon],
-					'freight_cost'		=> str_replace(',', '', $used[freight_cost]),
-					'total_harga'	    =>  str_replace(',', '', $used[total_harga]),
-					'tgl_delivery'	    => $used[tgl_delivery],
+					'id_category3'		=> $used['id_material'],
+					'nama_produk'	    => $used['nama_produk'],
+					'qty_invoice'	    => $used['qty_so'],
+					'qty'			    => $used['qty'],
+					'harga_satuan'		=> str_replace(',', '', $used['harga_satuan']),
+					'stok_tersedia'		=> $used['stok_tersedia'],
+					'potensial_loss'		=> $used['potensial_loss'],
+					'diskon'		        => $used['diskon'],
+					'freight_cost'		=> str_replace(',', '', $used['freight_cost']),
+					'total_harga'	    =>  str_replace(',', '', $used['total_harga']),
+					'tgl_delivery'	    => $used['tgl_delivery'],
 					'created_on'			=> date('Y-m-d H:i:s'),
 					'created_by'			=> $this->auth->user_id(),
-					'nilai_diskon'		=> str_replace(',', '', $used[nilai_diskon]),
+					'nilai_diskon'		=> str_replace(',', '', $used['nilai_diskon']),
 					'id_invoice'		 	=> $id,
-					'original_size'		=> str_replace(',', '', $used[original_size]),
-					'tobe_size'	        =>  str_replace(',', '', $used[tobe_size]),
+					'original_size'		=> str_replace(',', '', $used['original_size']),
+					'tobe_size'	        =>  str_replace(',', '', $used['tobe_size']),
 				);
 			}
 		}
@@ -951,28 +951,28 @@ class Wt_invoicing extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[no_surat])) {
+			if (!empty($used['no_surat'])) {
 				$numb1++;
 				$dt[] =  array(
 
-					'id_penawaran_detail' => $used[id_penawaran],
+					'id_penawaran_detail' => $used['id_penawaran'],
 					'no_penawaran'		=> $post['no_penawaran'],
 					'no_so'				=> $post['no_so'],
 					'no_invoice'			=> $code,
-					'id_category3'		=> $used[no_surat],
-					'nama_produk'	    => $used[nama_produk],
-					'qty_invoice'	    => $used[qty_so],
-					'qty'			    => $used[qty],
-					'harga_satuan'		=> str_replace(',', '', $used[harga_satuan]),
-					'stok_tersedia'		=> $used[stok_tersedia],
-					'potensial_loss'		=> $used[potensial_loss],
-					'diskon'		        => $used[diskon],
-					'freight_cost'		=> str_replace(',', '', $used[freight_cost]),
-					'total_harga'	    =>  str_replace(',', '', $used[total_harga]),
-					'tgl_delivery'	    => $used[tgl_delivery],
+					'id_category3'		=> $used['no_surat'],
+					'nama_produk'	    => $used['nama_produk'],
+					'qty_invoice'	    => $used['qty_so'],
+					'qty'			    => $used['qty'],
+					'harga_satuan'		=> str_replace(',', '', $used['harga_satuan']),
+					'stok_tersedia'		=> $used['stok_tersedia'],
+					'potensial_loss'		=> $used['potensial_loss'],
+					'diskon'		        => $used['diskon'],
+					'freight_cost'		=> str_replace(',', '', $used['freight_cost']),
+					'total_harga'	    =>  str_replace(',', '', $used['total_harga']),
+					'tgl_delivery'	    => $used['tgl_delivery'],
 					'created_on'			=> date('Y-m-d H:i:s'),
 					'created_by'			=> $this->auth->user_id(),
-					'nilai_diskon'		=> str_replace(',', '', $used[nilai_diskon]),
+					'nilai_diskon'		=> str_replace(',', '', $used['nilai_diskon']),
 					'id_invoice'		 	=> $id
 				);
 			}
@@ -1109,26 +1109,26 @@ class Wt_invoicing extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[no_surat])) {
+			if (!empty($used['no_surat'])) {
 				$numb1++;
 				$dt[] =  array(
 
-					'id_penawaran_detail' => $used[id_penawaran],
+					'id_penawaran_detail' => $used['id_penawaran'],
 					'no_penawaran'		=> $post['no_penawaran'],
-					'id_category3'		=> $used[no_surat],
-					'nama_produk'	    => $used[nama_produk],
-					'qty_invoice'	    => $used[qty_so],
-					'qty'			    => $used[qty],
-					'harga_satuan'		=> str_replace(',', '', $used[harga_satuan]),
-					'stok_tersedia'		=> $used[stok_tersedia],
-					'potensial_loss'		=> $used[potensial_loss],
-					'diskon'		        => $used[diskon],
-					'freight_cost'		=> str_replace(',', '', $used[freight_cost]),
-					'total_harga'	    =>  str_replace(',', '', $used[total_harga]),
-					'tgl_delivery'	    => $used[date],
+					'id_category3'		=> $used['no_surat'],
+					'nama_produk'	    => $used['nama_produk'],
+					'qty_invoice'	    => $used['qty_so'],
+					'qty'			    => $used['qty'],
+					'harga_satuan'		=> str_replace(',', '', $used['harga_satuan']),
+					'stok_tersedia'		=> $used['stok_tersedia'],
+					'potensial_loss'		=> $used['potensial_loss'],
+					'diskon'		        => $used['diskon'],
+					'freight_cost'		=> str_replace(',', '', $used['freight_cost']),
+					'total_harga'	    =>  str_replace(',', '', $used['total_harga']),
+					'tgl_delivery'	    => $used['date'],
 					'created_on'			=> date('Y-m-d H:i:s'),
 					'created_by'			=> $this->auth->user_id(),
-					'nilai_diskon'		=> str_replace(',', '', $used[nilai_diskon]),
+					'nilai_diskon'		=> str_replace(',', '', $used['nilai_diskon']),
 					'id_invoice'		    => $code
 				);
 			}
@@ -1273,27 +1273,27 @@ class Wt_invoicing extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[no_surat])) {
+			if (!empty($used['no_surat'])) {
 				$numb1++;
 				$dt[] =  array(
 
-					'id_penawaran_detail' => $used[id_penawaran],
+					'id_penawaran_detail' => $used['id_penawaran'],
 					'no_so'				=> $post['no_so'],
 					'no_invoice'			=> $code,
-					'id_category3'		=> $used[no_surat],
-					'nama_produk'	    => $used[nama_produk],
-					'qty_invoice'	    => $used[qty_so],
-					'qty'			    => $used[qty],
-					'harga_satuan'		=> str_replace(',', '', $used[harga_satuan]),
-					'stok_tersedia'		=> $used[stok_tersedia],
-					'potensial_loss'		=> $used[potensial_loss],
-					'diskon'		        => $used[diskon],
-					'freight_cost'		=> str_replace(',', '', $used[freight_cost]),
-					'total_harga'	    =>  str_replace(',', '', $used[total_harga]),
-					'tgl_delivery'	    => $used[date],
+					'id_category3'		=> $used['no_surat'],
+					'nama_produk'	    => $used['nama_produk'],
+					'qty_invoice'	    => $used['qty_so'],
+					'qty'			    => $used['qty'],
+					'harga_satuan'		=> str_replace(',', '', $used['harga_satuan']),
+					'stok_tersedia'		=> $used['stok_tersedia'],
+					'potensial_loss'		=> $used['potensial_loss'],
+					'diskon'		        => $used['diskon'],
+					'freight_cost'		=> str_replace(',', '', $used['freight_cost']),
+					'total_harga'	    =>  str_replace(',', '', $used['total_harga']),
+					'tgl_delivery'	    => $used['date'],
 					'created_on'			=> date('Y-m-d H:i:s'),
 					'created_by'			=> $this->auth->user_id(),
-					'nilai_diskon'		=> str_replace(',', '', $used[nilai_diskon]),
+					'nilai_diskon'		=> str_replace(',', '', $used['nilai_diskon']),
 					'id_invoice'			=> $id
 				);
 			}
@@ -1428,29 +1428,29 @@ class Wt_invoicing extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[no_surat])) {
+			if (!empty($used['no_surat'])) {
 				$numb1++;
 
 				//    print_r($used);
 				//    exit;
 				$dt[] =  array(
 					'no_so'		=> $code,
-					'id_penawaran_detail' => $used[id_penawaran],
+					'id_penawaran_detail' => $used['id_penawaran'],
 					'no_penawaran'		=> $post['no_penawaran'],
-					'id_category3'		=> $used[no_surat],
-					'nama_produk'	    => $used[nama_produk],
-					'qty_so'			    => $used[qty_so],
-					'qty'			    => $used[qty],
-					'harga_satuan'		=> str_replace(',', '', $used[harga_satuan]),
-					'stok_tersedia'		=> $used[stok_tersedia],
-					'potensial_loss'		=> $used[potensial_loss],
-					'diskon'		        => $used[diskon],
-					'freight_cost'		=> str_replace(',', '', $used[freight_cost]),
-					'total_harga'	    =>  str_replace(',', '', $used[total_harga]),
-					'tgl_delivery'	    => $used[tgl_delivery],
+					'id_category3'		=> $used['no_surat'],
+					'nama_produk'	    => $used['nama_produk'],
+					'qty_so'			    => $used['qty_so'],
+					'qty'			    => $used['qty'],
+					'harga_satuan'		=> str_replace(',', '', $used['harga_satuan']),
+					'stok_tersedia'		=> $used['stok_tersedia'],
+					'potensial_loss'		=> $used['potensial_loss'],
+					'diskon'		        => $used['diskon'],
+					'freight_cost'		=> str_replace(',', '', $used['freight_cost']),
+					'total_harga'	    =>  str_replace(',', '', $used['total_harga']),
+					'tgl_delivery'	    => $used['tgl_delivery'],
 					'created_on'			=> date('Y-m-d H:i:s'),
 					'created_by'			=> $this->auth->user_id(),
-					'nilai_diskon'		=> str_replace(',', '', $used[nilai_diskon])
+					'nilai_diskon'		=> str_replace(',', '', $used['nilai_diskon'])
 				);
 			}
 		}
@@ -1474,13 +1474,13 @@ class Wt_invoicing extends Admin_Controller
 
 
 			$datatop = [
-				'id_top'			    => $det[id_top],
-				'id_top_planning'		=> $det[id_top_planning],
-				'payment'			    => $det[payment],
-				'keterangan'		    => $det[keterangan],
-				'persentase'			=> $det[persentase],
+				'id_top'			    => $det['id_top'],
+				'id_top_planning'		=> $det['id_top_planning'],
+				'payment'			    => $det['payment'],
+				'keterangan'		    => $det['keterangan'],
+				'persentase'			=> $det['persentase'],
 				'nilai'					=> $nilai,
-				'nilai_tagih'			=> round(($det[persentase] * $nilai) / 100, 2),
+				'nilai_tagih'			=> round(($det['persentase'] * $nilai) / 100, 2),
 				'no_so'			        => $code,
 				'created_on'			=> date('Y-m-d H:i:s'),
 				'created_by'			=> $this->auth->user_id(),
@@ -1541,22 +1541,22 @@ class Wt_invoicing extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[no_surat])) {
+			if (!empty($used['no_surat'])) {
 				$numb1++;
 				$dt[] =  array(
 					'no_penawaran'		=> $code,
-					'id_category3'		=> $used[no_surat],
-					'nama_produk'	    => $used[nama_produk],
-					'qty'			    => $used[qty],
-					'harga_satuan'		=> str_replace(',', '', $used[harga_satuan]),
-					'stok_tersedia'		=> $used[stok_tersedia],
-					'potensial_loss'	=> $used[potensial_loss],
-					'diskon'		    => $used[diskon],
-					'freight_cost'		=> str_replace(',', '', $used[freight_cost]),
-					'total_harga'	    => str_replace(',', '', $used[total_harga]),
+					'id_category3'		=> $used['no_surat'],
+					'nama_produk'	    => $used['nama_produk'],
+					'qty'			    => $used['qty'],
+					'harga_satuan'		=> str_replace(',', '', $used['harga_satuan']),
+					'stok_tersedia'		=> $used['stok_tersedia'],
+					'potensial_loss'	=> $used['potensial_loss'],
+					'diskon'		    => $used['diskon'],
+					'freight_cost'		=> str_replace(',', '', $used['freight_cost']),
+					'total_harga'	    => str_replace(',', '', $used['total_harga']),
 					'created_on'		=> date('Y-m-d H:i:s'),
 					'created_by'		=> $this->auth->user_id(),
-					'nilai_diskon'		=> str_replace(',', '', $used[nilai_diskon])
+					'nilai_diskon'		=> str_replace(',', '', $used['nilai_diskon'])
 				);
 			}
 		}
@@ -1949,22 +1949,22 @@ class Wt_invoicing extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[no_surat])) {
+			if (!empty($used['no_surat'])) {
 				$numb1++;
 				$dt[] =  array(
 					'no_penawaran'		=> $code,
-					'id_category3'		=> $used[no_surat],
-					'nama_produk'	    => $used[nama_produk],
-					'qty'			    => $used[qty],
-					'harga_satuan'		=> str_replace(',', '', $used[harga_satuan]),
-					'stok_tersedia'		=> $used[stok_tersedia],
-					'potensial_loss'	=> $used[potensial_loss],
-					'diskon'		    => $used[diskon],
-					'freight_cost'		=> str_replace(',', '', $used[freight_cost]),
-					'total_harga'	    => str_replace(',', '', $used[total_harga]),
+					'id_category3'		=> $used['no_surat'],
+					'nama_produk'	    => $used['nama_produk'],
+					'qty'			    => $used['qty'],
+					'harga_satuan'		=> str_replace(',', '', $used['harga_satuan']),
+					'stok_tersedia'		=> $used['stok_tersedia'],
+					'potensial_loss'	=> $used['potensial_loss'],
+					'diskon'		    => $used['diskon'],
+					'freight_cost'		=> str_replace(',', '', $used['freight_cost']),
+					'total_harga'	    => str_replace(',', '', $used['total_harga']),
 					'created_on'		=> date('Y-m-d H:i:s'),
 					'created_by'		=> $this->auth->user_id(),
-					'nilai_diskon'      => str_replace(',', '', $used[nilai_diskon])
+					'nilai_diskon'      => str_replace(',', '', $used['nilai_diskon'])
 				);
 			}
 		}
@@ -2184,23 +2184,23 @@ class Wt_invoicing extends Admin_Controller
 
 		$numb1 = 0;
 		foreach ($_POST['dt'] as $used) {
-			if (!empty($used[no_surat])) {
+			if (!empty($used['no_surat'])) {
 				$numb1++;
 				$dt[] =  array(
 					'no_penawaran'		=> $code,
-					'id_category3'		=> $used[no_surat],
-					'nama_produk'	    => $used[nama_produk],
-					'qty'			    => $used[qty],
-					'harga_satuan'		=> str_replace(',', '', $used[harga_satuan]),
-					'stok_tersedia'		=> $used[stok_tersedia],
-					'potensial_loss'	=> $used[potensial_loss],
-					'diskon'		    => $used[diskon],
-					'freight_cost'		=> str_replace(',', '', $used[freight_cost]),
-					'total_harga'	    => str_replace(',', '', $used[total_harga]),
+					'id_category3'		=> $used['no_surat'],
+					'nama_produk'	    => $used['nama_produk'],
+					'qty'			    => $used['qty'],
+					'harga_satuan'		=> str_replace(',', '', $used['harga_satuan']),
+					'stok_tersedia'		=> $used['stok_tersedia'],
+					'potensial_loss'	=> $used['potensial_loss'],
+					'diskon'		    => $used['diskon'],
+					'freight_cost'		=> str_replace(',', '', $used['freight_cost']),
+					'total_harga'	    => str_replace(',', '', $used['total_harga']),
 					'revisi'			=> $norev,
 					'created_on'		=> date('Y-m-d H:i:s'),
 					'created_by'		=> $this->auth->user_id(),
-					'nilai_diskon'      => str_replace(',', '', $used[nilai_diskon])
+					'nilai_diskon'      => str_replace(',', '', $used['nilai_diskon'])
 				);
 			}
 		}
