@@ -225,8 +225,46 @@ $tanggal = date('Y-m-d');
 			var id_gudang = $('#id_gudang').val();
 			var pic = $('#pic').val();
 			var data, xhr;
-			if (pic == '' || pic == null) {
-				swal("Warning", "Form Tidak Boleh Kosong :)", "error");
+			var fieldWajib = [{
+					selector: '#id_suplier',
+					label: 'Supplier'
+				},
+				{
+					selector: '[name="tanggal"]',
+					label: 'Tanggal Kedatangan'
+				},
+				{
+					selector: '#pic',
+					label: 'PIC'
+				},
+				{
+					selector: '#ket',
+					label: 'Keterangan'
+				},
+				{
+					selector: '#pib',
+					label: 'PIB'
+				},
+				{
+					selector: '#no_invoice',
+					label: $.trim($('#lbl_inv').text()) || 'Packing List'
+				},
+				{
+					selector: '#total',
+					label: 'Total Incoming'
+				}
+			];
+			var fieldKosong = [];
+			$.each(fieldWajib, function(i, f) {
+				var $el = $(f.selector);
+				// field yang disembunyikan (mis. PIB untuk supplier tertentu) tidak diwajibkan
+				if ($el.length && $el.closest('.form-group').is(':visible') && $.trim($el.val()) === '') {
+					fieldKosong.push(f.label);
+				}
+			});
+
+			if (fieldKosong.length > 0) {
+				swal("Warning", "Form berikut belum diisi:\n- " + fieldKosong.join("\n- "), "error");
 				return false;
 			} else {
 				swal({
