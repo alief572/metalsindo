@@ -470,10 +470,10 @@ class Master_customers extends Admin_Controller
 			$numb2++;
 			$data =  array(
 				'id_customer'	=> $code,
-				'name_pic'		=> $d1[name_pic],
-				'phone_pic'		=> $d1[phone_pic],
-				'email_pic'		=> $d1[email_pic],
-				'position_pic'	=> $d1[position_pic]
+				'name_pic'		=> $d1['name_pic'],
+				'phone_pic'		=> $d1['phone_pic'],
+				'email_pic'		=> $d1['email_pic'],
+				'position_pic'	=> $d1['position_pic']
 			);
 			//Add Data
 			$this->db->insert('child_customer_pic', $data);
@@ -483,7 +483,7 @@ class Master_customers extends Admin_Controller
 			$numb2++;
 			$data =  array(
 				'id_customer'	=> $code,
-				'name_category_customer'		=> $d2[id_category_customer],
+				'name_category_customer'		=> $d2['id_category_customer'],
 			);
 			//Add Data
 			$this->db->insert('child_category_customer', $data);
@@ -663,10 +663,10 @@ class Master_customers extends Admin_Controller
 			$code = $post['id_customer'];
 			$data =  array(
 				'id_customer'	=> $code,
-				'name_pic'		=> $d1[name_pic],
-				'phone_pic'		=> $d1[phone_pic],
-				'email_pic'		=> $d1[email_pic],
-				'position_pic'	=> $d1[position_pic]
+				'name_pic'		=> $d1['name_pic'],
+				'phone_pic'		=> $d1['phone_pic'],
+				'email_pic'		=> $d1['email_pic'],
+				'position_pic'	=> $d1['position_pic']
 			);
 			//Add Data
 			$this->db->insert('child_customer_pic', $data);
@@ -677,7 +677,7 @@ class Master_customers extends Admin_Controller
 			$numb2++;
 			$data =  array(
 				'id_customer'	=> $code,
-				'name_category_customer'		=> $d2[id_category_customer],
+				'name_category_customer'		=> $d2['id_category_customer'],
 			);
 			//Add Data
 			$this->db->insert('child_category_customer', $data);
@@ -742,10 +742,10 @@ class Master_customers extends Admin_Controller
 			$numb2++;
 			$data =  array(
 				'id_suplier'	=> $code,
-				'name_pic'		=> $d1[name_pic],
-				'phone_pic'		=> $d1[phone_pic],
-				'email_pic'		=> $d1[email_pic],
-				'position_pic'	=> $d1[position_pic]
+				'name_pic'		=> $d1['name_pic'],
+				'phone_pic'		=> $d1['phone_pic'],
+				'email_pic'		=> $d1['email_pic'],
+				'position_pic'	=> $d1['position_pic']
 			);
 			//Add Data
 			$this->db->insert('child_supplier_pic', $data);
@@ -813,10 +813,10 @@ class Master_customers extends Admin_Controller
 			$code = $post['id_suplier'];
 			$data =  array(
 				'id_suplier'	=> $code,
-				'name_pic'		=> $d1[name_pic],
-				'phone_pic'		=> $d1[phone_pic],
-				'email_pic'		=> $d1[email_pic],
-				'position_pic'	=> $d1[position_pic]
+				'name_pic'		=> $d1['name_pic'],
+				'phone_pic'		=> $d1['phone_pic'],
+				'email_pic'		=> $d1['email_pic'],
+				'position_pic'	=> $d1['position_pic']
 			);
 			//Add Data
 			$this->db->insert('child_supplier_pic', $data);
@@ -882,10 +882,10 @@ class Master_customers extends Admin_Controller
 			$numb2++;
 			$data =  array(
 				'id_suplier'	=> $code,
-				'name_pic'		=> $d1[name_pic],
-				'phone_pic'		=> $d1[phone_pic],
-				'email_pic'		=> $d1[email_pic],
-				'position_pic'	=> $d1[position_pic]
+				'name_pic'		=> $d1['name_pic'],
+				'phone_pic'		=> $d1['phone_pic'],
+				'email_pic'		=> $d1['email_pic'],
+				'position_pic'	=> $d1['position_pic']
 			);
 			//Add Data
 			$this->db->insert('child_supplier_pic', $data);
@@ -948,8 +948,8 @@ class Master_customers extends Admin_Controller
 			$numb1++;
 			$produk = $_POST['hd1']['1']['id_inventory'];
 			$header1 =  array(
-				'id_type'		    => $h1[inventory_1],
-				'nama'		        => $h1[nm_inventory],
+				'id_type'		    => $h1['inventory_1'],
+				'nama'		        => $h1['nm_inventory'],
 				'modified_on'		=> date('Y-m-d H:i:s'),
 				'modified_by'		=> $this->auth->user_id(),
 				'deleted'			=> '0'
@@ -966,7 +966,7 @@ class Master_customers extends Admin_Controller
 				$code = $_POST['hd1']['1']['id_inventory'];
 				$data1 =  array(
 					'id_category1' => $code,
-					'name_compotition' => $d1[name_compotition],
+					'name_compotition' => $d1['name_compotition'],
 					'deleted' => '0',
 					'created_on' => date('Y-m-d H:i:s'),
 					'created_by' => $session['id_user'],
@@ -981,7 +981,7 @@ class Master_customers extends Admin_Controller
 
 			$info = $d2['id_compotition'];
 			$data2 =  array(
-				'name_compotition' => $d2[name_compotition],
+				'name_compotition' => $d2['name_compotition'],
 				'deleted' => '0',
 				'modified_on' => date('Y-m-d H:i:s'),
 				'modified_by' => $session['id_user'],
