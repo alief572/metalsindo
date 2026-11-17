@@ -1133,16 +1133,16 @@ function cari_inven1()
 		$numb1++;        
                 $dt =  array(
 							'id_spkproduksi'		=> $code,
-							'no_surat'				=> $used[no_surat],
+							'no_surat'				=> $used['no_surat'],
 							'id_dt_spkproduksi'		=> $code.'-'.$numb1,
-							'idcustomer'			=> $used[idcustomer],
-							'nmmaterial'		    => $used[nmmaterial],
-							'thickness'		    	=> $used[thickness],
-							'weight'		        => $used[weight],
-							'qtycoil'		        => $used[qtycoil],
-							'width'					=> $used[width],
-							'totalwidth'		    => $used[totalwidth],
-							'delivery'				=> $used[delivery],
+							'idcustomer'			=> $used['idcustomer'],
+							'nmmaterial'		    => $used['nmmaterial'],
+							'thickness'		    	=> $used['thickness'],
+							'weight'		        => $used['weight'],
+							'qtycoil'		        => $used['qtycoil'],
+							'width'					=> $used['width'],
+							'totalwidth'		    => $used['totalwidth'],
+							'delivery'				=> $used['delivery'],
                             );
                     $this->db->insert('dt_spk_produksi',$dt);
 			
@@ -1204,16 +1204,16 @@ function cari_inven1()
 		$numb1++;        
                 $dt =  array(
 							'id_spkproduksi'		=> $code,
-							'no_surat'				=> $used[no_surat],
+							'no_surat'				=> $used['no_surat'],
 							'id_dt_spkproduksi'		=> $code.'-'.$numb1,
-							'idcustomer'			=> $used[idcustomer],
-							'nmmaterial'		    => $used[nmmaterial],
-							'thickness'		    	=> $used[thickness],
-							'weight'		        => $used[weight],
-							'qtycoil'		        => $used[qtycoil],
-							'width'					=> $used[width],
-							'totalwidth'		    => $used[totalwidth],
-							'delivery'				=> $used[delivery],
+							'idcustomer'			=> $used['idcustomer'],
+							'nmmaterial'		    => $used['nmmaterial'],
+							'thickness'		    	=> $used['thickness'],
+							'weight'		        => $used['weight'],
+							'qtycoil'		        => $used['qtycoil'],
+							'width'					=> $used['width'],
+							'totalwidth'		    => $used['totalwidth'],
+							'delivery'				=> $used['delivery'],
                             );
                     $this->db->insert('dt_spk_produksi',$dt);
 			
@@ -1273,18 +1273,18 @@ function cari_inven1()
                 $stokpakai =  array(
 							'id_shearing'		    	=> $code,
 							'id_used_syock_penawaran'	=> $code.'-'.$numb1,
-							'idstk'		    			=> $use[idstk],
-							'lotno'		        		=> $use[lotno],
-							'namamaterial'		        => $use[namamaterial],
-							'weight'		        	=> $use[weight],
-							'density'		        	=> $use[density],
-							'hasilpanjang'		        => $use[hasilpanjang],
-							'width'		    			=> $use[width],
-							'lebarcc'					=> $use[lebarcc],
-							'jumlahcc'		    		=> $use[jumlahcc],
-							'sisapotongan'		    	=> $use[sisapotongan],
-							'qty'		    			=> $use[qty],
-							'jmlpisau'		    		=> $use[jmlpisau]
+							'idstk'		    			=> $use['idstk'],
+							'lotno'		        		=> $use['lotno'],
+							'namamaterial'		        => $use['namamaterial'],
+							'weight'		        	=> $use['weight'],
+							'density'		        	=> $use['density'],
+							'hasilpanjang'		        => $use['hasilpanjang'],
+							'width'		    			=> $use['width'],
+							'lebarcc'					=> $use['lebarcc'],
+							'jumlahcc'		    		=> $use['jumlahcc'],
+							'sisapotongan'		    	=> $use['sisapotongan'],
+							'qty'		    			=> $use['qty'],
+							'jmlpisau'		    		=> $use['jmlpisau']
                             );
                     $this->db->insert('dt_penawaran_shearing_used',$stokpakai);
 			
@@ -1389,19 +1389,19 @@ public function deletePenawaran(){
 		foreach($_POST['hd1'] as $h1){
 		$numb1++;
                 $header1 =  array(
-							'id_type'		        => $h1[inventory_1],
-							'id_category1'		    => $h1[inventory_2],
-							'id_category2'		    => $h1[inventory_3],
-							'nama'		        	=> $h1[nm_inventory],
-							'maker'		        	=> $h1[maker],
-							'density'		        => $h1[density],
-							'hardness'		        => $h1[hardness],
-							'id_bentuk'		        => $h1[id_bentuk],
-							'id_surface'		    => $h1[id_surface],
-							'mountly_forecast'		=> $h1[mountly_forecast],
-							'safety_stock'		    => $h1[safety_stock],
-							'order_point'		    => $h1[order_point],
-							'maksimum'		    	=> $h1[maksimum],
+							'id_type'		        => $h1['inventory_1'],
+							'id_category1'		    => $h1['inventory_2'],
+							'id_category2'		    => $h1['inventory_3'],
+							'nama'		        	=> $h1['nm_inventory'],
+							'maker'		        	=> $h1['maker'],
+							'density'		        => $h1['density'],
+							'hardness'		        => $h1['hardness'],
+							'id_bentuk'		        => $h1['id_bentuk'],
+							'id_surface'		    => $h1['id_surface'],
+							'mountly_forecast'		=> $h1['mountly_forecast'],
+							'safety_stock'		    => $h1['safety_stock'],
+							'order_point'		    => $h1['order_point'],
+							'maksimum'		    	=> $h1['maksimum'],
 							'aktif'					=> 'aktif',
 							'created_on'		=> date('Y-m-d H:i:s'),
 							'created_by'		=> $this->auth->user_id(),
@@ -1420,9 +1420,9 @@ public function deletePenawaran(){
 		$numb2++;
               $data1 =  array(
 			                    'id_category3'=>$id,
-								'id_suplier'=>$d1[id_supplier],
-								'lead'=>$d1[lead],
-								'minimum'=>$d1[minimum],
+								'id_suplier'=>$d1['id_supplier'],
+								'lead'=>$d1['lead'],
+								'minimum'=>$d1['minimum'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -1441,8 +1441,8 @@ public function deletePenawaran(){
 		$numb3++;
               $comp =  array(
 			                    'id_category3'=>$id,
-								'id_compotition'=>$c1[id_compotition],
-								'nilai_compotition'=>$c1[jumlah_kandungan],
+								'id_compotition'=>$c1['id_compotition'],
+								'nilai_compotition'=>$c1['jumlah_kandungan'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -1461,8 +1461,8 @@ public function deletePenawaran(){
 		$numb4++;
               $dms =  array(
 			                    'id_category3'=>$id,
-								'id_dimensi'=>$dm[id_dimensi],
-								'nilai_dimensi'=>$dm[nilai_dimensi],
+								'id_dimensi'=>$dm['id_dimensi'],
+								'nilai_dimensi'=>$dm['nilai_dimensi'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -1594,19 +1594,19 @@ public function deletePenawaran(){
 		$numb1++;
 
                 $header1 =  array(
-							'id_type'		        => $h1[inventory_1],
-							'id_category1'		    => $h1[inventory_2],
-							'id_category2'		    => $h1[inventory_3],
-							'nama'		        	=> $h1[nm_inventory],
-							'maker'		        	=> $h1[maker],
-							'density'		        => $h1[density],
-							'hardness'		        => $h1[hardness],
-							'id_bentuk'		        => $h1[id_bentuk],
-							'id_surface'		    => $h1[id_surface],
-							'mountly_forecast'		=> $h1[mountly_forecast],
-							'safety_stock'		    => $h1[safety_stock],
-							'order_point'		    => $h1[order_point],
-							'maksimum'		    	=> $h1[maksimum],
+							'id_type'		        => $h1['inventory_1'],
+							'id_category1'		    => $h1['inventory_2'],
+							'id_category2'		    => $h1['inventory_3'],
+							'nama'		        	=> $h1['nm_inventory'],
+							'maker'		        	=> $h1['maker'],
+							'density'		        => $h1['density'],
+							'hardness'		        => $h1['hardness'],
+							'id_bentuk'		        => $h1['id_bentuk'],
+							'id_surface'		    => $h1['id_surface'],
+							'mountly_forecast'		=> $h1['mountly_forecast'],
+							'safety_stock'		    => $h1['safety_stock'],
+							'order_point'		    => $h1['order_point'],
+							'maksimum'		    	=> $h1['maksimum'],
 							'aktif'					=> 'aktif',
 							'created_on'		=> date('Y-m-d H:i:s'),
 							'created_by'		=> $this->auth->user_id(),
@@ -1624,9 +1624,9 @@ public function deletePenawaran(){
 		$numb2++;
               $data1 =  array(
 			                    'id_category3'=>$code,
-								'id_suplier'=>$d1[id_supplier],
-								'lead'=>$d1[lead],
-								'minimum'=>$d1[minimum],
+								'id_suplier'=>$d1['id_supplier'],
+								'lead'=>$d1['lead'],
+								'minimum'=>$d1['minimum'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -1643,8 +1643,8 @@ public function deletePenawaran(){
 		$numb3++;
               $comp =  array(
 			                    'id_category3'=>$code,
-								'id_compotition'=>$c1[id_compotition],
-								'nilai_compotition'=>$c1[jumlah_kandungan],
+								'id_compotition'=>$c1['id_compotition'],
+								'nilai_compotition'=>$c1['jumlah_kandungan'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -1661,8 +1661,8 @@ public function deletePenawaran(){
 		$numb4++;
               $dms =  array(
 			                    'id_category3'=>$code,
-								'id_dimensi'=>$dm[id_dimensi],
-								'nilai_dimensi'=>$dm[nilai_dimensi],
+								'id_dimensi'=>$dm['id_dimensi'],
+								'nilai_dimensi'=>$dm['nilai_dimensi'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -1702,19 +1702,19 @@ public function deletePenawaran(){
 		$numb1++;
 
                 $header1 =  array(
-							'id_type'		        => $h1[inventory_1],
-							'id_category1'		    => $h1[inventory_2],
-							'id_category2'		    => $h1[inventory_3],
-							'nama'		        	=> $h1[nm_inventory],
-							'maker'		        	=> $h1[maker],
-							'density'		        => $h1[density],
-							'hardness'		        => $h1[hardness],
-							'id_bentuk'		        => $h1[id_bentuk],
-							'id_surface'		    => $h1[id_surface],
-							'mountly_forecast'		=> $h1[mountly_forecast],
-							'safety_stock'		    => $h1[safety_stock],
-							'order_point'		    => $h1[order_point],
-							'maksimum'		    	=> $h1[maksimum],
+							'id_type'		        => $h1['inventory_1'],
+							'id_category1'		    => $h1['inventory_2'],
+							'id_category2'		    => $h1['inventory_3'],
+							'nama'		        	=> $h1['nm_inventory'],
+							'maker'		        	=> $h1['maker'],
+							'density'		        => $h1['density'],
+							'hardness'		        => $h1['hardness'],
+							'id_bentuk'		        => $h1['id_bentuk'],
+							'id_surface'		    => $h1['id_surface'],
+							'mountly_forecast'		=> $h1['mountly_forecast'],
+							'safety_stock'		    => $h1['safety_stock'],
+							'order_point'		    => $h1['order_point'],
+							'maksimum'		    	=> $h1['maksimum'],
 							'aktif'					=> 'aktif',
 							'created_on'		=> date('Y-m-d H:i:s'),
 							'created_by'		=> $this->auth->user_id(),
@@ -1731,9 +1731,9 @@ public function deletePenawaran(){
 		$numb2++;
               $data1 =  array(
 			                    'id_category3'=>$id,
-								'id_suplier'=>$d1[id_supplier],
-								'lead'=>$d1[lead],
-								'minimum'=>$d1[minimum],
+								'id_suplier'=>$d1['id_supplier'],
+								'lead'=>$d1['lead'],
+								'minimum'=>$d1['minimum'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -1750,8 +1750,8 @@ public function deletePenawaran(){
 		$numb3++;
               $comp =  array(
 			                    'id_category3'=>$id,
-								'id_compotition'=>$c1[id_compotition],
-								'nilai_compotition'=>$c1[jumlah_kandungan],
+								'id_compotition'=>$c1['id_compotition'],
+								'nilai_compotition'=>$c1['jumlah_kandungan'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -1768,8 +1768,8 @@ public function deletePenawaran(){
 		$numb4++;
               $dms =  array(
 			                    'id_category3'=>$id,
-								'id_dimensi'=>$dm[id_dimensi],
-								'nilai_dimensi'=>$dm[nilai_dimensi],
+								'id_dimensi'=>$dm['id_dimensi'],
+								'nilai_dimensi'=>$dm['nilai_dimensi'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),

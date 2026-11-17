@@ -290,7 +290,7 @@ class Spk_aktual_sheet extends Admin_Controller
 		$ngek_upload	= $_FILES['ngek_upload'];
 		
 
-		$countfiles 	= count($_FILES['ngin_upload']['name']);
+		$countfiles 	= count((array) ($_FILES['ngin_upload']['name'] ?? []));
 		for($i=0;$i<$countfiles;$i++){
 			$nama_url = "";
 			if(!empty($_FILES["ngin_upload"]["tmp_name"][$i])){
@@ -312,7 +312,7 @@ class Spk_aktual_sheet extends Admin_Controller
 		$upload_in =  json_encode($ArrInsert);
 
 		//EXTERNAL
-		$countfiles2 	= count($_FILES['ngek_upload']['name']);
+		$countfiles2 	= count((array) ($_FILES['ngek_upload']['name'] ?? []));
 		for($i=0;$i<$countfiles2;$i++){
 			$nama_url = "";
 			if(!empty($_FILES["ngek_upload"]["tmp_name"][$i])){
@@ -591,14 +591,14 @@ class Spk_aktual_sheet extends Admin_Controller
 			$dt =  array(
 						'id_spk_aktual'			=> $id_spk_aktual,
 						'id_spkproduksi'		=> $post['id_spk_produksi'],
-						'no_surat'				=> $used[nosurat],
+						'no_surat'				=> $used['nosurat'],
 						'id_dt_spk_aktual'		=> $id_spk_aktual.'-'.$numb1,
-						'idcustomer'			=> $used[idcustomer],
-						'namacustomer'			=> $used[namacustomer],
-						'nmmaterial'		    => $used[nmmaterial],
-						'thickness'		    	=> $used[thickness],
+						'idcustomer'			=> $used['idcustomer'],
+						'namacustomer'			=> $used['namacustomer'],
+						'nmmaterial'		    => $used['nmmaterial'],
+						'thickness'		    	=> $used['thickness'],
 						'weight'		        => str_replace(',','',$post['tweightslitting']),
-						'qtycoil'		        => $used[qtycoil]
+						'qtycoil'		        => $used['qtycoil']
 						// 'qtyaktual'		        => $used[qtyaktual],
 						// 'width'					=> $used[width],
 						// 'totalwidth'		        => $used[totalwidth],
@@ -617,67 +617,67 @@ class Spk_aktual_sheet extends Admin_Controller
 			
 			
 			
-			foreach ($used[qtyaktual] as $key => $value) {
+			foreach ($used['qtyaktual'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['id_spk_aktual'] = $id_spk_aktual;
 				$ArrDetail[$key.$numb1]['id_dt_spkaktualdetail'] =$nomor;
 				$ArrDetail[$key.$numb1]['id_spkproduksi'] = $id_spkproduksi;
-				$ArrDetail[$key.$numb1]['no_surat'] =$used[nosurat];
+				$ArrDetail[$key.$numb1]['no_surat'] =$used['nosurat'];
 				$ArrDetail[$key.$numb1]['id_dt_spk_aktual'] = $id_spk_aktual.'-'.$numb1;
-				$ArrDetail[$key.$numb1]['idcustomer'] =  $used[idcustomer];
-				$ArrDetail[$key.$numb1]['namacustomer'] =  $used[namacustomer];
-				$ArrDetail[$key.$numb1]['nmmaterial'] =  $used[nmmaterial];
-				$ArrDetail[$key.$numb1]['thickness'] =  $used[thickness];
-				$ArrDetail[$key.$numb1]['density'] =  $used[density];
-				$ArrDetail[$key.$numb1]['qtycoil'] =  $used[qtycoil];
-				$ArrDetail[$key.$numb1]['qtysheet'] =  $used[qtysheet];
-				$ArrDetail[$key.$numb1]['total_sheet'] =  $used[qtysheet];
-				$ArrDetail[$key.$numb1]['id_tr_spk_produksi'] =  $used[id_tr_spk_produksi];
+				$ArrDetail[$key.$numb1]['idcustomer'] =  $used['idcustomer'];
+				$ArrDetail[$key.$numb1]['namacustomer'] =  $used['namacustomer'];
+				$ArrDetail[$key.$numb1]['nmmaterial'] =  $used['nmmaterial'];
+				$ArrDetail[$key.$numb1]['thickness'] =  $used['thickness'];
+				$ArrDetail[$key.$numb1]['density'] =  $used['density'];
+				$ArrDetail[$key.$numb1]['qtycoil'] =  $used['qtycoil'];
+				$ArrDetail[$key.$numb1]['qtysheet'] =  $used['qtysheet'];
+				$ArrDetail[$key.$numb1]['total_sheet'] =  $used['qtysheet'];
+				$ArrDetail[$key.$numb1]['id_tr_spk_produksi'] =  $used['id_tr_spk_produksi'];
 			}
-			foreach ($used[weight] as $key => $value) {
+			foreach ($used['weight'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['weight'] = $value;
 				$ArrDetail[$key.$numb1]['width_sheet'] = $value;
 			}
-			foreach ($used[qtyaktual] as $key => $value) {
+			foreach ($used['qtyaktual'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['qtyaktual'] = $value;
 			}
-			foreach ($used[width] as $key => $value) {
+			foreach ($used['width'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['width'] = $value;
 			}
-			foreach ($used[totalwidth] as $key => $value) {
+			foreach ($used['totalwidth'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['totalwidth'] = $value;
 			}
-			foreach ($used[qtywidth] as $key => $value) {
+			foreach ($used['qtywidth'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['qtysatuan'] = str_replace(',','',$value);
 			}
-			foreach ($used[totalaktual] as $key => $value) {
+			foreach ($used['totalaktual'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['totalaktual'] = str_replace(',','',$value);
 			}
-			foreach ($used[id_dt_spkproduksi] as $key => $value) {
+			foreach ($used['id_dt_spkproduksi'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['id_dt_spkproduksi'] = $value;
 			}
-			foreach ($used[delivery] as $key => $value) { 
+			foreach ($used['delivery'] as $key => $value) { 
 				$ArrDetail[$key.$numb1]['delivery'] = $value;
 			}
-			foreach ($used[lot_slitting] as $key => $value) {
+			foreach ($used['lot_slitting'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['lot_slitting'] = $value;
 			}
-			foreach ($used[keterangan] as $key => $value) {
+			foreach ($used['keterangan'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['keterangan'] = $value;
 			}
-			foreach ($used[length] as $key => $value) {
+			foreach ($used['length'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['length_sheet'] = $value;
 			}
-			foreach ($used[widthperkg] as $key => $value) {
+			foreach ($used['widthperkg'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['qty_persheet'] = $value;
 			}
 			
 
 			//baru insert  
-			foreach ($used[qtyaktual] as $key => $value) {
-				$ArrInsertStock[$key.$numb1]['no_surat'] =$used[nosurat];
+			foreach ($used['qtyaktual'] as $key => $value) {
+				$ArrInsertStock[$key.$numb1]['no_surat'] =$used['nosurat'];
 				$ArrInsertStock[$key.$numb1]['id_spkproduksi'] = $id_spk_aktual;
 				$ArrInsertStock[$key.$numb1]['id_category3'] = $post['id_material'];
-				$ArrInsertStock[$key.$numb1]['nama_material'] = $used[nmmaterial];
+				$ArrInsertStock[$key.$numb1]['nama_material'] = $used['nmmaterial'];
 				// $ArrInsertStock[$key.$numb1]['lotno'] = $post['lotno'];
 				$ArrInsertStock[$key.$numb1]['id_bentuk'] =  $idbentuk;
 				
@@ -687,25 +687,25 @@ class Spk_aktual_sheet extends Admin_Controller
 				$ArrInsertStock[$key.$numb1]['created_on'] =  date('Y-m-d H:i:s');
 				$ArrInsertStock[$key.$numb1]['created_by'] =  $this->auth->user_id();
 			}
-			foreach ($used[length] as $key => $value) {
+			foreach ($used['length'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['length'] =  $value;
 			}
-			foreach ($used[lot_slitting] as $key => $value) {
+			foreach ($used['lot_slitting'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['lotno'] = $value;
 				$ArrInsertStock[$key.$numb1]['lot_slitting'] = $value;
 			}
-			foreach ($used[totalaktual] as $key => $value) {
+			foreach ($used['totalaktual'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['totalweight'] = str_replace(',','',$value);
 			}
-			foreach ($used[qtyaktual] as $key => $value) {
+			foreach ($used['qtyaktual'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['qty'] = $value; 
 			}
-			foreach ($used[weight] as $key => $value) {
+			foreach ($used['weight'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['width'] = $value; 
 			}
-			foreach ($used[totalaktual] as $key => $value) {
-				$ArrInsertStock[$key.$numb1]['weight'] = str_replace(',','',$value) / $used[qtyaktual][$key];
-				$ArrInsertStock[$key.$numb1]['sisa_spk'] = str_replace(',','',$value) / $used[qtyaktual][$key];
+			foreach ($used['totalaktual'] as $key => $value) {
+				$ArrInsertStock[$key.$numb1]['weight'] = ((float) str_replace(',', '', $used['qtyaktual'][$key] ?? 0) > 0 ? (float) str_replace(',', '', $value) / (float) str_replace(',', '', $used['qtyaktual'][$key]) : 0);
+				$ArrInsertStock[$key.$numb1]['sisa_spk'] = ((float) str_replace(',', '', $used['qtyaktual'][$key] ?? 0) > 0 ? (float) str_replace(',', '', $value) / (float) str_replace(',', '', $used['qtyaktual'][$key]) : 0);
 			}
 			
 		}

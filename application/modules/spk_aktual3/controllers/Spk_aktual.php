@@ -1733,16 +1733,16 @@ function cari_inven1()
 		$numb1++;        
                 $dt =  array(
 							'id_spkproduksi'		=> $code,
-							'no_surat'				=> $used[no_surat],
+							'no_surat'				=> $used['no_surat'],
 							'id_dt_spkproduksi'		=> $code.'-'.$numb1,
-							'idcustomer'			=> $used[idcustomer],
-							'nmmaterial'		    => $used[nmmaterial],
-							'thickness'		    	=> $used[thickness],
-							'weight'		        => $used[weight],
-							'qtycoil'		        => $used[qtycoil],
-							'width'					=> $used[width],
-							'totalwidth'		    => $used[totalwidth],
-							'delivery'				=> $used[delivery],
+							'idcustomer'			=> $used['idcustomer'],
+							'nmmaterial'		    => $used['nmmaterial'],
+							'thickness'		    	=> $used['thickness'],
+							'weight'		        => $used['weight'],
+							'qtycoil'		        => $used['qtycoil'],
+							'width'					=> $used['width'],
+							'totalwidth'		    => $used['totalwidth'],
+							'delivery'				=> $used['delivery'],
                             );
                     $this->db->insert('dt_spk_produksi',$dt);
 			
@@ -1809,7 +1809,7 @@ function cari_inven1()
 		$ngek_upload	= $_FILES['ngek_upload'];
 		
 
-		$countfiles 	= count($_FILES['ngin_upload']['name']);
+		$countfiles 	= count((array) ($_FILES['ngin_upload']['name'] ?? []));
 		for($i=0;$i<$countfiles;$i++){
 			$nama_url = "";
 			if(!empty($_FILES["ngin_upload"]["tmp_name"][$i])){
@@ -1831,7 +1831,7 @@ function cari_inven1()
 		$upload_in =  json_encode($ArrInsert);
 
 		//EXTERNAL
-		$countfiles2 	= count($_FILES['ngek_upload']['name']);
+		$countfiles2 	= count((array) ($_FILES['ngek_upload']['name'] ?? []));
 		for($i=0;$i<$countfiles2;$i++){
 			$nama_url = "";
 			if(!empty($_FILES["ngek_upload"]["tmp_name"][$i])){
@@ -2156,14 +2156,14 @@ function cari_inven1()
 			$dt =  array(
 						'id_spk_aktual'			=> $id_spk_aktual,
 						'id_spkproduksi'		=> $post['id_spk_produksi'],
-						'no_surat'				=> $used[nosurat],
+						'no_surat'				=> $used['nosurat'],
 						'id_dt_spk_aktual'		=> $id_spk_aktual.'-'.$numb1,
-						'idcustomer'			=> $used[idcustomer],
-						'namacustomer'			=> $used[namacustomer],
-						'nmmaterial'		    => $used[nmmaterial],
-						'thickness'		    	=> $used[thickness],
-						'weight'		        => $used[weight],
-						'qtycoil'		        => $used[qtycoil]
+						'idcustomer'			=> $used['idcustomer'],
+						'namacustomer'			=> $used['namacustomer'],
+						'nmmaterial'		    => $used['nmmaterial'],
+						'thickness'		    	=> $used['thickness'],
+						'weight'		        => $used['weight'],
+						'qtycoil'		        => $used['qtycoil']
 						// 'qtyaktual'		        => $used[qtyaktual],
 						// 'width'					=> $used[width],
 						// 'totalwidth'		        => $used[totalwidth],
@@ -2182,48 +2182,48 @@ function cari_inven1()
 			
 			
 			
-			foreach ($used[qtyaktual] as $key => $value) {
+			foreach ($used['qtyaktual'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['id_spk_aktual'] = $id_spk_aktual;
 				$ArrDetail[$key.$numb1]['id_spkproduksi'] = $id_spkproduksi;
-				$ArrDetail[$key.$numb1]['no_surat'] =$used[nosurat];
+				$ArrDetail[$key.$numb1]['no_surat'] =$used['nosurat'];
 				$ArrDetail[$key.$numb1]['id_dt_spk_aktual'] = $id_spk_aktual.'-'.$numb1;
-				$ArrDetail[$key.$numb1]['idcustomer'] =  $used[idcustomer];
-				$ArrDetail[$key.$numb1]['namacustomer'] =  $used[namacustomer];
-				$ArrDetail[$key.$numb1]['nmmaterial'] =  $used[nmmaterial];
-				$ArrDetail[$key.$numb1]['thickness'] =  $used[thickness];
-				$ArrDetail[$key.$numb1]['weight'] =  $used[weight];
-				$ArrDetail[$key.$numb1]['qtycoil'] =  $used[qtycoil];
+				$ArrDetail[$key.$numb1]['idcustomer'] =  $used['idcustomer'];
+				$ArrDetail[$key.$numb1]['namacustomer'] =  $used['namacustomer'];
+				$ArrDetail[$key.$numb1]['nmmaterial'] =  $used['nmmaterial'];
+				$ArrDetail[$key.$numb1]['thickness'] =  $used['thickness'];
+				$ArrDetail[$key.$numb1]['weight'] =  $used['weight'];
+				$ArrDetail[$key.$numb1]['qtycoil'] =  $used['qtycoil'];
 			}
-			foreach ($used[qtyaktual] as $key => $value) {
+			foreach ($used['qtyaktual'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['qtyaktual'] = $value;
 			}
-			foreach ($used[width] as $key => $value) {
+			foreach ($used['width'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['width'] = $value;
 			}
-			foreach ($used[totalwidth] as $key => $value) {
+			foreach ($used['totalwidth'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['totalwidth'] = $value;
 			}
-			foreach ($used[qtywidth] as $key => $value) {
+			foreach ($used['qtywidth'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['qtysatuan'] = str_replace(',','',$value);
 			}
-			foreach ($used[totalaktual] as $key => $value) {
+			foreach ($used['totalaktual'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['totalaktual'] = str_replace(',','',$value);
 			}
-			foreach ($used[id_dt_spkproduksi] as $key => $value) {
+			foreach ($used['id_dt_spkproduksi'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['id_dt_spkproduksi'] = $value;
 			}
-			foreach ($used[delivery] as $key => $value) {
+			foreach ($used['delivery'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['delivery'] = $value;
 			}
-			foreach ($used[lot_slitting] as $key => $value) {
+			foreach ($used['lot_slitting'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['lot_slitting'] = $value;
 			}
 
 			//baru insert
-			foreach ($used[qtyaktual] as $key => $value) {
+			foreach ($used['qtyaktual'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['id_spkproduksi'] = $id_spk_aktual;
 				$ArrInsertStock[$key.$numb1]['id_category3'] = $post['id_material'];
-				$ArrInsertStock[$key.$numb1]['nama_material'] = $used[nmmaterial];
+				$ArrInsertStock[$key.$numb1]['nama_material'] = $used['nmmaterial'];
 				$ArrInsertStock[$key.$numb1]['lotno'] = $post['lotno'];
 				$ArrInsertStock[$key.$numb1]['id_bentuk'] =  $idbentuk;
 				$ArrInsertStock[$key.$numb1]['length'] =  $post['panjang'];
@@ -2233,20 +2233,20 @@ function cari_inven1()
 				$ArrInsertStock[$key.$numb1]['created_on'] =  date('Y-m-d H:i:s');
 				$ArrInsertStock[$key.$numb1]['created_by'] =  $this->auth->user_id();
 			}
-			foreach ($used[lot_slitting] as $key => $value) {
+			foreach ($used['lot_slitting'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['lot_slitting'] = $value;
 			}
-			foreach ($used[totalaktual] as $key => $value) {
+			foreach ($used['totalaktual'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['totalweight'] = str_replace(',','',$value);
 			}
-			foreach ($used[qtyaktual] as $key => $value) {
+			foreach ($used['qtyaktual'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['qty'] = $value;
 			}
-			foreach ($used[width] as $key => $value) {
+			foreach ($used['width'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['width'] = $value;
 			}
-			foreach ($used[totalaktual] as $key => $value) {
-				$ArrInsertStock[$key.$numb1]['weight'] = str_replace(',','',$value) / $used[qtyaktual][$key];
+			foreach ($used['totalaktual'] as $key => $value) {
+				$ArrInsertStock[$key.$numb1]['weight'] = ((float) str_replace(',', '', $used['qtyaktual'][$key] ?? 0) > 0 ? (float) str_replace(',', '', $value) / (float) str_replace(',', '', $used['qtyaktual'][$key]) : 0);
 			}
 		}
 	
@@ -2310,7 +2310,7 @@ function cari_inven1()
 		$ngek_ket		= json_encode($post['ngek_ket']);
 		$ngek_upload	= $_FILES['ngek_upload'];
 
-		$countfiles 	= count($_FILES['ngin_upload']['name']);
+		$countfiles 	= count((array) ($_FILES['ngin_upload']['name'] ?? []));
 		for($i=0;$i<$countfiles;$i++){
 			$nama_url = "";
 			if(!empty($_FILES["ngin_upload"]["tmp_name"][$i])){
@@ -2332,7 +2332,7 @@ function cari_inven1()
 		$upload_in =  json_encode($ArrInsert);
 
 		//EXTERNAL
-		$countfiles2 	= count($_FILES['ngek_upload']['name']);
+		$countfiles2 	= count((array) ($_FILES['ngek_upload']['name'] ?? []));
 		for($i=0;$i<$countfiles2;$i++){
 			$nama_url = "";
 			if(!empty($_FILES["ngek_upload"]["tmp_name"][$i])){
@@ -2465,14 +2465,14 @@ function cari_inven1()
 			$numb1++;        
 			$dt =  array(
 						'id_spk_aktual'			=> $id_spk_aktual,
-						'no_surat'				=> $used[nosurat],
+						'no_surat'				=> $used['nosurat'],
 						'id_dt_spk_aktual'		=> $id_spk_aktual.'-'.$numb1,
-						'idcustomer'			=> $used[idcustomer],
-						'namacustomer'			=> $used[namacustomer],
-						'nmmaterial'		    => $used[nmmaterial],
-						'thickness'		    	=> $used[thickness],
-						'weight'		        => $used[weight],
-						'qtycoil'		        => $used[qtycoil]
+						'idcustomer'			=> $used['idcustomer'],
+						'namacustomer'			=> $used['namacustomer'],
+						'nmmaterial'		    => $used['nmmaterial'],
+						'thickness'		    	=> $used['thickness'],
+						'weight'		        => $used['weight'],
+						'qtycoil'		        => $used['qtycoil']
 						// 'qtyaktual'		        => $used[qtyaktual],
 						// 'width'					=> $used[width],
 						// 'totalwidth'		    => $used[totalwidth],
@@ -2486,44 +2486,44 @@ function cari_inven1()
 			$this->db->delete('dt_spk_aktual');
 			
 			$this->db->insert('dt_spk_aktual',$dt);
-			foreach ($used[qtyaktual] as $key => $value) {
+			foreach ($used['qtyaktual'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['id_spk_aktual'] = $id_spk_aktual;
-				$ArrDetail[$key.$numb1]['no_surat'] =$used[nosurat];
+				$ArrDetail[$key.$numb1]['no_surat'] =$used['nosurat'];
 				$ArrDetail[$key.$numb1]['id_dt_spk_aktual'] = $id_spk_aktual.'-'.$numb1;
-				$ArrDetail[$key.$numb1]['idcustomer'] =  $used[idcustomer];
-				$ArrDetail[$key.$numb1]['namacustomer'] =  $used[namacustomer];
-				$ArrDetail[$key.$numb1]['nmmaterial'] =  $used[nmmaterial];
-				$ArrDetail[$key.$numb1]['thickness'] =  $used[thickness];
-				$ArrDetail[$key.$numb1]['weight'] =  $used[weight];
-				$ArrDetail[$key.$numb1]['qtycoil'] =  $used[qtycoil];
+				$ArrDetail[$key.$numb1]['idcustomer'] =  $used['idcustomer'];
+				$ArrDetail[$key.$numb1]['namacustomer'] =  $used['namacustomer'];
+				$ArrDetail[$key.$numb1]['nmmaterial'] =  $used['nmmaterial'];
+				$ArrDetail[$key.$numb1]['thickness'] =  $used['thickness'];
+				$ArrDetail[$key.$numb1]['weight'] =  $used['weight'];
+				$ArrDetail[$key.$numb1]['qtycoil'] =  $used['qtycoil'];
 			}
-			foreach ($used[qtyaktual] as $key => $value) {
+			foreach ($used['qtyaktual'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['qtyaktual'] = $value;
 			}
-			foreach ($used[width] as $key => $value) {
+			foreach ($used['width'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['width'] = $value;
 			}
-			foreach ($used[totalwidth] as $key => $value) {
+			foreach ($used['totalwidth'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['totalwidth'] = $value;
 			}
-			foreach ($used[totalaktual] as $key => $value) {
+			foreach ($used['totalaktual'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['totalaktual'] = str_replace(',','',$value);
 			}
-			foreach ($used[id_dt_spkproduksi] as $key => $value) {
+			foreach ($used['id_dt_spkproduksi'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['id_dt_spkproduksi'] = $value;
 			}
-			foreach ($used[delivery] as $key => $value) {
+			foreach ($used['delivery'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['delivery'] = $value;
 			}
-			foreach ($used[lot_slitting] as $key => $value) {
+			foreach ($used['lot_slitting'] as $key => $value) {
 				$ArrDetail[$key.$numb1]['lot_slitting'] = $value;
 			}
 
 			//baru insert
-			foreach ($used[qtyaktual] as $key => $value) {
+			foreach ($used['qtyaktual'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['id_spkproduksi'] = $id_spk_aktual;
 				$ArrInsertStock[$key.$numb1]['id_category3'] = $post['id_material'];
-				$ArrInsertStock[$key.$numb1]['nama_material'] = $used[nmmaterial];
+				$ArrInsertStock[$key.$numb1]['nama_material'] = $used['nmmaterial'];
 				$ArrInsertStock[$key.$numb1]['lotno'] = $post['lotno'];
 				$ArrInsertStock[$key.$numb1]['id_bentuk'] =  $idbentuk;
 				$ArrInsertStock[$key.$numb1]['length'] =  $post['panjang'];
@@ -2533,20 +2533,20 @@ function cari_inven1()
 				$ArrInsertStock[$key.$numb1]['created_on'] =  date('Y-m-d H:i:s');
 				$ArrInsertStock[$key.$numb1]['created_by'] =  $this->auth->user_id();
 			}
-			foreach ($used[lot_slitting] as $key => $value) {
+			foreach ($used['lot_slitting'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['lot_slitting'] = $value;
 			}
-			foreach ($used[totalaktual] as $key => $value) {
+			foreach ($used['totalaktual'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['totalweight'] = str_replace(',','',$value);
 			}
-			foreach ($used[qtyaktual] as $key => $value) {
+			foreach ($used['qtyaktual'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['qty'] = $value;
 			}
-			foreach ($used[width] as $key => $value) {
+			foreach ($used['width'] as $key => $value) {
 				$ArrInsertStock[$key.$numb1]['width'] = $value;
 			}
-			foreach ($used[totalaktual] as $key => $value) {
-				$ArrInsertStock[$key.$numb1]['weight'] = str_replace(',','',$value) / $used[qtyaktual][$key];
+			foreach ($used['totalaktual'] as $key => $value) {
+				$ArrInsertStock[$key.$numb1]['weight'] = ((float) str_replace(',', '', $used['qtyaktual'][$key] ?? 0) > 0 ? (float) str_replace(',', '', $value) / (float) str_replace(',', '', $used['qtyaktual'][$key]) : 0);
 			}
 		}
 
@@ -2661,19 +2661,19 @@ public function deletePenawaran(){
 		foreach($_POST['hd1'] as $h1){
 		$numb1++;
                 $header1 =  array(
-							'id_type'		        => $h1[inventory_1],
-							'id_category1'		    => $h1[inventory_2],
-							'id_category2'		    => $h1[inventory_3],
-							'nama'		        	=> $h1[nm_inventory],
-							'maker'		        	=> $h1[maker],
-							'density'		        => $h1[density],
-							'hardness'		        => $h1[hardness],
-							'id_bentuk'		        => $h1[id_bentuk],
-							'id_surface'		    => $h1[id_surface],
-							'mountly_forecast'		=> $h1[mountly_forecast],
-							'safety_stock'		    => $h1[safety_stock],
-							'order_point'		    => $h1[order_point],
-							'maksimum'		    	=> $h1[maksimum],
+							'id_type'		        => $h1['inventory_1'],
+							'id_category1'		    => $h1['inventory_2'],
+							'id_category2'		    => $h1['inventory_3'],
+							'nama'		        	=> $h1['nm_inventory'],
+							'maker'		        	=> $h1['maker'],
+							'density'		        => $h1['density'],
+							'hardness'		        => $h1['hardness'],
+							'id_bentuk'		        => $h1['id_bentuk'],
+							'id_surface'		    => $h1['id_surface'],
+							'mountly_forecast'		=> $h1['mountly_forecast'],
+							'safety_stock'		    => $h1['safety_stock'],
+							'order_point'		    => $h1['order_point'],
+							'maksimum'		    	=> $h1['maksimum'],
 							'aktif'					=> 'aktif',
 							'created_on'		=> date('Y-m-d H:i:s'),
 							'created_by'		=> $this->auth->user_id(),
@@ -2692,9 +2692,9 @@ public function deletePenawaran(){
 		$numb2++;
               $data1 =  array(
 			                    'id_category3'=>$id,
-								'id_suplier'=>$d1[id_supplier],
-								'lead'=>$d1[lead],
-								'minimum'=>$d1[minimum],
+								'id_suplier'=>$d1['id_supplier'],
+								'lead'=>$d1['lead'],
+								'minimum'=>$d1['minimum'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -2713,8 +2713,8 @@ public function deletePenawaran(){
 		$numb3++;
               $comp =  array(
 			                    'id_category3'=>$id,
-								'id_compotition'=>$c1[id_compotition],
-								'nilai_compotition'=>$c1[jumlah_kandungan],
+								'id_compotition'=>$c1['id_compotition'],
+								'nilai_compotition'=>$c1['jumlah_kandungan'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -2733,8 +2733,8 @@ public function deletePenawaran(){
 		$numb4++;
               $dms =  array(
 			                    'id_category3'=>$id,
-								'id_dimensi'=>$dm[id_dimensi],
-								'nilai_dimensi'=>$dm[nilai_dimensi],
+								'id_dimensi'=>$dm['id_dimensi'],
+								'nilai_dimensi'=>$dm['nilai_dimensi'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -2866,19 +2866,19 @@ public function deletePenawaran(){
 		$numb1++;
 
                 $header1 =  array(
-							'id_type'		        => $h1[inventory_1],
-							'id_category1'		    => $h1[inventory_2],
-							'id_category2'		    => $h1[inventory_3],
-							'nama'		        	=> $h1[nm_inventory],
-							'maker'		        	=> $h1[maker],
-							'density'		        => $h1[density],
-							'hardness'		        => $h1[hardness],
-							'id_bentuk'		        => $h1[id_bentuk],
-							'id_surface'		    => $h1[id_surface],
-							'mountly_forecast'		=> $h1[mountly_forecast],
-							'safety_stock'		    => $h1[safety_stock],
-							'order_point'		    => $h1[order_point],
-							'maksimum'		    	=> $h1[maksimum],
+							'id_type'		        => $h1['inventory_1'],
+							'id_category1'		    => $h1['inventory_2'],
+							'id_category2'		    => $h1['inventory_3'],
+							'nama'		        	=> $h1['nm_inventory'],
+							'maker'		        	=> $h1['maker'],
+							'density'		        => $h1['density'],
+							'hardness'		        => $h1['hardness'],
+							'id_bentuk'		        => $h1['id_bentuk'],
+							'id_surface'		    => $h1['id_surface'],
+							'mountly_forecast'		=> $h1['mountly_forecast'],
+							'safety_stock'		    => $h1['safety_stock'],
+							'order_point'		    => $h1['order_point'],
+							'maksimum'		    	=> $h1['maksimum'],
 							'aktif'					=> 'aktif',
 							'created_on'		=> date('Y-m-d H:i:s'),
 							'created_by'		=> $this->auth->user_id(),
@@ -2896,9 +2896,9 @@ public function deletePenawaran(){
 		$numb2++;
               $data1 =  array(
 			                    'id_category3'=>$code,
-								'id_suplier'=>$d1[id_supplier],
-								'lead'=>$d1[lead],
-								'minimum'=>$d1[minimum],
+								'id_suplier'=>$d1['id_supplier'],
+								'lead'=>$d1['lead'],
+								'minimum'=>$d1['minimum'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -2915,8 +2915,8 @@ public function deletePenawaran(){
 		$numb3++;
               $comp =  array(
 			                    'id_category3'=>$code,
-								'id_compotition'=>$c1[id_compotition],
-								'nilai_compotition'=>$c1[jumlah_kandungan],
+								'id_compotition'=>$c1['id_compotition'],
+								'nilai_compotition'=>$c1['jumlah_kandungan'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -2933,8 +2933,8 @@ public function deletePenawaran(){
 		$numb4++;
               $dms =  array(
 			                    'id_category3'=>$code,
-								'id_dimensi'=>$dm[id_dimensi],
-								'nilai_dimensi'=>$dm[nilai_dimensi],
+								'id_dimensi'=>$dm['id_dimensi'],
+								'nilai_dimensi'=>$dm['nilai_dimensi'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -2974,19 +2974,19 @@ public function deletePenawaran(){
 		$numb1++;
 
                 $header1 =  array(
-							'id_type'		        => $h1[inventory_1],
-							'id_category1'		    => $h1[inventory_2],
-							'id_category2'		    => $h1[inventory_3],
-							'nama'		        	=> $h1[nm_inventory],
-							'maker'		        	=> $h1[maker],
-							'density'		        => $h1[density],
-							'hardness'		        => $h1[hardness],
-							'id_bentuk'		        => $h1[id_bentuk],
-							'id_surface'		    => $h1[id_surface],
-							'mountly_forecast'		=> $h1[mountly_forecast],
-							'safety_stock'		    => $h1[safety_stock],
-							'order_point'		    => $h1[order_point],
-							'maksimum'		    	=> $h1[maksimum],
+							'id_type'		        => $h1['inventory_1'],
+							'id_category1'		    => $h1['inventory_2'],
+							'id_category2'		    => $h1['inventory_3'],
+							'nama'		        	=> $h1['nm_inventory'],
+							'maker'		        	=> $h1['maker'],
+							'density'		        => $h1['density'],
+							'hardness'		        => $h1['hardness'],
+							'id_bentuk'		        => $h1['id_bentuk'],
+							'id_surface'		    => $h1['id_surface'],
+							'mountly_forecast'		=> $h1['mountly_forecast'],
+							'safety_stock'		    => $h1['safety_stock'],
+							'order_point'		    => $h1['order_point'],
+							'maksimum'		    	=> $h1['maksimum'],
 							'aktif'					=> 'aktif',
 							'created_on'		=> date('Y-m-d H:i:s'),
 							'created_by'		=> $this->auth->user_id(),
@@ -3003,9 +3003,9 @@ public function deletePenawaran(){
 		$numb2++;
               $data1 =  array(
 			                    'id_category3'=>$id,
-								'id_suplier'=>$d1[id_supplier],
-								'lead'=>$d1[lead],
-								'minimum'=>$d1[minimum],
+								'id_suplier'=>$d1['id_supplier'],
+								'lead'=>$d1['lead'],
+								'minimum'=>$d1['minimum'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -3022,8 +3022,8 @@ public function deletePenawaran(){
 		$numb3++;
               $comp =  array(
 			                    'id_category3'=>$id,
-								'id_compotition'=>$c1[id_compotition],
-								'nilai_compotition'=>$c1[jumlah_kandungan],
+								'id_compotition'=>$c1['id_compotition'],
+								'nilai_compotition'=>$c1['jumlah_kandungan'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
@@ -3040,8 +3040,8 @@ public function deletePenawaran(){
 		$numb4++;
               $dms =  array(
 			                    'id_category3'=>$id,
-								'id_dimensi'=>$dm[id_dimensi],
-								'nilai_dimensi'=>$dm[nilai_dimensi],
+								'id_dimensi'=>$dm['id_dimensi'],
+								'nilai_dimensi'=>$dm['nilai_dimensi'],
 								'deleted' =>'0',
 							    'created_on' => date('Y-m-d H:i:s'),
 								'created_by' => $this->auth->user_id(),
