@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inquiry (CRCL)</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script src="assets/seed_sales.js"></script>
+<script>
+(function () {
+  var M = Mock, S = M.seedS, rows = S.inquiry, esc = M.esc;
+  var page = M.shell({key:'transaksi_inquiry', title:'Inquiry', sub:'Transaksi inquiry customer (CRCL)', module:'transaksi_inquiry', crumb:'Penjualan'});
+  page.insertAdjacentHTML('beforeend', '<div class="note">Detail item inquiry nyata dari <code>dt_inquery_transaksi</code>; header (customer, sales, email) diturunkan karena tabel <code>tr_inquiry</code> tidak ada di DB lokal. Alur: Add header → simpan → langsung ke halaman detail (<code>transaksi_inquiry/detail/{no_inquiry}</code>).</div>');
+  var root = document.createElement('div'); page.appendChild(root);
+  var BENTUK = ['ROLL', 'SHEET', 'ROUND BAR', 'SQUARE BAR', 'HEXAGON BAR', 'OKTAGON BAR', 'TUBE', 'PENTAGON BAR'];
+  var mats = {}; S.penawaran.concat(S.penawaranSlit).forEach(function (p) { p.det.forEach(function (d) { mats[d.material] = 1; }); }); rows.forEach(function (q) { q.det.forEach(function (d) { if (d.material !== '-') mats[d.material] = 1; }); });
+  var MAT = Object.keys(mats).sort();
+  rows.forEach(function (q, i) { q.email = q.email || 'purchasing' + (i + 1) + '@' + q.cust.toLowerCase().replace(/[^a-z]+/g, '').slice(0, 12) + '.example'; });
+
+  /* ===== daftar ===== */
+  function list() {
+    root.innerHTML = '<div class="box primary"><div class="box-header"><span id="addw"></span><button class="btn btn-success btn-sm" id="tpl">⬇ Download Template CRCL</button></div><div class="box-body" id="tbl"></div></div>';
+    function addBtn() { M.$('#addw').innerHTML = M.perm.Add ? '<button class="btn btn-success btn-sm" id="add">＋ Add</button>' : ''; if (M.perm.Add) M.$('#add').onclick = header; }
+    addBtn(); M.onPerm(addBtn); M.$('#tpl').onclick = function () { M.toast('template_crcl_v2.pdf diunduh (simulasi)'); };
+    M.table(M.$('#tbl'), {rows:function () { return rows; }, cols:[
+      {key:'crcl', label:'No.CRCL'}, {key:'cust', label:'Nama Customer'}, {key:'tgl', label:'Tanggal Inquiry', html:function (r) { return M.dstr(r.tgl); }, text:function (r) { return r.tgl; }},
+      {label:'Action', html:function (r) {
+        return (M.perm.View ? '<button class="btn btn-sm btn-success" data-a="crcl" data-id="' + esc(r.no) + '" title="View CRCL">👁 CRCL</button> ' : '') + (M.perm.Manage ? '<button class="btn btn-sm btn-warning" data-a="detail" data-id="' + esc(r.no) + '" title="Detail">✎ Detail</button>' : ''); }, text:function () { return ''; }}],
+      onAction:function (a, id) { var q = rows.filter(function (x) { return x.no === id; })[0]; if (a === 'crcl') M.toast('Membuka dokumen CRCL ' + q.crcl + ' (simulasi)'); else detail(q); }});
+  }
+
+  /* ===== tambah header -> simpan -> langsung ke halaman detail ===== */
+  function header() {
+    var no = 'IQ' + new Date().toISOString().slice(2, 10).replace(/-/g, '') + '0001', created = null;
+    var b = M.modal('Tambah Inquiry', '<form novalidate><div class="grid2">' + M.fg('NO.CRCL', '<input type="text" name="crcl" required placeholder="CRCL-01-xxx">') + M.fg('Tanggal', '<input type="text" name="tgl" value="' + new Date().toISOString().slice(0, 10) + '">') +
+      M.fg('SALES/MARKETING', '<select name="sales" required>' + M.opts(['Rama', 'Dewi', 'Budi']) + '</select>') + M.fg('CUSTOMER', '<select name="cust" required>' + M.opts(S.customer, '', 'nama', 'nama') + '</select>') +
+      M.fg('EMAIL', '<input type="text" name="email">') + M.fg('PIC CUSTOMER', '<input type="text" name="pic">') + M.fg('Berat Maksimum/palet (Kg)', '<input type="number" name="bp">') + M.fg('Tinggi Maksimum/palet (cm)', '<input type="number" name="tp">') + '</div>' +
+      M.fg('Upload Document CRCL', '<input type="file">') + '<div class="form-actions"><button class="btn btn-primary" type="submit">💾 Save</button></div></form>', {size:'xl'});
+    var f = b.querySelector('form'); f.onsubmit = function (e) { e.preventDefault(); if (!M.validate(f)) return;
+      M.saveFlow({text:'Inquiry akan disimpan.', done:'Inquiry berhasil disimpan. Lanjutkan dengan menambah detail material.', save:function () {
+        var cu = S.customer.filter(function (c) { return c.nama === f.cust.value; })[0]; created = {no:no, tgl:f.tgl.value, crcl:f.crcl.value, cust:f.cust.value, id_cust:cu.id, sales:f.sales.value, email:f.email.value, det:[]}; rows.unshift(created); },
+        after:function () { detail(created); }}); };
+  }
+
+  /* ===== halaman detail: header CRCL read-only + filter bentuk + tabel per bentuk ===== */
+  function detail(q) {
+    var ro = function (l, v) { return M.fg(l, '<input type="text" readonly value="' + esc(v) + '">'); };
+    root.innerHTML = '<div class="box primary"><div class="box-body"><div style="text-align:center"><h3 style="margin:4px 0 14px">CRCL (CUSTOMER REQUIREMENTS CHECK LIST)</h3></div><div class="grid2">' +
+      ro('NO.CRCL', q.crcl || '-') + ro('Tanggal', q.tgl) + ro('Nama Customer', q.cust) + ro('Email', q.email) + '</div></div>' +
+      '<div class="box-header"><button class="btn btn-primary btn-sm" id="back">Back</button><span id="flt"></span></div><div class="box-body" id="sec"></div></div>';
+    M.$('#back').onclick = list;
+    var cur = 'ALL';
+    function flt() { M.$('#flt').innerHTML = ['ALL'].concat(BENTUK).map(function (x) { return '<button class="btn btn-sm ' + (cur === x ? 'btn-primary' : 'btn-default') + '" data-b="' + x + '">' + (x === 'ALL' ? 'All Data' : x) + '</button>'; }).join(' '); }
+    M.$('#flt').onclick = function (e) { var b = e.target.closest('[data-b]'); if (b) { cur = b.dataset.b; flt(); sec(); } };
+    function sec() {
+      var host = M.$('#sec');
+      if (cur === 'ALL') {
+        host.innerHTML = '<div class="sect">All Data</div>' + M.stable([{label:'No. CRCL', html:function () { return esc(q.crcl || '-'); }}, {key:'material', label:'Nama Produk'}, {key:'bentuk', label:'Bentuk Material'}, {label:'Tanggal Revisi', html:function () { return '-'; }}, {label:'Tanggal CRCL', html:function () { return M.dstr(q.tgl); }},
+          {label:'Dokumen CRCL', html:function () { return '<button class="btn btn-sm btn-primary" onclick="Mock.toast(\'Membuka dokumen CRCL (simulasi)\')">👁</button>'; }}], q.det); return; }
+      host.innerHTML = '<div class="box-header" style="padding-left:0"><span class="sect" style="margin:0">' + cur + '</span><span id="addw"></span></div><div id="bt"></div>';
+      function addBtn() { M.$('#addw').innerHTML = M.perm.Add ? '<button class="btn btn-primary btn-sm">Tambah</button>' : ''; var b = M.$('#addw button'); if (b) b.onclick = function () { item(q, cur, null, t); }; }
+      addBtn(); M.onPerm(addBtn);
+      var t = M.table(M.$('#bt'), {rows:function () { return q.det.filter(function (d) { return d.bentuk === cur; }); }, cols:[
+        {label:'No. CRCL', html:function () { return esc(q.crcl || '-'); }, text:function () { return q.crcl || ''; }}, {key:'material', label:'Nama Produk'}, {label:'Tanggal Revisi', html:function () { return '-'; }, text:function () { return ''; }}], actions:{view:1, edit:1, del:1},
+        onAction:function (a, id) { var d = q.det.filter(function (x) { return x.id === id; })[0];
+          if (a === 'view') M.modal('Detail Item Inquiry', '<dl class="dl"><dt>Bentuk</dt><dd>' + esc(d.bentuk) + '</dd><dt>Material</dt><dd>' + esc(d.material) + '</dd><dt>Thickness</dt><dd>' + esc(d.thickness) + '</dd><dt>Dimensi</dt><dd>' + esc(d.dim1) + ' x ' + esc(d.dim2 || '-') + '</dd><dt>Toleransi (+/-)</dt><dd>' + esc(d.tol_max || '-') + ' / ' + esc(d.tol_min || '-') + '</dd><dt>Qty Order</dt><dd>' + esc(d.qty == null ? '-' : d.qty) + '</dd><dt>Target Harga</dt><dd>' + esc(d.target == null ? '-' : d.target) + '</dd><dt>Master Sample</dt><dd>' + esc(d.sample || '-') + '</dd><dt>Packing</dt><dd>' + esc(d.packing || '-') + '</dd></dl>', {size:'sm'});
+          else if (a === 'edit') item(q, d.bentuk, d, t); else M.delFlow('Item inquiry akan dihapus.', 'Item berhasil dihapus.', function () { q.det.splice(q.det.indexOf(d), 1); t.refresh(); }); }});
+    }
+    flt(); sec();
+  }
+
+  function item(q, bentuk, d, t) {
+    var edit = !!d; d = d || {material:'', thickness:'', dim1:'', dim2:'', qty:'', target:'', sample:'No', packing:'Metalsindo Format', tol_max:'', tol_min:''};
+    var b = M.modal((edit ? 'Edit ' : 'Tambah ') + 'Detail Inquiry - ' + bentuk, '<form novalidate>' + M.fg('Material', '<select name="material" required>' + M.opts(MAT, d.material) + '</select>', 'Daftar material mengikuti bentuk ' + bentuk) +
+      '<div class="grid2">' + M.fg('Thickness (mm)', '<input type="number" step="any" name="thickness" required value="' + esc(d.thickness) + '">') + M.fg('Dimensi 1', '<input type="text" name="dim1" value="' + esc(d.dim1) + '">') + M.fg('Dimensi 2', '<input type="text" name="dim2" value="' + esc(d.dim2) + '">') +
+      M.fg('Qty Order (Kg)', '<input type="number" name="qty" value="' + esc(d.qty == null ? '' : d.qty) + '">') + M.fg('Target Harga', '<input type="number" name="target" value="' + esc(d.target == null ? '' : d.target) + '">') + M.fg('Master Sample', '<select name="sample">' + M.opts(['Yes', 'No'], d.sample) + '</select>') +
+      M.fg('Toleransi Max', '<input type="text" name="tmax" value="' + esc(d.tol_max) + '">') + M.fg('Toleransi Min', '<input type="text" name="tmin" value="' + esc(d.tol_min) + '">') + M.fg('Packing', '<input type="text" name="packing" value="' + esc(d.packing) + '">') + '</div>' +
+      '<div class="form-actions"><button class="btn btn-primary" type="submit">💾 Save</button></div></form>', {size:'xl'});
+    var f = b.querySelector('form'); f.onsubmit = function (e) { e.preventDefault(); if (!M.validate(f)) return;
+      M.saveFlow({text:'Detail inquiry akan disimpan.', done:'Detail inquiry berhasil disimpan.', save:function () {
+        var o = {bentuk:bentuk, material:f.material.value, thickness:f.thickness.value, dim1:f.dim1.value, dim2:f.dim2.value, qty:f.qty.value || null, target:f.target.value || null, sample:f.sample.value, packing:f.packing.value, tol_max:f.tmax.value, tol_min:f.tmin.value};
+        if (edit) Object.assign(d, o); else { o.id = 'D' + Date.now() % 100000; q.det.push(o); } if (t) t.refresh(); }}); };
+  }
+  list();
+})();
+</script>
+</body>
+</html>

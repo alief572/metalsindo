@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flow Process</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script src="assets/seed_sales.js"></script>
+<script src="assets/seed_asset.js"></script>
+<script src="assets/costing.js"></script>
+<script src="assets/pcui.js"></script>
+<script>
+(function () {
+  var M = Mock, P = M.pc, U = M.pcui, A = M.seedA, esc = M.esc, st = P.st;
+  var page = U.head('flow_process', 'Flow Process & Cycletime', 'Proses per material (PG-08 · UC-N09)', 'Product Costing');
+  var root = document.createElement('div'); page.appendChild(root);
+  var machines = A.asset.filter(function (a) { return a.category === 1; });
+  var mname = function (id) { var a = A.asset.filter(function (x) { return x.id === +id; })[0]; return a ? a.nama : '-'; };
+
+  function list() {
+    root.innerHTML = '<div class="box primary"><div class="box-header"><span id="addw"></span></div><div class="box-body" id="tbl"></div></div>' +
+      '<div class="note">Kolom <b>Machine</b> dipilih dari master Asset berkategori <b>Machine</b> (' + machines.length + ' mesin pada data contoh). <b>Cycletime dalam menit/Kg.</b> Flow Process tidak diberi versi (hanya waktu update terakhir). Cycletime dan Jumlah Man Power disimpan sebagai informasi dan tidak ikut menghitung costing; Biaya Man Power diambil langsung dari Rate Man Power (Rp/Kg) di Master Rate Umum.</div>';
+    function addBtn() { M.$('#addw').innerHTML = M.perm.Add ? '<button class="btn btn-success btn-sm" id="add">＋ Add Cycletime</button>' : ''; if (M.perm.Add) M.$('#add').onclick = function () { choose(); }; }
+    addBtn(); M.onPerm(addBtn);
+    var t = M.table(M.$('#tbl'), {rows:function () { return st.mats.map(function (m) { var f = st.flow[m.id]; return {id:m.id, nama:m.nama, bentuk:m.bentuk, f:f, ct:P.flowCT(m.id)}; }); }, cols:[
+      {key:'nama', label:'Product / Material'}, {key:'bentuk', label:'Bentuk'},
+      {label:'Total Cycletime (mnt/Kg)', html:function (r) { return r.ct == null ? M.pill('Belum ada flow', 'gray') : '<span class="num" style="display:block">' + M.fmt(r.ct, 4) + '</span>'; }, text:function (r) { return r.ct == null ? '' : r.ct; }},
+      {label:'Jumlah Proses', html:function (r) { return r.f ? r.f.rows.length : '-'; }, text:function (r) { return r.f ? r.f.rows.length : 0; }},
+      {label:'Last Update', html:function (r) { return r.f ? M.dstr(r.f.upd) : '-'; }, text:function (r) { return r.f ? r.f.upd : ''; }}, {label:'Update By', html:function (r) { return r.f ? esc(r.f.by) : '-'; }, text:function (r) { return r.f ? r.f.by : ''; }}],
+      actions:{view:1, edit:1}, onAction:function (a, id) { if (a === 'view') view(id); else edit(id); }});
+  }
+  function view(id) { var f = st.flow[id]; M.modal('Flow Process - ' + U.mname(id), f ? M.stable([{label:'No', html:function (r) { return r.no; }}, {label:'Cost Centre/Area', html:function (r) { return esc(r.cc); }}, {label:'Nama Proses', html:function (r) { return esc(r.proses); }}, {label:'Cycletime (mnt/Kg)', cls:'num', html:function (r) { return M.fmt(r.ct, 4); }},
+    {label:'Man Power', cls:'num', html:function (r) { return r.mp; }}, {label:'Machine', html:function (r) { return esc(mname(r.asset)); }}], f.rows, '<tfoot><tr><td colspan="3" class="num">Total Cycletime</td><td class="num">' + M.fmt(P.flowCT(id), 4) + '</td><td colspan="2"></td></tr></tfoot>') : '<div class="note">Material ini belum memiliki Flow Process.</div>', {size:'xl'}); }
+  function choose() {
+    var without = st.mats.filter(function (m) { return !st.flow[m.id]; });
+    var b = M.modal('Tambah Cycletime', '<form novalidate>' + M.fg('Product / Material', '<select name="mid" required>' + M.opts(without.map(function (m) { return {v:m.id, t:m.nama}; }), '', 'v', 't', '-- Pilih Product --') + '</select>', 'Material yang belum memiliki flow') + '<div class="form-actions"><button class="btn btn-primary" type="submit">Lanjut</button></div></form>', {size:'sm'});
+    var f = b.querySelector('form'); f.onsubmit = function (e) { e.preventDefault(); if (!M.validate(f)) return; M.close(); edit(f.mid.value); };
+  }
+  function edit(id) {
+    var cur = st.flow[id], rows = cur ? JSON.parse(JSON.stringify(cur.rows)) : [{no:1, cc:'', proses:'', ct:'', mp:1, asset:''}];
+    root.innerHTML = '<div class="box primary"><div class="box-header"><h3>Flow Process <small>' + esc(U.mname(id)) + '</small></h3></div><div class="box-body"><form novalidate><table class="mini"><thead><tr><th>No</th><th>Cost Centre/Area</th><th>Nama Proses</th><th>Cycletime (mnt/Kg)</th><th>Man Power</th><th>Machine</th><th></th></tr></thead><tbody id="rows"></tbody></table>' +
+      '<button type="button" class="btn btn-warning btn-sm" id="addrow" style="margin-top:6px">＋ Add</button><div class="sumbox" style="margin-top:14px"><div><small>Total Cycletime</small><b id="tot">0</b> mnt/Kg</div></div>' +
+      '<div class="form-actions"><button class="btn btn-primary" type="submit">💾 Save</button><button class="btn btn-default" type="button" id="cancel">Batal</button></div></form></div></div>';
+    function draw() { M.$('#rows').innerHTML = rows.map(function (r, i) { return '<tr><td>' + (i + 1) + '</td><td><input type="text" data-i="' + i + '" data-k="cc" value="' + esc(r.cc) + '"></td><td><input type="text" data-i="' + i + '" data-k="proses" value="' + esc(r.proses) + '"></td><td><input type="number" step="any" data-i="' + i + '" data-k="ct" value="' + esc(r.ct) + '"></td><td><input type="number" data-i="' + i + '" data-k="mp" value="' + esc(r.mp) + '"></td><td><select data-i="' + i + '" data-k="asset">' + M.opts(machines.map(function (m) { return {v:String(m.id), t:m.nama}; }), String(r.asset), 'v', 't', '-- Machine --') + '</select></td><td><button type="button" class="btn btn-danger btn-sm" data-del="' + i + '">✕</button></td></tr>'; }).join(''); tot(); }
+    function tot() { M.$('#tot').textContent = M.fmt(rows.reduce(function (a, r) { return a + (+r.ct || 0); }, 0), 4); }
+    draw();
+    var f = root.querySelector('form');
+    f.addEventListener('input', function (e) { var d = e.target.dataset; if (d.i == null) return; rows[+d.i][d.k] = e.target.value; tot(); });
+    f.addEventListener('change', function (e) { var d = e.target.dataset; if (d.i != null && d.k === 'asset') rows[+d.i].asset = e.target.value; });
+    f.addEventListener('click', function (e) { if (e.target.id === 'addrow') { rows.push({no:rows.length + 1, cc:'', proses:'', ct:'', mp:1, asset:''}); draw(); } var dl = e.target.dataset.del; if (dl != null) { rows.splice(+dl, 1); draw(); } });
+    M.$('#cancel').onclick = list;
+    f.onsubmit = function (e) { e.preventDefault(); var ok = rows.length && rows.every(function (r) { return r.proses && r.ct !== ''; }); if (!ok) { M.toast('Lengkapi Nama Proses dan Cycletime pada setiap baris.', 'err'); return; }
+      M.saveFlow({text:'Flow Process akan disimpan.', done:'Flow Process berhasil disimpan.', save:function () { st.flow[id] = {upd:P.TODAY, by:'admin', rows:rows.map(function (r, i) { return {no:i + 1, cc:r.cc, proses:r.proses, ct:+r.ct, mp:+r.mp || 1, asset:r.asset ? +r.asset : ''}; })}; P.save(); }, after:list}); };
+  }
+  list();
+})();
+</script>
+</body>
+</html>

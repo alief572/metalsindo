@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Approval Pricelist</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script src="assets/seed_sales.js"></script>
+<script src="assets/costing.js"></script>
+<script src="assets/pcui.js"></script>
+<script>
+(function () {
+  var M = Mock, P = M.pc, U = M.pcui, esc = M.esc, st = P.st;
+  var page = U.head('pricelist_approval', 'Approval Pricelist', 'Antrean keputusan Management (PG-13 · UC-N14)', 'Pricelist');
+  var root = document.createElement('div'); page.appendChild(root);
+  function queue() { return st.pl.filter(function (p) { return p.lines.some(function (l) { return l.status === 'DIAJUKAN'; }); }); }
+
+  function list() {
+    root.innerHTML = '<div class="box primary"><div class="box-body" id="tbl"></div></div><div class="note">Management dapat <b>menyetujui seluruh baris, sebagian baris, atau menolak</b>. Baris yang disetujui langsung <b>dirilis</b> sebagai pricelist dasar (berlaku semua customer); baris yang tidak disetujui <b>kembali ke DRAFT</b>. Tombol keputusan memerlukan hak "Delete" pada simulasi hak akses (setara hak Setujui).</div>';
+    M.table(M.$('#tbl'), {rows:queue, cols:[{key:'no', label:'No. Pricelist'}, {label:'Tanggal', html:function (p) { return M.dstr(p.tgl); }, text:function (p) { return p.tgl; }}, {label:'Disusun oleh', html:function (p) { return esc(p.by); }, text:function (p) { return p.by; }},
+      {label:'Baris diajukan', html:function (p) { return p.lines.filter(function (l) { return l.status === 'DIAJUKAN'; }).length; }, text:function () { return ''; }}], actions:{view:'☰ Periksa'}, onAction:function (a, id) { decide(st.pl.filter(function (p) { return p.id === id; })[0]); }});
+  }
+  function decide(p) {
+    var ls = p.lines.filter(function (l) { return l.status === 'DIAJUKAN'; });
+    root.innerHTML = '<div class="box primary"><div class="box-header"><button class="btn btn-default btn-sm" id="back">← Back</button></div><div class="box-body"><div class="sumbox"><div><small>No. Pricelist</small><b>' + esc(p.no) + '</b></div><div><small>Tanggal</small><b>' + M.dstr(p.tgl) + '</b></div></div><form novalidate>' +
+      M.stable([{label:'Setujui', html:function (l) { return '<input type="checkbox" name="s" value="' + l.mid + '" checked>'; }}, {label:'Material', html:function (l) { return esc(U.mname(l.mid)); }}, {label:'Bottom Price baru (Rp/Kg)', cls:'num', html:function (l) { return '<b>' + M.fmt(l.bottom, 2) + '</b>'; }},
+        {label:'Pricelist dirilis saat ini (Rp/Kg)', cls:'num', html:function (l) { var r = P.releasedLine(l.mid); return r ? M.fmt(r.bottom, 2) : '-'; }}], ls) +
+      M.fg('Catatan', '<textarea name="cat"></textarea>') + '<div class="form-actions"><button class="btn btn-success" type="submit"' + (M.perm.Delete ? '' : ' disabled') + '>✓ Simpan Keputusan</button></div>' + (M.perm.Delete ? '' : '<div class="warnbox">Hak Setujui tidak aktif pada simulasi hak akses.</div>') + '</form></div></div>';
+    M.$('#back').onclick = list;
+    var f = root.querySelector('form'); f.onsubmit = function (e) { e.preventDefault();
+      var dec = {}; ls.forEach(function (l) { dec[l.mid] = false; }); [].forEach.call(f.querySelectorAll('input[name=s]:checked'), function (x) { dec[x.value] = true; });
+      var n = Object.keys(dec).filter(function (k) { return dec[k]; }).length;
+      M.saveFlow({text:n === ls.length ? 'Seluruh baris akan disetujui dan dirilis.' : n === 0 ? 'Seluruh baris akan ditolak dan kembali ke DRAFT.' : n + ' baris akan dirilis, sisanya kembali ke DRAFT.', okText:'Ya, Simpan!', done:'Keputusan tersimpan.', save:function () { P.decide(p, dec, f.cat.value); }, after:list}); };
+  }
+  list();
+})();
+</script>
+</body>
+</html>

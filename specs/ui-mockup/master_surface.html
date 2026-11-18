@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Master Surface</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script>
+(function () {
+  var M = Mock, rows = M.seed.surface;
+  var page = M.shell({key:'master_surface', title:'Master Surface', sub:'', module:'master_surface'});
+  page.innerHTML = '<div class="box primary"><div class="box-header"><span id="addwrap"></span></div><div class="box-body" id="tbl"></div></div>';
+
+  function addBtn() { M.$('#addwrap').innerHTML = M.perm.Add ? '<button class="btn btn-success btn-sm" id="add">＋ Add</button>' : ''; if (M.perm.Add) M.$('#add').onclick = function () { form(); }; }
+  addBtn(); M.onPerm(addBtn);
+
+  var t = M.table(M.$('#tbl'), {
+    rows: function () { return rows; },
+    cols: [{key:'id', label:'Id Surface', width:'15%'}, {key:'nama', label:'Nama Surface'}],
+    actions: {view:1, edit:1, del:1},
+    onAction: function (a, id) {
+      var r = rows.filter(function (x) { return x.id === id; })[0];
+      if (a === 'view') M.modal('Detail Surface', '<dl class="dl"><dt>Id Surface</dt><dd>' + M.esc(r.id) + '</dd><dt>Nama Surface</dt><dd>' + M.esc(r.nama) + '</dd></dl>');
+      else if (a === 'edit') form(r);
+      else M.delFlow('Data Surface akan di hapus.', 'Data Surface berhasil dihapus.', function () { rows.splice(rows.indexOf(r), 1); t.refresh(); });
+    }
+  });
+
+  function form(r) {
+    var edit = r && r.id;
+    var b = M.modal(edit ? 'Edit Surface' : 'Tambah Surface',
+      '<form novalidate>' + M.fg('Nama Surface', '<input type="text" name="nama" required placeholder="Nama Surface" value="' + M.esc(edit ? r.nama : '') + '">') +
+      '<div class="form-actions"><button class="btn btn-primary" type="submit">💾 Save</button></div></form>', {size:'sm'});
+    b.querySelector('form').onsubmit = function (e) {
+      e.preventDefault(); var f = e.target; if (!M.validate(f)) return;
+      M.saveFlow({text:'Data Surface akan di simpan.', done:'Data Surface berhasil disimpan.',
+        save: function () {
+          var n = f.nama.value.trim().toUpperCase();
+          if (edit) r.nama = n; else rows.push({id:M.nextId('I20', rows), nama:n});
+          t.refresh();
+        }});
+    };
+  }
+})();
+</script>
+</body>
+</html>

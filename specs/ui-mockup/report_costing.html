@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Report Costing Detail</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script src="assets/seed_sales.js"></script>
+<script src="assets/costing.js"></script>
+<script src="assets/pcui.js"></script>
+<script>
+(function () {
+  var M = Mock, P = M.pc, U = M.pcui, esc = M.esc, st = P.st;
+  var page = U.head('report_costing', 'Report Costing Detail', 'Rincian biaya per produk (PG-10 · UC-N11)', 'Product Costing');
+  var withCost = st.mats.filter(function (m) { return st.cost[m.id]; });
+  page.innerHTML = '<div class="box primary"><div class="box-header"><label>Product / Material: <select id="sel" style="padding:6px;min-width:340px">' + M.opts(withCost.map(function (m) { return {v:m.id, t:m.nama}; }), '', 'v', 't', '-- Pilih produk --') + '</select></label><button class="btn btn-info btn-sm" id="prt">🖶 Print</button></div><div class="box-body" id="rep"><div class="note">Pilih produk untuk melihat rincian costing dari Material Cost sampai Bottom Price. Hanya material yang sudah dihitung yang tampil.</div></div></div>';
+  M.$('#prt').onclick = function () { M.toast('Cetak Report Costing Detail (PDF, simulasi)'); };
+  M.$('#sel').onchange = function () {
+    var id = this.value; if (!id) return; var m = P.mat(id), c = st.cost[id];
+    M.$('#rep').innerHTML = '<div style="text-align:center"><h3 style="margin:4px 0 12px">Report Costing Detail</h3></div><div class="sumbox"><div><small>Product</small><b>' + esc(m.nama) + '</b></div><div><small>Bentuk</small><b>' + esc(m.bentuk) + '</b></div><div><small>Maker</small><b>' + esc(m.bentuk === 'ROLL' ? m.maker : '-') + '</b></div>' +
+      (m.berat ? '<div><small>Berat per Sheet</small><b>' + M.fmt(m.berat, 3) + ' kg</b></div>' : '') + '<div><small>Status costing</small><b>' + c.status + '</b></div><div><small>Dihitung</small><b>' + M.dstr(c.tgl) + '</b></div></div>' + U.elTable(c, m) +
+      '<div class="note">Referensi: Price Reference Costing ' + esc(c.refs.prc) + ' · Master Rate Umum ' + esc(c.refs.rate) + '</div>';
+  };
+})();
+</script>
+</body>
+</html>

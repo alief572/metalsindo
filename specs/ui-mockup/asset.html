@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asset</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script src="assets/seed_asset.js"></script>
+<script>
+(function () {
+  var M = Mock, A = M.seedA, rows = A.asset, esc = M.esc;
+  var TODAY = new Date('2026-11-10T00:00:00');
+  var page = M.shell({key:'asset', title:'Asset', sub:'Daftar asset & penyusutan', module:'asset', crumb:'Asset'});
+  page.innerHTML = '<div class="box primary"><div class="box-header"><span id="addw"></span><button class="btn btn-info btn-sm" id="xls">⬇ Download Excel</button>' +
+    '<span class="pull-right"><label>Kategori: <select id="fc" style="padding:5px"></select></label></span></div><div class="box-body" id="tbl"></div></div>' +
+    '<div class="note">Asset dengan kategori <b>Machine</b> menjadi sumber pilihan mesin pada Flow Process. Akumulasi depresiasi dan nilai asset dihitung per 10 Nov 2026 dari penyusutan per bulan × bulan berjalan (turunan peragaan).</div>';
+  M.$('#xls').onclick = function () { M.toast('asset.xlsx diunduh (simulasi)'); };
+  var cat = function (id) { var c = A.category.filter(function (x) { return x.id === +id; })[0]; return c ? c.nama : '-'; };
+  var months = function (a) { var d = new Date(a.tgl + 'T00:00:00'); return Math.max(0, Math.min(a.tahun * 12, (TODAY.getFullYear() - d.getFullYear()) * 12 + TODAY.getMonth() - d.getMonth())); };
+  var akum = function (a) { return Math.min(a.nilai, a.susut * months(a)); };
+  var val = function (a) { return a.nilai - akum(a); };
+  var fcSel = M.$('#fc'); fcSel.innerHTML = '<option value="">Semua</option>' + A.category.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nama) + '</option>'; }).join('');
+  fcSel.onchange = function () { t.refresh(); };
+  function addBtn() { M.$('#addw').innerHTML = M.perm.Add ? '<button class="btn btn-success btn-sm" id="add">＋ Tambah Asset</button>' : ''; if (M.perm.Add) M.$('#add').onclick = function () { form(null); }; }
+  addBtn(); M.onPerm(addBtn);
+  var num = function (v) { return '<span class="num" style="display:block">' + M.fmt(v, 0) + '</span>'; };
+  var t = M.table(M.$('#tbl'), {rows:function () { return fcSel.value ? rows.filter(function (r) { return String(r.category) === fcSel.value; }) : rows; }, cols:[
+    {key:'kode', label:'Kode Asset'}, {key:'nama', label:'Nama Asset'}, {label:'Category', html:function (r) { return r.category === 1 ? esc(cat(r.category)) + ' ' + M.pill('Mesin', 'info') : esc(cat(r.category)); }, text:function (r) { return cat(r.category); }},
+    {label:'Tgl Perolehan', html:function (r) { return M.dstr(r.tgl); }, text:function (r) { return r.tgl; }}, {label:'Depresiasi', html:function (r) { return r.tahun + ' thn'; }, text:function (r) { return r.tahun; }},
+    {label:'Acquisition', html:function (r) { return num(r.nilai); }, text:function (r) { return r.nilai; }}, {label:'Akumulasi Depresiasi', html:function (r) { return num(akum(r)); }, text:function (r) { return akum(r); }}, {label:'Asset Value', html:function (r) { return num(val(r)); }, text:function (r) { return val(r); }}],
+    actions:{view:1, edit:1, del:1}, onAction:function (a, id) { var r = rows.filter(function (x) { return String(x.id) === id; })[0];
+      if (a === 'view') view(r); else if (a === 'edit') form(r); else M.delFlow('Asset akan dihapus.', 'Asset berhasil dihapus.', function () { rows.splice(rows.indexOf(r), 1); t.refresh(); }); }});
+
+  function view(r) {
+    var p = A.pajak.filter(function (x) { return x.id === r.pajak; })[0], d = A.dept.filter(function (x) { return x.id === r.dept; })[0];
+    M.modal('Detail Asset', '<dl class="dl"><dt>Kode Asset</dt><dd>' + esc(r.kode) + '</dd><dt>Nama Asset</dt><dd>' + esc(r.nama) + '</dd><dt>Kategori</dt><dd>' + esc(cat(r.category)) + '</dd><dt>Kategori Pajak</dt><dd>' + esc(p ? p.nama + ' (' + p.tahun + ' thn)' : '-') + '</dd>' +
+      '<dt>Department</dt><dd>' + esc(d ? d.nama : '-') + '</dd><dt>Tgl Perolehan</dt><dd>' + M.dstr(r.tgl) + '</dd><dt>Qty</dt><dd>' + r.qty + '</dd><dt>Nilai Perolehan</dt><dd>' + M.idr(r.nilai) + '</dd><dt>Jangka Waktu</dt><dd>' + r.tahun + ' tahun</dd><dt>Penyusutan / Bulan</dt><dd>' + M.idr(r.susut) + '</dd>' +
+      '<dt>Penyusutan</dt><dd>' + (r.penyusutan === 'Y' ? 'Ya' : 'Tidak') + '</dd><dt>Akumulasi Depresiasi</dt><dd>' + M.idr(akum(r)) + '</dd><dt>Asset Value</dt><dd><b>' + M.idr(val(r)) + '</b></dd></dl>', {size:'sm'});
+  }
+  function form(r) {
+    var edit = !!r; r = r || {kode:'', nama:'', tgl:'', category:'', pajak:'', nilai:'', qty:1, tahun:'', susut:0, dept:'', penyusutan:'Y', cc:''};
+    var b = M.modal(edit ? 'Edit Asset' : 'Tambah Asset', '<form novalidate><div class="grid2">' +
+      M.fg('Kode Asset', '<input type="text" name="kode" required value="' + esc(r.kode) + '"' + (edit ? ' readonly' : '') + '>') + M.fg('Kategori Pajak', '<select name="pajak" required>' + M.opts(A.pajak.map(function (p) { return {v:String(p.id), t:p.nama.toUpperCase()}; }), String(r.pajak), 'v', 't', 'Pilih Kategori Pajak') + '</select>') +
+      M.fg('Nama Asset', '<input type="text" name="nama" required value="' + esc(r.nama) + '"' + (edit ? ' readonly' : '') + '>') + M.fg('Kategori', '<select name="category" required>' + M.opts(A.category.map(function (c) { return {v:String(c.id), t:c.nama.toUpperCase()}; }), String(r.category), 'v', 't', 'Pilih Kategori') + '</select>') +
+      M.fg('Department', '<select name="dept" required>' + M.opts(A.dept.map(function (d) { return {v:String(d.id), t:d.nama.toUpperCase()}; }), String(r.dept), 'v', 't', 'Pilih Department') + '</select>') + M.fg('Cost Center', '<select name="cc"></select>') +
+      M.fg('Tanggal Perolehan', '<input type="text" name="tgl" required value="' + esc(r.tgl) + '" placeholder="YYYY-MM-DD">') + M.fg('Qty', '<input type="number" name="qty" required value="' + r.qty + '">') +
+      M.fg('Nilai Asset (Acquisition)', '<input type="number" name="nilai" required value="' + esc(r.nilai) + '">') + M.fg('Jangka Waktu (Tahun)', '<input type="text" name="tahun" readonly value="' + esc(r.tahun) + '">', 'Otomatis dari kategori') +
+      M.fg('Dipresiasi Perbulan', '<input type="text" name="susut" readonly value="' + M.fmt(r.susut, 0) + '">') + M.fg('Penyusutan', '<select name="penyusutan">' + M.opts(['Y', 'N'], r.penyusutan) + '</select>') +
+      M.fg('Foto', '<input type="file">') + '</div><div class="form-actions"><button class="btn btn-primary" type="submit">💾 Save</button></div></form>', {size:'xl'});
+    var f = b.querySelector('form');
+    function ccs() { var l = A.cc.filter(function (c) { return String(c.dept) === f.dept.value; }); f.cc.innerHTML = '<option value="">' + (l.length ? '-- Pilih --' : 'List Empty') + '</option>' + l.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nama) + '</option>'; }).join(''); }
+    function calc() { var c = A.category.filter(function (x) { return String(x.id) === f.category.value; })[0]; f.tahun.value = c ? c.tahun : ''; f.susut.value = c && +f.nilai.value ? M.fmt(Math.round(f.nilai.value / (c.tahun * 12)), 0) : ''; }
+    f.dept.onchange = ccs; f.category.onchange = calc; f.nilai.oninput = calc; ccs();
+    f.onsubmit = function (e) { e.preventDefault(); if (!M.validate(f)) return;
+      M.saveFlow({text:'Data asset akan disimpan.', done:'Data asset berhasil disimpan.', save:function () { var c = A.category.filter(function (x) { return String(x.id) === f.category.value; })[0];
+        var o = {kode:f.kode.value, nama:f.nama.value.toUpperCase(), tgl:f.tgl.value, category:+f.category.value, pajak:+f.pajak.value, nilai:+f.nilai.value, qty:+f.qty.value, tahun:c.tahun, susut:Math.round(f.nilai.value / (c.tahun * 12)), dept:+f.dept.value, penyusutan:f.penyusutan.value, cc:f.cc.value};
+        if (edit) Object.assign(r, o); else { o.id = Math.max.apply(null, rows.map(function (x) { return x.id; })) + 1; rows.push(o); } t.refresh(); }}); };
+  }
+})();
+</script>
+</body>
+</html>

@@ -44,6 +44,7 @@ One `-` bullet per event, newest first:
 ---
 
 
+- **2026-11-10** `[STATUS][FEAT-03][FEAT-04][FEAT-05][FEAT-06][FEAT-07][FEAT-08][FEAT-09][FEAT-10]` **Epic `product-costing-rev1` diarsipkan sebagai `dropped`.** Keputusan user: Product Costing disusun ulang dari referensi To Be (input/Product Costing), desain Rev.1 dibuang. Dua capsule (`pc-master-data`, `pc-bom-flow-price-reference`) dihapus (ada di git history), tiga `migration_*.sql` lama dihapus. Kode aplikasi yang sudah ditulis di bawah FEAT-03/04 tidak disentuh. Pengganti dikerjakan sebagai artefak dokumen (ERD, FR/NFR, Use Case, Flow Process) tanpa issue terpisah.
 - **2026-10-28** `[STATUS][FEAT-11]` **Handover ke Dev: rencana implementasi CI3 disusun** (`.artifacts/claim_material/plan_claim_material_28-10-2026.md` + `task_...`). `[DISCOVERY]` dari
   pembacaan kode nyata: (T1) tombol Hold & Claim di `production_report` menerima `isHoldClaim` tetapi tidak memakainya, jadi belum ada backend Claim; (T2) tidak ada kode yang memindahkan
   coil ke Hold (`status_proses='on_hold'` / `kd_gudang='HLD'` hanya dibaca); (T3) stok coil nyata = `warehouse_stock_coil`, bukan `baby_coil` di ERD; (T4) tab "On Hold" sudah ada di

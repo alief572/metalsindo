@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Master Rate Umum</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script src="assets/seed_sales.js"></script>
+<script src="assets/costing.js"></script>
+<script src="assets/pcui.js"></script>
+<script>
+(function () {
+  var M = Mock, P = M.pc, U = M.pcui, esc = M.esc, st = P.st;
+  var page = U.head('master_rate_umum', 'Master Rate Umum', 'Rate untuk semua produk (PG-07 · UC-N08)', 'Rate');
+  var root = document.createElement('div'); page.appendChild(root);
+  var EL = [['manpower', '2.1 Man Power', 'Rp/Kg', 'Rate Rp/Kg (diinput langsung; tidak bergantung Cycletime)'], ['machine', '2.2 Machine', 'Rp/Kg', 'Rate Rp/Kg'], ['consumable', '2.3 Consumable', 'Rp/Kg', 'Rate Rp/Kg (Biaya Consumable ÷ total Kg tahun lalu)'], ['foh', '3 FOH', 'Rp/Kg', 'Rate Rp/Kg (Biaya Kepala 5 ÷ total Kg tahun lalu, termasuk logistik)'],
+    ['waste', '4 Waste', '%', 'Rate % × Biaya Material'], ['admin', '5 Biaya Admin', 'Rp/Kg', 'Rate Rp/Kg (Biaya Kepala 6 ÷ total Kg tahun lalu)'], ['profit', '6 Profit', '%', 'Rate % × Cost of Sales'],
+    ['na', '7 Negotiation Allowance', '%', 'Rate % × Sales Price'], ['komisi', '8 Commission Fee', 'Rp/Kg', 'Rate Rp/Kg']];
+
+  function list() {
+    var a = P.active(st.rate);
+    root.innerHTML = '<div class="box primary"><div class="box-header"><span id="addw"></span><span class="pull-right">Versi aktif: <b>v' + a.ver + '</b> · Last update ' + M.dstr(a.tgl) + ' oleh ' + esc(a.by) + '</span></div><div class="box-body">' +
+      M.stable([{label:'Element Costing', html:function (e) { return esc(e[1]); }}, {label:'Formula', html:function (e) { return esc(e[3]); }}, {label:'Rate', cls:'num', html:function (e) { return '<b>' + M.fmt(a.v[e[0]], e[2] === '%' ? 2 : 0) + '</b> ' + esc(e[2]); }}], EL) +
+      '<div class="sect">Riwayat Versi</div><div id="hist"></div></div></div>' +
+      '<div class="note">Setiap simpan menghasilkan <b>versi baru</b> (riwayat dipertahankan, versi terbaru aktif). Nilai rate diinput; perhitungan asalnya dilakukan di luar sistem. Rate Machine memakai Rp/Kg. Logistic Cost tidak termasuk.</div>';
+    function addBtn() { M.$('#addw').innerHTML = M.perm.Manage ? '<button class="btn btn-success btn-sm" id="edit">✎ Ubah (versi baru)</button>' : ''; if (M.perm.Manage) M.$('#edit').onclick = function () { edit(a); }; }
+    addBtn(); M.onPerm(addBtn);
+    M.$('#hist').innerHTML = M.stable([{label:'Versi', html:function (v) { return 'v' + v.ver + (v.aktif ? ' ' + M.pill('Aktif', 'ok') : ''); }}, {label:'Tanggal', html:function (v) { return M.dstr(v.tgl); }}, {label:'Update By', html:function (v) { return esc(v.by); }}].concat(EL.map(function (e) { return {label:e[1].replace(/^[\d.]+ /, ''), cls:'num', html:function (v) { return M.fmt(v.v[e[0]], e[2] === '%' ? 2 : 0); }}; })), st.rate.slice().reverse());
+  }
+  function edit(a) {
+    var b = M.modal('Ubah Master Rate Umum (versi v' + (a.ver + 1) + ')', '<form novalidate>' + EL.map(function (e) { return M.fg(e[1] + ' (' + e[2] + ')', '<input type="number" step="any" name="' + e[0] + '" required value="' + a.v[e[0]] + '">', e[3]); }).join('') +
+      '<div class="form-actions"><button class="btn btn-primary" type="submit">💾 Save (versi baru)</button></div></form>', {size:'sm'});
+    var f = b.querySelector('form'); f.onsubmit = function (e) { e.preventDefault(); if (!M.validate(f)) return;
+      M.saveFlow({text:'Master Rate Umum akan disimpan sebagai versi baru.', done:'Versi baru Master Rate Umum aktif.', save:function () { var v = {}; EL.forEach(function (x) { v[x[0]] = +f[x[0]].value; }); st.rate.forEach(function (x) { x.aktif = false; }); st.rate.push({ver:a.ver + 1, tgl:P.TODAY, by:'admin', aktif:true, v:v}); P.save(); }, after:list}); };
+  }
+  list();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pricelist</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script src="assets/seed_sales.js"></script>
+<script>
+(function () {
+  var M = Mock, S = M.seedS, esc = M.esc;
+  var page = M.shell({key:'pricelist', title:'Pricelist', sub:'Ferrous & Non Ferrous', module:'pricelist', crumb:'Penjualan'});
+  var root = document.createElement('div'); page.appendChild(root);
+  var names = S.bookprice.map(function (b) { return b.alloy + '-' + b.material + '-' + b.hardness + '-' + b.thickness; });
+
+  function index() {
+    root.innerHTML = '<div class="box primary"><div class="box-body" id="tbl"></div></div>';
+    M.table(M.$('#tbl'), {rows:function () { return S.plCat; }, cols:[{key:'nama', label:'Nama'}], actions:{view:'▦ Detail'}, onAction:function (a, id) { detail(id); }});
+  }
+
+  function detail(catId) {
+    var ferr = /^I2000001$/.test(catId) || /FERROUS/i.test((S.plCat.filter(function (c) { return c.id === catId; })[0] || {}).nama || '') && !/NON/i.test((S.plCat.filter(function (c) { return c.id === catId; })[0] || {}).nama || '');
+    var rows = ferr ? S.plFr : S.plNfr, title = ferr ? 'PRICELIST FERROUS' : 'PRICELIST NON FERROUS';
+    root.innerHTML = '<div class="box primary"><div class="box-header"><h3>' + title + '</h3><span id="addw"></span><button class="btn btn-default btn-sm" id="back">← Back</button></div><div class="box-body" id="tbl"></div></div>';
+    M.$('#back').onclick = index;
+    function addBtn() { M.$('#addw').innerHTML = (M.perm.Add ? '<button class="btn btn-success btn-sm" id="add">＋ Add</button> ' : '') + (M.perm.Manage ? '<button class="btn btn-success btn-sm" id="rf">⟳ Refresh</button>' : '');
+      if (M.perm.Add) M.$('#add').onclick = function () { form(null); }; if (M.perm.Manage) M.$('#rf').onclick = function () { M.saveFlow({text:'Seluruh bottom price akan dihitung ulang dari bookprice dan rate LME terbaru.', okText:'Ya, Refresh!', done:'Pricelist berhasil di-refresh.', save:function () { var d = new Date().toISOString().slice(0, 19).replace('T', ' '); rows.forEach(function (r) { r.upd = d; }); t.refresh(); }}); }; }
+    addBtn(); M.onPerm(addBtn);
+    var usd = function (v) { return '<span class="num" style="display:block">$. ' + M.fmt(v, 2) + '</span>'; };
+    var cols = [{key:'nama', label:'Detail Nama Material'}, {key:'upd', label:'Update Terakhir', html:function (r) { return M.dstr(r.upd); }, text:function (r) { return r.upd; }}];
+    if (ferr) cols.push({label:'Bottom Price', html:function (r) { return '<span class="num" style="display:block">' + M.fmt(r.bottom, 2) + '</span>'; }, text:function (r) { return r.bottom; }});
+    else cols.push({label:'Bottom Price by Book Of Price', html:function (r) { return usd(r.b); }, text:function (r) { return r.b; }}, {label:'Bottom Price by LME 10 Hari', html:function (r) { return usd(r.b10); }, text:function (r) { return r.b10; }},
+      {label:'Bottom Price By LME 1 Bulan', html:function (r) { return usd(r.b30); }, text:function (r) { return r.b30; }}, {label:'Bottom Price By LME Spot', html:function (r) { return usd(r.bspot); }, text:function (r) { return r.bspot; }});
+    var t = M.table(M.$('#tbl'), {rows:function () { return rows; }, cols:cols, actions:{view:1, edit:1, del:1}, onAction:function (a, id) { var r = rows.filter(function (x) { return x.id === id; })[0];
+      if (a === 'view') view(r); else if (a === 'edit') form(r); else M.delFlow('Pricelist akan dihapus.', 'Pricelist berhasil dihapus.', function () { rows.splice(rows.indexOf(r), 1); t.refresh(); }); }});
+    root.insertAdjacentHTML('beforeend', '<div class="note">' + (ferr ? 'Bottom Price = Book Price + Book Price × (Scrap% + COGS% + Biaya Operasional% + Bunga% + Profit%).' : 'Sama seperti Ferrous, tetapi basis harga dapat berupa Book Price atau rata-rata LME (10 hari, 1 bulan, spot) — masing-masing dengan profit% sendiri.') + '</div>');
+
+    function view(r) {
+      var kv = ferr ? [['Book Price', r.book], ['Scrap %', r.scrap], ['COGS %', r.cogs], ['Biaya Operasional %', r.opc], ['Bunga %', r.int], ['Profit %', r.profit], ['Bottom Price', r.bottom]]
+        : [['Book Price', r.book], ['LME 10 Hari', r.lme10], ['LME 1 Bulan', r.lme30], ['LME Spot', r.lmespot], ['Scrap %', r.scrap], ['COGS %', r.cogs], ['Biaya Operasional %', r.opc], ['Bunga %', r.int], ['Profit % (Book)', r.profit], ['Profit % (10 hari)', r.p10], ['Profit % (1 bulan)', r.p30], ['Profit % (Spot)', r.pspot], ['Bottom Price (Book)', r.b], ['Bottom Price (10 hari)', r.b10], ['Bottom Price (1 bulan)', r.b30], ['Bottom Price (Spot)', r.bspot]];
+      M.modal('Detail Pricelist', '<dl class="dl"><dt>Material</dt><dd>' + esc(r.nama) + '</dd>' + kv.map(function (x) { return '<dt>' + x[0] + '</dt><dd>' + M.fmt(x[1], 2) + '</dd>'; }).join('') + '</dl>', {size:'sm'});
+    }
+    function form(r) {
+      var edit = !!r; r = r || {nama:'', book:0, lme10:0, lme30:0, lmespot:0, scrap:0, cogs:0, opc:0, int:0, profit:0, p10:0, p30:0, pspot:0};
+      var fld = function (n, l, v, ro) { return M.fg(l, '<input type="number" step="any" name="' + n + '" value="' + (v == null ? 0 : v) + '"' + (ro ? ' readonly' : '') + '>'); };
+      var b = M.modal(edit ? 'Edit Pricelist' : 'Tambah Pricelist', '<form novalidate>' + M.fg('Material', '<select name="nama" required' + (edit ? ' disabled' : '') + '>' + M.opts(edit ? [r.nama] : names, r.nama) + '</select>') + fld('book', 'Book Price (Rp/Kg)', r.book) +
+        (ferr ? '' : fld('lme10', 'LME 10 Hari ($/Kg)', r.lme10) + fld('lme30', 'LME 1 Bulan ($/Kg)', r.lme30) + fld('lmespot', 'LME Spot ($/Kg)', r.lmespot)) +
+        fld('scrap', 'Scrap (%)', r.scrap) + fld('cogs', 'COGS (%)', r.cogs) + fld('opc', 'Biaya Operasional (%)', r.opc) + fld('int', 'Bunga (%)', r.int) + fld('profit', ferr ? 'Profit (%)' : 'Profit Book (%)', r.profit) +
+        (ferr ? '' : fld('p10', 'Profit 10 Hari (%)', r.p10) + fld('p30', 'Profit 1 Bulan (%)', r.p30) + fld('pspot', 'Profit Spot (%)', r.pspot)) +
+        '<div class="sect">Hasil Perhitungan</div>' + (ferr ? fld('bottom', 'Bottom Price', 0, 1) : fld('b', 'Bottom (Book)', 0, 1) + fld('b10', 'Bottom (10 Hari)', 0, 1) + fld('b30', 'Bottom (1 Bulan)', 0, 1) + fld('bspot', 'Bottom (Spot)', 0, 1)) +
+        '<div class="form-actions"><button class="btn btn-primary" type="submit">💾 Save</button></div></form>');
+      var f = b.querySelector('form');
+      function bp(base, pr) { return base + base * ((+f.scrap.value) + (+f.cogs.value) + (+f.opc.value) + (+f.int.value) + pr) / 100; }
+      function calc() { if (ferr) f.bottom.value = bp(+f.book.value, +f.profit.value).toFixed(2); else { f.b.value = bp(+f.book.value, +f.profit.value).toFixed(2); f.b10.value = bp(+f.lme10.value, +f.p10.value).toFixed(2); f.b30.value = bp(+f.lme30.value, +f.p30.value).toFixed(2); f.bspot.value = bp(+f.lmespot.value, +f.pspot.value).toFixed(2); } }
+      b.querySelectorAll('input[type=number]').forEach(function (i) { i.oninput = calc; });
+      f.nama.onchange = function () { var bk = S.bookprice.filter(function (x) { return x.alloy + '-' + x.material + '-' + x.hardness + '-' + x.thickness === f.nama.value; })[0]; if (bk) { f.book.value = bk.nilai; calc(); } };
+      calc();
+      f.onsubmit = function (e) { e.preventDefault(); if (!M.validate(f)) return;
+        M.saveFlow({text:'Pricelist akan disimpan.', done:'Pricelist berhasil disimpan.', save:function () {
+          var o = {nama:edit ? r.nama : f.nama.value, upd:new Date().toISOString().slice(0, 19).replace('T', ' '), book:+f.book.value, scrap:+f.scrap.value, cogs:+f.cogs.value, opc:+f.opc.value, int:+f.int.value, profit:+f.profit.value};
+          if (ferr) o.bottom = +f.bottom.value; else Object.assign(o, {lme10:+f.lme10.value, lme30:+f.lme30.value, lmespot:+f.lmespot.value, p10:+f.p10.value, p30:+f.p30.value, pspot:+f.pspot.value, b:+f.b.value, b10:+f.b10.value, b30:+f.b30.value, bspot:+f.bspot.value});
+          if (edit) Object.assign(r, o); else { o.id = 'P26' + String(rows.length + 100).padStart(5, '0'); rows.unshift(o); } t.refresh(); }}); };
+    }
+  }
+  index();
+})();
+</script>
+</body>
+</html>

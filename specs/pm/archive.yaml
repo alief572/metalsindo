@@ -77,3 +77,149 @@ issues:
       mockup dimuat di Chrome headless tanpa error JS. Tidak dikerjakan:
       mockup PG-01/02/03 (sudah ada di program), layar pc lain dibiarkan.
       Angka acuan uji Man Power baru (NFR-11) masih {TBC} dari klien.
+  - id: FEAT-03
+    title: Master data dasar Product Costing (Master Produk, Master Material, Master Standard Material)
+    type: feature
+    epic: product-costing-rev1
+    slug: pc-master-data
+    status: dropped
+    closed: 2026-11-10
+    source: UC-01, UC-02, UC-03 di input/Rev.1 Use Case Product Costing.xlsx
+    depends_on: [FEAT-02]
+    blocks: [FEAT-04]
+    summary: >-
+      Dibatalkan sebelum selesai. Kode modul (application/modules) yang sudah ditulis di bawah issue ini
+      TIDAK dihapus dan tidak pernah diuji di database; nasibnya diputuskan terpisah.
+    outcome: >-
+      Desain Rev.1 (BOM varian tebal, tabel master_standard_material, flow_process_*, product_costing_*,
+      migrasi SQL) dibuang. Keputusan user 2026-11-10: Product Costing disusun ulang dari referensi To Be
+      saja (input/Product Costing: diagram BPM D001 dan workbook New Structure Material&Product).
+      Pengganti: ERD, FR/NFR, Use Case, Flow Process baru (belum menjadi issue). Tiga file migration lama
+      di specs/ sudah dihapus (pemulihan: git log --all --diff-filter=D -- '*migration_*').
+  - id: FEAT-04
+    title: BOM per Varian Tebal, Flow Process, dan Kurs / Price Reference
+    type: feature
+    epic: product-costing-rev1
+    slug: pc-bom-flow-price-reference
+    status: dropped
+    closed: 2026-11-10
+    source: UC-04, UC-05, UC-06
+    depends_on: [FEAT-03]
+    blocks: [FEAT-06]
+    summary: >-
+      Dibatalkan sebelum selesai. Kode modul (application/modules) yang sudah ditulis di bawah issue ini
+      TIDAK dihapus dan tidak pernah diuji di database; nasibnya diputuskan terpisah.
+    outcome: >-
+      Desain Rev.1 (BOM varian tebal, tabel master_standard_material, flow_process_*, product_costing_*,
+      migrasi SQL) dibuang. Keputusan user 2026-11-10: Product Costing disusun ulang dari referensi To Be
+      saja (input/Product Costing: diagram BPM D001 dan workbook New Structure Material&Product).
+      Pengganti: ERD, FR/NFR, Use Case, Flow Process baru (belum menjadi issue). Tiga file migration lama
+      di specs/ sudah dihapus (pemulihan: git log --all --diff-filter=D -- '*migration_*').
+  - id: FEAT-05
+    title: Master rate (Man Power, FOH, Bahan Pendukung, Manufacturing Support, Other Cost, Negotiation Allowance)
+    type: feature
+    epic: product-costing-rev1
+    slug: pc-master-rate
+    status: dropped
+    closed: 2026-11-10
+    source: UC-07, UC-08, UC-09, UC-10
+    depends_on: [FEAT-02]
+    blocks: [FEAT-06, FEAT-08]
+    summary: >-
+      Dibatalkan sebelum dimulai (tidak ada kode).
+    outcome: >-
+      Desain Rev.1 (BOM varian tebal, tabel master_standard_material, flow_process_*, product_costing_*,
+      migrasi SQL) dibuang. Keputusan user 2026-11-10: Product Costing disusun ulang dari referensi To Be
+      saja (input/Product Costing: diagram BPM D001 dan workbook New Structure Material&Product).
+      Pengganti: ERD, FR/NFR, Use Case, Flow Process baru (belum menjadi issue). Tiga file migration lama
+      di specs/ sudah dihapus (pemulihan: git log --all --diff-filter=D -- '*migration_*').
+  - id: FEAT-06
+    title: Mesin perhitungan Material Cost, Biaya Proses, Manufacturing Support, HPP, Bottom Price
+    type: feature
+    epic: product-costing-rev1
+    slug: pc-costing-engine
+    status: dropped
+    closed: 2026-11-10
+    source: UC-11, UC-12, UC-13, UC-14, UC-15
+    depends_on: [FEAT-04, FEAT-05]
+    blocks: [FEAT-07, FEAT-08]
+    summary: >-
+      Dibatalkan sebelum dimulai (tidak ada kode).
+    outcome: >-
+      Desain Rev.1 (BOM varian tebal, tabel master_standard_material, flow_process_*, product_costing_*,
+      migrasi SQL) dibuang. Keputusan user 2026-11-10: Product Costing disusun ulang dari referensi To Be
+      saja (input/Product Costing: diagram BPM D001 dan workbook New Structure Material&Product).
+      Pengganti: ERD, FR/NFR, Use Case, Flow Process baru (belum menjadi issue). Tiga file migration lama
+      di specs/ sudah dihapus (pemulihan: git log --all --diff-filter=D -- '*migration_*').
+  - id: FEAT-07
+    title: Price List, approval Pricelist, dan rilis Product Catalog
+    type: feature
+    epic: product-costing-rev1
+    slug: pc-pricelist-approval
+    status: dropped
+    closed: 2026-11-10
+    source: UC-16, UC-17, UC-18, UC-19
+    depends_on: [FEAT-06]
+    blocks: []
+    summary: >-
+      Dibatalkan sebelum dimulai (tidak ada kode).
+    outcome: >-
+      Desain Rev.1 (BOM varian tebal, tabel master_standard_material, flow_process_*, product_costing_*,
+      migrasi SQL) dibuang. Keputusan user 2026-11-10: Product Costing disusun ulang dari referensi To Be
+      saja (input/Product Costing: diagram BPM D001 dan workbook New Structure Material&Product).
+      Pengganti: ERD, FR/NFR, Use Case, Flow Process baru (belum menjadi issue). Tiga file migration lama
+      di specs/ sudah dihapus (pemulihan: git log --all --diff-filter=D -- '*migration_*').
+  - id: FEAT-08
+    title: Integrasi rate Product Costing ke HPP Laporan Produksi
+    type: integration
+    epic: product-costing-rev1
+    slug: pc-production-report-integration
+    status: dropped
+    closed: 2026-11-10
+    source: ERD Product Costing-Production Report.jpg; FR-48, FR-49
+    depends_on: [FEAT-05, FEAT-06]
+    blocks: []
+    summary: >-
+      Dibatalkan sebelum dimulai (tidak ada kode).
+    outcome: >-
+      Desain Rev.1 (BOM varian tebal, tabel master_standard_material, flow_process_*, product_costing_*,
+      migrasi SQL) dibuang. Keputusan user 2026-11-10: Product Costing disusun ulang dari referensi To Be
+      saja (input/Product Costing: diagram BPM D001 dan workbook New Structure Material&Product).
+      Pengganti: ERD, FR/NFR, Use Case, Flow Process baru (belum menjadi issue). Tiga file migration lama
+      di specs/ sudah dihapus (pemulihan: git log --all --diff-filter=D -- '*migration_*').
+  - id: FEAT-09
+    title: Dashboard notifikasi perubahan Bottom Price untuk Sales
+    type: feature
+    epic: product-costing-rev1
+    slug: pc-bottom-price-notification
+    status: dropped
+    closed: 2026-11-10
+    source: permintaan user 2026-10-21 (input/2026-10-21-bottom-price-change-notification/)
+    depends_on: [FEAT-05, FEAT-06, FEAT-07]
+    blocks: []
+    summary: >-
+      Dibatalkan sebelum dimulai (tidak ada kode).
+    outcome: >-
+      Desain Rev.1 (BOM varian tebal, tabel master_standard_material, flow_process_*, product_costing_*,
+      migrasi SQL) dibuang. Keputusan user 2026-11-10: Product Costing disusun ulang dari referensi To Be
+      saja (input/Product Costing: diagram BPM D001 dan workbook New Structure Material&Product).
+      Pengganti: ERD, FR/NFR, Use Case, Flow Process baru (belum menjadi issue). Tiga file migration lama
+      di specs/ sudah dihapus (pemulihan: git log --all --diff-filter=D -- '*migration_*').
+  - id: FEAT-10
+    title: History Costing dan History Price List; nama produk di depan pada Pricelist dan Product Catalog
+    type: feature
+    epic: product-costing-rev1
+    slug: pc-history-costing-pricelist
+    status: dropped
+    closed: 2026-11-10
+    source: permintaan user 2026-10-21 (input/2026-10-21-history-costing-pricelist/)
+    depends_on: [FEAT-06, FEAT-07]
+    blocks: []
+    summary: >-
+      Dibatalkan sebelum dimulai (tidak ada kode).
+    outcome: >-
+      Desain Rev.1 (BOM varian tebal, tabel master_standard_material, flow_process_*, product_costing_*,
+      migrasi SQL) dibuang. Keputusan user 2026-11-10: Product Costing disusun ulang dari referensi To Be
+      saja (input/Product Costing: diagram BPM D001 dan workbook New Structure Material&Product).
+      Pengganti: ERD, FR/NFR, Use Case, Flow Process baru (belum menjadi issue). Tiga file migration lama
+      di specs/ sudah dihapus (pemulihan: git log --all --diff-filter=D -- '*migration_*').

@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventory Level 4 - Material</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script>
+(function () {
+  var M = Mock, S = M.seed, rows = S.material;
+  var page = M.shell({key:'inventory_4', title:'Inventory Material', sub:'Level 4', module:'inventory_4'});
+
+  function byId(list, id) { return list.filter(function (x) { return x.id === id; })[0] || {}; }
+  function chain(r) { var c2 = byId(S.cat2, r.id_cat2), c1 = byId(S.cat1, c2.id_cat1), ty = byId(S.type, c1.id_type); return {c2:c2, c1:c1, ty:ty}; }
+  function supNames(r) { return r.sup.map(function (s) { return s.s; }).join(', '); }
+  function dimVal(r, k) { return r.dim[k] || ''; }
+  function nama(r) { return r.nama; }
+  /* Material Ekuivalen (K44). Otomatis, berurutan: (1) validasi Spesifikasi SAMA, (2) validasi Thickness SAMA. Maker TIDAK menjadi syarat (opsional); kolom Maker diambil dari isian Maker material, bukan dari Supplier.
+     Searah Roll -> Sheet: Sheet mendapat Roll (Roll dapat diolah menjadi Sheet), Roll TIDAK mendapat Sheet. Relasi manual disimpan di material (eqm); DUA ARAH dan BERANTAI (A=B dan B=C berarti A=C). */
+  function sameThick(a, b) { var x = parseFloat(a), y = parseFloat(b); return !isNaN(x) && !isNaN(y) && x === y; }
+  function autoOk(m, ctx) { ctx = ctx || {}; return ctx.sheet ? true : m.id_bentuk !== 'B2000002'; }
+  function eqIds(idSpek, excludeId, manual, excl, thick, ctx) {
+    excl = excl || [];
+    var sp = byId(S.spesifikasi, idSpek);
+    var direct = rows.filter(function (m) { return m.id !== excludeId && (manual.indexOf(m.id) > -1 || (idSpek && m.id_spek === idSpek && sameThick(dimVal(m, 'THICKNESS'), thick) && autoOk(m, ctx) && excl.indexOf(m.id) < 0 && (m.eqx || []).indexOf(excludeId) < 0)); });
+    var seen = {}, chain = {}, out = [], queue = direct.slice();
+    seen[excludeId] = 1; direct.forEach(function (m) { seen[m.id] = 1; });
+    while (queue.length) {
+      var cur = queue.shift(); out.push(cur);
+      rows.forEach(function (x) { if (seen[x.id]) return; if ((cur.eqm || []).indexOf(x.id) > -1 || (x.eqm || []).indexOf(cur.id) > -1) { seen[x.id] = 1; chain[x.id] = 1; queue.push(x); } });
+    }
+    return {sp: sp, list: out, chain: chain};
+  }
+  function eqHtml(idSpek, excludeId, manual, editable, excl, thick, ctx) {
+    manual = manual || [];
+    var e = eqIds(idSpek, excludeId, manual, excl, thick, ctx), sp = e.sp, list = e.list, chain = e.chain;
+    var h = '<div class="eqnote">Ekuivalen otomatis, divalidasi berurutan: <b>1) Spesifikasi sama</b> (' + (idSpek ? '<b>' + M.esc(sp.nama) + '</b>' : 'belum dipilih') + '), lalu <b>2) Thickness sama</b>' + (thick !== '' && thick != null ? ' (' + M.esc(thick) + ' mm)' : ' (isi Thickness dulu)') + '. Maker tidak menjadi syarat (opsional). ' +
+      ((ctx && ctx.sheet) ? 'Untuk Sheet, <b>Roll</b> dengan spesifikasi dan thickness yang sama juga ekuivalen karena Roll dapat menjadi Sheet. ' : 'Sheet tidak ekuivalen dengan Roll (Sheet tidak dapat menjadi Roll). ') +
+      'Ditemukan ' + list.length + ' material (relasi manual dua arah dan berantai: A=B dan B=C berarti A=C)' + (editable ? '. Semua material pada daftar ini (otomatis maupun manual) bisa dihapus, dan material lain bisa ditambahkan.' : '.') + '</div>';
+    if (!list.length) return h + '<div class="tbl-wrap"><table class="tbl"><tbody><tr><td class="empty">Tidak ada material lain dengan spesifikasi sama dan thickness sama</td></tr></tbody></table></div>';
+    return h + '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Id Material</th><th>Nama Material</th><th>Spesifikasi</th><th>Relasi</th><th>Bentuk</th><th>Hardness</th><th>Thickness</th><th>Maker</th><th>Status</th>' + (editable ? '<th>Action</th>' : '') + '</tr></thead><tbody>' +
+      list.map(function (m) {
+        var man = manual.indexOf(m.id) > -1;
+        var tag = man ? '<span class="tag man">Manual</span>' : chain[m.id] ? '<span class="tag chain">Berantai</span>' : '<span class="tag same">' + (ctx && ctx.sheet && m.id_bentuk !== 'B2000002' ? 'Roll → Sheet' : 'Sama') + '</span>';
+        return '<tr><td>' + M.esc(m.id) + '</td><td>' + M.esc(m.nama) + '</td><td>' + M.esc(m.spek) + '</td><td>' + tag + '</td><td>' +
+          M.esc(byId(S.bentuk, m.id_bentuk).nama) + '</td><td>' + M.esc(m.hardness) + '</td><td>' + M.esc(dimVal(m, 'THICKNESS') || '-') + '</td><td>' + M.esc(m.maker || '-') + '</td><td>' + M.badge(m.aktif) + '</td>' +
+          (editable ? '<td class="act">' + (chain[m.id] ? '<span class="eqnote">lewat material lain</span>' : '<button type="button" class="btn btn-sm btn-danger" data-rm="' + M.esc(m.id) + '" title="Hapus dari daftar ekuivalen">🗑</button>') + '</td>' : '') + '</tr>'; }).join('') + '</tbody></table></div>';
+  }
+  function num(v) { return v === '' || v == null ? '-' : M.fmt(v); }
+  /* Pola nama: ROLL = TYPE ALLOY-SPEK-HARDNESS-TEBAL (Hardness dilewati bila kosong); SHEET = SPEK-HARDNESS-TEBAL-LEBAR-PANJANG-TYPE ALLOY (tanpa Maker, Surface, Komposisi). Bagian kosong dilewati; Nama Sheet boleh diedit. */
+  function buildNama(idB, p) {
+    var d = p.dim, j = function (a) { return a.filter(function (x) { return x !== '' && x != null; }).join('-'); };
+    if (idB === 'B2000001') return j([p.alloy, p.spek, p.hardness, d.THICKNESS || '']);
+    if (idB === 'B2000002') return j([p.spek, p.hardness, d.THICKNESS || '', d.WIDTH || '', d.LENGTH || '', p.alloy]);
+    return j([p.alloy, p.spek, p.hardness].concat(Object.keys(d).map(function (k) { return d[k]; })));
+  }
+
+  /* ---------- Layar 1: pilih bentuk ---------- */
+  function showBentuk() {
+    page.innerHTML = '<div class="box primary"><div class="box-header"><h3>Bentuk Material</h3></div><div class="box-body" id="tbl"></div></div>';
+    M.table(M.$('#tbl'), {
+      rows: function () { return S.bentuk; },
+      cols: [{key:'nama', label:'Bentuk Material'}, {label:'Jumlah Material', text: function (b) { return rows.filter(function (r) { return r.id_bentuk === b.id; }).length; }}],
+      actions: {view:'▦ Detail'}, // tombol "Detail" mengarah ke daftar material per bentuk
+      onAction: function (a, id) { location.hash = id; }
+    });
+  }
+
+  /* ---------- Layar 2: daftar material per bentuk ---------- */
+  function showList(idB) {
+    var bt = byId(S.bentuk, idB), coil = idB === 'B2000001';
+    var list = function () { return rows.filter(function (r) { return r.id_bentuk === idB; }); };
+    page.innerHTML = '<div class="box primary"><div class="box-header"><h3>' + M.esc(bt.nama || idB) + '</h3><span class="pull-right"><a class="btn btn-primary btn-sm" href="#">◀ Back</a> <span id="addwrap"></span></span></div><div class="box-body" id="tbl"></div></div>';
+    function addBtn() { M.$('#addwrap').innerHTML = M.perm.Add ? '<button class="btn btn-success btn-sm" id="add">＋ Add</button>' : ''; if (M.perm.Add) M.$('#add').onclick = function () { form(bt); }; }
+    addBtn(); M.onPerm(addBtn);
+    var st = {label:'Status', html: function (r) { return M.badge(r.aktif); }, text: function (r) { return r.aktif === 'aktif' ? 'Aktif' : 'Non Aktif'; }};
+    var base = [
+      {key:'id', label:'Id Material'},
+      {label:'Nama Type', text: function (r) { return chain(r).ty.nama; }},
+      {label:'FERROUS / NON FERROUS', text: function (r) { return chain(r).c1.nama; }},
+      {label:'Nama Category II', text: function (r) { return chain(r).c2.nama; }}
+    ];
+    var cols = coil ? base.concat([
+      {label:'Detail Nama Material', text: nama}, {key:'spek', label:'Alloy'},
+      {label:'Thickness', text: function (r) { return dimVal(r, 'THICKNESS'); }}, {key:'hardness', label:'Hardness'}, {key:'density', label:'Density'},
+      {label:'Supplier', text: supNames}, {key:'maker', label:'Maker'}, st])
+      : base.concat([{label:'Nama Material', text: function (r) { return r.id_bentuk === 'B2000002' ? r.nama : chain(r).c2.nama + '-' + r.nama + '-' + r.hardness; }}, {label:'Supplier', text: supNames}, st]);
+    var t = M.table(M.$('#tbl'), {
+      rows: list, cols: cols, actions: {view:1, edit:1, del:1},
+      onAction: function (a, id) {
+        var r = byId(rows, id);
+        if (a === 'view') view(r); else if (a === 'edit') form(bt, r);
+        else M.delFlow('Data Inventory akan di hapus.', 'Data Inventory berhasil dihapus.', function () { rows.splice(rows.indexOf(r), 1); rows.forEach(function (x) { x.eqm = (x.eqm || []).filter(function (i) { return i !== r.id; }); x.eqx = (x.eqx || []).filter(function (i) { return i !== r.id; }); }); t.refresh(); });
+      }
+    });
+    page._t = t;
+  }
+
+  /* ---------- Detail (view) ---------- */
+  function view(r) {
+    var c = chain(r), bt = byId(S.bentuk, r.id_bentuk);
+    var dims = bt.dimensi.map(function (k) { return '<dt>' + k + '</dt><dd>' + M.esc(dimVal(r, k) || '-') + '</dd>'; }).join('');
+    var w = weight(r.id_bentuk, r.dim, r.density);
+    M.modal('Detail Material - ' + r.id,
+      '<div class="grid2"><dl class="dl" style="grid-template-columns:150px 1fr"><dt>Type Inventory</dt><dd>' + M.esc(c.ty.nama) + '</dd><dt>Ferous / Non Ferous</dt><dd>' + M.esc(c.c1.nama) +
+      '</dd><dt>Type Alloy</dt><dd>' + M.esc(c.c2.nama) + '</dd><dt>Spesifikasi</dt><dd>' + M.esc(r.spek) + '</dd>' + (r.id_bentuk === 'B2000002' ? '' : '<dt>Maker</dt><dd>' + M.esc(r.maker) + '</dd>') +
+      '<dt>Density</dt><dd>' + M.esc(r.density) + '</dd><dt>Hardness</dt><dd>' + M.esc(r.hardness || '-') + '</dd><dt>Nama Material</dt><dd>' + M.esc(nama(r)) +
+      '</dd>' + (r.id_bentuk === 'B2000002' ? '' : '<dt>Komposisi</dt><dd>' + (c.c1.komposisi || []).map(function (k) { return '<span class="tag">' + M.esc(k) + ': ' + M.esc((r.komp || {})[k] || '-') + '</span>'; }).join('') + '</dd>') + '</dl>' +
+      '<dl class="dl" style="grid-template-columns:150px 1fr"><dt>Bentuk Material</dt><dd>' + M.esc(bt.nama) + '</dd>' + (r.id_bentuk === 'B2000002' ? '' : '<dt>Surface</dt><dd>' + M.esc(byId(S.surface, r.surface).nama || '-') + '</dd>') + dims +
+      (w !== null ? '<dt>Berat / Sheet (Kg)</dt><dd>' + w + '</dd>' : '') +
+      '<dt>Monthly Forecast</dt><dd>' + num(r.forecast) + '</dd><dt>Safety Stock</dt><dd>' + num(r.safety) + '</dd><dt>Order Point</dt><dd>' + num(r.order) +
+      '</dd><dt>Maximum Stock</dt><dd>' + num(r.max) + '</dd><dt>Status</dt><dd>' + M.badge(r.aktif) + '</dd></dl></div>' +
+      '<div class="fsec">Supplier</div><table class="mini"><thead><tr><th>Nama Supplier</th><th>Lead Time (hari)</th><th>Minimum Order</th></tr></thead><tbody>' +
+      r.sup.map(function (s) { return '<tr><td>' + M.esc(s.s) + '</td><td>' + M.esc(s.lead || '-') + '</td><td>' + M.esc(s.min || '-') + '</td></tr>'; }).join('') + '</tbody></table>' +
+      '<div class="fsec">Material Ekuivalen</div>' + eqHtml(r.id_spek, r.id, r.eqm || [], false, r.eqx || [], dimVal(r, 'THICKNESS'), {sheet:r.id_bentuk === 'B2000002', maker:r.maker}), {size:'xl'});
+  }
+
+  /* Berat/Sheet (kg) = Thickness (mm) x Width (mm) x Length (mm) x Berat jenis (g/cm3) / 1.000.000; hanya bentuk Sheet (B2000002); kosong bila ada bagian yang belum diisi */
+  function sheetKg(t, w, l, bj) {
+    var n = [t, w, l, bj].map(function (v) { return parseFloat(String(v == null ? '' : v).replace(/,/g, '')); });
+    return n.some(function (x) { return isNaN(x) || !x; }) ? null : n[0] * n[1] * n[2] * n[3] / 1000000;
+  }
+  function weight(idB, dim, density) {
+    if (idB !== 'B2000002') return null;
+    var v = sheetKg(dim.THICKNESS, dim.WIDTH, dim.LENGTH, density); return v == null ? '-' : M.fmt(v, 3);
+  }
+
+  /* ---------- Form tambah / ubah ---------- */
+  function supRow(s) {
+    return '<tr><td><select name="s">' + M.opts(S.supplier, s ? s.s : '', null, null, '-- Pilih Supplier --') + '</select></td>' +
+      '<td><input type="text" name="lead" value="' + M.esc(s ? s.lead : '') + '"></td><td><input type="text" name="min" value="' + M.esc(s ? s.min : '') + '"></td>' +
+      '<td align="center" style="width:70px"><button type="button" class="btn btn-sm btn-danger del">🗑</button></td></tr>';
+  }
+  function form(bt, r) {
+    var edit = !!r, c = edit ? chain(r) : {}, isSheet = bt.id === 'B2000002';
+    var dimHtml = bt.dimensi.map(function (k) { return M.fg(k, '<input type="number" step="any" min="0" name="dim_' + k + '" class="dim"' + (isSheet ? ' required' : '') + ' value="' + M.esc(edit ? dimVal(r, k) : '') + '">', isSheet ? 'Wajib diisi (menentukan Berat/Sheet)' : ''); }).join('');
+    var b = M.modal(edit ? 'Edit Material - ' + r.id : 'Tambah Material - ' + bt.nama,
+      '<form novalidate><div class="grid2"><div>' +
+      '<div class="fsec">Klasifikasi</div>' +
+      M.fg('Type Inventory', '<select name="t" required>' + M.opts(S.type.filter(function (x) { return x.aktif === 'aktif'; }), c.ty ? c.ty.id : '', 'id', 'nama', '-- Pilih Type --') + '</select>') +
+      M.fg('Ferous / Non Ferous', '<select name="c1" required></select>') +
+      M.fg('Type Alloy', '<select name="c2" required></select>') +
+      M.fg('Spesifikasi', '<select name="spek" required></select>', 'Pilihan dari <a href="master_spesifikasi.html" target="_blank">Master Spesifikasi</a>, sesuai Type Alloy.') +
+      (isSheet ? '' : M.fg('Maker', '<input type="text" name="maker" placeholder="Maker" value="' + M.esc(edit ? r.maker : '') + '">')) +
+      M.fg('Density', '<input type="text" name="density" placeholder="Density"' + (isSheet ? ' required' : '') + ' value="' + M.esc(edit ? r.density : '') + '">', isSheet ? 'Wajib diisi (menentukan Berat/Sheet)' : '') +
+      M.fg('Hardness', '<input type="text" name="hardness" placeholder="Hardness (opsional)" value="' + M.esc(edit ? r.hardness : '') + '">', 'Opsional (tidak wajib diisi)' + (isSheet ? '; bila diisi masuk Nama Material Sheet.' : '.')) +
+      M.fg('Nama Material', '<input type="text" name="nama" required placeholder="Otomatis">', 'Terisi otomatis: ' + (isSheet ? 'Spesifikasi-Hardness-Thickness-Width-Length-Type Alloy (Hardness dilewati bila kosong). Boleh diedit.' : 'Type Alloy-Spesifikasi-Hardness-Tebal (Hardness dilewati bila kosong). Boleh diedit.')) +
+      (isSheet ? '' : M.fg('Komposisi Material', '<div id="komp"><em>Pilih Ferous / Non Ferous</em></div>')) +
+      '</div><div>' +
+      '<div class="fsec">Bentuk &amp; Dimensi</div>' +
+      M.fg('Bentuk Material', '<input type="text" readonly value="' + M.esc(bt.nama) + '">') +
+      (isSheet ? '' : M.fg('Surface', '<select name="surface" required>' + M.opts(S.surface, edit ? r.surface : '', 'id', 'nama') + '</select>')) +
+      dimHtml + (bt.id === 'B2000002' ? M.fg('Berat / Sheet (Kg)', '<input type="text" name="weight" readonly>', 'Thickness (mm) × Width (mm) × Length (mm) × Berat jenis (g/cm³) ÷ 1.000.000') : '') +
+      '<div class="fsec">Stok</div>' +
+      M.fg('Monthly Forecast', '<input type="number" min="0" name="forecast" value="' + M.esc(edit ? r.forecast : '') + '">') +
+      M.fg('Safety Stock', '<input type="number" min="0" name="safety" value="' + M.esc(edit ? r.safety : '') + '">') +
+      M.fg('Order Point', '<input type="number" min="0" name="order" value="' + M.esc(edit ? r.order : '') + '">') +
+      M.fg('Maximum Stock', '<input type="number" min="0" name="max" value="' + M.esc(edit ? r.max : '') + '">') +
+      (edit ? M.fg('Status', '<div class="radio-row"><label><input type="radio" name="aktif" value="aktif"' + (r.aktif === 'aktif' ? ' checked' : '') + '> Aktif</label><label><input type="radio" name="aktif" value="nonaktif"' + (r.aktif !== 'aktif' ? ' checked' : '') + '> Non Aktif</label></div>') : '') +
+      '</div></div>' +
+      '<div class="fsec">Supplier <button type="button" class="btn btn-sm btn-success pull-right" id="adds">＋ Add</button></div>' +
+      '<table class="mini"><thead><tr><th>Nama Supplier</th><th>Lead Time (hari)</th><th>Minimum Order</th><th>Action</th></tr></thead><tbody id="sup">' + (edit ? r.sup.map(supRow).join('') : supRow()) + '</tbody></table>' +
+      '<div class="fsec">Material Ekuivalen <button type="button" class="btn btn-sm btn-success pull-right" id="eqadd">＋ Tambah Material Ekuivalen</button></div>' +
+      '<div id="eqpick" style="display:none;border:1px solid #c6dcea;background:#f6fafd;padding:10px;margin-bottom:10px"><input type="text" id="eqq" placeholder="Cari id / nama / spesifikasi / maker..." style="width:100%;border:1px solid #d2d6de;padding:6px 10px;height:34px"><div id="eqres" style="margin-top:8px"></div></div>' +
+      '<div id="eq"></div>' +
+      '<div class="form-actions" style="justify-content:center"><button class="btn btn-success" type="submit">💾 Simpan</button></div></form>', {size:'xl'});
+    var f = b.querySelector('form');
+    function fill1(sel) { f.c1.innerHTML = M.opts(S.cat1.filter(function (x) { return x.id_type === f.t.value && x.aktif === 'aktif'; }), sel || '', 'id', 'nama'); }
+    function fill2(sel) { f.c2.innerHTML = M.opts(S.cat2.filter(function (x) { return x.id_cat1 === f.c1.value && x.aktif === 'aktif'; }), sel || '', 'id', 'nama'); }
+    function komp(vals) {
+      if (!b.querySelector('#komp')) return;
+      var k = byId(S.cat1, f.c1.value).komposisi || []; vals = vals || {};
+      b.querySelector('#komp').innerHTML = k.length ? '<table class="mini"><thead><tr><th>Unsur</th><th>Nilai (%)</th></tr></thead><tbody>' + k.map(function (x) {
+        return '<tr><td>' + M.esc(x) + '</td><td><input type="text" data-k="' + M.esc(x) + '" value="' + M.esc(vals[x] || '') + '"></td></tr>'; }).join('') + '</tbody></table>' : '<em>-</em>';
+    }
+    function fillSpek(sel) {
+      var list = S.spesifikasi.filter(function (x) { return x.id_cat2 === f.c2.value && (x.aktif === 'aktif' || x.id === sel); });
+      f.spek.innerHTML = M.opts(list, sel || '', 'id', 'nama', f.c2.value ? '-- Pilih Spesifikasi --' : '-- Pilih Type Alloy dulu --');
+    }
+    var manual = edit ? (r.eqm || []).slice() : [], excl = edit ? (r.eqx || []).slice() : [], selfId = edit ? r.id : '';
+    function showEq() { b.querySelector('#eq').innerHTML = eqHtml(f.spek.value, selfId, manual, true, excl, curThick(), curCtx()); pick(); }
+    function curCtx() { return {sheet:isSheet, maker:f.maker ? f.maker.value : ''}; }
+    function curThick() { return f.dim_THICKNESS ? f.dim_THICKNESS.value : ''; }
+    function pick() {
+      var box = b.querySelector('#eqpick'); if (box.style.display === 'none') return;
+      var shown = eqIds(f.spek.value, selfId, manual, excl, curThick(), curCtx()).list.map(function (m) { return m.id; }), q = b.querySelector('#eqq').value.trim().toLowerCase();
+      var c = rows.filter(function (m) { return m.id !== selfId && shown.indexOf(m.id) < 0 && (!q || [m.id, m.nama, m.spek, m.maker].join(' ').toLowerCase().indexOf(q) > -1); });
+      b.querySelector('#eqres').innerHTML = c.length ? '<div class="tbl-wrap" style="max-height:220px;overflow:auto"><table class="tbl"><tbody>' + c.slice(0, 30).map(function (m) {
+        return '<tr><td>' + M.esc(m.id) + '</td><td>' + M.esc(m.nama) + '</td><td>' + M.esc(m.spek) + '</td><td>' + M.esc(byId(S.bentuk, m.id_bentuk).nama) + '</td><td class="act"><button type="button" class="btn btn-sm btn-primary" data-add="' + M.esc(m.id) + '">＋ Tambah</button></td></tr>'; }).join('') + '</tbody></table></div>' +
+        (c.length > 30 ? '<div class="eqnote">Menampilkan 30 dari ' + c.length + ' - persempit pencarian.</div>' : '') : '<div class="eqnote">Tidak ada material lain yang cocok.</div>';
+    }
+    b.querySelector('#eqadd').onclick = function () { var bx = b.querySelector('#eqpick'); bx.style.display = bx.style.display === 'none' ? 'block' : 'none'; pick(); if (bx.style.display === 'block') b.querySelector('#eqq').focus(); };
+    b.querySelector('#eqq').oninput = pick;
+    b.querySelector('#eqpick').onclick = function (e) { var x = e.target.closest('[data-add]'); if (x) { var i = excl.indexOf(x.dataset.add); if (i > -1) excl.splice(i, 1); manual.push(x.dataset.add); showEq(); } };
+    b.querySelector('#eq').onclick = function (e) { var x = e.target.closest('[data-rm]'); if (x) { var i = manual.indexOf(x.dataset.rm); if (i > -1) manual.splice(i, 1); if (excl.indexOf(x.dataset.rm) < 0) excl.push(x.dataset.rm); showEq(); } };
+    function specName() { return (byId(S.spesifikasi, f.spek.value).nama || ''); }
+    var namaDirty = false;
+    function auto() {
+      if (namaDirty) return;
+      var dim = {}; bt.dimensi.forEach(function (k) { dim[k] = f['dim_' + k].value; });
+      f.nama.value = f.c2.value ? buildNama(bt.id, {alloy:byId(S.cat2, f.c2.value).nama, spek:specName(), hardness:f.hardness.value.trim(), surface:'', dim:dim}) : '';
+    }
+    function calc() {
+      if (!f.weight) return;
+      var v = sheetKg(f.dim_THICKNESS && f.dim_THICKNESS.value, f.dim_WIDTH && f.dim_WIDTH.value, f.dim_LENGTH && f.dim_LENGTH.value, f.density.value);
+      f.weight.value = v == null ? '-' : M.fmt(v, 3);
+    }
+    fill1(edit ? c.c1.id : ''); fill2(edit ? c.c2.id : ''); fillSpek(edit ? r.id_spek : ''); komp(edit ? r.komp : {}); auto(); calc(); showEq();
+    if (edit && r.nama !== f.nama.value) { namaDirty = true; f.nama.value = r.nama; } f.nama.oninput = function () { namaDirty = true; };
+    f.t.onchange = function () { fill1(''); fill2(''); fillSpek(''); komp(); auto(); showEq(); };
+    f.c1.onchange = function () { fill2(''); fillSpek(''); komp(); auto(); showEq(); };
+    f.c2.onchange = function () { fillSpek(''); auto(); showEq(); }; f.spek.onchange = function () { auto(); showEq(); }; f.hardness.oninput = auto;
+    f.querySelectorAll('.dim').forEach(function (i) { i.oninput = function () { calc(); auto(); showEq(); }; });
+    f.density.oninput = calc;
+    b.querySelector('#adds').onclick = function () { b.querySelector('#sup').insertAdjacentHTML('beforeend', supRow()); };
+    b.querySelector('#sup').onclick = function (e) { var d = e.target.closest('.del'); if (d) d.closest('tr').remove(); };
+    f.onsubmit = function (e) {
+      e.preventDefault(); if (!M.validate(f)) return;
+      M.saveFlow({text:'Data akan diproses dan tidak dapat diulang.', okText:'Ya, Proses!', done:'Data Inventory berhasil disimpan.',
+        save: function () {
+          var dim = {}; bt.dimensi.forEach(function (k) { dim[k] = f['dim_' + k].value; });
+          var sup = Array.prototype.map.call(f.querySelectorAll('#sup tr'), function (tr) {
+            return {s:tr.querySelector('[name=s]').value, lead:tr.querySelector('[name=lead]').value, min:tr.querySelector('[name=min]').value}; }).filter(function (x) { return x.s; });
+          var komp = {}; f.querySelectorAll('#komp [data-k]').forEach(function (i) { if (i.value.trim()) komp[i.dataset.k] = i.value.trim(); });
+          var d = {id_bentuk:bt.id, nama:f.nama.value, komp:komp, id_cat2:f.c2.value, spek:specName(), id_spek:f.spek.value, maker:f.maker ? f.maker.value.trim() : '', density:f.density.value, hardness:f.hardness.value, surface:f.surface ? f.surface.value : '',
+            dim:dim, forecast:f.forecast.value, safety:f.safety.value, order:f.order.value, max:f.max.value, sup:sup};
+          var o = r;
+          if (edit) Object.assign(r, d, {aktif:f.aktif.value}); else { o = Object.assign({id:M.nextId('I25', rows), aktif:'aktif'}, d); rows.push(o); }
+          o.eqm = manual.slice(); o.eqx = excl.slice();
+          rows.forEach(function (x) { if (x === o) return; var l = (x.eqm = x.eqm || []), i = l.indexOf(o.id); if (manual.indexOf(x.id) > -1) { if (i < 0) l.push(o.id); } else if (i > -1) l.splice(i, 1);
+            var ex = (x.eqx = x.eqx || []), j = ex.indexOf(o.id); if (excl.indexOf(x.id) > -1) { if (j < 0) ex.push(o.id); } else if (j > -1) ex.splice(j, 1); });
+          if (page._t) page._t.refresh();
+        }});
+    };
+  }
+
+  rows.forEach(function (r) { if (r.id_bentuk === 'B2000002') { r.nama = buildNama(r.id_bentuk, {alloy:chain(r).c2.nama, spek:r.spek, hardness:'', surface:'', dim:r.dim || {}}); r.maker = ''; r.surface = ''; r.komp = {}; if (r.hardness === '0') r.hardness = ''; } });
+  function route() { var h = location.hash.slice(1); if (h) showList(h); else showBentuk(); }
+  window.addEventListener('hashchange', route); route();
+})();
+</script>
+</body>
+</html>

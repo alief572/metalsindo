@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPK Marketing</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script src="assets/seed_sales.js"></script>
+<script src="assets/pen.js"></script>
+<script src="assets/spk.js"></script>
+<script>
+(function () {
+  var M = Mock, S = M.seedS;
+  var page = M.shell({key:'spk_marketing', title:'SPK Marketing', sub:'Reguler', module:'spk_marketing', crumb:'Penjualan'});
+  M.pen.derive(S.penawaran, S.spk);
+  M.spk.build(page, {type:'reguler', rows:S.spk});
+})();
+</script>
+</body>
+</html>

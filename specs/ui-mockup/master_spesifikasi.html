@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Master Spesifikasi</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script>
+(function () {
+  var M = Mock, S = M.seed, rows = S.spesifikasi;
+  var page = M.shell({key:'master_spesifikasi', title:'Master Spesifikasi', sub:'Pilihan spesifikasi untuk Level 4 - Material', module:'(usulan baru - belum ada di aplikasi)'});
+  page.innerHTML = '<div class="box primary"><div class="box-header"><span id="addwrap"></span>' +
+    '<span class="pull-right"><label style="font-size:13px">Filter Type Alloy: <select id="fa" style="border:1px solid #ddd;padding:4px 8px"></select></label></span></div>' +
+    '<div class="box-body" id="tbl"></div></div>';
+  var fa = M.$('#fa'); fa.innerHTML = M.opts(S.cat2, '', 'id', 'nama', 'Semua');
+
+  function alloy(id) { return (S.cat2.filter(function (x) { return x.id === id; })[0] || {}).nama || '-'; }
+  function used(r) { return S.material.filter(function (m) { return m.id_spek === r.id; }); }
+
+  function addBtn() { M.$('#addwrap').innerHTML = M.perm.Add ? '<button class="btn btn-success btn-sm" id="add">＋ Add</button>' : ''; if (M.perm.Add) M.$('#add').onclick = function () { form(); }; }
+  addBtn(); M.onPerm(addBtn);
+
+  var t = M.table(M.$('#tbl'), {
+    rows: function () { return fa.value ? rows.filter(function (r) { return r.id_cat2 === fa.value; }) : rows; },
+    cols: [
+      {key:'id', label:'Id Spesifikasi', width:'14%'},
+      {label:'Type Alloy', text: function (r) { return alloy(r.id_cat2); }},
+      {key:'nama', label:'Nama Spesifikasi'},
+      {label:'Dipakai (material)', text: function (r) { return used(r).length; }},
+      {label:'Status', html: function (r) { return M.badge(r.aktif); }, text: function (r) { return r.aktif === 'aktif' ? 'Aktif' : 'Non Aktif'; }}
+    ],
+    actions: {view:1, edit:1, del:1},
+    onAction: function (a, id) {
+      var r = rows.filter(function (x) { return x.id === id; })[0];
+      if (a === 'view') view(r); else if (a === 'edit') form(r);
+      else if (used(r).length) M.swal({title:'Tidak bisa dihapus', text:'Spesifikasi ' + r.nama + ' masih dipakai ' + used(r).length + ' material. Non-aktifkan saja.', type:'error'});
+      else M.delFlow('Data Spesifikasi akan di hapus.', 'Data Spesifikasi berhasil dihapus.', function () { rows.splice(rows.indexOf(r), 1); t.refresh(); });
+    }
+  });
+  fa.onchange = function () { t.refresh(); };
+
+  function view(r) {
+    var u = used(r);
+    M.modal('Detail Spesifikasi', '<dl class="dl"><dt>Id Spesifikasi</dt><dd>' + M.esc(r.id) + '</dd><dt>Type Alloy</dt><dd>' + M.esc(alloy(r.id_cat2)) + '</dd>' +
+      '<dt>Nama Spesifikasi</dt><dd>' + M.esc(r.nama) + '</dd><dt>Status</dt><dd>' + M.badge(r.aktif) + '</dd></dl>' +
+      '<div class="fsec">Dipakai di material (' + u.length + ')</div>' +
+      (u.length ? '<table class="mini"><thead><tr><th>Id Material</th><th>Nama Material</th></tr></thead><tbody>' + u.map(function (m) { return '<tr><td>' + M.esc(m.id) + '</td><td>' + M.esc(m.nama) + '</td></tr>'; }).join('') + '</tbody></table>' : '<em>Belum dipakai.</em>'), {size:'sm'});
+  }
+
+  function form(r) {
+    var edit = r && r.id;
+    var b = M.modal(edit ? 'Edit Spesifikasi' : 'Tambah Spesifikasi',
+      '<form novalidate>' +
+      M.fg('Type Alloy', '<select name="id_cat2" required>' + M.opts(S.cat2.filter(function (x) { return x.aktif === 'aktif'; }), edit ? r.id_cat2 : '', 'id', 'nama', '-- Pilih Alloy --') + '</select>', 'Level 3. Spesifikasi hanya muncul di Level 4 untuk alloy yang sama.') +
+      M.fg('Nama Spesifikasi', '<input type="text" name="nama" required placeholder="Contoh: C2680, 304, SPCC-SD" value="' + M.esc(edit ? r.nama : '') + '">') +
+      (edit ? M.fg('Status', '<div class="radio-row"><label><input type="radio" name="aktif" value="aktif"' + (r.aktif === 'aktif' ? ' checked' : '') + '> Aktif</label>' +
+        '<label><input type="radio" name="aktif" value="nonaktif"' + (r.aktif !== 'aktif' ? ' checked' : '') + '> Non Aktif</label></div>') : '') +
+      '<div class="form-actions"><button class="btn btn-primary" type="submit">💾 Save</button></div></form>', {size:'sm'});
+    b.querySelector('form').onsubmit = function (e) {
+      e.preventDefault(); var f = e.target; if (!M.validate(f)) return;
+      var nm = f.nama.value.trim().toUpperCase();
+      var dup = rows.some(function (x) { return x !== r && x.id_cat2 === f.id_cat2.value && x.nama.toUpperCase() === nm; });
+      if (dup) { f.nama.classList.add('err'); f.nama.parentNode.insertAdjacentHTML('beforeend', '<div class="ferr">Spesifikasi ini sudah ada untuk alloy tersebut</div>'); return; }
+      M.saveFlow({text:'Data Spesifikasi akan di simpan.', done:'Data Spesifikasi berhasil disimpan.',
+        save: function () {
+          var o = r;
+          if (edit) { r.id_cat2 = f.id_cat2.value; r.nama = nm; r.aktif = f.aktif.value; used(r).forEach(function (m) { m.spek = nm; m.id_cat2 = r.id_cat2; }); }
+          else { o = {id:M.nextId('I20', rows), id_cat2:f.id_cat2.value, nama:nm, aktif:'aktif'}; rows.push(o); }
+          t.refresh();
+        }});
+    };
+  }
+})();
+</script>
+</body>
+</html>

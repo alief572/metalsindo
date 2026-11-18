@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product Costing</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script src="assets/seed_sales.js"></script>
+<script src="assets/costing.js"></script>
+<script src="assets/pcui.js"></script>
+<script>
+(function () {
+  var M = Mock, P = M.pc, U = M.pcui, esc = M.esc, st = P.st;
+  var page = U.head('product_costing', 'Product Costing', 'Update Costing semua material (PG-09 · UC-N10)', 'Product Costing');
+  page.innerHTML = '<div class="box primary"><div class="box-header"><span id="addw"></span><span class="pull-right"><small>Tanggal sistem contoh: ' + M.dstr(P.TODAY) + '</small></span></div><div class="box-body"><div id="res"></div><div id="tbl"></div></div></div>' +
+    '<div class="note">Costing <b>tidak dihitung otomatis</b>. Tekan <b>Update Costing</b> untuk menghitung <b>semua material</b>. Material yang Price Reference-nya <b>kedaluwarsa diblokir</b> dan memunculkan <b>notifikasi lonceng</b>. Bila salah satu Rate (mis. Rate Man Power) belum diisi di Master Rate Umum, costing <b>dihitung sebagian</b> (status SEBAGIAN) dan belum boleh masuk pricelist. Material tanpa Price Reference belum dapat dihitung (asumsi mockup).</div>';
+  function addBtn() { M.$('#addw').innerHTML = M.perm.Manage ? '<button class="btn btn-success" id="upd">⟳ Update Costing (semua material)</button>' : ''; if (M.perm.Manage) M.$('#upd').onclick = run; }
+  addBtn(); M.onPerm(addBtn);
+  function run() {
+    M.saveFlow({text:'Seluruh material akan dihitung ulang. Material dengan Price Reference kedaluwarsa akan diblokir.', okText:'Ya, Update!', done:'Update Costing selesai.', save:function () { var s = P.runUpdate(); last = s; U.refresh(); }, after:function () { renderRes(); t.refresh(); }});
+  }
+  var last = null;
+  function renderRes() {
+    if (!last) { M.$('#res').innerHTML = ''; return; }
+    M.$('#res').innerHTML = '<div class="sumbox"><div><small>LENGKAP</small><b>' + last.lengkap + '</b></div><div><small>SEBAGIAN</small><b>' + last.sebagian + '</b></div><div><small>Diblokir (kedaluwarsa)</small><b>' + last.blokir + '</b></div><div><small>Belum ada Price Reference</small><b>' + last.tanpa + '</b></div><div><small>Notifikasi baru</small><b>' + last.ntf + '</b></div></div>' +
+      (last.blokir ? '<div class="warnbox">' + last.blokir + ' material diblokir karena Price Reference Costing kedaluwarsa. Notifikasi lonceng dikirim ke PIC pemilik akses modul (lihat ikon 🔔).</div>' : '<div class="okbox">Tidak ada material yang diblokir.</div>');
+  }
+  var t = M.table(M.$('#tbl'), {rows:function () { return st.mats.map(function (m) { var c = st.cost[m.id], pr = P.priceRef(m.id), r = c || (pr ? (P.expired(pr) ? {state:'BLOKIR'} : null) : {state:'TANPA_PR'}); return {id:m.id, m:m, c:c, r:r}; }); }, cols:[
+    {label:'Material', html:function (x) { return esc(x.m.nama); }, text:function (x) { return x.m.nama; }}, {label:'Bentuk', html:function (x) { return esc(x.m.bentuk); }, text:function (x) { return x.m.bentuk; }},
+    {label:'Status', html:function (x) { return U.badgeCost(x.r && x.r.state === 'OK' ? x.r : x.r); }, text:function (x) { return x.c ? x.c.status : (x.r ? x.r.state : ''); }},
+    {label:'HPP (Rp/Kg)', html:function (x) { return '<span class="num" style="display:block">' + (x.c ? M.fmt(x.c.hpp, 2) : '-') + '</span>'; }, text:function (x) { return x.c ? x.c.hpp : 0; }},
+    {label:'Bottom Price (Rp/Kg)', html:function (x) { return '<span class="num" style="display:block">' + (x.c ? '<b>' + M.fmt(x.c.bottom, 2) + '</b>' : '-') + '</span>'; }, text:function (x) { return x.c ? x.c.bottom : 0; }},
+    {label:'Bottom Price (Rp/Sheet)', html:function (x) { return '<span class="num" style="display:block">' + (x.c && x.c.bottom_sheet ? M.fmt(x.c.bottom_sheet, 2) : '-') + '</span>'; }, text:function (x) { return x.c && x.c.bottom_sheet ? x.c.bottom_sheet : 0; }},
+    {label:'Dihitung', html:function (x) { return x.c ? M.dstr(x.c.tgl) : '-'; }, text:function (x) { return x.c ? x.c.tgl : ''; }}],
+    actions:{view:'☰ Rincian'}, onAction:function (a, id) { var m = P.mat(id), c = st.cost[id];
+      if (!c) { var pr = P.priceRef(id); M.modal('Rincian Costing - ' + m.nama, '<div class="warnbox">' + (!pr ? 'Material ini belum memiliki Price Reference sehingga belum dapat dihitung.' : 'Price Reference Costing kedaluwarsa pada ' + M.dstr(pr.sd) + '. Perbarui Price Reference Purchase, lalu jalankan Update Costing lagi.') + '</div>', {size:'sm'}); return; }
+      M.modal('Rincian Costing - ' + m.nama, '<div class="sumbox"><div><small>Status</small><b>' + c.status + '</b></div><div><small>Dihitung</small><b>' + M.dstr(c.tgl) + '</b></div><div><small>Master Rate Umum</small><b>' + esc(c.refs.rate) + '</b></div></div>' + (c.status === 'SEBAGIAN' ? '<div class="warnbox">Dihitung sebagian: ada Rate yang belum diisi di Master Rate Umum, sehingga elemen tersebut belum masuk. Status SEBAGIAN tidak boleh dimasukkan ke pricelist.</div>' : '') + U.elTable(c, m), {size:'xl'}); }});
+})();
+</script>
+</body>
+</html>

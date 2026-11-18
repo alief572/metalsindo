@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup UI Metalsindo</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script>
+var page = Mock.shell({key:'', title:'Mockup UI', sub:'Modul inventory & master', module:'(inventory, master data, penjualan)'});
+var items = [
+  ['inventory_1.html','Level 1 - Type','inventory_1','Master tipe inventory (Material, Non Material, ...). Tambah, ubah, lihat, hapus, status aktif.'],
+  ['inventory_2.html','Level 2 - Ferrous / Non Ferrous','inventory_2','Kategori di bawah Type, lengkap dengan daftar komposisi (Fe, C, Mn, ...).'],
+  ['inventory_3.html','Level 3 - Alloy','inventory_3','Alloy di bawah Level 2, dengan Kode Coretax. Dropdown Level 2 mengikuti Type.'],
+  ['inventory_4.html','Level 4 - Material','inventory_4','Pilih bentuk, lalu daftar material per bentuk. Form lengkap: klasifikasi, dimensi, stok, supplier.'],
+  ['master_bentuk.html','Master Bentuk','master_bentuk','Bentuk material (Coil, Sheet, ...) beserta daftar dimensinya.'],
+  ['master_spesifikasi.html','Master Spesifikasi','(usulan baru)','Daftar spesifikasi per Type Alloy (C2680, 304, SPCC-SD, ...). Dipakai sebagai pilihan di Level 4 - Material.'],
+  ['master_surface.html','Master Surface','master_surface','Daftar finishing permukaan (2B, BA, ...).'],
+  ['master_suplier.html','Master Supplier','master_suplier','Supplier lokal & internasional beserta kategori dan contact person.'],
+  ['master_lme.html','Master LME','master_lme','Riwayat harga LME harian (Cu, Zn, Sn, Ni, Ag, Al) dan rate H-30 / H-10 / saat ini.'],
+  ['master_kurs.html','Master Kurs','master_kurs','Riwayat perubahan kurs IDR dan rate kurs terbaru / 10 hari / 30 hari.'],
+  ['bookprice_material.html','Bookprice Material','bookprice_material','Harga acuan per material; upload Excel dan template.'],
+  ['purchase_request.html','Purchase Request','purchase_request','Daftar PR (Waiting / Approved), Create/Edit halaman penuh (Roll: ID/OD, Sheet: Qty Sheet x Weight/Sheet), Approve, Copy PR.'],
+  ['purchase_order.html','Purchase Order','purchase_order','PO dari PR Approved per supplier: Roll (Rate LME, Alloy Price, Fab Cost) dan Sheet; Lokal / Import, kurs, diskon, pajak, Approval PO, hapus.'],
+  ['transaksi_inquiry.html','Inquiry (CRCL)','transaksi_inquiry','Inquiry customer beserta detail item per bentuk material.'],
+  ['pricelist.html','Pricelist','pricelist','Bottom price Ferrous (book price) dan Non Ferrous (book + LME 10 hari / 1 bulan / spot).'],
+  ['penawaran.html','Penawaran Material','penawaran','Header, item, profit otomatis, closing, copy, ajukan revisi.'],
+  ['index_approval.html','Approval Revisi Penawaran','penawaran/index_approval','Approve / reject pengajuan revisi penawaran (material & slitting).'],
+  ['approval_diskon.html','Approval Diskon Penawaran (PG-15)','penawaran/approval_diskon','Direktur menyetujui / menolak diskon penawaran di atas 5% atau item di bawah Bottom Price; ditolak kembali ke Penawaran untuk direvisi.'],
+  ['penawaran_slitting.html','Penawaran Slitting','penawaran_slitting','Penawaran slitting dengan qty slitting, qty coil, width akhir.'],
+  ['spk_marketing.html','SPK Marketing','spk_marketing','SPK reguler: belum approve / approved, edit harga deal, revisi.'],
+  ['price_reference_purchase.html','Price Reference Purchase (PG-04)','price_reference_purchase','Dikelompokkan Ferrous / Non Ferrous. Last Purchase (dari PO incoming terakhir) dan Costing Price USD; masa berlaku global per tipe; simpan menurunkan Price Reference Costing otomatis.'],
+  ['price_reference_costing.html','Price Reference Costing (PG-05)','price_reference_costing','Costing Price turunan dari Purchase; masa berlaku mengikuti Purchase; baca saja.'],
+  ['master_rate_umum.html','Master Rate Umum (PG-07)','master_rate_umum','Machine, Consumable, FOH, Waste, Admin, Profit, Negotiation Allowance, Commission; versi baru tiap simpan.'],
+  ['flow_process.html','Flow Process (PG-08)','flow_process','Proses dan cycletime (menit/Kg) per material; mesin dipilih dari asset kategori Machine.'],
+  ['product_costing.html','Product Costing (PG-09)','product_costing','Tombol Update Costing untuk semua material: LENGKAP, SEBAGIAN, diblokir (Price Reference kedaluwarsa) dengan notifikasi lonceng.'],
+  ['report_costing.html','Report Costing Detail (PG-10)','report_costing','Rincian elemen biaya sampai Bottom Price per produk (Rp/Kg dan Rp/Sheet).'],
+  ['notifikasi.html','Notifikasi Costing (PG-11)','notifikasi','Daftar notifikasi lonceng untuk PIC; tandai dibaca.'],
+  ['pricelist_dasar.html','Pricelist (PG-12)','pricelist_dasar','Susun pricelist dasar dari costing LENGKAP (Rp/Kg, semua customer) dan ajukan approval.'],
+  ['pricelist_approval.html','Approval Pricelist (PG-13)','pricelist_approval','Management menyetujui seluruh/sebagian baris atau menolak; baris disetujui dirilis, lainnya kembali DRAFT.'],
+  ['asset_category.html','Asset Category','asset_category','Kategori asset (Machine, Office Equipment, ...). Kategori Machine menjadi sumber mesin untuk Flow Process.'],
+  ['asset.html','Asset','asset','Daftar asset beserta penyusutan; asset berkategori Machine dipilih sebagai mesin pada Flow Process.'],
+  ['index_slitting.html','SPK Marketing Slitting','spk_marketing/index_slitting','SPK Marketing untuk order slitting.']
+];
+page.innerHTML = '<div class="cards">' + items.map(function (i) {
+  return '<a class="card" href="' + i[0] + '"><h3>' + i[1] + '</h3><small>modul <code>' + i[2] + '</code></small><p>' + i[3] + '</p></a>'; }).join('') + '</div>' +
+  '<div class="box" style="margin-top:18px"><div class="box-header"><h3>Catatan</h3></div><div class="box-body"><ul>' +
+  '<li>Modul master data & penjualan: data contoh dari <code>metalsindo_live</code> lokal; header penawaran/SPK/inquiry diturunkan (tabel tr_* tidak ada di DB lokal). Status Open/Closed/revisi pada peragaan bersifat ilustrasi.</li><li><b>Tahap 3 (To Be Product Costing)</b>: halaman PG-04 sampai PG-13 memakai data bersama yang disimpan di <code>localStorage</code> agar alur rate → costing → pricelist → penawaran terlihat lintas halaman; nilai contoh dari workbook (mis. Bottom Price Rp 342.532,87). Tombol <b>Reset data costing</b> ada di menu kiri. Penawaran (PG-14) dan Material (PG-02) sudah disesuaikan.</li><li>Data contoh diambil dari database lokal (hanya baris terpilih), disimpan di memori browser; reload mengembalikan data awal.</li>' +
+  '<li>Tombol "Simulasi hak akses" di pojok kanan atas meniru <code>has_permission()</code> (Add / View / Manage / Delete).</li>' +
+  '<li>Buka langsung lewat file (double-click); tidak perlu server atau koneksi internet.</li></ul></div></div>';
+</script>
+</body>
+</html>

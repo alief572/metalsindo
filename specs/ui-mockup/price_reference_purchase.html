@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Price Reference Purchase</title>
+<link rel="stylesheet" href="assets/mock.css">
+<style>
+.grp-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.grp-h .mb{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:13px}
+.grp-h .mb select{padding:4px 8px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script src="assets/seed_sales.js"></script>
+<script src="assets/costing.js"></script>
+<script src="assets/pen.js"></script>
+<script src="assets/pcui.js"></script>
+<script>
+(function () {
+  var M = Mock, P = M.pc, U = M.pcui, esc = M.esc, st = P.st;
+  var page = U.head('price_reference_purchase', 'Price Reference Purchase', 'Harga acuan pembelian (PG-04 · UC-N05)', 'Price Reference');
+  page.innerHTML = '<div class="note">Kurs terbaru: <b>' + M.fmt(P.kursNow(), 0) + '</b>. Daftar <b>dikelompokkan berdasarkan Level 2</b> (Ferrous dan Non Ferrous) dan memuat <b>seluruh material</b>; harga diperbarui <b>per material</b> lewat tombol <b>Update</b>. Roll dicatat <b>per Maker</b>, Sheet <b>tanpa Maker</b>. Harga selalu Rp/Kg (USD × kurs). ' +
+    '<b>Last Purchase</b> diambil otomatis dari <b>History Pembelian terakhir</b> (PO yang sudah incoming) dan disimpan sebagai snapshot; <b>Costing Price</b> diinput dan <b>harus lebih besar dari Last Purchase</b>. ' +
+    '<b>Masa berlaku bersifat global per tipe</b> (satu untuk Ferrous, satu untuk Non Ferrous): Berlaku s/d = tanggal update harga terbaru + masa berlaku tipenya. Setiap simpan harga menambah baris riwayat dan <b>otomatis menurunkan Price Reference Costing</b> dari Costing Price.</div>' +
+    '<div id="tabhost"></div>';
+
+  function last(mid) { return P.latestPrp(mid); }
+  var num = function (v, dg) { return '<span class="num" style="display:block">' + (v == null ? '-' : M.fmt(v, dg)) + '</span>'; };
+  var tables = {};
+
+  function mbCtl(tipe) {
+    var el = M.$('#mb_' + tipe), cur = st.mb[tipe];
+    el.innerHTML = '<label for="mbs_' + tipe + '">Masa Berlaku ' + esc(P.tipeLabel(tipe)) + ' (global)</label>' + (M.perm.Manage ? '<select id="mbs_' + tipe + '">' + P.OPSI.map(function (o) { return '<option value="' + o[0] + '"' + (cur === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' : '<b>' + esc(P.opsiLabel(cur)) + '</b>');
+    var s = M.$('#mbs_' + tipe);
+    if (s) s.onchange = function () {
+      var n = P.setMasaBerlakuTipe(tipe, s.value);
+      tables[tipe].refresh(); M.toast('Masa berlaku ' + P.tipeLabel(tipe) + ' diubah menjadi ' + P.opsiLabel(s.value) + ' untuk ' + n + ' material. Berlaku s/d dihitung ulang dan Price Reference Costing ikut diperbarui.');
+    };
+  }
+
+  function renderTipe(el, tipe) {
+    el.innerHTML = '<div class="box primary"><div class="box-header grp-h"><h3 class="box-title" style="margin:0">' + esc(P.tipeLabel(tipe)) + '</h3><span class="mb" id="mb_' + tipe + '"></span></div><div class="box-body" id="tbl_' + tipe + '"></div></div>';
+    mbCtl(tipe);
+    tables[tipe] = M.table(M.$('#tbl_' + tipe), {rows:function () { return st.mats.filter(function (m) { return m.tipe === tipe; }).map(function (m) { return {id:m.id, nama:m.nama, maker:m.bentuk === 'ROLL' ? m.maker : '(tanpa maker)', bentuk:m.bentuk, d:last(m.id)}; }); }, cols:[
+      {key:'nama', label:'Material'}, {key:'bentuk', label:'Bentuk'}, {key:'maker', label:'Maker'},
+      {label:'Last Purchase (USD)', html:function (r) { return r.d && r.d.lp != null ? num(r.d.lp, 2) : '<span class="num" style="display:block" title="Belum ada riwayat PO incoming">kosong</span>'; }, text:function (r) { return r.d && r.d.lp != null ? r.d.lp : ''; }},
+      {label:'Costing Price (USD)', html:function (r) { return num(r.d && r.d.cp, 2); }, text:function (r) { return r.d ? r.d.cp : ''; }},
+      {label:'Costing Price (Rp/Kg)', html:function (r) { return num(r.d && r.d.cp_rp, 0); }, text:function (r) { return r.d ? r.d.cp_rp : ''; }},
+      {label:'Berlaku s/d', html:function (r) { return r.d ? M.dstr(r.d.sd) + ' ' + (r.d.sd < P.TODAY ? M.pill('Kedaluwarsa', 'off') : M.pill('Berlaku', 'ok')) : M.pill('Belum ada harga', 'gray'); }, text:function (r) { return r.d ? r.d.sd : ''; }},
+      {label:'Action', html:function (r) { return (M.perm.View ? '<button class="btn btn-sm btn-primary" data-a="riwayat" data-id="' + esc(r.id) + '" title="Riwayat">☰ Riwayat</button> ' : '') + (M.perm.Manage ? '<button class="btn btn-sm btn-success" data-a="update" data-id="' + esc(r.id) + '" title="Update harga material ini">✎ Update</button>' : ''); }, text:function () { return ''; }}],
+      onAction:function (a, id) { if (a === 'riwayat') riwayat(id); else form(id); }});
+  }
+  M.tabs(M.$('#tabhost'), P.TIPE.map(function (tp) { return {label:tp[1], render:function (el) { renderTipe(el, tp[0]); }}; }));
+  function refreshAll() { P.TIPE.forEach(function (t) { if (tables[t[0]] && M.$('#tbl_' + t[0])) tables[t[0]].refresh(); }); }
+
+  function riwayat(mid) {
+    var m = P.mat(mid), rows = st.prpd.filter(function (d) { return d.mid === mid; }).sort(function (a, b) { return a.tgl < b.tgl ? 1 : -1; });
+    M.modal('Riwayat Price Reference Purchase - ' + m.nama, '<div class="sumbox"><div><small>Tipe (Level 2)</small><b>' + esc(P.tipeLabel(m.tipe)) + '</b></div><div><small>Bentuk</small><b>' + esc(m.bentuk) + '</b></div><div><small>Maker</small><b>' + esc(m.bentuk === 'ROLL' ? m.maker : '-') + '</b></div></div>' +
+      M.stable([{label:'Tanggal', html:function (d) { return M.dstr(d.tgl); }}, {label:'Last Purchase USD', cls:'num', html:function (d) { return d.lp == null ? '-' : M.fmt(d.lp, 2); }}, {label:'PO sumber', html:function (d) { return esc(d.po || '-'); }}, {label:'Costing Price USD', cls:'num', html:function (d) { return M.fmt(d.cp, 2); }}, {label:'Kurs', cls:'num', html:function (d) { return M.fmt(d.kurs, 0); }},
+        {label:'Last Purchase Rp/Kg', cls:'num', html:function (d) { return d.lp_rp == null ? '-' : M.fmt(d.lp_rp, 0); }}, {label:'Costing Price Rp/Kg', cls:'num', html:function (d) { return M.fmt(d.cp_rp, 0); }}, {label:'Masa Berlaku', html:function (d) { return esc(P.opsiLabel(d.opsi)); }}, {label:'Berlaku s/d', html:function (d) { return M.dstr(d.sd); }},
+        {label:'Evidence', html:function (d) { return esc(d.evidence || '-'); }}, {label:'Note', html:function (d) { return esc(d.note || '-'); }}], rows), {size:'xl'});
+  }
+
+  /* Update harga untuk SATU material (material tetap, tidak dipilih ulang) */
+  function form(mid) {
+    var K = P.kursNow(), m = P.mat(mid), cur = last(mid), po = P.lastPO(mid), lpRp = po ? Math.round(po.usd * K) : null, opsi = P.mbOf(mid);
+    var b = M.modal('Update Price Reference Purchase - ' + m.nama, '<form novalidate>' +
+      (cur ? '<div class="sumbox"><div><small>Costing Price saat ini (USD)</small><b>' + M.fmt(cur.cp, 2) + '</b></div><div><small>Berlaku s/d</small><b>' + M.dstr(cur.sd) + '</b></div><div><small>Masa berlaku ' + esc(P.tipeLabel(m.tipe)) + ' (global)</small><b>' + esc(P.opsiLabel(opsi)) + '</b></div></div>' : '<div class="note">Material ini belum memiliki Price Reference Purchase.</div>') +
+      '<div class="sect" style="text-align:center">REFERENSI HARGA (Book Price dan LME)</div>' + M.pen.plTable(M.pen.plFor(m.nama)) +
+      '<div class="hint" style="margin:8px 0 12px;text-align:center">Referensi untuk menentukan Costing Price. Non Ferrous: LME dalam USD dikali kurs (Rp); baris Dolar = USD. Ferrous hanya Book Price (Rp).</div>' +
+      M.fg('Material', '<input type="text" readonly value="' + esc(m.nama) + ' (' + esc(m.bentuk) + ', ' + esc(P.tipeLabel(m.tipe)) + ')">') +
+      M.fg('Maker', '<input type="text" readonly value="' + esc(m.bentuk === 'ROLL' ? m.maker : '(tanpa maker)') + '">', 'Roll: per maker; Sheet: tanpa maker') +
+      '<div class="grid2">' + M.fg('Last Purchase (USD)', '<input type="text" name="lp" readonly value="' + (po ? M.fmt(po.usd, 2) : '') + '" placeholder="Kosong">', po ? 'PO ' + esc(po.no) + ', incoming ' + M.dstr(po.tglIn) + ' (History Pembelian terakhir, otomatis)' : 'Belum ada riwayat PO incoming; Last Purchase dikosongkan') +
+      M.fg('Costing Price (USD)', '<input type="number" step="any" min="0" name="cp" required value="' + (cur ? cur.cp : '') + '">', po ? 'Harus lebih besar dari Last Purchase (' + M.fmt(po.usd, 2) + ')' : 'Input bebas') +
+      M.fg('Kurs', '<input type="text" name="kurs" readonly value="' + M.fmt(K, 0) + '">', 'Kurs terbaru dari Master Kurs') + M.fg('Masa Berlaku', '<input type="text" readonly value="' + esc(P.opsiLabel(opsi)) + '">', 'Global per tipe; diubah dari header kelompok pada daftar') +
+      M.fg('Last Purchase (Rp/Kg)', '<input type="text" readonly value="' + (lpRp == null ? '' : M.fmt(lpRp, 0)) + '">') + M.fg('Costing Price (Rp/Kg)', '<input type="text" name="cprp" readonly>') + '</div>' +
+      M.fg('File Evidence', '<input type="file">', 'Opsional') + M.fg('Note', '<textarea name="note"></textarea>', 'Opsional') +
+      '<div class="form-actions"><button class="btn btn-primary" type="submit">💾 Save</button></div></form>', {size:'xl'});
+    var f = b.querySelector('form');
+    function calc() { f.cprp.value = f.cp.value ? M.fmt(Math.round(f.cp.value * K), 0) : ''; }
+    f.cp.oninput = calc; calc();
+    f.onsubmit = function (e) { e.preventDefault(); if (!M.validate(f)) return;
+      if (po && !(+f.cp.value > po.usd)) { f.cp.classList.add('err'); f.cp.parentNode.querySelectorAll('.ferr').forEach(function (x) { x.remove(); }); f.cp.parentNode.insertAdjacentHTML('beforeend', '<div class="ferr">Costing Price harus lebih besar dari Last Purchase (' + M.fmt(po.usd, 2) + ' USD)</div>'); return; }
+      M.saveFlow({text:'Harga ' + m.nama + ' akan diperbarui dan Price Reference Costing diturunkan otomatis.', done:'Tersimpan. Price Reference Costing diperbarui otomatis.', save:function () { P.addPurchase(mid, +f.cp.value, K, f.note.value); refreshAll(); }}); };
+  }
+})();
+</script>
+</body>
+</html>

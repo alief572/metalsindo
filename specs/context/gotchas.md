@@ -122,4 +122,22 @@ gives the age. Past roughly a dozen entries, or a month, it is worth a pass.
 
 ## Entries
 
-_Empty. Append below._
+## draw.io CLI tidak menjalankan stackLayout: setiap lane BPMN butuh y eksplisit
+
+- **type:** tooling
+- **date:** 2026-11-10
+
+Pool BPMN dengan `childLayout=stackLayout` hanya menumpuk lane otomatis saat dibuka di editor draw.io. Saat diekspor lewat CLI (`draw.io.exe -x -f png`), semua lane menumpuk di y yang sama dan diagram tampak rusak.
+
+**Why:** CLI hanya merender geometri yang tertulis di file; layout dijalankan oleh editor. Lane tanpa atribut `y` pada `mxGeometry` jatuh ke 0.
+**How to apply:** saat membuat BPMN lewat skrip, tulis `y` kumulatif untuk tiap lane (mulai 20, setinggi title pool) dan tinggi pool = jumlah tinggi lane + 20. Baru kemudian ekspor dan periksa hasilnya.
+
+## Python di mesin ini dipanggil lewat py, bukan python
+
+- **type:** tooling
+- **date:** 2026-11-10
+
+Perintah `python` dan `python3` di Git Bash membuka alias Microsoft Store dan gagal; Python 3.14 dengan openpyxl terpasang dan dapat dipakai lewat `py` (mis. `py script.py`).
+
+**Why:** alias eksekusi aplikasi Windows menimpa `python` di PATH sebelum instalasi sungguhan.
+**How to apply:** pakai `py` untuk skrip openpyxl (workbook) dan pengecekan XML; contoh pengecekan di `document-writer-only/bpmn-conventions.md` perlu `py`, bukan `python`.

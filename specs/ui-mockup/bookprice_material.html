@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bookprice Material</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script src="assets/seed_sales.js"></script>
+<script>
+(function () {
+  var M = Mock, rows = M.seedS.bookprice;
+  var page = M.shell({key:'bookprice_material', title:'Bookprice Material', sub:'Harga acuan per material', module:'bookprice_material', crumb:'Master Data'});
+  page.innerHTML = '<div class="box primary"><div class="box-header"><span id="addw"></span><button class="btn btn-success btn-sm" id="tpl">⬇ Download Template</button></div><div class="box-body" id="tbl"></div></div>';
+  function addBtn() { M.$('#addw').innerHTML = M.perm.Add ? '<button class="btn btn-success btn-sm" id="up">⬆ Upload Excel</button>' : ''; if (M.perm.Add) M.$('#up').onclick = upload; }
+  addBtn(); M.onPerm(addBtn);
+  M.$('#tpl').onclick = function () { M.toast('Template bookprice_material.xlsx diunduh (simulasi)'); };
+
+  var t = M.table(M.$('#tbl'), {rows:function () { return rows; }, cols:[
+    {key:'alloy', label:'Type Alloy'}, {key:'material', label:'Nama Material'}, {key:'hardness', label:'Hardness'}, {key:'thickness', label:'Thickness'},
+    {key:'nilai', label:'Nilai Bookprice', html:function (r) { return '<span class="num" style="display:block">' + M.fmt(r.nilai, 2) + '</span>'; }, text:function (r) { return r.nilai; }}],
+    actions:{view:1}, onAction:function (a, id) { var r = rows.filter(function (x) { return String(x.id) === id; })[0];
+      M.modal('Detail Bookprice', '<dl class="dl"><dt>Type Alloy</dt><dd>' + M.esc(r.alloy) + '</dd><dt>Nama Material</dt><dd>' + M.esc(r.material) + '</dd><dt>Bentuk</dt><dd>' + M.esc(r.bentuk || '-') + '</dd><dt>Hardness</dt><dd>' + M.esc(r.hardness) + '</dd><dt>Thickness</dt><dd>' + M.esc(r.thickness) + '</dd><dt>Nilai Bookprice</dt><dd>Rp ' + M.fmt(r.nilai, 2) + ' / kg</dd></dl>', {size:'sm'}); }});
+  page.insertAdjacentHTML('beforeend', '<div class="note">Bookprice dipakai sebagai "Dasar Harga" pada pricelist dan penawaran (bottom price = bookprice + scrap + COGS + biaya operasional + bunga + profit).</div>');
+
+  function upload() {
+    var b = M.modal('Upload Bookprice (Excel)', '<form novalidate>' + M.fg('File Excel', '<input type="file" name="xls" accept=".xls,.xlsx" required>', 'Gunakan template. Baris dengan Nama Material yang sama akan diperbarui. Pada mockup, isi file disimulasikan: 1 baris baru dan 1 baris yang diperbarui.') +
+      '<div class="form-actions"><button class="btn btn-primary" type="submit">⬆ Upload</button></div></form>', {size:'sm'});
+    var f = b.querySelector('form');
+    f.onsubmit = function (e) { e.preventDefault(); if (!M.validate(f)) return;
+      var nm = (f.xls.files[0] ? f.xls.files[0].name : 'bookprice').replace(/\.[^.]+$/, '').toUpperCase();
+      M.saveFlow({text:'Data bookprice akan diunggah.', okText:'Ya, Upload!', done:'Upload berhasil: 1 baris baru ditambahkan dan 1 baris diperbarui (isi file disimulasikan).', save:function () {
+        var base = rows[0], id = rows.reduce(function (m, x) { return Math.max(m, +x.id || 0); }, 0) + 1;
+        rows.unshift(Object.assign({}, base, {id:id, material:'UPLOAD-' + nm, nilai:Math.round(base.nilai) + 1000}));
+        rows[1].nilai = Math.round(rows[1].nilai) + 500; t.refresh(); }}); };
+  }
+})();
+</script>
+</body>
+</html>

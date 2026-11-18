@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventory Level 1 - Type</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script>
+(function () {
+  var M = Mock, rows = M.seed.type;
+  var page = M.shell({key:'inventory_1', title:'Inventory Type', sub:'Level 1', module:'inventory_1'});
+  page.innerHTML = '<div class="box primary"><div class="box-header"><span id="addwrap"></span></div><div class="box-body" id="tbl"></div></div>';
+
+  function addBtn() { M.$('#addwrap').innerHTML = M.perm.Add ? '<button class="btn btn-success btn-sm" id="add">＋ Add</button>' : ''; if (M.perm.Add) M.$('#add').onclick = form; }
+  addBtn(); M.onPerm(addBtn);
+
+  var t = M.table(M.$('#tbl'), {
+    rows: function () { return rows; },
+    cols: [
+      {key:'id', label:'Id', width:'13%'},
+      {key:'nama', label:'Nama Type'},
+      {key:'aktif', label:'Status', html: function (r) { return M.badge(r.aktif); }, text: function (r) { return r.aktif === 'aktif' ? 'Aktif' : 'Non Aktif'; }}
+    ],
+    actions: {view:1, edit:1, del:1},
+    onAction: function (a, id) {
+      var r = rows.filter(function (x) { return x.id === id; })[0];
+      if (a === 'view') view(r); else if (a === 'edit') form(r);
+      else M.delFlow('Data Inventory akan di hapus.', 'Data Inventory berhasil dihapus.', function () { rows.splice(rows.indexOf(r), 1); t.refresh(); });
+    }
+  });
+
+  function view(r) {
+    M.modal('Detail Inventory', '<dl class="dl"><dt>Id</dt><dd>' + M.esc(r.id) + '</dd><dt>Nama Type</dt><dd>' + M.esc(r.nama) + '</dd><dt>Status</dt><dd>' + M.badge(r.aktif) + '</dd></dl>');
+  }
+
+  function form(r) {
+    var edit = r && r.id;
+    var b = M.modal(edit ? 'Edit Inventory' : 'Tambah Inventory',
+      '<form novalidate>' +
+      M.fg('Nama Type', '<input type="text" name="nama" required placeholder="Nama Type" value="' + M.esc(edit ? r.nama : '') + '">') +
+      (edit ? M.fg('Status', '<div class="radio-row"><label><input type="radio" name="aktif" value="aktif"' + (r.aktif === 'aktif' ? ' checked' : '') + '> Aktif</label>' +
+        '<label><input type="radio" name="aktif" value="nonaktif"' + (r.aktif !== 'aktif' ? ' checked' : '') + '> Non Aktif</label></div>') : '') +
+      '<div class="form-actions"><button class="btn btn-primary" type="submit">💾 Save</button></div></form>');
+    b.querySelector('form').onsubmit = function (e) {
+      e.preventDefault(); var f = e.target; if (!M.validate(f)) return;
+      M.saveFlow({text:'Data Inventory akan di simpan.', done:'Data Inventory berhasil disimpan.',
+        save: function () {
+          var nama = f.nama.value.trim().toUpperCase();
+          if (edit) { r.nama = nama; r.aktif = f.aktif.value; }
+          else rows.push({id:M.nextId('I20', rows), nama:nama, aktif:'aktif'});
+          t.refresh();
+        }});
+    };
+  }
+})();
+</script>
+</body>
+</html>

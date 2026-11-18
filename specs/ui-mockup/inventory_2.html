@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventory Level 2 - Ferrous / Non Ferrous</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script>
+(function () {
+  var M = Mock, S = M.seed, rows = S.cat1;
+  var page = M.shell({key:'inventory_2', title:'Inventory Category', sub:'Level 2 - Ferrous / Non Ferrous', module:'inventory_2'});
+  page.innerHTML = '<div class="box primary"><div class="box-header"><span id="addwrap"></span></div><div class="box-body" id="tbl"></div></div>';
+  function typeName(id) { var t = S.type.filter(function (x) { return x.id === id; })[0]; return t ? t.nama : '-'; }
+
+  function addBtn() { M.$('#addwrap').innerHTML = M.perm.Add ? '<button class="btn btn-success btn-sm" id="add">＋ Add</button>' : ''; if (M.perm.Add) M.$('#add').onclick = function () { form(); }; }
+  addBtn(); M.onPerm(addBtn);
+
+  var t = M.table(M.$('#tbl'), {
+    rows: function () { return rows; },
+    cols: [
+      {key:'id', label:'Id Category', width:'13%'},
+      {label:'Nama Type', text: function (r) { return typeName(r.id_type); }},
+      {key:'nama', label:'Nama Category'},
+      {label:'Status', html: function (r) { return M.badge(r.aktif); }, text: function (r) { return r.aktif === 'aktif' ? 'Aktif' : 'Non Aktif'; }}
+    ],
+    actions: {view:1, edit:1, del:1},
+    onAction: function (a, id) {
+      var r = rows.filter(function (x) { return x.id === id; })[0];
+      if (a === 'view') view(r); else if (a === 'edit') form(r);
+      else M.delFlow('Data Inventory akan di hapus.', 'Data Inventory berhasil dihapus.', function () { rows.splice(rows.indexOf(r), 1); t.refresh(); });
+    }
+  });
+
+  function view(r) {
+    M.modal('Detail Inventory',
+      '<dl class="dl"><dt>Id Category</dt><dd>' + M.esc(r.id) + '</dd><dt>Inventory Type</dt><dd>' + M.esc(typeName(r.id_type)) + '</dd>' +
+      '<dt>Nama Category</dt><dd>' + M.esc(r.nama) + '</dd><dt>Status</dt><dd>' + M.badge(r.aktif) + '</dd>' +
+      '<dt>Name Compotition</dt><dd>' + (r.komposisi.length ? r.komposisi.map(function (k) { return '<span class="tag">' + M.esc(k) + '</span>'; }).join('') : '<em>-</em>') + '</dd></dl>');
+  }
+
+  function compRow(v) { return '<tr><td><input type="text" name="komp" value="' + M.esc(v || '') + '"></td><td align="center" style="width:70px"><button type="button" class="btn btn-sm btn-danger del" title="Hapus Data">🗑</button></td></tr>'; }
+
+  function form(r) {
+    var edit = r && r.id;
+    var b = M.modal(edit ? 'Edit Inventory' : 'Tambah Inventory',
+      '<form novalidate>' +
+      M.fg('Inventory Type', '<select name="id_type" required>' + M.opts(S.type.filter(function (x) { return x.aktif === 'aktif'; }), edit ? r.id_type : '', 'id', 'nama', '-- inventory --') + '</select>') +
+      M.fg('Inventory Name', '<input type="text" name="nama" required placeholder="Nama Inventory" value="' + M.esc(edit ? r.nama : '') + '">') +
+      (edit ? M.fg('Status', '<div class="radio-row"><label><input type="radio" name="aktif" value="aktif"' + (r.aktif === 'aktif' ? ' checked' : '') + '> Aktif</label>' +
+        '<label><input type="radio" name="aktif" value="nonaktif"' + (r.aktif !== 'aktif' ? ' checked' : '') + '> Non Aktif</label></div>') : '') +
+      '<div class="fsec">Komposisi <button type="button" class="btn btn-sm btn-success pull-right" id="addc">＋ Add</button></div>' +
+      '<table class="mini"><thead><tr><th>Name Compotition</th><th>Action</th></tr></thead><tbody id="comp">' +
+      (edit ? r.komposisi.map(compRow).join('') : '') + '</tbody></table>' +
+      '<div class="form-actions" style="justify-content:center"><button class="btn btn-success" type="submit">💾 Simpan</button></div></form>', {size:'sm'});
+    var comp = b.querySelector('#comp');
+    b.querySelector('#addc').onclick = function () { comp.insertAdjacentHTML('beforeend', compRow('')); };
+    comp.onclick = function (e) { var d = e.target.closest('.del'); if (d) d.closest('tr').remove(); };
+    b.querySelector('form').onsubmit = function (e) {
+      e.preventDefault(); var f = e.target; if (!M.validate(f)) return;
+      M.saveFlow({text:'Data akan diproses dan tidak dapat diulang.', done:'Data Inventory berhasil disimpan.', okText:'Ya, Proses!',
+        save: function () {
+          var kom = Array.prototype.map.call(f.querySelectorAll('[name=komp]'), function (i) { return i.value.trim(); }).filter(Boolean);
+          var nama = f.nama.value.trim().toUpperCase();
+          if (edit) { r.id_type = f.id_type.value; r.nama = nama; r.aktif = f.aktif.value; r.komposisi = kom; }
+          else rows.push({id:M.nextId('I20', rows), id_type:f.id_type.value, nama:nama, aktif:'aktif', komposisi:kom});
+          t.refresh();
+        }});
+    };
+  }
+})();
+</script>
+</body>
+</html>

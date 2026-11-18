@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Master LME</title>
+<link rel="stylesheet" href="assets/mock.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="assets/mock.js"></script>
+<script src="assets/seed_sales.js"></script>
+<script>
+(function () {
+  var M = Mock, hist = M.seedS.lme, EL = ['Cu', 'Zn', 'Sn', 'Ni', 'Ag', 'Al'];
+  var page = M.shell({key:'master_lme', title:'Master LME', sub:'Harga LME harian & rate', module:'master_lme', crumb:'Master Data'});
+  var host = document.createElement('div'); host.className = 'box primary'; host.innerHTML = '<div class="box-body" id="tabs"></div>'; page.appendChild(host);
+
+  function sorted() { return hist.slice().sort(function (a, b) { return a.tgl < b.tgl ? 1 : a.tgl > b.tgl ? -1 : 0; }); }
+  function atOrBefore(days) { // nilai terakhir pada atau sebelum (tanggal terbaru - days)
+    var s = sorted(), d0 = new Date(s[0].tgl + 'T00:00:00'); d0.setDate(d0.getDate() - days);
+    var lim = d0.toISOString().slice(0, 10); return s.filter(function (x) { return x.tgl <= lim; })[0] || s[s.length - 1]; }
+
+  function historyPane(el) {
+    el.innerHTML = '<div style="margin-bottom:8px"><span class="addw"></span></div><div class="tb"></div>';
+    function addBtn() { el.querySelector('.addw').innerHTML = M.perm.Add ? '<button class="btn btn-success btn-sm">＋ Input Harga LME</button>' : ''; var b = el.querySelector('.addw button'); if (b) b.onclick = input; }
+    var cols = [{key:'tgl', label:'Update Date', html:function (r) { return M.dstr(r.tgl); }, text:function (r) { return r.tgl; }}, {key:'by', label:'Update By'}]
+      .concat(EL.map(function (e) { return {label:e.toLowerCase(), html:function (r) { return '<span class="num" style="display:block">' + M.fmt(r.v[e] || 0, 0) + '</span>'; }, text:function (r) { return r.v[e] || 0; }}; }));
+    var t = M.table(el.querySelector('.tb'), {rows:sorted, cols:cols});
+    el.insertAdjacentHTML('beforeend', '<div class="note">Satuan: Rp per kg (nilai LME per komposisi, sudah dikonversi dengan kurs saat input).</div>');
+    addBtn(); M.onPerm(addBtn);
+    function input() {
+      var b = M.modal('Input Harga LME', '<form novalidate>' + M.fg('Tanggal LME', '<input type="text" name="tgl" required value="' + new Date().toISOString().slice(0, 10) + '">', 'Format YYYY-MM-DD') +
+        EL.map(function (e) { return M.fg(e, '<input type="number" step="any" name="' + e + '" required value="0">'); }).join('') +
+        '<div class="form-actions"><button class="btn btn-primary" type="submit">💾 Save</button></div></form>', {size:'sm'});
+      var f = b.querySelector('form'); f.onsubmit = function (e) { e.preventDefault(); if (!M.validate(f)) return;
+        M.saveFlow({text:'Harga LME akan disimpan.', done:'Harga LME berhasil disimpan.', save:function () { var v = {}; EL.forEach(function (x) { v[x] = +f[x].value; });
+          hist.push({id:'HL' + (hist.length + 2601597), tgl:f.tgl.value, v:v, by:'admin'}); t.refresh(); }}); }; }
+  }
+  function ratePane(el) {
+    var now = sorted()[0], d10 = atOrBefore(10), d30 = atOrBefore(30);
+    el.innerHTML = '<div class="sumbox"><div><small>Rate saat ini</small><b>' + M.dstr(now.tgl) + '</b></div><div><small>Rate H-10</small><b>' + M.dstr(d10.tgl) + '</b></div><div><small>Rate H-30</small><b>' + M.dstr(d30.tgl) + '</b></div></div>' +
+      M.stable([{label:'Komposisi', key:'k'}, {label:'Rate H-30', cls:'num', html:function (r) { return M.fmt(r.a, 0); }}, {label:'Rate H-10', cls:'num', html:function (r) { return M.fmt(r.b, 0); }}, {label:'Rate Saat Ini', cls:'num', html:function (r) { return '<b>' + M.fmt(r.c, 0) + '</b>'; }}],
+        EL.map(function (e) { return {k:e, a:d30.v[e] || 0, b:d10.v[e] || 0, c:now.v[e] || 0}; })) +
+      '<div class="note">Rate dipakai pricelist Non Ferrous (Bottom Price by LME 10 hari / 1 bulan / Spot) dan perhitungan penawaran.</div>';
+  }
+  M.tabs(M.$('#tabs'), [{label:'History LME', render:historyPane}, {label:'Rate LME', render:ratePane}]);
+})();
+</script>
+</body>
+</html>
