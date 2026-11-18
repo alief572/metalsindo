@@ -181,7 +181,7 @@ class Control_do extends Admin_Controller
                 }
                 $qty_fg = (float) str_replace(',', '', $d['qty_fg']);
                 $qty_fg_sheet = 0;
-                if (isset($d['qty_fg    _sheet'])) {
+                if (isset($d['qty_fg_sheet'])) {
                     $qty_fg_sheet = (float) str_replace(',', '', $d['qty_fg_sheet']);
                 }
                 $qty_ng = (float) str_replace(',', '', $d['qty_ng']);
@@ -470,56 +470,32 @@ class Control_do extends Admin_Controller
 
     public function download_excel()
     {
-        $tahun = $this->input->get('tahun', true);
-        $bulan = $this->input->get('bulan', true);
-        $no_do = $this->input->get('no_do', true);
-        $no_spk = $this->input->get('no_spk', true);
-        $customer = $this->input->get('customer', true);
+        $this->auth->restrict($this->viewPermission);
 
-        // Your Excel download logic here
+        // Pakai filter & query yang sama persis dengan grid (get_data_control_do)
+        $this->_filter_control_do($this->_get_filter_params('get'));
         $this->db->select('a.*, b.name_customer');
-        $this->db->from('tr_delivery_order a');
-        $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
-        $this->db->where('a.deleted', null);
-        $this->db->where('a.close_do', null);
-
-        if (!empty($tahun)) {
-            $this->db->where('YEAR(a.tgl_delivery_order)', $tahun);
-        }
-        if (!empty($bulan)) {
-            $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
-        }
-        if (!empty($no_do)) {
-            $this->db->where('a.no_surat', $no_do);
-        }
-        if (!empty($no_spk)) {
-            $this->db->where('a.no_spk_marketing', $no_spk);
-        }
-        if (!empty($customer)) {
-            $this->db->where('b.id_customer', $customer);
-        }
-
         $this->db->group_by('a.id_delivery_order');
+        $this->db->order_by('a.id_delivery_order', 'desc');
         $get_data_control_do = $this->db->get()->result();
 
-        $arr_total_do = [];
-        $arr_total_delivered = [];
+        // Total per DO (sama dengan yang tampil di grid)
+        $arr_totals = [];
         foreach ($get_data_control_do as $do_item) {
-            $totals = $this->control_do_model->get_total_do($do_item->id_delivery_order);
-            $arr_total_do[$do_item->id_delivery_order] = $totals->total_do;
-            $arr_total_delivered[$do_item->id_delivery_order] = $totals->total_delivered;
+            $arr_totals[$do_item->id_delivery_order] = $this->control_do_model->get_total_do($do_item->id_delivery_order);
         }
 
         $data = [
             'data_control_do' => $get_data_control_do,
-            'arr_total_do' => $arr_total_do,
-            'arr_total_delivered' => $arr_total_delivered
+            'arr_totals' => $arr_totals
         ];
         $this->load->view('download_excel', $data);
     }
 
     public function download_excel_scrap()
     {
+        $this->auth->restrict($this->viewPermission);
+
         $tahun = $this->input->get('tahun', true);
         $bulan = $this->input->get('bulan', true);
         $no_do = $this->input->get('no_do', true);
@@ -545,36 +521,63 @@ class Control_do extends Admin_Controller
             $this->db->where('a.no_spk_marketing', $no_spk);
         }
         if (!empty($customer)) {
-            $this->db->where('b.id_customer', $customer);
+            $this->db->where('a.id_customer', $customer);
+        }
+        $search = $this->input->get('search', true);
+        if (!empty($search)) {
+            $this->db->group_start();
+            $this->db->like('a.tgl_delivery_order', $search, 'both');
+            $this->db->or_like('a.no_surat', $search, 'both');
+            $this->db->or_like('a.no_spk_marketing', $search, 'both');
+            $this->db->or_like('c.name_customer', $search, 'both');
+            $this->db->group_end();
         }
         $this->db->group_by('a.id_delivery_order');
         $get_data_control_do = $this->db->get()->result();
 
-        $arr_total_do = [];
-        $arr_total_delivered = [];
+        $arr_totals = [];
         foreach ($get_data_control_do as $do_item) {
-            $totals = $this->control_do_model->get_total_do_scrap($do_item->id_delivery_order);
-            $arr_total_do[$do_item->id_delivery_order] = $totals->total_do;
-            $arr_total_delivered[$do_item->id_delivery_order] = $totals->total_delivered;
+            $arr_totals[$do_item->id_delivery_order] = $this->control_do_model->get_total_do_scrap($do_item->id_delivery_order);
         }
 
         $data = [
             'data_control_do' => $get_data_control_do,
-            'arr_total_do' => $arr_total_do,
-            'arr_total_delivered' => $arr_total_delivered
+            'arr_totals' => $arr_totals
         ];
         $this->load->view('download_excel_scrap', $data);
     }
 
-    private function _filter_control_do()
+    /**
+     * Ambil parameter filter dari request (POST untuk grid, GET untuk download)
+     */
+    private function _get_filter_params($method = 'post')
     {
-        $tahun    = $this->input->post('tahun', true);
-        $bulan    = $this->input->post('bulan', true);
-        $no_do    = $this->input->post('no_do', true);
-        $no_spk   = $this->input->post('no_spk', true);
-        $customer = $this->input->post('customer', true);
-        $search   = $this->input->post('search', true);
-        $searchValue = isset($search['value']) ? $search['value'] : null;
+        $search = $this->input->$method('search', true);
+        if (is_array($search)) {
+            $search = isset($search['value']) ? $search['value'] : null;
+        }
+
+        return [
+            'tahun'    => $this->input->$method('tahun', true),
+            'bulan'    => $this->input->$method('bulan', true),
+            'no_do'    => $this->input->$method('no_do', true),
+            'no_spk'   => $this->input->$method('no_spk', true),
+            'customer' => $this->input->$method('customer', true),
+            'search'   => $search
+        ];
+    }
+
+    private function _filter_control_do($params = null)
+    {
+        if ($params === null) {
+            $params = $this->_get_filter_params('post');
+        }
+        $tahun       = $params['tahun'];
+        $bulan       = $params['bulan'];
+        $no_do       = $params['no_do'];
+        $no_spk      = $params['no_spk'];
+        $customer    = $params['customer'];
+        $searchValue = $params['search'];
 
         $this->db->from('tr_delivery_order a');
         $this->db->join('master_customers b', 'b.id_customer = a.id_customer');
@@ -585,7 +588,7 @@ class Control_do extends Admin_Controller
         if (!empty($bulan))    $this->db->where('MONTH(a.tgl_delivery_order)', $bulan);
         if (!empty($no_do))    $this->db->where('a.no_surat', $no_do);
         if (!empty($no_spk))   $this->db->where('a.no_spk_marketing', $no_spk);
-        if (!empty($customer)) $this->db->where('b.id_customer', $customer);
+        if (!empty($customer)) $this->db->where('a.id_customer', $customer);
 
         if (!empty($searchValue)) {
             $this->db->group_start();
@@ -714,7 +717,7 @@ class Control_do extends Admin_Controller
             $this->db->where('a.no_spk_marketing', $no_spk);
         }
         if (!empty($customer)) {
-            $this->db->where('b.id_customer', $customer);
+            $this->db->where('a.id_customer', $customer);
         }
         $this->db->group_by('a.id_delivery_order');
         $count_all = $this->db->get()->num_rows();
@@ -741,7 +744,7 @@ class Control_do extends Admin_Controller
             $this->db->where('a.no_spk_marketing', $no_spk);
         }
         if (!empty($customer)) {
-            $this->db->where('b.id_customer', $customer);
+            $this->db->where('a.id_customer', $customer);
         }
 
         if (!empty($search)) {
@@ -778,7 +781,7 @@ class Control_do extends Admin_Controller
             $this->db->where('a.no_spk_marketing', $no_spk);
         }
         if (!empty($customer)) {
-            $this->db->where('b.id_customer', $customer);
+            $this->db->where('a.id_customer', $customer);
         }
 
         if (!empty($search)) {

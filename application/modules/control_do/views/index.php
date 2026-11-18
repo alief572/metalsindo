@@ -763,28 +763,30 @@ $ENABLE_DELETE  = has_permission('Control_DO.Delete');
 		datatables_scrap();
 	}
 
+	function buildDownloadUrl(method, prefix, tableId) {
+		// Filter diambil dari dropdown, lalu grid di-refresh agar tampilan = isi Excel
+		var params = {
+			tahun: $('select[name="' + prefix + 'tahun"]').val() || '',
+			bulan: $('select[name="' + prefix + 'bulan"]').val() || '',
+			no_do: $('select[name="' + prefix + 'no_do"]').val() || '',
+			no_spk: $('select[name="' + prefix + 'no_spk"]').val() || '',
+			customer: $('select[name="' + prefix + 'customer"]').val() || '',
+			search: ''
+		};
+		if ($.fn.dataTable.isDataTable('#' + tableId)) {
+			params.search = $('#' + tableId).DataTable().search() || '';
+		}
+		return siteurl + active_controller + method + '?' + $.param(params);
+	}
+
 	function downloadExcel() {
-		var tahun = $('select[name="filter_tahun"]').val();
-		var bulan = $('select[name="filter_bulan"]').val();
-		var no_do = $('select[name="filter_no_do"]').val();
-		var no_spk = $('select[name="filter_no_spk"]').val();
-		var customer = $('select[name="filter_customer"]').val();
-
-		var url = siteurl + active_controller + 'download_excel?tahun=' + encodeURIComponent(tahun || '') + '&bulan=' + encodeURIComponent(bulan || '') + '&no_do=' + encodeURIComponent(no_do || '') + '&no_spk=' + encodeURIComponent(no_spk || '') + '&customer=' + encodeURIComponent(customer || '');
-
-		window.open(url, '_blank');
+		datatables();
+		window.open(buildDownloadUrl('download_excel', 'filter_', 'example2'), '_blank');
 	}
 
 	function downloadExcelScrap() {
-		var tahun = $('select[name="filter_scrap_tahun"]').val();
-		var bulan = $('select[name="filter_scrap_bulan"]').val();
-		var no_do = $('select[name="filter_scrap_no_do"]').val();
-		var no_spk = $('select[name="filter_scrap_no_spk"]').val();
-		var customer = $('select[name="filter_scrap_customer"]').val();
-
-		var url = siteurl + active_controller + 'download_excel_scrap?tahun=' + encodeURIComponent(tahun || '') + '&bulan=' + encodeURIComponent(bulan || '') + '&no_do=' + encodeURIComponent(no_do || '') + '&no_spk=' + encodeURIComponent(no_spk || '') + '&customer=' + encodeURIComponent(customer || '');
-
-		window.open(url, '_blank');
+		datatables_scrap();
+		window.open(buildDownloadUrl('download_excel_scrap', 'filter_scrap_', 'example3'), '_blank');
 	}
 
 	function datatables() {
