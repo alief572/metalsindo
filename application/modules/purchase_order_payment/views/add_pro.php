@@ -36,7 +36,7 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="">DPP</label>
-            <input type="text" name="total_pembelian" id="" class="form-control form-control-sm text-right total_pembelian" value="<?= number_format($base_dpp, 2) ?>" readonly>
+            <input type="text" name="total_pembelian" id="" class="form-control form-control-sm text-right total_pembelian" value="<?= number_format($base_dpp - $nilai_ppn , 2) ?>" readonly>
         </div>
     </div>
     <div class="col-md-6">
