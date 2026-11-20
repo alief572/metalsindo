@@ -155,7 +155,39 @@ class Retur_pmb_cn_model extends BF_Model
 		$this->db->from('dt_retur_pembelian a');
 		$this->db->where('a.id_header', $retur_header->no_surat);
 		$this->db->order_by('a.id', 'asc');
-		$detail = $this->db->get()->result();
+		$retur_detail = $this->db->get()->result();
+
+		// Sumber utama detail SJ = detail DN (sama dengan halaman View DN).
+		// Detail retur hanya dipakai untuk melengkapi lot, qty order, qty receive & qty sheet.
+		$this->db->select('a.*');
+		$this->db->from('dt_dn_retur_pmb a');
+		$this->db->where('a.id_cn', $dn_header->no_surat);
+		$this->db->order_by('a.id', 'asc');
+		$dn_detail = $this->db->get()->result();
+
+		if (empty($dn_detail)) {
+			$detail = $retur_detail;
+		} else {
+			$retur_by_po_detail = array();
+			foreach ($retur_detail as $item) {
+				$retur_by_po_detail[(string) $item->id_detail_po][] = $item;
+			}
+			$detail = array();
+			foreach ($dn_detail as $item) {
+				$key = (string) $item->id_detail_po;
+				$match = !empty($retur_by_po_detail[$key]) ? array_shift($retur_by_po_detail[$key]) : null;
+				$row = $match ? clone $match : new stdClass();
+				$row->id_material = $item->id_material;
+				$row->nama_material = $item->nama_material;
+				$row->width = $item->width;
+				$row->no_po = $item->no_po;
+				$row->jumlah_retur = $item->qty;
+				$row->harga_satuan = $item->unit_price;
+				$row->grand_total = $item->grand_total;
+				$row->from_retur = $match !== null;
+				$detail[] = $row;
+			}
+		}
 		$supplier = !empty($retur_header->id_supplier) ? $this->get_supplier($retur_header->id_supplier) : null;
 
 		$po_numbers = array_values(array_filter(array_map('trim', explode(',', (string) $retur_header->no_po)), 'strlen'));
@@ -191,7 +223,9 @@ class Retur_pmb_cn_model extends BF_Model
 		$rows = array();
 		foreach ($detail as $item) {
 			$row = clone $item;
-			$is_sheet = isset($material_shapes[$item->id_material]) && $material_shapes[$item->id_material] === 'B2000002';
+			// Qty sheet hanya tersedia di detail retur; tanpa data retur tampilkan KGS dari detail DN.
+			$is_sheet = isset($material_shapes[$item->id_material]) && $material_shapes[$item->id_material] === 'B2000002'
+				&& (!isset($item->from_retur) || $item->from_retur);
 			$receive_field = $is_sheet ? 'qty_sheet' : 'qty_receive';
 			$retur_field = $is_sheet ? 'qty_sheet_retur' : 'jumlah_retur';
 			$row->print_receive = isset($item->$receive_field) ? (float) $item->$receive_field : null;

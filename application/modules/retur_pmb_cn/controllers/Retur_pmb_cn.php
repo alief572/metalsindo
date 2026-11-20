@@ -264,6 +264,7 @@ class Retur_pmb_cn extends Admin_Controller
 			$this->db->like('a.no_surat', $search['value'], 'both');
 			$this->db->or_like('a.nm_supplier', $search['value'], 'both');
 			$this->db->or_like('a.alasan_retur', $search['value'], 'both');
+			$this->db->or_like('DATE_FORMAT(a.tgl_retur, "%d %M %Y")', $search['value'], 'both');
 			$this->db->group_end();
 		}
 
@@ -308,6 +309,7 @@ class Retur_pmb_cn extends Admin_Controller
 				'no_cn' => $item->no_surat,
 				'nama_supplier' => $item->nm_supplier,
 				'nomor_po' => $no_surat_po,
+				'tanggal_retur' => (!empty($item->tgl_retur) && substr($item->tgl_retur, 0, 4) !== '0000') ? date('d F Y', strtotime($item->tgl_retur)) : '',
 				'alasan_retur' => $item->alasan_retur,
 				'action' => $action
 			];

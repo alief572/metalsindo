@@ -232,7 +232,14 @@
             total_pembelian = parseFloat(total_pembelian);
         }
 
-        var value_dp = (total_pembelian * persen_dp / 100);
+        var nilai_ppn = $('.nilai_ppn').val();
+        nilai_ppn = (nilai_ppn == '' || nilai_ppn == null) ? 0 : parseFloat(nilai_ppn.split(',').join(''));
+
+        if (isNaN(persen_dp)) {
+            persen_dp = 0;
+        }
+
+        var value_dp = (total_pembelian * (persen_dp / 100)) + (nilai_ppn * (persen_dp / 100));
 
         $('.value_dp').val(value_dp.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     });
@@ -266,7 +273,11 @@
             total_pembelian = parseFloat(total_pembelian);
         }
 
-        var persen_dp = parseFloat((value_dp / total_pembelian) * 100);
+        var nilai_ppn = $('.nilai_ppn').val();
+        nilai_ppn = (nilai_ppn == '' || nilai_ppn == null) ? 0 : parseFloat(nilai_ppn.split(',').join(''));
+
+        var total_dpp_ppn = total_pembelian + nilai_ppn;
+        var persen_dp = total_dpp_ppn > 0 ? (value_dp / total_dpp_ppn) * 100 : 0;
         $('.value_dp').val(value_dp.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
         $('.persen_dp').val(persen_dp.toFixed(2));
     });
