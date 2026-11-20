@@ -1345,7 +1345,7 @@ class Delivery_order extends Admin_Controller
 		$code 		= $this->Delivery_order_model->generate_code();
 		$no_surat 	= $this->Delivery_order_model->BuatNomor($post['no_surat']);
 
-		$tipe = $post['tipe'];
+		$tipe = isset($post['tipe']) ? $post['tipe'] : 'reguler';
 
 		if ($tipe == 'retur') {
 			$type = 'retur';
@@ -1400,35 +1400,35 @@ class Delivery_order extends Admin_Controller
 
 				$idstock = $this->db->query("SELECT * FROM stock_material WHERE lotno='$lotno'")->row();
 
-				$ArrDetail[$val . $vaX]['id_delivery_order']		= $code;
-				$ArrDetail[$val . $vaX]['id_dt_delivery_order']	= $code . '-' . $numb1;
-				$ArrDetail[$val . $vaX]['id_material']		    = $dt['id_material'];
-				$ArrDetail[$val . $vaX]['nm_material']		    = $dt['material'];
-				$ArrDetail[$val . $vaX]['no_alloy']		        = $dt['no_alloy'];
-				$ArrDetail[$val . $vaX]['thickness']		        = $dt['thickness'];
-				$ArrDetail[$val . $vaX]['width']		        	= str_replace(',', '', $dt['width']);
-				$ArrDetail[$val . $vaX]['length']		        	= str_replace(',', '', $dt['length']);
-				$ArrDetail[$val . $vaX]['qty_order']			    = str_replace(',', '', $dt['qty_produk']);
+				$ArrDetail[$val]['id_delivery_order']		= $code;
+				$ArrDetail[$val]['id_dt_delivery_order']	= $code . '-' . $numb1;
+				$ArrDetail[$val]['id_material']		    = $dt['id_material'];
+				$ArrDetail[$val]['nm_material']		    = $dt['material'];
+				$ArrDetail[$val]['no_alloy']		        = $dt['no_alloy'];
+				$ArrDetail[$val]['thickness']		        = $dt['thickness'];
+				$ArrDetail[$val]['width']		        	= str_replace(',', '', $dt['width']);
+				$ArrDetail[$val]['length']		        	= str_replace(',', '', $dt['length']);
+				$ArrDetail[$val]['qty_order']			    = str_replace(',', '', $dt['qty_produk']);
 
-				$ArrDetail[$val . $vaX]['id_stock']			    = $id_stock;
-				$ArrDetail[$val . $vaX]['qty']			    	= str_replace(',', '', $dt['qty']);
-				$ArrDetail[$val . $vaX]['weight']			    	= str_replace(',', '', $dt['weight']);
-				$ArrDetail[$val . $vaX]['qty_mat']			    = str_replace(',', '', $dt['qty_mat']);
-				$ArrDetail[$val . $vaX]['weight_mat']			    = str_replace(',', '', $dt['weight_mat']);
-				$ArrDetail[$val . $vaX]['remark']			    	= $dt['remarks'];
-				$ArrDetail[$val . $vaX]['bantuan']			    = $dt['bantuan'];
-				$ArrDetail[$val . $vaX]['id_dt_spkmarketing']	    = $dt['id_dt_spkmarketing'];
-				$ArrDetail[$val . $vaX]['lotno']			        = $dt['lot'];
-				$ArrDetail[$val . $vaX]['lot_slitting']			= $dt['lot'];
-				$ArrDetail[$val . $vaX]['part_number']			= $dt['part_number'];
+				$ArrDetail[$val]['id_stock']			    = $id_stock;
+				$ArrDetail[$val]['qty']			    	= str_replace(',', '', isset($dt['qty']) ? $dt['qty'] : $dt['qty_mat']);
+				$ArrDetail[$val]['weight']			    	= str_replace(',', '', isset($dt['weight']) ? $dt['weight'] : $dt['weight_mat']);
+				$ArrDetail[$val]['qty_mat']			    = str_replace(',', '', $dt['qty_mat']);
+				$ArrDetail[$val]['weight_mat']			    = str_replace(',', '', $dt['weight_mat']);
+				$ArrDetail[$val]['remark']			    	= $dt['remarks'];
+				$ArrDetail[$val]['bantuan']			    = $dt['bantuan'];
+				$ArrDetail[$val]['id_dt_spkmarketing']	    = isset($dt['id_dt_spkmarketing']) ? $dt['id_dt_spkmarketing'] : '';
+				$ArrDetail[$val]['lotno']			        = $dt['lot'];
+				$ArrDetail[$val]['lot_slitting']			= $dt['lot'];
+				$ArrDetail[$val]['part_number']			= isset($dt['part_number']) ? $dt['part_number'] : '';
 
 
-				$ArrDetail[$val . $vaX]['created_by']			    = $this->auth->user_id();
-				$ArrDetail[$val . $vaX]['created_on']			    = date('Y-m-d H:i:s');
+				$ArrDetail[$val]['created_by']			    = $this->auth->user_id();
+				$ArrDetail[$val]['created_on']			    = date('Y-m-d H:i:s');
 
-				$UpdateArr[$val . $vaX]['id']			    		= $dt['lot'];
-				$UpdateArr[$val . $vaX]['qty']			    	= str_replace(',', '', $dt['qty_mat']);
-				$UpdateArr[$val . $vaX]['weight']			    	= str_replace(',', '', $dt['weight_mat']);
+				$UpdateArr[$val]['id']			    		= $dt['lot'];
+				$UpdateArr[$val]['qty']			    	= str_replace(',', '', $dt['qty_mat']);
+				$UpdateArr[$val]['weight']			    	= str_replace(',', '', $dt['weight_mat']);
 			}
 		}
 
@@ -1444,34 +1444,34 @@ class Delivery_order extends Admin_Controller
 				$lotno2 = $dt2['lot'];
 				$idstock2 = $this->db->query("SELECT * FROM stock_material WHERE lotno='$lotno2'")->row();
 
-				$ArrDetail2[$val . $vaX]['id_delivery_order']		= $code;
-				$ArrDetail2[$val . $vaX]['id_dt_delivery_order']	= $code . '-' . $numb2;
-				$ArrDetail2[$val . $vaX]['id_material']		    = $dt2['id_material'];
-				$ArrDetail2[$val . $vaX]['nm_material']		    = $dt2['material'];
-				$ArrDetail2[$val . $vaX]['no_alloy']		        = $dt2['no_alloy'];
-				$ArrDetail2[$val . $vaX]['thickness']		        = $dt2['thickness'];
-				$ArrDetail2[$val . $vaX]['width']		        	= str_replace(',', '', $dt2['width']);
-				$ArrDetail2[$val . $vaX]['length']		        	= str_replace(',', '', $dt2['length']);
-				$ArrDetail2[$val . $vaX]['qty_order']			    = str_replace(',', '', $dt2['qty_produk']);
+				$ArrDetail2[$val]['id_delivery_order']		= $code;
+				$ArrDetail2[$val]['id_dt_delivery_order']	= $code . '-' . $numb2;
+				$ArrDetail2[$val]['id_material']		    = $dt2['id_material'];
+				$ArrDetail2[$val]['nm_material']		    = $dt2['material'];
+				$ArrDetail2[$val]['no_alloy']		        = $dt2['no_alloy'];
+				$ArrDetail2[$val]['thickness']		        = $dt2['thickness'];
+				$ArrDetail2[$val]['width']		        	= str_replace(',', '', $dt2['width']);
+				$ArrDetail2[$val]['length']		        	= str_replace(',', '', $dt2['length']);
+				$ArrDetail2[$val]['qty_order']			    = str_replace(',', '', $dt2['qty_produk']);
 
-				$ArrDetail2[$val . $vaX]['id_stock']			    = $idstock2->id_stock;
-				$ArrDetail2[$val . $vaX]['qty']			    	= str_replace(',', '', $dt2['qty']);
-				$ArrDetail2[$val . $vaX]['weight']			    	= str_replace(',', '', $dt2['weight']);
-				$ArrDetail2[$val . $vaX]['qty_mat']			    = str_replace(',', '', $dt2['qty_mat']);
-				$ArrDetail2[$val . $vaX]['weight_mat']			    = str_replace(',', '', $dt2['weight_mat']);
-				$ArrDetail2[$val . $vaX]['remark']			    	= $dt2['remarks'];
-				$ArrDetail2[$val . $vaX]['bantuan']			    = $dt2['bantuan'];
-				$ArrDetail2[$val . $vaX]['id_dt_spkmarketing']	    = $dt2['id_dt_spkmarketing'];
-				$ArrDetail2[$val . $vaX]['lotno']			        = $dt2['numberlot'];
-				$ArrDetail2[$val . $vaX]['lot_slitting']			= $dt2['lot'];
+				$ArrDetail2[$val]['id_stock']			    = $idstock2->id_stock;
+				$ArrDetail2[$val]['qty']			    	= str_replace(',', '', isset($dt2['qty']) ? $dt2['qty'] : $dt2['qty_mat']);
+				$ArrDetail2[$val]['weight']			    	= str_replace(',', '', isset($dt2['weight']) ? $dt2['weight'] : $dt2['weight_mat']);
+				$ArrDetail2[$val]['qty_mat']			    = str_replace(',', '', $dt2['qty_mat']);
+				$ArrDetail2[$val]['weight_mat']			    = str_replace(',', '', $dt2['weight_mat']);
+				$ArrDetail2[$val]['remark']			    	= $dt2['remarks'];
+				$ArrDetail2[$val]['bantuan']			    = $dt2['bantuan'];
+				$ArrDetail2[$val]['id_dt_spkmarketing']	    = isset($dt2['id_dt_spkmarketing']) ? $dt2['id_dt_spkmarketing'] : '';
+				$ArrDetail2[$val]['lotno']			        = $dt2['numberlot'];
+				$ArrDetail2[$val]['lot_slitting']			= $dt2['lot'];
 
 
-				$ArrDetail2[$val . $vaX]['created_by']			    = $this->auth->user_id();
-				$ArrDetail2[$val . $vaX]['created_on']			    = date('Y-m-d H:i:s');
+				$ArrDetail2[$val]['created_by']			    = $this->auth->user_id();
+				$ArrDetail2[$val]['created_on']			    = date('Y-m-d H:i:s');
 
-				$UpdateArr[$val . $vaX]['id']			    		= $dt2['lot'];
-				$UpdateArr[$val . $vaX]['qty']			    	= str_replace(',', '', $dt2['qty_mat']);
-				$UpdateArr[$val . $vaX]['weight']			    	= str_replace(',', '', $dt2['weight_mat']);
+				$UpdateArr[$val]['id']			    		= $dt2['lot'];
+				$UpdateArr[$val]['qty']			    	= str_replace(',', '', $dt2['qty_mat']);
+				$UpdateArr[$val]['weight']			    	= str_replace(',', '', $dt2['weight_mat']);
 			}
 		}
 
@@ -1480,12 +1480,12 @@ class Delivery_order extends Admin_Controller
 		$temp = [];
 		foreach ($UpdateArr as $val => $value) {
 			if (!array_key_exists($value['id'], $temp)) {
-				$temp[$value['id']]['qty'] 		= 0;
-				$temp[$value['id']]['weight'] 	= 0;
+				$temp[$value['id']]['qty'] 		= 0.0;
+				$temp[$value['id']]['weight'] 	= 0.0;
 			}
 			$temp[$value['id']]['id'] 		= $value['id'];
-			$temp[$value['id']]['qty'] 		+= $value['qty'];
-			$temp[$value['id']]['weight'] 	+= $value['weight'];
+			$temp[$value['id']]['qty'] 		+= (float) $value['qty'];
+			$temp[$value['id']]['weight'] 	+= (float) $value['weight'];
 		}
 
 		$ArrStock = array();
@@ -1604,34 +1604,34 @@ class Delivery_order extends Admin_Controller
 			$lotno = $dt['lot'];
 			$idstock = $this->db->query("SELECT * FROM stock_material WHERE lotno='$lotno'")->row();
 
-			$ArrDetail[$val . $vaX]['id_delivery_order']		= $id_delivery;
-			$ArrDetail[$val . $vaX]['id_dt_delivery_order']	= $id_delivery . '-' . $numb1;
-			$ArrDetail[$val . $vaX]['id_material']		    = $dt['id_material'];
-			$ArrDetail[$val . $vaX]['nm_material']		    = $dt['material'];
-			$ArrDetail[$val . $vaX]['no_alloy']		        = $dt['no_alloy'];
-			$ArrDetail[$val . $vaX]['thickness']		        = $dt['thickness'];
-			$ArrDetail[$val . $vaX]['width']		        	= str_replace(',', '', $dt['width']);
-			$ArrDetail[$val . $vaX]['length']		        	= str_replace(',', '', $dt['length']);
-			$ArrDetail[$val . $vaX]['qty_order']			    = str_replace(',', '', $dt['qty_produk']);
+			$ArrDetail[$val]['id_delivery_order']		= $id_delivery;
+			$ArrDetail[$val]['id_dt_delivery_order']	= $id_delivery . '-' . $numb1;
+			$ArrDetail[$val]['id_material']		    = $dt['id_material'];
+			$ArrDetail[$val]['nm_material']		    = $dt['material'];
+			$ArrDetail[$val]['no_alloy']		        = $dt['no_alloy'];
+			$ArrDetail[$val]['thickness']		        = $dt['thickness'];
+			$ArrDetail[$val]['width']		        	= str_replace(',', '', $dt['width']);
+			$ArrDetail[$val]['length']		        	= str_replace(',', '', $dt['length']);
+			$ArrDetail[$val]['qty_order']			    = str_replace(',', '', $dt['qty_produk']);
 
-			$ArrDetail[$val . $vaX]['id_stock']			    = $idstock->id_stock;
-			$ArrDetail[$val . $vaX]['qty']			    	= str_replace(',', '', $dt['qty']);
-			$ArrDetail[$val . $vaX]['weight']			    	= str_replace(',', '', $dt['weight']);
-			$ArrDetail[$val . $vaX]['qty_mat']			    = str_replace(',', '', $dt['qty_mat']);
-			$ArrDetail[$val . $vaX]['weight_mat']			    = str_replace(',', '', $dt['weight_mat']);
-			$ArrDetail[$val . $vaX]['remark']			    	= $dt['remarks'];
-			$ArrDetail[$val . $vaX]['bantuan']			    = $dt['bantuan'];
-			$ArrDetail[$val . $vaX]['id_dt_spkmarketing']	    = $dt['id_dt_spkmarketing'];
-			$ArrDetail[$val . $vaX]['lotno']			        = $dt['lot'];
-			$ArrDetail[$val . $vaX]['lot_slitting']			= $dt['lot'];
+			$ArrDetail[$val]['id_stock']			    = $idstock->id_stock;
+			$ArrDetail[$val]['qty']			    	= str_replace(',', '', $dt['qty']);
+			$ArrDetail[$val]['weight']			    	= str_replace(',', '', $dt['weight']);
+			$ArrDetail[$val]['qty_mat']			    = str_replace(',', '', $dt['qty_mat']);
+			$ArrDetail[$val]['weight_mat']			    = str_replace(',', '', $dt['weight_mat']);
+			$ArrDetail[$val]['remark']			    	= $dt['remarks'];
+			$ArrDetail[$val]['bantuan']			    = $dt['bantuan'];
+			$ArrDetail[$val]['id_dt_spkmarketing']	    = $dt['id_dt_spkmarketing'];
+			$ArrDetail[$val]['lotno']			        = $dt['lot'];
+			$ArrDetail[$val]['lot_slitting']			= $dt['lot'];
 
 
-			$ArrDetail[$val . $vaX]['created_by']			    = $this->auth->user_id();
-			$ArrDetail[$val . $vaX]['created_on']			    = date('Y-m-d H:i:s');
+			$ArrDetail[$val]['created_by']			    = $this->auth->user_id();
+			$ArrDetail[$val]['created_on']			    = date('Y-m-d H:i:s');
 
-			$UpdateArr[$val . $vaX]['id']			    		= $dt['lot'];
-			$UpdateArr[$val . $vaX]['qty']			    	= str_replace(',', '', $dt['qty_mat']);
-			$UpdateArr[$val . $vaX]['weight']			    	= str_replace(',', '', $dt['weight_mat']);
+			$UpdateArr[$val]['id']			    		= $dt['lot'];
+			$UpdateArr[$val]['qty']			    	= str_replace(',', '', $dt['qty_mat']);
+			$UpdateArr[$val]['weight']			    	= str_replace(',', '', $dt['weight_mat']);
 		}
 
 
@@ -1646,34 +1646,34 @@ class Delivery_order extends Admin_Controller
 				$lotno2 = $dt2['lot'];
 				$idstock2 = $this->db->query("SELECT * FROM stock_material WHERE lotno='$lotno2'")->row();
 
-				$ArrDetail2[$val . $vaX]['id_delivery_order']		= $id_delivery;
-				$ArrDetail2[$val . $vaX]['id_dt_delivery_order']	= $id_delivery . '-' . $numb2;
-				$ArrDetail2[$val . $vaX]['id_material']		    = $dt2['id_material'];
-				$ArrDetail2[$val . $vaX]['nm_material']		    = $dt2['material'];
-				$ArrDetail2[$val . $vaX]['no_alloy']		        = $dt2['no_alloy'];
-				$ArrDetail2[$val . $vaX]['thickness']		        = $dt2['thickness'];
-				$ArrDetail2[$val . $vaX]['width']		        	= str_replace(',', '', $dt2['width']);
-				$ArrDetail2[$val . $vaX]['length']		        	= str_replace(',', '', $dt2['length']);
-				$ArrDetail2[$val . $vaX]['qty_order']			    = str_replace(',', '', $dt2['qty_produk']);
+				$ArrDetail2[$val]['id_delivery_order']		= $id_delivery;
+				$ArrDetail2[$val]['id_dt_delivery_order']	= $id_delivery . '-' . $numb2;
+				$ArrDetail2[$val]['id_material']		    = $dt2['id_material'];
+				$ArrDetail2[$val]['nm_material']		    = $dt2['material'];
+				$ArrDetail2[$val]['no_alloy']		        = $dt2['no_alloy'];
+				$ArrDetail2[$val]['thickness']		        = $dt2['thickness'];
+				$ArrDetail2[$val]['width']		        	= str_replace(',', '', $dt2['width']);
+				$ArrDetail2[$val]['length']		        	= str_replace(',', '', $dt2['length']);
+				$ArrDetail2[$val]['qty_order']			    = str_replace(',', '', $dt2['qty_produk']);
 
-				$ArrDetail2[$val . $vaX]['id_stock']			    = $idstock2->id_stock;
-				$ArrDetail2[$val . $vaX]['qty']			    	= str_replace(',', '', $dt2['qty']);
-				$ArrDetail2[$val . $vaX]['weight']			    	= str_replace(',', '', $dt2['weight']);
-				$ArrDetail2[$val . $vaX]['qty_mat']			    = str_replace(',', '', $dt2['qty_mat']);
-				$ArrDetail2[$val . $vaX]['weight_mat']			    = str_replace(',', '', $dt2['weight_mat']);
-				$ArrDetail2[$val . $vaX]['remark']			    	= $dt2['remarks'];
-				$ArrDetail2[$val . $vaX]['bantuan']			    = $dt2['bantuan'];
-				$ArrDetail2[$val . $vaX]['id_dt_spkmarketing']	    = $dt2['id_dt_spkmarketing'];
-				$ArrDetail2[$val . $vaX]['lotno']			        = $dt2['lot'];
-				$ArrDetail2[$val . $vaX]['lot_slitting']			= $dt2['lot'];
+				$ArrDetail2[$val]['id_stock']			    = $idstock2->id_stock;
+				$ArrDetail2[$val]['qty']			    	= str_replace(',', '', $dt2['qty']);
+				$ArrDetail2[$val]['weight']			    	= str_replace(',', '', $dt2['weight']);
+				$ArrDetail2[$val]['qty_mat']			    = str_replace(',', '', $dt2['qty_mat']);
+				$ArrDetail2[$val]['weight_mat']			    = str_replace(',', '', $dt2['weight_mat']);
+				$ArrDetail2[$val]['remark']			    	= $dt2['remarks'];
+				$ArrDetail2[$val]['bantuan']			    = $dt2['bantuan'];
+				$ArrDetail2[$val]['id_dt_spkmarketing']	    = $dt2['id_dt_spkmarketing'];
+				$ArrDetail2[$val]['lotno']			        = $dt2['lot'];
+				$ArrDetail2[$val]['lot_slitting']			= $dt2['lot'];
 
 
-				$ArrDetail2[$val . $vaX]['created_by']			    = $this->auth->user_id();
-				$ArrDetail2[$val . $vaX]['created_on']			    = date('Y-m-d H:i:s');
+				$ArrDetail2[$val]['created_by']			    = $this->auth->user_id();
+				$ArrDetail2[$val]['created_on']			    = date('Y-m-d H:i:s');
 
-				$UpdateArr[$val . $vaX]['id']			    		= $dt2['lot'];
-				$UpdateArr[$val . $vaX]['qty']			    	= str_replace(',', '', $dt2['qty_mat']);
-				$UpdateArr[$val . $vaX]['weight']			    	= str_replace(',', '', $dt2['weight_mat']);
+				$UpdateArr[$val]['id']			    		= $dt2['lot'];
+				$UpdateArr[$val]['qty']			    	= str_replace(',', '', $dt2['qty_mat']);
+				$UpdateArr[$val]['weight']			    	= str_replace(',', '', $dt2['weight_mat']);
 			}
 		}
 
@@ -1683,12 +1683,12 @@ class Delivery_order extends Admin_Controller
 		$temp = [];
 		foreach ($UpdateArr as $val => $value) {
 			if (!array_key_exists($value['id'], $temp)) {
-				$temp[$value['id']]['qty'] 		= 0;
-				$temp[$value['id']]['weight'] 	= 0;
+				$temp[$value['id']]['qty'] 		= 0.0;
+				$temp[$value['id']]['weight'] 	= 0.0;
 			}
 			$temp[$value['id']]['id'] 		= $value['id'];
-			$temp[$value['id']]['qty'] 		+= $value['qty'];
-			$temp[$value['id']]['weight'] 	+= $value['weight'];
+			$temp[$value['id']]['qty'] 		+= (float) $value['qty'];
+			$temp[$value['id']]['weight'] 	+= (float) $value['weight'];
 		}
 
 		$ArrStock = array();
@@ -1785,12 +1785,12 @@ class Delivery_order extends Admin_Controller
 		$temp = [];
 		foreach ($UpdateArr as $val => $value) {
 			if (!array_key_exists($value['id'], $temp)) {
-				$temp[$value['id']]['qty'] 		= 0;
-				$temp[$value['id']]['weight'] 	= 0;
+				$temp[$value['id']]['qty'] 		= 0.0;
+				$temp[$value['id']]['weight'] 	= 0.0;
 			}
 			$temp[$value['id']]['id'] 		= $value['id'];
-			$temp[$value['id']]['qty'] 		+= $value['qty'];
-			$temp[$value['id']]['weight'] 	+= $value['weight'];
+			$temp[$value['id']]['qty'] 		+= (float) $value['qty'];
+			$temp[$value['id']]['weight'] 	+= (float) $value['weight'];
 		}
 
 
@@ -2723,7 +2723,6 @@ class Delivery_order extends Admin_Controller
 		$id_material = $this->Delivery_order_model->get_data('ms_inventory_category3', 'deleted', $deleted);
 		$id_gudang = $this->Delivery_order_model->get_data('ms_gudang');
 
-		$this->template->set('results', $data);
 		$data = [
 			'produksi' => $produksi,
 			'penawaran' => $penawaran,
@@ -2785,7 +2784,7 @@ class Delivery_order extends Admin_Controller
 
 
 		$code 		= $this->Delivery_order_model->generate_code();
-		$no_surat 	= $this->Delivery_order_model->BuatNomor();
+		$no_surat 	= $this->Delivery_order_model->BuatNomor($post['no_surat']);
 		$Detail 	= $_POST['dt'];
 
 		// print_r($Detail);
@@ -2838,35 +2837,35 @@ class Delivery_order extends Admin_Controller
 
 				$idstock = $this->db->query("SELECT * FROM stock_material WHERE lotno='$lotno'")->row();
 
-				$ArrDetail[$val . $vaX]['id_delivery_order']		= $code;
-				$ArrDetail[$val . $vaX]['id_dt_delivery_order']	= $code . '-' . $numb1;
-				$ArrDetail[$val . $vaX]['id_material']		    = $dt['id_material'];
-				$ArrDetail[$val . $vaX]['nm_material']		    = $dt['material'];
-				$ArrDetail[$val . $vaX]['no_alloy']		        = $dt['no_alloy'];
-				$ArrDetail[$val . $vaX]['thickness']		        = $dt['thickness'];
-				$ArrDetail[$val . $vaX]['width']		        	= str_replace(',', '', $dt['width']);
-				$ArrDetail[$val . $vaX]['length']		        	= str_replace(',', '', $dt['length']);
-				$ArrDetail[$val . $vaX]['qty_order']			    = str_replace(',', '', $dt['qty_produk']);
+				$ArrDetail[$val]['id_delivery_order']		= $code;
+				$ArrDetail[$val]['id_dt_delivery_order']	= $code . '-' . $numb1;
+				$ArrDetail[$val]['id_material']		    = $dt['id_material'];
+				$ArrDetail[$val]['nm_material']		    = $dt['material'];
+				$ArrDetail[$val]['no_alloy']		        = $dt['no_alloy'];
+				$ArrDetail[$val]['thickness']		        = $dt['thickness'];
+				$ArrDetail[$val]['width']		        	= str_replace(',', '', $dt['width']);
+				$ArrDetail[$val]['length']		        	= str_replace(',', '', $dt['length']);
+				$ArrDetail[$val]['qty_order']			    = str_replace(',', '', $dt['qty_produk']);
 
-				$ArrDetail[$val . $vaX]['id_stock']			    = $id_stock;
-				$ArrDetail[$val . $vaX]['qty']			    	= str_replace(',', '', $dt['qty']);
-				$ArrDetail[$val . $vaX]['weight']			    	= str_replace(',', '', $dt['weight']);
-				$ArrDetail[$val . $vaX]['qty_mat']			    = str_replace(',', '', $dt['qty_mat']);
-				$ArrDetail[$val . $vaX]['weight_mat']			    = str_replace(',', '', $dt['weight_mat']);
-				$ArrDetail[$val . $vaX]['remark']			    	= $dt['remarks'];
-				$ArrDetail[$val . $vaX]['bantuan']			    = $dt['bantuan'];
-				$ArrDetail[$val . $vaX]['id_dt_spkmarketing']	    = $dt['id_dt_spkmarketing'];
-				$ArrDetail[$val . $vaX]['lotno']			        = $dt['lot'];
-				$ArrDetail[$val . $vaX]['lot_slitting']			= $dt['lot'];
-				$ArrDetail[$val . $vaX]['part_number']			= $dt['part_number'];
+				$ArrDetail[$val]['id_stock']			    = $id_stock;
+				$ArrDetail[$val]['qty']			    	= str_replace(',', '', $dt['qty']);
+				$ArrDetail[$val]['weight']			    	= str_replace(',', '', $dt['weight']);
+				$ArrDetail[$val]['qty_mat']			    = str_replace(',', '', $dt['qty_mat']);
+				$ArrDetail[$val]['weight_mat']			    = str_replace(',', '', $dt['weight_mat']);
+				$ArrDetail[$val]['remark']			    	= $dt['remarks'];
+				$ArrDetail[$val]['bantuan']			    = $dt['bantuan'];
+				$ArrDetail[$val]['id_dt_spkmarketing']	    = $dt['id_dt_spkmarketing'];
+				$ArrDetail[$val]['lotno']			        = $dt['lot'];
+				$ArrDetail[$val]['lot_slitting']			= $dt['lot'];
+				$ArrDetail[$val]['part_number']			= $dt['part_number'];
 
 
-				$ArrDetail[$val . $vaX]['created_by']			    = $this->auth->user_id();
-				$ArrDetail[$val . $vaX]['created_on']			    = date('Y-m-d H:i:s');
+				$ArrDetail[$val]['created_by']			    = $this->auth->user_id();
+				$ArrDetail[$val]['created_on']			    = date('Y-m-d H:i:s');
 
-				$UpdateArr[$val . $vaX]['id']			    		= $dt['lot'];
-				$UpdateArr[$val . $vaX]['qty']			    	= str_replace(',', '', $dt['qty_mat']);
-				$UpdateArr[$val . $vaX]['weight']			    	= str_replace(',', '', $dt['weight_mat']);
+				$UpdateArr[$val]['id']			    		= $dt['lot'];
+				$UpdateArr[$val]['qty']			    	= str_replace(',', '', $dt['qty_mat']);
+				$UpdateArr[$val]['weight']			    	= str_replace(',', '', $dt['weight_mat']);
 			}
 		}
 
@@ -2882,34 +2881,34 @@ class Delivery_order extends Admin_Controller
 				$lotno2 = $dt2['lot'];
 				$idstock2 = $this->db->query("SELECT * FROM stock_material WHERE lotno='$lotno2'")->row();
 
-				$ArrDetail2[$val . $vaX]['id_delivery_order']		= $code;
-				$ArrDetail2[$val . $vaX]['id_dt_delivery_order']	= $code . '-' . $numb2;
-				$ArrDetail2[$val . $vaX]['id_material']		    = $dt2['id_material'];
-				$ArrDetail2[$val . $vaX]['nm_material']		    = $dt2['material'];
-				$ArrDetail2[$val . $vaX]['no_alloy']		        = $dt2['no_alloy'];
-				$ArrDetail2[$val . $vaX]['thickness']		        = $dt2['thickness'];
-				$ArrDetail2[$val . $vaX]['width']		        	= str_replace(',', '', $dt2['width']);
-				$ArrDetail2[$val . $vaX]['length']		        	= str_replace(',', '', $dt2['length']);
-				$ArrDetail2[$val . $vaX]['qty_order']			    = str_replace(',', '', $dt2['qty_produk']);
+				$ArrDetail2[$val]['id_delivery_order']		= $code;
+				$ArrDetail2[$val]['id_dt_delivery_order']	= $code . '-' . $numb2;
+				$ArrDetail2[$val]['id_material']		    = $dt2['id_material'];
+				$ArrDetail2[$val]['nm_material']		    = $dt2['material'];
+				$ArrDetail2[$val]['no_alloy']		        = $dt2['no_alloy'];
+				$ArrDetail2[$val]['thickness']		        = $dt2['thickness'];
+				$ArrDetail2[$val]['width']		        	= str_replace(',', '', $dt2['width']);
+				$ArrDetail2[$val]['length']		        	= str_replace(',', '', $dt2['length']);
+				$ArrDetail2[$val]['qty_order']			    = str_replace(',', '', $dt2['qty_produk']);
 
-				$ArrDetail2[$val . $vaX]['id_stock']			    = $idstock2->id_stock;
-				$ArrDetail2[$val . $vaX]['qty']			    	= str_replace(',', '', $dt2['qty']);
-				$ArrDetail2[$val . $vaX]['weight']			    	= str_replace(',', '', $dt2['weight']);
-				$ArrDetail2[$val . $vaX]['qty_mat']			    = str_replace(',', '', $dt2['qty_mat']);
-				$ArrDetail2[$val . $vaX]['weight_mat']			    = str_replace(',', '', $dt2['weight_mat']);
-				$ArrDetail2[$val . $vaX]['remark']			    	= $dt2['remarks'];
-				$ArrDetail2[$val . $vaX]['bantuan']			    = $dt2['bantuan'];
-				$ArrDetail2[$val . $vaX]['id_dt_spkmarketing']	    = $dt2['id_dt_spkmarketing'];
-				$ArrDetail2[$val . $vaX]['lotno']			        = $dt2['numberlot'];
-				$ArrDetail2[$val . $vaX]['lot_slitting']			= $dt2['lot'];
+				$ArrDetail2[$val]['id_stock']			    = $idstock2->id_stock;
+				$ArrDetail2[$val]['qty']			    	= str_replace(',', '', $dt2['qty']);
+				$ArrDetail2[$val]['weight']			    	= str_replace(',', '', $dt2['weight']);
+				$ArrDetail2[$val]['qty_mat']			    = str_replace(',', '', $dt2['qty_mat']);
+				$ArrDetail2[$val]['weight_mat']			    = str_replace(',', '', $dt2['weight_mat']);
+				$ArrDetail2[$val]['remark']			    	= $dt2['remarks'];
+				$ArrDetail2[$val]['bantuan']			    = $dt2['bantuan'];
+				$ArrDetail2[$val]['id_dt_spkmarketing']	    = $dt2['id_dt_spkmarketing'];
+				$ArrDetail2[$val]['lotno']			        = $dt2['numberlot'];
+				$ArrDetail2[$val]['lot_slitting']			= $dt2['lot'];
 
 
-				$ArrDetail2[$val . $vaX]['created_by']			    = $this->auth->user_id();
-				$ArrDetail2[$val . $vaX]['created_on']			    = date('Y-m-d H:i:s');
+				$ArrDetail2[$val]['created_by']			    = $this->auth->user_id();
+				$ArrDetail2[$val]['created_on']			    = date('Y-m-d H:i:s');
 
-				$UpdateArr[$val . $vaX]['id']			    		= $dt2['lot'];
-				$UpdateArr[$val . $vaX]['qty']			    	= str_replace(',', '', $dt2['qty_mat']);
-				$UpdateArr[$val . $vaX]['weight']			    	= str_replace(',', '', $dt2['weight_mat']);
+				$UpdateArr[$val]['id']			    		= $dt2['lot'];
+				$UpdateArr[$val]['qty']			    	= str_replace(',', '', $dt2['qty_mat']);
+				$UpdateArr[$val]['weight']			    	= str_replace(',', '', $dt2['weight_mat']);
 			}
 		}
 
@@ -2918,12 +2917,12 @@ class Delivery_order extends Admin_Controller
 		$temp = [];
 		foreach ($UpdateArr as $val => $value) {
 			if (!array_key_exists($value['id'], $temp)) {
-				$temp[$value['id']]['qty'] 		= 0;
-				$temp[$value['id']]['weight'] 	= 0;
+				$temp[$value['id']]['qty'] 		= 0.0;
+				$temp[$value['id']]['weight'] 	= 0.0;
 			}
 			$temp[$value['id']]['id'] 		= $value['id'];
-			$temp[$value['id']]['qty'] 		+= $value['qty'];
-			$temp[$value['id']]['weight'] 	+= $value['weight'];
+			$temp[$value['id']]['qty'] 		+= (float) $value['qty'];
+			$temp[$value['id']]['weight'] 	+= (float) $value['weight'];
 		}
 
 		$ArrStock = array();
