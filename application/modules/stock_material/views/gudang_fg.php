@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
 <link rel="stylesheet" href="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/stock_material.css') ?>">
-<link rel="stylesheet" href="<?= base_url('assets/css/stock_material_fg.css') ?>">
+<link rel="stylesheet" href="<?= base_url('assets/css/stock_material_fg.css') ?>?v=<?= filemtime(FCPATH.'assets/css/stock_material_fg.css') ?>">
 <link rel="stylesheet" href="<?= base_url('assets/css/stock_material_date.css') ?>">
 
 <div class="stock-material-container stock-dated-wrapper stock-fg-wrapper">
@@ -75,4 +75,4 @@
 </div>
 <script src="<?= base_url('assets/plugins/datatables/jquery.dataTables.min.js') ?>"></script>
 <script src="<?= base_url('assets/plugins/datatables/dataTables.bootstrap.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/stock_material_date.js') ?>"></script>
+<script src="<?= base_url('assets/js/stock_material_date.js') ?>?v=<?= filemtime(FCPATH.'assets/js/stock_material_date.js') ?>"></script>
