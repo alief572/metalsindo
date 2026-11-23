@@ -418,8 +418,8 @@ class Retur_penjualan_model extends BF_Model
 		foreach ($get_data as $item) {
 			$no++;
 
-			$is_cancelled = ($item->sts === 'CANCEL');
-			$is_closed    = ($item->status_cn === 'CLOSED');
+			$is_cancelled = (trim($item->sts) == 'CANCEL');
+			$is_closed    = (trim($item->status_cn) == 'CLOSED');
 
 			$action = '';
 			if ($ENABLE_MANAGE && !$is_cancelled) {
@@ -667,12 +667,12 @@ class Retur_penjualan_model extends BF_Model
 		}
 
 		// 2. Guard: tidak boleh cancel jika CN sudah CLOSED
-		if ($retur->status_cn === 'CLOSED') {
+		if (trim($retur->status_cn) == 'CLOSED') {
 			return ['status' => 0, 'pesan' => 'Retur tidak dapat dibatalkan karena Credit Note sudah CLOSED!'];
 		}
 
 		// 3. Guard: tidak boleh cancel ulang
-		if ($retur->sts === 'CANCEL') {
+		if (trim($retur->sts) == 'CANCEL') {
 			return ['status' => 0, 'pesan' => 'Retur ini sudah berstatus CANCEL!'];
 		}
 
