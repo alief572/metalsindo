@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $ENABLE_ADD     = has_permission('Purchase_Request.Add');
 $ENABLE_MANAGE  = has_permission('Purchase_Request.Manage');
 $ENABLE_VIEW    = has_permission('Purchase_Request.View');
@@ -840,16 +840,20 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 
 									}
 								},
-								error: function() {
-
+								error: function(xhr, status, error) {
+									var errDetail = 'HTTP ' + xhr.status + ' - ' + error;
+									if (xhr.responseText) {
+										var raw = xhr.responseText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 600);
+										errDetail += '\n' + raw;
+									}
 									swal({
 										title: "Error Message !",
-										text: 'An Error Occured During Process. Please try again..',
+										text: errDetail,
 										type: "warning",
-										timer: 5000,
+										timer: 15000,
 										showCancelButton: false,
-										showConfirmButton: false,
-										allowOutsideClick: false
+										showConfirmButton: true,
+										allowOutsideClick: true
 									});
 								}
 							});
@@ -1011,11 +1015,19 @@ $ENABLE_DELETE  = has_permission('Purchase_Request.Delete');
 					width: "100%"
 				});
 			},
-			error: function(result) {
+			error: function(xhr, status, error) {
+				var errDetail = 'HTTP ' + xhr.status + ' - ' + error;
+				if (xhr.responseText) {
+					var raw = xhr.responseText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 600);
+					errDetail += '\n' + raw;
+				}
 				swal({
 					title: 'Error !',
-					text: 'Please try again later !',
-					type: 'error'
+					text: errDetail,
+					type: 'error',
+					timer: 15000,
+					showConfirmButton: true,
+					allowOutsideClick: true
 				});
 			}
 		});

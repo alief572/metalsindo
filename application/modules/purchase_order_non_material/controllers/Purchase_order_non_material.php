@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if (!defined('BASEPATH')) {
 	exit('No direct script access allowed');
@@ -1421,11 +1421,11 @@ class Purchase_order_non_material extends Admin_Controller
 		$po_pr_asset = 0;
 		foreach ($_POST['dt'] as $used) {
 			// if ($po_pr_depart == '0') {
-			if ($used[tipe_pr] == 'pr depart') {
+			if ($used['tipe_pr'] == 'pr depart') {
 				$po_pr_depart = '1';
 			}
 			// }
-			if ($used[tipe_pr] == 'pr asset') {
+			if ($used['tipe_pr'] == 'pr asset') {
 				$po_pr_asset = '1';
 			}
 		}
@@ -1454,7 +1454,7 @@ class Purchase_order_non_material extends Admin_Controller
 				'nilai_disc' => str_replace(',', '', $post['totaldisc']),
 				'note' => $post['note'],
 				'delivery_date' => $post['delivery_date'],
-				'id_dept' => implode(',', $post['dept']),
+				'id_dept' => implode(',', $post['dept'] ?? []),
 				'receiving_person' => $post['receiving_person'],
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
@@ -1485,7 +1485,7 @@ class Purchase_order_non_material extends Admin_Controller
 				'nilai_disc' => str_replace(',', '', $post['totaldisc']),
 				'note' => $post['note'],
 				'delivery_date' => $post['delivery_date'],
-				'id_dept' => implode(',', $post['dept']),
+				'id_dept' => implode(',', $post['dept'] ?? []),
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id(),
 				'tipe'		=> 'pr asset'
@@ -1515,7 +1515,7 @@ class Purchase_order_non_material extends Admin_Controller
 				'nilai_disc' => str_replace(',', '', $post['totaldisc']),
 				'note' => $post['note'],
 				'delivery_date' => $post['delivery_date'],
-				'id_dept' => implode(',', $post['dept']),
+				'id_dept' => implode(',', $post['dept'] ?? []),
 				'created_on'		=> date('Y-m-d H:i:s'),
 				'created_by'		=> $this->auth->user_id()
 			];
@@ -1531,35 +1531,35 @@ class Purchase_order_non_material extends Admin_Controller
 		$numb1 = 0;
 
 		foreach ($_POST['dt'] as $used) {
-			if (isset($used[checked_point])) {
+			if (isset($used['checked_point'])) {
 				$numb1++;
 				$dt =  array(
 					'no_po'					=> $code,
 					'id_dt_po'				=> $code . '-' . $numb1,
-					'idpr'					=> $used[idpr],
-					'idmaterial'			=> $used[idmaterial],
-					'namamaterial'			=> $used[namamaterial],
-					'description'			=> $used[description],
-					'qty'					=> $used[qty],
-					'width'					=> str_replace(",", "", $used[width]),
-					'rate_lme'				=> $used[ratelme],
-					'fabcost'				=> str_replace(",", "", $used[fabcost]),
-					'alloyprice'			=> str_replace(",", "", $used[alloyprice]),
-					'totalwidth'			=> str_replace(",", "", $used[totalweight]),
-					'hargasatuan'			=> str_replace(",", "", $used[hargasatuan]),
-					'lebar'					=> $used[lebar],
-					'panjang'				=> str_replace(",", "", $used[length]),
-					'diskon'				=> str_replace(",", "", $used[diskon]),
-					'pajak'					=> str_replace(",", "", $used[pajak]),
-					'jumlahharga'			=> str_replace(",", "", $used[jumlahharga]),
-					'ppn'					=> str_replace(",", "", $used[nilai_ppn]),
-					'ppn_persen'			=> str_replace(",", "", $used[persen_ppn]),
-					'persen_disc'			=> str_replace(",", "", $used[disc_persen]),
-					'nilai_disc'			=> str_replace(",", "", $used[disc_num]),
-					'harga_total'			=> str_replace(",", "", $used[totalharga]),
-					'note'					=> $used[note],
-					'kode_barang'			=> $used[kode_barang],
-					'tipe'			=> $used[tipe_pr]
+					'idpr'					=> $used['idpr'],
+					'idmaterial'			=> $used['idmaterial'],
+					'namamaterial'			=> $used['namamaterial'],
+					'description'			=> $used['description'],
+					'qty'					=> $used['qty'],
+					'width'					=> str_replace(",", "", $used['width']),
+					'rate_lme'				=> $used['ratelme'],
+					'fabcost'				=> str_replace(",", "", $used['fabcost']),
+					'alloyprice'			=> str_replace(",", "", $used['alloyprice']),
+					'totalwidth'			=> str_replace(",", "", $used['totalweight']),
+					'hargasatuan'			=> str_replace(",", "", $used['hargasatuan']),
+					'lebar'					=> $used['lebar'],
+					'panjang'				=> str_replace(",", "", $used['length']),
+					'diskon'				=> str_replace(",", "", $used['diskon']),
+					'pajak'					=> str_replace(",", "", $used['pajak']),
+					'jumlahharga'			=> str_replace(",", "", $used['jumlahharga']),
+					'ppn'					=> str_replace(",", "", $used['nilai_ppn']),
+					'ppn_persen'			=> str_replace(",", "", $used['persen_ppn']),
+					'persen_disc'			=> str_replace(",", "", $used['disc_persen']),
+					'nilai_disc'			=> str_replace(",", "", $used['disc_num']),
+					'harga_total'			=> str_replace(",", "", $used['totalharga']),
+					'note'					=> $used['note'],
+					'kode_barang'			=> $used['kode_barang'],
+					'tipe'			=> $used['tipe_pr']
 				);
 
 				$insert_dt_trans_po = $this->db->insert('dt_trans_po_non_material', $dt);
@@ -1567,28 +1567,28 @@ class Purchase_order_non_material extends Admin_Controller
 				// 	print_r($this->db->error($insert_dt_trans_po));
 				// 	exit;
 				// }
-				// $nopr = $used[no_pr];
+				// $nopr = $used['no_pr'];
 				$dataupdate = [
 					'status_po'				=> 'CLS',
 				];
 
 				if ($valid_qty == 1) {
-					$get_other_po_brg = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS other_qty FROM dt_trans_po_non_material a WHERE a.idpr = '" . $used[idpr] . "' AND a.tipe = '" . $used[tipe_pr] . "'")->row();
+					$get_other_po_brg = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS other_qty FROM dt_trans_po_non_material a WHERE a.idpr = '" . $used['idpr'] . "' AND a.tipe = '" . $used['tipe_pr'] . "'")->row();
 
-					if ($used[tipe_pr] == 'pr depart') {
-						$get_data_pr = $this->db->query("SELECT IF(qty IS NOT NULL, qty, 0) AS qty_pr FROM rutin_non_planning_detail WHERE id = '" . $used[idpr] . "'")->row();
-					} else if ($used[tipe_pr] == 'pr asset') {
-						$get_data_pr = $this->db->query("SELECT IF(rev_qty IS NOT NULL, rev_qty, 0) AS qty_pr FROM asset_planning WHERE id = '" . $used[idpr] . "'")->row();
+					if ($used['tipe_pr'] == 'pr depart') {
+						$get_data_pr = $this->db->query("SELECT IF(qty IS NOT NULL, qty, 0) AS qty_pr FROM rutin_non_planning_detail WHERE id = '" . $used['idpr'] . "'")->row();
+					} else if ($used['tipe_pr'] == 'pr asset') {
+						$get_data_pr = $this->db->query("SELECT IF(rev_qty IS NOT NULL, rev_qty, 0) AS qty_pr FROM asset_planning WHERE id = '" . $used['idpr'] . "'")->row();
 					} else {
-						$get_data_pr = $this->db->query("SELECT IF(propose_purchase IS NOT NULL, propose_purchase, 0) AS qty_pr FROM material_planning_base_on_produksi_detail WHERE id = '" . $used[idpr] . "'")->row();
+						$get_data_pr = $this->db->query("SELECT IF(propose_purchase IS NOT NULL, propose_purchase, 0) AS qty_pr FROM material_planning_base_on_produksi_detail WHERE id = '" . $used['idpr'] . "'")->row();
 					}
 					// print_r($get_other_po_brg->other_qty.' - '.$get_data_pr->qty_pr);
-					// print_r($used[tipe_pr]);
+					// print_r($used['tipe_pr']);
 					// exit;
 
 
-					$qty_all = ($used[qty] + $get_other_po_brg->other_qty);
-					// print($used[idpr].' ('. $used[qty] . ' + '.$get_other_po_brg->other_qty.') - ' . $get_data_pr->qty_pr.'<br>');
+					$qty_all = ($used['qty'] + $get_other_po_brg->other_qty);
+					// print($used['idpr'].' ('. $used['qty'] . ' + '.$get_other_po_brg->other_qty.') - ' . $get_data_pr->qty_pr.'<br>');
 					if ($get_other_po_brg->other_qty > $get_data_pr->qty_pr) {
 						$valid_qty = 0;
 					}
@@ -1602,7 +1602,7 @@ class Purchase_order_non_material extends Admin_Controller
 		$this->db->select('*');
 		$this->db->from('material_planning_base_on_produksi');
 		$this->db->where_in('so_number', explode(',', $post['so_number']));
-		$countMat = $this->db->get()->row_array();
+		$countMat = $this->db->get()->result_array();
 		if (count($countMat) > 0) {
 			$update_material_planning = $this->db->where_in('so_number', explode(',', $post['so_number']))->update('material_planning_base_on_produksi', ['po_number' => $code, 'po_date' => date('Y-m-d')]);
 
@@ -1616,7 +1616,7 @@ class Purchase_order_non_material extends Admin_Controller
 		$this->db->select('*');
 		$this->db->from('rutin_non_planning_header');
 		$this->db->where_in('no_pengajuan', explode(',', $post['so_number']));
-		$countDept = $this->db->get()->row_array();
+		$countDept = $this->db->get()->result_array();
 		if (count($countDept) > 0) {
 			$update_rutin_non_planning = $this->db->where_in('no_pengajuan', explode(',', $post['so_number']))->update('rutin_non_planning_header', ['po_number' => $code, 'po_date' => date('Y-m-d')]);
 			if (!$update_rutin_non_planning) {
@@ -1720,7 +1720,7 @@ class Purchase_order_non_material extends Admin_Controller
 			'total_ppn_persen'	=> str_replace(',', '', $post['persenppn']),
 			'persen_disc'	=> str_replace(',', '', $post['persendisc']),
 			'nilai_disc'	=> str_replace(',', '', $post['totaldisc']),
-			'id_dept' => implode(',', $post['dept']),
+			'id_dept' => implode(',', $post['dept'] ?? []),
 			'delivery_date' => $post['delivery_date'],
 			'note' => $post['note'],
 			'receiving_person' => $post['receiving_person']
@@ -1734,38 +1734,38 @@ class Purchase_order_non_material extends Admin_Controller
 			$numb1++;
 
 			$dt =  array(
-				'description'			=> $used[description],
-				'qty'					=> $used[qty],
-				'hargasatuan'			=> str_replace(",", "", $used[hargasatuan]),
-				'jumlahharga'			=> str_replace(",", "", $used[jumlahharga]),
-				'ppn'					=> str_replace(",", "", $used[nilai_ppn]),
-				'ppn_persen'			=> str_replace(",", "", $used[persen_ppn]),
-				'persen_disc' 			=> str_replace(",", "", $used[disc_persen]),
-				'nilai_disc' 			=> str_replace(",", "", $used[disc_num]),
-				'harga_total'			=> str_replace(",", "", $used[totalharga]),
-				'note'					=> $used[note]
+				'description'			=> $used['description'],
+				'qty'					=> $used['qty'],
+				'hargasatuan'			=> str_replace(",", "", $used['hargasatuan']),
+				'jumlahharga'			=> str_replace(",", "", $used['jumlahharga']),
+				'ppn'					=> str_replace(",", "", $used['nilai_ppn']),
+				'ppn_persen'			=> str_replace(",", "", $used['persen_ppn']),
+				'persen_disc' 			=> str_replace(",", "", $used['disc_persen']),
+				'nilai_disc' 			=> str_replace(",", "", $used['disc_num']),
+				'harga_total'			=> str_replace(",", "", $used['totalharga']),
+				'note'					=> $used['note']
 			);
 
 			if ($valid_qty == 1) {
-				$get_other_po_brg = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS other_qty FROM dt_trans_po_non_material a WHERE a.idpr = '" . $used[idpr] . "' AND a.tipe = '" . $used[tipe_pr] . "'")->row();
+				$get_other_po_brg = $this->db->query("SELECT IF(SUM(a.qty) IS NOT NULL, SUM(a.qty), 0) AS other_qty FROM dt_trans_po_non_material a WHERE a.idpr = '" . $used['idpr'] . "' AND a.tipe = '" . $used['tipe_pr'] . "'")->row();
 
-				if ($used[tipe_pr] == 'pr depart') {
-					$get_data_pr = $this->db->query("SELECT IF(qty IS NOT NULL, qty, 0) AS qty_pr FROM rutin_non_planning_detail WHERE id = '" . $used[idpr] . "'")->row();
-				} else if ($used[tipe_pr] == 'pr asset') {
+				if ($used['tipe_pr'] == 'pr depart') {
+					$get_data_pr = $this->db->query("SELECT IF(qty IS NOT NULL, qty, 0) AS qty_pr FROM rutin_non_planning_detail WHERE id = '" . $used['idpr'] . "'")->row();
+				} else if ($used['tipe_pr'] == 'pr asset') {
 					$this->db->select('IF(a.qty IS NOT NULL, a.qty, 0) as qty_pr');
 					$this->db->from('asset_planning a');
-					$this->db->where('a.id', $used[idpr]);
+					$this->db->where('a.id', $used['idpr']);
 					$get_data_pr = $this->db->get()->row();
 				} else {
-					$get_data_pr = $this->db->query("SELECT IF(propose_purchase IS NOT NULL, propose_purchase, 0) AS qty_pr FROM material_planning_base_on_produksi_detail WHERE id = '" . $used[idpr] . "'")->row();
+					$get_data_pr = $this->db->query("SELECT IF(propose_purchase IS NOT NULL, propose_purchase, 0) AS qty_pr FROM material_planning_base_on_produksi_detail WHERE id = '" . $used['idpr'] . "'")->row();
 				}
 
 
 
-				$qty_all = ($used[qty]);
+				$qty_all = ($used['qty']);
 
-				// $qty_all = ($used[qty] + $get_other_po_brg->other_qty);
-				// print($used[idpr].' ('. $used[qty] . ' + '.$get_other_po_brg->other_qty.') - ' . $get_data_pr->qty_pr.'<br>');
+				// $qty_all = ($used['qty'] + $get_other_po_brg->other_qty);
+				// print($used['idpr'].' ('. $used['qty'] . ' + '.$get_other_po_brg->other_qty.') - ' . $get_data_pr->qty_pr.'<br>');
 				if ($qty_all > $get_data_pr->qty_pr) {
 					$valid_qty = 0;
 				}
@@ -1774,12 +1774,12 @@ class Purchase_order_non_material extends Admin_Controller
 			$this->db->update('dt_trans_po_non_material', $dt, ['id' => $used['id']]);
 			// print_r($this->db->last_query());
 			// exit;
-			// $nopr = $used[no_pr];
+			// $nopr = $used['no_pr'];
 			$dataupdate = [
 				'status_po'				=> 'CLS',
 			];
 
-			// print_r($used[id]);
+			// print_r($used['id']);
 			// exit;
 
 
@@ -1883,23 +1883,23 @@ class Purchase_order_non_material extends Admin_Controller
 			$dt =  array(
 				'no_po'					=> $code,
 				'id_dt_po'				=> $code . '-' . $numb1,
-				'idpr'					=> $used[idpr],
-				'idmaterial'			=> $used[idmaterial],
-				'namamaterial'			=> $used[namamaterial],
-				'description'			=> $used[description],
-				'qty'					=> $used[qty],
-				'width'					=> str_replace(",", "", $used[width]),
-				'rate_lme'				=> $used[ratelme],
-				'fabcost'				=> str_replace(",", "", $used[fabcost]),
-				'alloyprice'			=> str_replace(",", "", $used[alloyprice]),
-				'totalwidth'			=> str_replace(",", "", $used[totalweight]),
-				'hargasatuan'			=> str_replace(",", "", $used[hargasatuan]),
-				'lebar'					=> $used[lebar],
-				'panjang'				=> str_replace(",", "", $used[length]),
-				'diskon'				=> str_replace(",", "", $used[diskon]),
-				'pajak'					=> str_replace(",", "", $used[pajak]),
-				'jumlahharga'			=> str_replace(",", "", $used[jumlahharga]),
-				'note'					=> $used[note],
+				'idpr'					=> $used['idpr'],
+				'idmaterial'			=> $used['idmaterial'],
+				'namamaterial'			=> $used['namamaterial'],
+				'description'			=> $used['description'],
+				'qty'					=> $used['qty'],
+				'width'					=> str_replace(",", "", $used['width']),
+				'rate_lme'				=> $used['ratelme'],
+				'fabcost'				=> str_replace(",", "", $used['fabcost']),
+				'alloyprice'			=> str_replace(",", "", $used['alloyprice']),
+				'totalwidth'			=> str_replace(",", "", $used['totalweight']),
+				'hargasatuan'			=> str_replace(",", "", $used['hargasatuan']),
+				'lebar'					=> $used['lebar'],
+				'panjang'				=> str_replace(",", "", $used['length']),
+				'diskon'				=> str_replace(",", "", $used['diskon']),
+				'pajak'					=> str_replace(",", "", $used['pajak']),
+				'jumlahharga'			=> str_replace(",", "", $used['jumlahharga']),
+				'note'					=> $used['note'],
 			);
 			$this->db->insert('dt_trans_po_non_material', $dt);
 		}

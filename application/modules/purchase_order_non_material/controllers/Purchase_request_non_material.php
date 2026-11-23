@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 if (!defined('BASEPATH')) {
     exit('No direct script access allowed');
@@ -601,7 +601,7 @@ function cari_inven1()
 		$numb1 =0;
 		foreach($_POST['dt'] as $used){
 		$numb1++;
-		$materials = $this->db->query("SELECT a.*, b.nama as alloy, c.nm_bentuk as bentuk FROM ms_inventory_category3 as a INNER JOIN ms_inventory_category2 as b ON a.id_category2 = b.id_category2 INNER JOIN ms_bentuk as c ON a.id_bentuk = c.id_bentuk WHERE a.id_category3 = '".$used[idmaterial]."' AND a.deleted = '0'  ")->result();
+		$materials = $this->db->query("SELECT a.*, b.nama as alloy, c.nm_bentuk as bentuk FROM ms_inventory_category3 as a INNER JOIN ms_inventory_category2 as b ON a.id_category2 = b.id_category2 INNER JOIN ms_bentuk as c ON a.id_bentuk = c.id_bentuk WHERE a.id_category3 = '".$used['idmaterial']."' AND a.deleted = '0'  ")->result();
 		foreach ($materials as $material){
 		if($material->id_bentuk == 'B2000001' ){
 		$dimensi = $this->db->query("SELECT * FROM child_inven_dimensi WHERE id_category3 = '$material->id_category3' AND id_dimensi = '22' ")->result();
@@ -644,16 +644,16 @@ function cari_inven1()
                 $dt =  array(
 							'no_pr'					=> $code,
 							'id_dt_pr'				=> $code.'-'.$numb1,
-							'idmaterial'			=> $used[idmaterial],
+							'idmaterial'			=> $used['idmaterial'],
 							'nama_material'			=> $nama_material,
-							'bentuk'				=> $used[bentuk],
-							'id_bentuk'				=> $used[idbentuk],
-							'qty'			=> $used[qty],
-							'weight'			=> $used[weight],
-							'totalweight'			=> $used[totalweight],
-							'suplier'			=> $used[suplier],
-							'tanggal'			=> $used[tanggal],
-							'keterangan'			=> $used[keterangan],
+							'bentuk'				=> $used['bentuk'],
+							'id_bentuk'				=> $used['idbentuk'],
+							'qty'			=> $used['qty'],
+							'weight'			=> $used['weight'],
+							'totalweight'			=> $used['totalweight'],
+							'suplier'			=> $used['suplier'],
+							'tanggal'			=> $used['tanggal'],
+							'keterangan'			=> $used['keterangan'],
                             );
                     $this->db->insert('dt_trans_pr',$dt);
 			
