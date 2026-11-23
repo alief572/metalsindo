@@ -19,10 +19,13 @@ class Stock_raw_material_model extends CI_Model
         $width = isset($input['series']) ? $input['series'] : '';
         if (!is_scalar($width) || ($width !== '' && (!is_numeric($width) || (float)$width < 0)))
             throw new InvalidArgumentException('Width harus berupa angka positif atau nol.');
+        $thickness = isset($input['thickness']) ? $input['thickness'] : '';
+        if (!is_scalar($thickness) || ($thickness !== '' && (!is_numeric($thickness) || (float)$thickness < 0)))
+            throw new InvalidArgumentException('Thickness harus berupa angka positif atau nol.');
         if (isset($input['search']) && !is_array($input['search'])) throw new InvalidArgumentException('Pencarian tidak valid.');
         $search = isset($input['search']['value']) ? $input['search']['value'] : '';
         if (!is_scalar($search)) throw new InvalidArgumentException('Pencarian tidak valid.');
-        return array('stock_date'=>$date,'width'=>(string)$width,'search'=>(string)$search);
+        return array('stock_date'=>$date,'width'=>(string)$width,'thickness'=>(string)$thickness,'search'=>(string)$search);
     }
 
     public function resolve($filters)
@@ -62,6 +65,7 @@ class Stock_raw_material_model extends CI_Model
     {
         $conditions=array(); $bindings=array();
         if ($filters['width'] !== '') { $conditions[]='a.width=?'; $bindings[]=$filters['width']; }
+        if (!empty($filters['thickness'])) { $conditions[]='a.thickness=?'; $bindings[]=$filters['thickness']; }
         if ($filters['search'] !== '') {
             $parts = array();
             foreach (array('a.lot_slitting','a.lotno','a.nama_material','a.id_category3','a.no_surat','a.customer') as $field) {
@@ -81,7 +85,7 @@ class Stock_raw_material_model extends CI_Model
     {
         if (!$meta['available']) return array('n'=>0,'total'=>0,'weight'=>0);
         list($sql,$bindings) = $this->relation($filters,$meta,false,$filtered && $filters['search'] !== '');
-        if (!$filtered || ($filters['width'] === '' && $filters['search'] === ''))
+        if (!$filtered || ($filters['width'] === '' && empty($filters['thickness']) && $filters['search'] === ''))
             return $this->db->query('SELECT COUNT(*) total,COUNT(*) n,COALESCE(SUM(a.sisa_spk*a.qty),0) weight'.$sql,$bindings)->row_array();
         // Both filtered and unfiltered counts share one scan of the selected stock batch.
         list($predicate,$filterBindings) = $this->filterPredicate($filters);

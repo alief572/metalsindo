@@ -48,6 +48,7 @@ class Warehouse_stock_date_model extends Stock_raw_material_model
     {
         $conditions=array(); $bindings=array();
         if ($filters['width'] !== '') { $conditions[]='a.width=?'; $bindings[]=$filters['width']; }
+        if (!empty($filters['thickness'])) { $conditions[]='a.thickness=?'; $bindings[]=$filters['thickness']; }
         if ($filters['search'] !== '') {
             $parts = array();
             foreach (array('a.lot_slitting','a.lotno','a.nama_material','a.id_category3','a.no_surat','a.customer') as $field) {
@@ -68,7 +69,7 @@ class Warehouse_stock_date_model extends Stock_raw_material_model
     {
         if (!$meta['available']) return array('n'=>0,'total'=>0,'weight'=>0);
         list($sql,$bindings) = $this->warehouseRelation($filters,$meta,false,$filtered && $filters['search'] !== '');
-        if (!$filtered || ($filters['width'] === '' && $filters['search'] === ''))
+        if (!$filtered || ($filters['width'] === '' && empty($filters['thickness']) && $filters['search'] === ''))
             return $this->db->query('SELECT COUNT(*) total,COUNT(*) n,COALESCE(SUM(a.sisa_spk*a.qty),0) weight'.$sql,$bindings)->row_array();
         // Both filtered and unfiltered counts share one scan of the selected stock batch.
         list($predicate,$filterBindings) = $this->filterPredicate($filters);

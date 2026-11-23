@@ -26,6 +26,10 @@
 				<label class="stock-label" for="series">Lebar / width (mm)</label>
 				<input class="stock-input" type="number" id="series" name="width" min="0" step="any" placeholder="Semua lebar" inputmode="decimal">
 			</div>
+			<div class="stock-form-group fg-thickness">
+				<label class="stock-label" for="fg-thickness">Tebal / thickness (mm)</label>
+				<input class="stock-input" type="number" id="fg-thickness" name="thickness" min="0" step="any" placeholder="Semua tebal" inputmode="decimal">
+			</div>
 			<div class="stock-date-actions">
 				<button class="btn-stock btn-stock-primary" type="button" id="fg-date-apply">Terapkan</button>
 				<button class="btn-stock btn-stock-reset" type="button" id="fg-reset">Reset filter</button>

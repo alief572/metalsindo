@@ -21,6 +21,8 @@
             clearTimeout(timer);
             var width = document.getElementById('series');
             if (width && !width.checkValidity()) { validation('Width harus berupa angka positif atau nol.'); return; }
+            var thickness = document.getElementById('fg-thickness');
+            if (thickness && !thickness.checkValidity()) { validation('Thickness harus berupa angka positif atau nol.'); return; }
             validation('');
             table.search(element('search').val()).draw();
         }
@@ -47,10 +49,11 @@
                 { targets: 8, className: prefix + '-number ' + prefix + '-weight' },
                 { targets: warehouse === '3' ? 11 : 10, className: prefix + '-location' }
             ],
-            stateSaveParams: function (settings, data) { data.stockDateWidth = $('#series').val() || ''; },
+            stateSaveParams: function (settings, data) { data.stockDateWidth = $('#series').val() || ''; data.stockDateThickness = $('#fg-thickness').val() || ''; },
             stateLoadParams: function (settings, data) {
                 if (!data.columns || data.columns.length !== columns) return false;
                 $('#series').val(data.stockDateWidth || '');
+                $('#fg-thickness').val(data.stockDateThickness || '');
                 element('search').val(data.search ? data.search.search : '');
             },
             ajax: {
@@ -58,6 +61,7 @@
                 data: function (data) {
                     loaded = false; element('export').prop('disabled', true);
                     data.gudang = warehouse; data.stock_date = appliedDate; data.series = $('#series').val() || '';
+                    data.thickness = $('#fg-thickness').val() || '';
                 },
                 dataSrc: function (data) {
                     if (table && Number(data.draw) < table.settings()[0].iDraw) return data.data;
@@ -92,11 +96,11 @@
             if (!$date[0].checkValidity()) { validation('Pilih tanggal stok yang valid dan tidak melebihi hari ini.'); $date[0].focus(); return; }
             appliedDate = $date.val(); filters();
         });
-        element('search').add($('#series')).on('input', function () { clearTimeout(timer); timer = setTimeout(filters, 450); });
+        element('search').add($('#series')).add($('#fg-thickness')).on('input', function () { clearTimeout(timer); timer = setTimeout(filters, 450); });
         element('filter-form').on('submit', function (event) { event.preventDefault(); element('date-apply').trigger('click'); });
         element('reset').on('click', function () {
             clearTimeout(timer); $date.val(today); appliedDate = today;
-            element('search').val(''); $('#series').val(''); validation('');
+            element('search').val(''); $('#series').val(''); $('#fg-thickness').val(''); validation('');
             table.search('').order([[0, 'asc']]).draw();
         });
         element('retry').on('click', function () { table.ajax.reload(null, false); });
@@ -104,6 +108,7 @@
             if (!loaded) return;
             window.location.href = $host.attr('data-export-url') + '?' + $.param({
                 gudang: warehouse, stock_date: appliedDate, series: $('#series').val() || '',
+                thickness: $('#fg-thickness').val() || '',
                 search: { value: table.search() }, direction: table.order()[0][1]
             });
         });

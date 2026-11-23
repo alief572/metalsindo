@@ -12,6 +12,7 @@
 .stock-fg-wrapper .stock-label { text-transform: none; letter-spacing: 0; }
 .stock-fg-wrapper .fg-search { flex: 1 1 340px; }
 .stock-fg-wrapper .fg-width { flex: 0 1 180px; }
+.stock-fg-wrapper .fg-thickness { flex: 0 1 180px; }
 .stock-fg-wrapper .fg-table-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .stock-fg-wrapper .fg-table-heading h2 { font-size: 15px; font-weight: 600; color: #263e50; margin: 0; }
 .stock-fg-wrapper .fg-table-heading p, .stock-fg-wrapper .fg-note { font-size: 12px; color: #526778; margin: 0; }
@@ -50,6 +51,7 @@
     .stock-fg-wrapper .fg-summary > div { padding-left: 16px; }
     .stock-fg-wrapper .fg-search { flex-basis: 100%; }
     .stock-fg-wrapper .fg-width { flex: 1 1 100%; }
+    .stock-fg-wrapper .fg-thickness { flex: 1 1 100%; }
     .stock-fg-wrapper .fg-toolbar .btn-stock { flex: 1 1 auto; padding: 0 12px; }
     .stock-fg-wrapper .fg-table-controls { align-items: flex-start; flex-direction: column; }
     .stock-fg-wrapper .pagination > li > a, .stock-fg-wrapper .pagination > li > span { padding: 6px 9px; }
