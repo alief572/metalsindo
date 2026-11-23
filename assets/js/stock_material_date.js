@@ -52,6 +52,7 @@
             stateSaveParams: function (settings, data) { data.stockDateWidth = $('#series').val() || ''; data.stockDateThickness = $('#fg-thickness').val() || ''; },
             stateLoadParams: function (settings, data) {
                 if (!data.columns || data.columns.length !== columns) return false;
+                if (data.stockDateThickness === undefined) return false;
                 $('#series').val(data.stockDateWidth || '');
                 $('#fg-thickness').val(data.stockDateThickness || '');
                 element('search').val(data.search ? data.search.search : '');
