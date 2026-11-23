@@ -378,6 +378,7 @@ class Retur_penjualan_model extends BF_Model
 	public function get_retur_incoming()
 	{
 		$ENABLE_MANAGE = has_permission('Retur_Penjualan.Manage');
+		$ENABLE_DELETE = has_permission('Retur_Penjualan.Delete');
 
 		$post   = $this->input->post();
 		$draw   = intval($post['draw']);
@@ -388,7 +389,6 @@ class Retur_penjualan_model extends BF_Model
 		$this->db->select('a.*, b.name_customer');
 		$this->db->from('tr_retur_penjualan a');
 		$this->db->join('master_customers b', 'b.id_customer=a.id_customer', 'left');
-		// $this->db->where('a.no_do IS NOT NULL');
 
 		// Filter Search
 		if (!empty($search)) {
@@ -418,20 +418,38 @@ class Retur_penjualan_model extends BF_Model
 		foreach ($get_data as $item) {
 			$no++;
 
+			$is_cancelled = ($item->sts === 'CANCEL');
+			$is_closed    = ($item->status_cn === 'CLOSED');
+
 			$action = '';
-			if ($ENABLE_MANAGE) {
-				$action = '<a class="btn btn-success btn-sm" href="' . base_url('/retur_penjualan/PrintH2/' . $item->id_retur) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
+			if ($ENABLE_MANAGE && !$is_cancelled) {
+				$action .= '<a class="btn btn-success btn-sm" href="' . base_url('/retur_penjualan/PrintH2/' . $item->id_retur) . '" target="_blank" title="Print"><i class="fa fa-print"></i></a>';
+			}
+			if ($ENABLE_DELETE && !$is_cancelled && !$is_closed) {
+				$action .= ' <button class="btn btn-danger btn-sm btn-cancel-retur" data-id="' . $item->id_retur . '" data-no="' . $item->no_retur . '" title="Cancel Retur"><i class="fa fa-ban"></i></button>';
+			}
+
+			$status_label = '';
+			if ($is_cancelled) {
+				$status_label = '<span class="label label-danger">CANCEL</span>';
+			} elseif ($is_closed) {
+				$status_label = '<span class="label label-success">CN CLOSED</span>';
+			} elseif ($item->status_cn === 'COMPLETED') {
+				$status_label = '<span class="label label-info">CN COMPLETED</span>';
+			} else {
+				$status_label = '<span class="label label-warning">PENDING</span>';
 			}
 
 			$hasil[] = [
-				'no'         => $no,
-				'no_retur'   => $item->no_retur,
-				'tgl_retur'  => date('d F Y', strtotime($item->tgl_retur)),
-				'customer'   => $item->name_customer,
-				'no_do'      => !empty($item->no_do) ? $item->no_do : '-',
-				'no_po'      => !empty($item->no_po) ? $item->no_po : '-',
-				'kompensasi' => ($item->kompensasi == 'brg') ? 'Ganti Barang' : 'Potong Hutang',
-				'action'     => $action
+				'no'          => $no,
+				'no_retur'    => $item->no_retur,
+				'tgl_retur'   => date('d F Y', strtotime($item->tgl_retur)),
+				'customer'    => $item->name_customer,
+				'no_do'       => !empty($item->no_do) ? $item->no_do : '-',
+				'no_po'       => !empty($item->no_po) ? $item->no_po : '-',
+				'kompensasi'  => ($item->kompensasi == 'brg') ? 'Ganti Barang' : 'Potong Hutang',
+				'status'      => $status_label,
+				'action'      => $action
 			];
 		}
 
@@ -630,5 +648,104 @@ class Retur_penjualan_model extends BF_Model
 		$this->db->where('a.id_retur', $id_retur);
 		$query = $this->db->get();
 		return $query->row();
+	}
+
+	/**
+	 * Cancel retur: hapus stok yang dikembalikan dan ubah status header
+	 * Hanya boleh dipanggil jika status_cn bukan CLOSED
+	 *
+	 * @param  string $id_retur
+	 * @return array  ['status' => 1|0, 'pesan' => string]
+	 */
+	public function cancel_retur($id_retur)
+	{
+		// 1. Ambil header
+		$retur = $this->db->get_where('tr_retur_penjualan', ['id_retur' => $id_retur])->row();
+
+		if (!$retur) {
+			return ['status' => 0, 'pesan' => 'Data retur tidak ditemukan!'];
+		}
+
+		// 2. Guard: tidak boleh cancel jika CN sudah CLOSED
+		if ($retur->status_cn === 'CLOSED') {
+			return ['status' => 0, 'pesan' => 'Retur tidak dapat dibatalkan karena Credit Note sudah CLOSED!'];
+		}
+
+		// 3. Guard: tidak boleh cancel ulang
+		if ($retur->sts === 'CANCEL') {
+			return ['status' => 0, 'pesan' => 'Retur ini sudah berstatus CANCEL!'];
+		}
+
+		// 4. Ambil data stok yang akan dihapus sebelum di-delete (untuk audit trail)
+		$this->db->like('keterangan', 'RETUR (' . $id_retur . ')', 'both');
+		$stok_dihapus = $this->db->get('stock_material')->result_array();
+
+		$this->db->trans_begin();
+
+		// 5. Simpan ke audit trail stock_cancel_retur
+		if (!empty($stok_dihapus)) {
+			$cancelled_on = date('Y-m-d H:i:s');
+			$cancelled_by = $this->session->userdata('user_id');
+
+			$arr_audit = [];
+			foreach ($stok_dihapus as $stok) {
+				$arr_audit[] = [
+					'id_retur'           => $id_retur,
+					'no_retur'           => $retur->no_retur,
+					'cancelled_by'       => $cancelled_by,
+					'cancelled_on'       => $cancelled_on,
+					'id_stock'           => $stok['id_stock'],
+					'id_category3'       => $stok['id_category3'],
+					'nama_material'      => $stok['nama_material'],
+					'width'              => $stok['width'],
+					'length'             => $stok['length'],
+					'id_bentuk'          => $stok['id_bentuk'],
+					'lotno'              => $stok['lotno'],
+					'qty'                => $stok['qty'],
+					'weight'             => $stok['weight'],
+					'totalweight'        => $stok['totalweight'],
+					'booking'            => $stok['booking'],
+					'thickness'          => $stok['thickness'],
+					'aktif'              => $stok['aktif'],
+					'id_gudang'          => $stok['id_gudang'],
+					'lot_slitting'       => $stok['lot_slitting'],
+					'keterangan'         => $stok['keterangan'],
+					'id_roll'            => $stok['id_roll'],
+					'panjang'            => $stok['panjang'],
+					'actual_berat'       => $stok['actual_berat'],
+					'sisa_spk'           => $stok['sisa_spk'],
+					'no_surat'           => $stok['no_surat'],
+					'customer'           => $stok['customer'],
+					'status_do'          => $stok['status_do'],
+					'costbook'           => $stok['costbook'],
+					'id_dt_spkmarketing' => $stok['id_dt_spkmarketing'],
+					'harga_deal'         => $stok['harga_deal'],
+					'tipe_material'      => $stok['tipe_material'],
+					'qty_sheet'          => $stok['qty_sheet'],
+					'created_by'         => $stok['created_by'],
+					'created_on'         => $stok['created_on'],
+				];
+			}
+			$this->db->insert_batch('stock_cancel_retur', $arr_audit);
+		}
+
+		// 6. Hapus stok material yang dikembalikan oleh retur ini
+		$this->db->like('keterangan', 'RETUR (' . $id_retur . ')', 'both');
+		$this->db->delete('stock_material');
+
+		// 7. Update status header menjadi CANCEL
+		$this->db->where('id_retur', $id_retur);
+		$this->db->update('tr_retur_penjualan', [
+			'sts'       => 'CANCEL',
+			'status_cn' => 'CANCEL',
+		]);
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+			return ['status' => 0, 'pesan' => 'Gagal membatalkan retur. Silakan coba lagi!'];
+		}
+
+		$this->db->trans_commit();
+		return ['status' => 1, 'pesan' => 'Retur ' . $retur->no_retur . ' berhasil dibatalkan.'];
 	}
 }

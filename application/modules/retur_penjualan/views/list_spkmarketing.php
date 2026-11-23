@@ -32,6 +32,7 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 					<th>No. DO</th>
 					<th>No. SJ Customer</th>
 					<th>Kompensasi</th>
+					<th>Status</th>
 					<th width="10%">Action</th>
 				</tr>
 			</thead>
@@ -250,31 +251,65 @@ $ENABLE_DELETE  = has_permission('Retur_Penjualan.Delete');
 				cache: false,
 				dataType: 'json'
 			},
-			columns: [{
-					data: 'no'
-				},
-				{
-					data: 'no_retur'
-				},
-				{
-					data: 'tgl_retur'
-				},
-				{
-					data: 'customer'
-				},
-				{
-					data: 'no_do'
-				},
-				{
-					data: 'no_po'
-				},
-				{
-					data: 'kompensasi'
-				},
-				{
-					data: 'action'
-				}
+			columns: [
+				{ data: 'no' },
+				{ data: 'no_retur' },
+				{ data: 'tgl_retur' },
+				{ data: 'customer' },
+				{ data: 'no_do' },
+				{ data: 'no_po' },
+				{ data: 'kompensasi' },
+				{ data: 'status', orderable: false },
+				{ data: 'action', orderable: false }
 			]
 		});
 	}
+
+	// Cancel Retur
+	$(document).on('click', '.btn-cancel-retur', function () {
+		var id    = $(this).data('id');
+		var noRet = $(this).data('no');
+
+		swal({
+			title: 'Batalkan Retur?',
+			text: 'Retur ' + noRet + ' akan dibatalkan dan stok yang dikembalikan akan dihapus. Tindakan ini tidak dapat diurungkan!',
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonClass: 'btn-danger',
+			confirmButtonText: 'Ya, Batalkan!',
+			cancelButtonText: 'Tidak',
+			closeOnConfirm: false
+		}, function (isConfirm) {
+			if (!isConfirm) {
+				swal('Dibatalkan', 'Retur tidak jadi dibatalkan.', 'info');
+				return;
+			}
+
+			$.ajax({
+				type: 'POST',
+				url: siteurl + active_controller + 'cancel_retur',
+				dataType: 'json',
+				data: { id_retur: id },
+				success: function (res) {
+					if (res.status == 1) {
+						swal({
+							title: 'Berhasil!',
+							text: res.pesan,
+							type: 'success',
+							timer: 3000,
+							showConfirmButton: false
+						});
+						setTimeout(function () {
+							$('#table_retur_incoming').DataTable().ajax.reload(null, false);
+						}, 1500);
+					} else {
+						swal('Gagal!', res.pesan, 'error');
+					}
+				},
+				error: function () {
+					swal('Error!', 'Koneksi bermasalah. Silakan coba lagi.', 'error');
+				}
+			});
+		});
+	});
 </script>

@@ -1502,6 +1502,20 @@ class Retur_penjualan extends Admin_Controller
 		}
 	}
 
+	public function cancel_retur()
+	{
+		$this->auth->restrict($this->deletePermission);
+		$id_retur = $this->input->post('id_retur');
+
+		if (empty($id_retur)) {
+			echo json_encode(['status' => 0, 'pesan' => 'ID Retur tidak valid!']);
+			return;
+		}
+
+		$result = $this->Retur_penjualan_model->cancel_retur($id_retur);
+		echo json_encode($result);
+	}
+
 	public function confirm_cn()
 	{
 		$this->auth->restrict('CN_Retur_Penjualan.Manage');
