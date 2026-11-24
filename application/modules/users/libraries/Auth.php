@@ -71,8 +71,11 @@ class Auth
 
         $user     = $this->ci->users_model->find_by(array('username' => $username));
 
-        if (!$user) {
-            $this->ci->template->set_message(lang('users_login_fail'), 'error');
+        // Pesan seragam agar tidak membocorkan apakah username terdaftar.
+        // Status akun (dihapus/nonaktif) baru ditampilkan setelah password terbukti benar.
+        if (!$user || !password_verify($password, $user->password)) {
+            $this->ci->template->set_message(lang('users_login_invalid'), 'error');
+            $this->ci->template->message();
             return FALSE;
         }
 
@@ -86,32 +89,24 @@ class Auth
             return FALSE;
         }
 
-        if (password_verify($password, $user->password)) {
-            //Buat Session
-            $array = array();
-            foreach ($user as $key => $usr) {
-                $array[$key] = $usr;
-            }
-
-            $this->ci->session->set_userdata('app_session', $array);
-            //Set User Data
-            $this->user = $this->ci->session->userdata('app_session');
-            //Update Login Terakhir
-            $ip_address = ($this->ci->input->ip_address()) == "::1" ? "127.0.0.1" : $this->ci->input->ip_address();
-            $this->ci->users_model->update($this->user_id(), array('login_terakhir' => date('Y-m-d H:i:s'), 'ip' => $ip_address));
-
-            $requested_page = $this->ci->session->userdata('requested_page');
-            if ($requested_page != '') {
-                //redirect($requested_page);
-                redirect("/");
-            }
-
-            redirect("/");
+        //Buat Session
+        $array = array();
+        foreach ($user as $key => $usr) {
+            $array[$key] = $usr;
         }
+        // Jangan simpan hash password di sesi
+        unset($array['password']);
+        // Cegah session fixation
+        $this->ci->session->sess_regenerate(FALSE);
 
-        $this->ci->template->set_message(lang('users_wrong_password'), 'error');
-        $this->ci->template->message();
-        return FALSE;
+        $this->ci->session->set_userdata('app_session', $array);
+        //Set User Data
+        $this->user = $this->ci->session->userdata('app_session');
+        //Update Login Terakhir
+        $ip_address = ($this->ci->input->ip_address()) == "::1" ? "127.0.0.1" : $this->ci->input->ip_address();
+        $this->ci->users_model->update($this->user_id(), array('login_terakhir' => date('Y-m-d H:i:s'), 'ip' => $ip_address));
+
+        redirect("/");
     }
 
     public function logout()

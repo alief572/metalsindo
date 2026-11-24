@@ -5,6 +5,15 @@ class Ms_asset extends CI_Controller{
     public function __construct(){
         parent::__construct();
 
+		// Wajib login (sebelumnya controller ini bisa diakses tanpa autentikasi)
+		$this->load->library('session');
+		if (!$this->session->userdata('app_session')) {
+			if ($this->input->is_ajax_request()) {
+				show_error('Unauthorized', 401);
+			}
+			redirect('login');
+		}
+
 		$this->load->model('asset_model');
 		$this->load->model('master_model');
     }
@@ -33,7 +42,7 @@ class Ms_asset extends CI_Controller{
 
 	public function modal_view(){
 		$id = $this->uri->segment(3);
-		$qData	= "SELECT a.*, b.nm_costcenter FROM asset a LEFT JOIN costcenter b ON a.id_costcenter=b.id_costcenter WHERE a.id='".$this->uri->segment(3)."'";
+		$qData	= "SELECT a.*, b.nm_costcenter FROM asset a LEFT JOIN costcenter b ON a.id_costcenter=b.id_costcenter WHERE a.id='".$this->db->escape_str($this->uri->segment(3))."'";
 		$dataD	= $this->db->query($qData)->result_array();
 
 		$data = array(
@@ -391,7 +400,7 @@ class Ms_asset extends CI_Controller{
 	public function list_center(){
 		$id = $this->uri->segment(3);
 		$cs = $this->uri->segment(4);
-		$query	 	= "SELECT * FROM costcenter WHERE id_dept='".$id."' ORDER BY nm_costcenter ASC";
+		$query	 	= "SELECT * FROM costcenter WHERE id_dept='".$this->db->escape_str($id)."' ORDER BY nm_costcenter ASC";
 		$Q_result	= $this->db->query($query)->result();
 		$option 	= "<option value='0'>Select Costcenter</option>";
 		foreach($Q_result as $row)	{
@@ -405,7 +414,7 @@ class Ms_asset extends CI_Controller{
 	
 	public function get_jangka_waktu(){
 		$id = $this->uri->segment(3);
-		$query	 	= "SELECT * FROM asset_category_pajak WHERE id='".$id."' ";
+		$query	 	= "SELECT * FROM asset_category_pajak WHERE id='".$this->db->escape_str($id)."' ";
 		$Q_result	= $this->db->query($query)->result();
 		$data 	 	= $Q_result[0]->jangka_waktu;
 		echo json_encode(array(
@@ -513,7 +522,7 @@ class Ms_asset extends CI_Controller{
             }
             
             $id = $this->uri->segment(3);
-            $query = "SELECT * FROM asset_category WHERE id ='".$id."' LIMIT 1 ";
+            $query = "SELECT * FROM asset_category WHERE id ='".$this->db->escape_str($id)."' LIMIT 1 ";
             $result = $this->db->query($query)->result();
 
 			$data = array(

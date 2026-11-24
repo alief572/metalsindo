@@ -12,6 +12,23 @@ class Jurnal_nomor extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
+
+        // Wajib login (sebelumnya controller ini bisa diakses tanpa autentikasi)
+        $this->load->library('session');
+        if (!$this->session->userdata('app_session')) {
+            if ($this->input->is_ajax_request()) {
+                show_error('Unauthorized', 401);
+            }
+            redirect('login');
+        }
+
+        // Segmen URI dipakai langsung di query SQL; hanya izinkan karakter aman
+        foreach (array(3, 4, 5, 6) as $seg) {
+            if (!preg_match('/^[A-Za-z0-9_.\- ]*$/', rawurldecode((string) $this->uri->segment($seg)))) {
+                show_error('Bad Request', 400);
+            }
+        }
+
         $this->load->model(array('Jurnal_nomor/Acc_model',
                                  'Jurnal_nomor/Jurnal_model'));
         date_default_timezone_set("Asia/Bangkok");

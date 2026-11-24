@@ -39,6 +39,7 @@ $lang['users_already_deleted'] = 'User has been removed,<br> for more informatio
 $lang['users_permission_edit_success'] = "User's permission saved successfully";
 $lang['users_permission_edit_fail'] = "User's permission saving failed";
 
+$lang['users_login_invalid']   = 'Username atau password salah';
 $lang['users_login_fail'] 	  = 'Login failed, username not found';
 $lang['users_not_active'] 		= 'Your username was not active anymore';
 $lang['users_wrong_password'] 	= 'You entered a wrong password';

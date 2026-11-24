@@ -90,7 +90,7 @@ if ($inven->spek != '') {
 								<label for="customer">Maker</label>
 							</div>
 							<div class="col-md-6">
-								<input type="text" class="form-control maker" id="hd1[1][maker]" required name="hd1[1][maker]" value='<?= $inven->maker ?>' placeholder="Maker">
+								<input type="text" class="form-control maker" id="hd1[1][maker]" required name="hd1[1][maker]" value='<?= html_escape($inven->negara) ?>' placeholder="Maker">
 							</div>
 						</div>
 						<div class="form-group row">
@@ -117,7 +117,7 @@ if ($inven->spek != '') {
 								<label for="customer">Nama Material</label>
 							</div>
 							<div class="col-md-6">
-								<input type="text" class="form-control nama" id="hd1[1][nama]" name="hd1[1][nama]" placeholder="Nama Material" value='<?= $inven->nama ?>' readonly>
+								<input type="text" class="form-control nama" id="hd1[1][nama]" name="hd1[1][nama]" placeholder="Nama Material" value='<?= html_escape($inven->nama) ?>'>
 							</div>
 						</div>
 
@@ -314,6 +314,18 @@ if ($inven->spek != '') {
 					</div>
 				</div>
 			</div>
+
+			<?php if ($inven->id_bentuk === 'B2000001') : ?>
+			<h4 class="page-header">Material Ekuivalen
+				<button type="button" class="btn btn-sm btn-success pull-right" id="eq-toggle"><i class="fa fa-plus"></i> Tambah Material Ekuivalen</button>
+			</h4>
+			<div id="eq-pick" class="well well-sm" style="display:none">
+				<input type="text" id="eq-q" class="form-control input-sm" placeholder="Cari id / nama / spesifikasi / maker...">
+				<div id="eq-res" style="margin-top:8px"></div>
+			</div>
+			<div id="eq-list"></div>
+			<?php endif; ?>
+
 			<hr>
 			<center>
 				<!--<button type="submit" class="btn btn-primary btn-sm add_field_button2" name="save"><i class="fa fa-plus"></i>Add Main Produk</button>
@@ -702,4 +714,70 @@ if ($inven->spek != '') {
 		$(".nama").val(nama);
 
 	}
+
+	// ---- Material Ekuivalen (Roll B2000001) ----
+	<?php if ($inven->id_bentuk === 'B2000001') : ?>
+	(function() {
+		var SELF   = <?= json_encode($inven->id_category3) ?>;
+		var manual = <?= json_encode(array_values($results['eq']['manual'])) ?>;
+		var excl   = <?= json_encode(array_values($results['eq']['exclude'])) ?>;
+
+		function eqData(extra) {
+			return $.extend({
+				self:      SELF,
+				id_spek:   <?= json_encode($results['id_spesifikasi']) ?>,
+				thickness: <?= json_encode($results['thickness']) ?>,
+				is_sheet:  '0',
+				manual:    manual,
+				excl:      excl
+			}, extra || {});
+		}
+
+		function showEq() {
+			$.post(siteurl + 'inventory_4/ekuivalen_list', eqData(), function(h) {
+				$('#eq-list').html(h);
+			});
+			pick();
+		}
+
+		function pick() {
+			if (!$('#eq-pick').is(':visible')) return;
+			$.post(siteurl + 'inventory_4/ekuivalen_cari', eqData({ q: $('#eq-q').val() }), function(h) {
+				$('#eq-res').html(h);
+			});
+		}
+
+		$('#eq-toggle').on('click', function() {
+			$('#eq-pick').toggle();
+			pick();
+			if ($('#eq-pick').is(':visible')) $('#eq-q').focus();
+		});
+		$('#eq-q').on('input', pick);
+		$('#eq-res').on('click', '.eq-add', function() {
+			var id = String($(this).data('id'));
+			excl = $.grep(excl, function(x) { return x !== id; });
+			if ($.inArray(id, manual) < 0) manual.push(id);
+			showEq();
+		});
+		$('#eq-list').on('click', '.eq-rm', function() {
+			var id = String($(this).data('id'));
+			manual = $.grep(manual, function(x) { return x !== id; });
+			if ($.inArray(id, excl) < 0) excl.push(id);
+			showEq();
+		});
+
+		// Kirim data ekuivalen saat simpan
+		$('#simpan-com').on('click', function() {
+			$('#data-form [name="eq_manual[]"], #data-form [name="eq_excl[]"]').remove();
+			$.each(manual, function(i, id) {
+				$('<input>').attr({ type: 'hidden', name: 'eq_manual[]', value: id }).appendTo('#data-form');
+			});
+			$.each(excl, function(i, id) {
+				$('<input>').attr({ type: 'hidden', name: 'eq_excl[]', value: id }).appendTo('#data-form');
+			});
+		});
+
+		showEq();
+	})();
+	<?php endif; ?>
 </script>

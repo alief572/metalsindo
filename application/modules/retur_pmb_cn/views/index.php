@@ -26,6 +26,7 @@ $ENABLE_DELETE  = has_permission('Retur_Credit_Note.Delete');
 					<th class="text-center">No. DN</th>
                     <th class="text-center">Nama Supplier</th>
                     <th class="text-center">Nomor PO</th>
+                    <th class="text-center">Tanggal Retur</th>
                     <th class="text-center">Alasan Retur</th>
 					<th class="text-center">Action</th>
 				</tr>
@@ -122,6 +123,10 @@ $ENABLE_DELETE  = has_permission('Retur_Credit_Note.Delete');
 				},
 				{
 					data: 'nomor_po'
+				},
+				{
+					data: 'tanggal_retur',
+					sClass: 'text-center'
 				},
 				{
 					data: 'alasan_retur'

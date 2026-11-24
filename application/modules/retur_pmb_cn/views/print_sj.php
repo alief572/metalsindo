@@ -27,6 +27,7 @@ $date = function ($value, $format) {
     </table>
     <table class="sj-title" cellspacing="0"><tr><td style="width: 100%;">SURAT JALAN</td></tr></table>
     <p class="sj-number"><b>NO : <?= $esc($header->no_surat) ?></b></p>
+    <p class="sj-date"><b>TANGGAL : <?= $date($retur_header->tgl_retur, 'd-M-Y') ?></b></p>
     <table class="sj-address" cellspacing="0">
         <tr>
             <td class="sj-sender" style="width: 50%;">
@@ -95,7 +96,14 @@ $date = function ($value, $format) {
                 <td><b>DIPERIKSA<br><i>(CHECKED BY)</i></b></td>
                 <td><b>HORMAT KAMI<br><i>(YOURS FAITHFULLY)</i></b></td>
             </tr>
-            <tr><td class="sj-sign-space"></td><td></td><td></td></tr>
+            <tr>
+                <td class="sj-sign-space" style="height: 100px;"></td>
+                <td class="sj-sign-space" style="height: 100px;"></td>
+                <td class="sj-sign-space" style="height: 100px;"></td>
+            </tr>
+            <tr>
+                <td>(_________________________)</td><td>(_________________________)</td><td>(_________________________)</td>
+            </tr>
             <tr>
                 <td><b>STEMPEL/NAMA JELAS</b></td><td><b>POS JAGA</b></td><td><b>GUDANG JADI</b></td>
             </tr>

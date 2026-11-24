@@ -308,4 +308,279 @@ class Inventory_4_model extends BF_Model
 		$this->db->where('id_bentuk', $id_bentuk);
 		return $this->db->count_all_results();
 	}
+
+	/* ------------------------------------------------------------------
+	 * Sheet (B2000002) & Material Ekuivalen
+	 * ----------------------------------------------------------------*/
+
+	const BENTUK_SHEET = 'B2000002';
+
+	/** Opsi berjenjang untuk form Sheet. $keep = id yang tetap ikut walau nonaktif. */
+	public function opsi($level, $parent, $keep = '')
+	{
+		if ($level === 'c1') {
+			$tbl = 'ms_inventory_category1';
+			$id = 'id_category1';
+			$par = 'id_type';
+		} elseif ($level === 'c2') {
+			$tbl = 'ms_inventory_category2';
+			$id = 'id_category2';
+			$par = 'id_category1';
+		} else {
+			$tbl = 'ms_spesifikasi';
+			$id = 'id_spesifikasi';
+			$par = 'id_category2';
+		}
+		$this->db->select("$id AS id, nama", false)->from($tbl)
+			->where('deleted', 0)->where($par, $parent)
+			->group_start()->where('aktif', 'aktif');
+		if ($keep !== '') {
+			$this->db->or_where($id, $keep);
+		}
+		return $this->db->group_end()->order_by('nama', 'ASC')->get()->result();
+	}
+
+	/** Cek rantai Type > C1 > C2 > Spesifikasi. Mengembalikan pesan error atau ''. */
+	public function validasi_hierarki($type, $c1, $c2, $spek, $old = null)
+	{
+		$ok = function ($tbl, $id_col, $id, $par_col, $par, $old_id) {
+			$this->db->where('deleted', 0)->where($id_col, $id)->where($par_col, $par);
+			if ($id !== $old_id) {
+				$this->db->where('aktif', 'aktif');
+			}
+			return $this->db->count_all_results($tbl) > 0;
+		};
+		$o = $old ?: (object) array('id_type' => '', 'id_category1' => '', 'id_category2' => '', 'id_spesifikasi' => '');
+		if (!$ok('ms_inventory_type', 'id_type', $type, 'id_type', $type, $o->id_type)) {
+			return 'Type Inventory tidak valid.';
+		}
+		if (!$ok('ms_inventory_category1', 'id_category1', $c1, 'id_type', $type, $o->id_category1)) {
+			return 'Ferous / Non Ferous tidak valid.';
+		}
+		if (!$ok('ms_inventory_category2', 'id_category2', $c2, 'id_category1', $c1, $o->id_category2)) {
+			return 'Type Alloy tidak valid.';
+		}
+		if (!$ok('ms_spesifikasi', 'id_spesifikasi', $spek, 'id_category2', $c2, $o->id_spesifikasi)) {
+			return 'Spesifikasi tidak valid untuk Type Alloy tersebut.';
+		}
+		return '';
+	}
+
+	public function nama_alloy($id_category2)
+	{
+		$r = $this->db->select('nama')->get_where('ms_inventory_category2', array('id_category2' => $id_category2))->row();
+		return $r ? $r->nama : '';
+	}
+
+	public function get_spesifikasi($id)
+	{
+		return $this->db->get_where('ms_spesifikasi', array('id_spesifikasi' => $id, 'deleted' => 0))->row();
+	}
+
+	/** Nama Sheet: SPEK-HARDNESS-THICKNESS-WIDTH-LENGTH-ALLOY, bagian kosong dilewati. */
+	public function build_nama_sheet($spek, $hardness, $t, $w, $l, $alloy)
+	{
+		$parts = array($spek, $hardness, $t, $w, $l, $alloy);
+		return implode('-', array_filter(array_map('trim', array_map('strval', $parts)), function ($x) {
+			return $x !== '';
+		}));
+	}
+
+	/** Berat/Sheet (kg) = T x W x L x berat jenis / 1.000.000. */
+	public function berat_sheet($t, $w, $l, $bj)
+	{
+		return round((float) $t * (float) $w * (float) $l * (float) $bj / 1000000, 2);
+	}
+
+	/** Nilai dimensi material: array nm_dimensi => nilai. */
+	public function dim_map($id)
+	{
+		$map = array();
+		foreach ($this->dimensy($id) as $d) {
+			$map[strtoupper($d->nm_dimensi)] = $d->nilai_dimensi;
+		}
+		return $map;
+	}
+
+	public function dimensi_sheet()
+	{
+		return $this->db->where('id_bentuk', self::BENTUK_SHEET)->where('deleted', 0)->order_by('id_dimensi', 'ASC')->get('ms_dimensi')->result();
+	}
+
+	/** Pasangan ekuivalen milik satu material: ['manual' => [ids], 'exclude' => [ids]]. */
+	public function eq_saved($id)
+	{
+		$out = array('manual' => array(), 'exclude' => array());
+		if ($id === '') {
+			return $out;
+		}
+		$rows = $this->db->query(
+			"SELECT id_category3_a a, id_category3_b b, tipe FROM ms_material_ekuivalen WHERE id_category3_a = ? OR id_category3_b = ?",
+			array($id, $id)
+		)->result();
+		foreach ($rows as $r) {
+			$other = $r->a === $id ? $r->b : $r->a;
+			if (isset($out[$r->tipe])) {
+				$out[$r->tipe][] = $other;
+			}
+		}
+		return $out;
+	}
+
+	/** Ganti seluruh pasangan milik $id dengan daftar baru. Dipanggil di dalam transaksi pemanggil. */
+	public function eq_save($id, $manual, $exclude, $user)
+	{
+		$this->db->query("DELETE FROM ms_material_ekuivalen WHERE id_category3_a = ? OR id_category3_b = ?", array($id, $id));
+		$now = date('Y-m-d H:i:s');
+		foreach (array('manual' => $manual, 'exclude' => $exclude) as $tipe => $list) {
+			foreach (array_unique($list) as $o) {
+				if ($o === '' || $o === $id) {
+					continue;
+				}
+				$pair = strcmp($id, $o) < 0 ? array($id, $o) : array($o, $id);
+				$this->db->query(
+					"INSERT IGNORE INTO ms_material_ekuivalen (id_category3_a, id_category3_b, tipe, created_by, created_on) VALUES (?,?,?,?,?)",
+					array($pair[0], $pair[1], $tipe, $user, $now)
+				);
+			}
+		}
+	}
+
+	/** Hanya id yang benar-benar ada (non-deleted), tanpa $self. */
+	public function filter_ids($ids, $self = '')
+	{
+		$ids = array_values(array_unique(array_filter(array_map('strval', (array) $ids))));
+		if (!$ids) {
+			return array();
+		}
+		$rows = $this->db->select('id_category3')->where('deleted', 0)->where_in('id_category3', $ids)->get('ms_inventory_category3')->result();
+		$ok = array();
+		foreach ($rows as $r) {
+			if ($r->id_category3 !== $self) {
+				$ok[] = $r->id_category3;
+			}
+		}
+		return $ok;
+	}
+
+	private function same_thick($a, $b)
+	{
+		if ($a === '' || $a === null || $b === '' || $b === null || !is_numeric($a) || !is_numeric($b)) {
+			return false;
+		}
+		return round((float) $a, 2) === round((float) $b, 2);
+	}
+
+	/** Semua material (kolom ringan) berkunci id_category3, dalam urutan id. */
+	private function all_material()
+	{
+		$rows = $this->db->query(
+			"SELECT m.id_category3, m.nama, m.spek, m.hardness, m.thickness, m.maker, m.aktif, m.id_bentuk,
+					m.id_category2, m.id_spesifikasi, b.nm_bentuk
+			 FROM ms_inventory_category3 m
+			 LEFT JOIN ms_bentuk b ON b.id_bentuk = m.id_bentuk
+			 WHERE m.deleted = 0 ORDER BY m.id_category3"
+		)->result();
+		$out = array();
+		foreach ($rows as $r) {
+			$out[$r->id_category3] = $r;
+		}
+		return $out;
+	}
+
+	/**
+	 * Material Ekuivalen. Otomatis: (1) spesifikasi sama, (2) thickness sama.
+	 * Sheet juga mendapat Roll; Roll tidak mendapat Sheet. Manual dua arah dan berantai.
+	 * @return array ['sp' => row|null, 'list' => [row + ->rel], 'ids' => [id]]
+	 */
+	public function eq_calc($self, $id_spek, $thickness, $is_sheet, $manual, $exclude)
+	{
+		$sp  = $id_spek !== '' ? $this->get_spesifikasi($id_spek) : null;
+		$all = $this->all_material();
+		$manual  = array_flip((array) $manual);
+		$exclude = array_flip((array) $exclude);
+
+		// Graf manual milik material lain (pasangan milik $self diganti oleh $manual dari form)
+		$adj = array();
+		$pairs = $this->db->query("SELECT id_category3_a a, id_category3_b b FROM ms_material_ekuivalen WHERE tipe = 'manual'")->result();
+		foreach ($pairs as $p) {
+			if ($p->a === $self || $p->b === $self) {
+				continue;
+			}
+			$adj[$p->a][] = $p->b;
+			$adj[$p->b][] = $p->a;
+		}
+
+		$direct = array();
+		$rel = array();
+		foreach ($all as $id => $m) {
+			if ($id === $self) {
+				continue;
+			}
+			if (isset($manual[$id])) {
+				$direct[] = $id;
+				$rel[$id] = 'manual';
+				continue;
+			}
+			if (!$sp || isset($exclude[$id])) {
+				continue;
+			}
+			$spek_ok = $m->id_spesifikasi === $sp->id_spesifikasi
+				|| ($m->id_category2 === $sp->id_category2 && strcasecmp(trim((string) $m->spek), $sp->nama) === 0);
+			$auto_ok = $is_sheet ? true : $m->id_bentuk !== self::BENTUK_SHEET;
+			if ($spek_ok && $auto_ok && $this->same_thick($m->thickness, $thickness)) {
+				$direct[] = $id;
+				$rel[$id] = ($is_sheet && $m->id_bentuk !== self::BENTUK_SHEET) ? 'roll_sheet' : 'sama';
+			}
+		}
+
+		$seen = array($self => 1);
+		foreach ($direct as $id) {
+			$seen[$id] = 1;
+		}
+		$queue = $direct;
+		$order = array();
+		while ($queue) {
+			$cur = array_shift($queue);
+			$order[] = $cur;
+			foreach (isset($adj[$cur]) ? $adj[$cur] : array() as $x) {
+				if (isset($seen[$x]) || !isset($all[$x])) {
+					continue;
+				}
+				$seen[$x] = 1;
+				$rel[$x] = 'berantai';
+				$queue[] = $x;
+			}
+		}
+
+		$list = array();
+		foreach ($order as $id) {
+			$row = clone $all[$id];
+			$row->rel = $rel[$id];
+			$list[] = $row;
+		}
+		return array('sp' => $sp, 'list' => $list, 'ids' => $order);
+	}
+
+	/** Pencarian material untuk ditambah manual (maks 30). */
+	public function eq_cari($self, $shown, $q)
+	{
+		$q = strtolower(trim($q));
+		$shown = array_flip((array) $shown);
+		$out = array();
+		$total = 0;
+		foreach ($this->all_material() as $id => $m) {
+			if ($id === $self || isset($shown[$id])) {
+				continue;
+			}
+			if ($q !== '' && strpos(strtolower(implode(' ', array($m->id_category3, $m->nama, $m->spek, $m->maker))), $q) === false) {
+				continue;
+			}
+			$total++;
+			if (count($out) < 30) {
+				$out[] = $m;
+			}
+		}
+		return array('list' => $out, 'total' => $total);
+	}
 }
