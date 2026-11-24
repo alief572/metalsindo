@@ -185,3 +185,15 @@ select[multiple]{height:auto!important;padding:4px!important}
 
 .guide-btn{background:rgba(0,0,0,.12);color:#fff;border:0;border-radius:3px;padding:6px 10px;cursor:pointer;font-size:12px}.guide-btn:hover{background:rgba(0,0,0,.22)}
 .driver-popover{font-family:inherit}.driver-popover-title{font-size:15px}.driver-popover-description{font-size:13px;line-height:1.5}
+
+/* ---------- Alur pengadaan (proc.js): bar alur antar modul ---------- */
+.flowbar{background:#fff;border:1px solid var(--bd);border-top:3px solid var(--blue);border-radius:3px;padding:10px 14px;margin-bottom:14px;font-size:13px}
+.flowbar>div{margin-top:6px}
+.steps{list-style:none;display:flex;flex-wrap:wrap;gap:4px;margin:0;padding:0}
+.steps li{padding:3px 10px;border-radius:12px;background:#eef1f4;color:#6b7a86;font-size:12px}
+.steps li.done{background:#e6f6ec;color:#1c6b3a}
+.steps li.on{background:var(--blue);color:#fff;font-weight:700}
+.flowbar .tag.chain{text-decoration:none}
+.flowbar .tag small{opacity:.7;margin-left:4px}
+.printdoc{background:#fff;padding:8px 4px}
+@media print{.topbar,.sidebar,.flowbar,.mock-banner,.footer,.md-h,.form-actions{display:none!important}.content-wrap{margin:0!important}}

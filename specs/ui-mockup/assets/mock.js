@@ -644,6 +644,32 @@
     {hdr:'Purchasing'},
     {key:'purchase_request', href:'purchase_request.html', icon:'☷', label:'Purchase Request'},
     {key:'purchase_order', href:'purchase_order.html', icon:'☰', label:'Purchase Order'},
+    {hdr:'Pengadaan Non Material'},
+    {key:'flow_pengadaan', href:'flow_pengadaan.html', icon:'⇢', label:'Peta Alur Pengadaan'},
+    {key:'non_rutin_index', href:'non_rutin_index.html', icon:'☷', label:'PR Departemen'},
+    {key:'non_rutin_approval_head', href:'non_rutin_approval_head.html', icon:'✔', label:'  Approval Head Dept'},
+    {key:'non_rutin_approval_cost_control', href:'non_rutin_approval_cost_control.html', icon:'✔', label:'  Approval Cost Control'},
+    {key:'non_rutin_approval_management', href:'non_rutin_approval_management.html', icon:'✔', label:'  Approval Management'},
+    {key:'asset_planning_index_asset', href:'asset_planning_index_asset.html', icon:'▥', label:'Planning Asset'},
+    {key:'asset_planning_index_asset_approve', href:'asset_planning_index_asset_approve.html', icon:'✔', label:'  Approval Planning Asset'},
+    {key:'pr_asset_pr', href:'pr_asset_pr.html', icon:'☷', label:'PR Asset'},
+    {key:'pr_asset_approval_head', href:'pr_asset_approval_head.html', icon:'✔', label:'  Approval Head'},
+    {key:'pr_asset_approval_cost_control', href:'pr_asset_approval_cost_control.html', icon:'✔', label:'  Approval Cost Control'},
+    {key:'pr_asset_approval_management', href:'pr_asset_approval_management.html', icon:'✔', label:'  Approval Management'},
+    {key:'app_pr_stock_approval_head', href:'app_pr_stock_approval_head.html', icon:'✔', label:'PR Stock - Approval Head'},
+    {key:'app_pr_stock_approval_cost_control', href:'app_pr_stock_approval_cost_control.html', icon:'✔', label:'PR Stock - Approval Cost Control'},
+    {key:'app_pr_stock_approval_management', href:'app_pr_stock_approval_management.html', icon:'✔', label:'PR Stock - Approval Management'},
+    {key:'metode_pembelian_pr', href:'metode_pembelian_pr.html', icon:'☰', label:'Metode Pembelian - PR'},
+    {key:'purchase_order_non_material', href:'purchase_order_non_material.html', icon:'☰', label:'PO Non Material'},
+    {key:'approval_po_non_material', href:'approval_po_non_material.html', icon:'✔', label:'Approval PO Non Material'},
+    {hdr:'Penerimaan & Hutang'},
+    {key:'incoming_departemen', href:'incoming_departemen.html', icon:'⇩', label:'Incoming Departemen'},
+    {key:'incoming_asset_asset', href:'incoming_asset_asset.html', icon:'⇩', label:'Incoming Asset'},
+    {key:'purchase_order_payment', href:'purchase_order_payment.html', icon:'▤', label:'Receive Invoice'},
+    {key:'request_payment_index', href:'request_payment_index.html', icon:'$', label:'Dashboard Pembayaran (Finance)'},
+    {key:'request_payment_list_approve_checker', href:'request_payment_list_approve_checker.html', icon:'✔', label:'Request Payment - Checker'},
+    {key:'request_payment_list_approve_management', href:'request_payment_list_approve_management.html', icon:'✔', label:'Request Payment - Management'},
+    {key:'pembayaran_material_payment_list', href:'pembayaran_material_payment_list.html', icon:'$', label:'Payment List'},
     {hdr:'Penjualan'},
     {key:'transaksi_inquiry', href:'transaksi_inquiry.html', icon:'?', label:'Inquiry (CRCL)'},
     {key:'pricelist', href:'pricelist.html', icon:'≣', label:'Pricelist (lama, digantikan)'},
@@ -774,7 +800,7 @@
           return '<td>' + (c.html ? c.html(r) : esc(val(r, c))) + '</td>'; }).join('') + '</tr>';
       });
       tbl.innerHTML = h + '</tbody>';
-      $('.info', host).textContent = total ? 'Showing ' + (from + 1) + ' to ' + (from + part.length) + ' of ' + total + ' entries' : 'Showing 0 entries';
+      $('.dt-bot .info', host).textContent = total ? 'Showing ' + (from + 1) + ' to ' + (from + part.length) + ' of ' + total + ' entries' : 'Showing 0 entries';
       var p = '<button data-p="' + (st.page - 1) + '"' + (st.page <= 1 ? ' disabled' : '') + '>Previous</button>';
       for (var i = 1; i <= pages; i++) p += '<button data-p="' + i + '" class="' + (i === st.page ? 'on' : '') + '">' + i + '</button>';
       $('.pager', host).innerHTML = p + '<button data-p="' + (st.page + 1) + '"' + (st.page >= pages ? ' disabled' : '') + '>Next</button>';
@@ -853,7 +879,7 @@
   function persistSave() {
     try {
       var all = pall();
-      ['seed', 'seedS', 'seedA', 'seedP'].forEach(function (n) {
+      ['seed', 'seedS', 'seedA', 'seedP', 'seedR'].forEach(function (n) {
         var s = w.Mock[n]; if (!s || SIG[n] == null) return; var o = {};
         Object.keys(s).forEach(function (k) { try { o[k] = JSON.parse(JSON.stringify(s[k])); } catch (e) {} });
         all[n] = o; all[n + '_sig'] = SIG[n];

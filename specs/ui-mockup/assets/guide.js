@@ -125,7 +125,7 @@
   /* ---------- jalankan ---------- */
   function file() { var p = location.pathname.split('/').pop(); return p || 'index.html'; }
   function run() {
-    var f = T[file()], list = f ? f() : [S(null, document.title, 'Belum ada panduan khusus untuk halaman ini.')];
+    var f = T[file()], list = f ? f() : ((w.Mock.proc && w.Mock.proc.guide && w.Mock.proc.guide(file())) || [S(null, document.title, 'Belum ada panduan khusus untuk halaman ini.')]);
     var extra = (!/^(index|daftar)\.html$/.test(file()) && !has('.ov.show')) ? [side.search, side.perm] : [];
     var st = list.concat(extra).filter(function (s) { return !s.el || has(s.el); }).map(function (s) {
       var step = {popover:{title:s.title, description:s.text}}; if (s.el) step.element = s.el; if (s.side && s.el) step.popover.side = s.side; return step; });

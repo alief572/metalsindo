@@ -43,7 +43,31 @@ var items = [
   ['pricelist_approval.html','Approval Pricelist (PG-13)','pricelist_approval','Management menyetujui seluruh/sebagian baris atau menolak; baris disetujui dirilis, lainnya kembali DRAFT.'],
   ['asset_category.html','Asset Category','asset_category','Kategori asset (Machine, Office Equipment, ...). Kategori Machine menjadi sumber mesin untuk Flow Process.'],
   ['asset.html','Asset','asset','Daftar asset beserta penyusutan; asset berkategori Machine dipilih sebagai mesin pada Flow Process.'],
-  ['index_slitting.html','SPK Marketing Slitting','spk_marketing/index_slitting','SPK Marketing untuk order slitting.']
+  ['index_slitting.html','SPK Marketing Slitting','spk_marketing/index_slitting','SPK Marketing untuk order slitting.'],
+  ['flow_pengadaan.html','Peta Alur Pengadaan','(non_rutin sampai pembayaran_material)','Peta 9 tahap PR, approval, PO, penerimaan, invoice, request payment, pembayaran; tiap kartu ke halaman dan angka dokumen menunggu.'],
+  ['non_rutin_index.html','PR Departemen','non_rutin/index','Daftar, tambah, edit, print, Close PR. Nomor PR terbit saat dibuat dan tetap sama setelah approval.'],
+  ['non_rutin_approval_head.html','Approval PR Departemen - Head','non_rutin/approval_head','Head Department merevisi qty/harga lalu Approve atau Reject.'],
+  ['non_rutin_approval_cost_control.html','Approval PR Departemen - Cost Control','non_rutin/approval_cost_control','Level kedua approval PR Departemen.'],
+  ['non_rutin_approval_management.html','Approval PR Departemen - Management','non_rutin/approval_management','Level ketiga; setelah ini PR masuk Metode Pembelian.'],
+  ['asset_planning_index_asset.html','Planning Asset','asset_planning/index_asset','Budget planning asset per departemen: tambah, edit, hapus.'],
+  ['asset_planning_index_asset_approve.html','Approval Planning Asset','asset_planning/index_asset/approve','Approve atau Reject planning asset; yang Approved bisa dibuat PR.'],
+  ['pr_asset_pr.html','PR Asset','pr_asset/pr','Buat PR Asset dari planning Approved, print, ajukan ulang bila ditolak.'],
+  ['pr_asset_approval_head.html','Approval PR Asset - Head','pr_asset/approval_head','Approval level 1 PR Asset.'],
+  ['pr_asset_approval_cost_control.html','Approval PR Asset - Cost Control','pr_asset/approval_cost_control','Approval level 2 PR Asset.'],
+  ['pr_asset_approval_management.html','Approval PR Asset - Management','pr_asset/approval_management','Approval level 3 PR Asset.'],
+  ['app_pr_stock_approval_head.html','Approval PR Stock - Head','app_pr_stock/approval_head','Approval level 1 PR Stock; item bisa ditolak per baris dan Qty Rev diubah.'],
+  ['app_pr_stock_approval_cost_control.html','Approval PR Stock - Cost Control','app_pr_stock/approval_cost_control','Approval level 2 PR Stock.'],
+  ['app_pr_stock_approval_management.html','Approval PR Stock - Management','app_pr_stock/approval_management','Approval level 3; nomor PR (PRS) tetap.'],
+  ['metode_pembelian_pr.html','Metode Pembelian - PR','metode_pembelian/pr','Semua PR Approved (Departemen, Asset, Stok) dengan status Outstanding / Partial / Clear dan tombol Buat PO.'],
+  ['purchase_order_non_material.html','Purchase Order Non Material','purchase_order_non_material','Daftar PO, pilih PR, form PO dengan TOP 100%, edit saat ditolak, print, Close PO.'],
+  ['approval_po_non_material.html','Approval PO Non Material','approval_po_non_material','Approve atau Reject PO beserta alasan.'],
+  ['incoming_departemen.html','Incoming Departemen','incoming_departemen','Penerimaan barang/jasa departemen berdasarkan PO Approved.'],
+  ['incoming_asset_asset.html','Incoming Asset','incoming_asset/asset','Penerimaan asset; unit OK membentuk asset baru (asset_new).'],
+  ['purchase_order_payment.html','Receive Invoice','purchase_order_payment','Satu modul untuk semua PO (Non Material dan Material): tipe DP, Incoming (aktual diterima, potongan DP proporsional), dan Progress (TOP). Request Payment yang ditolak dapat diajukan ulang.'],
+  ['request_payment_index.html','Dashboard Pembayaran (Finance)','request_payment/index','Baca-saja: jumlah dan nominal pengajuan per status (Waiting Checker, Waiting Management, Menunggu Pembayaran, Sudah Dibayar, Ditolak), per kategori, dan jatuh tempo.'],
+  ['request_payment_list_approve_checker.html','Request Payment - Checker','request_payment/list_approve_checker','Approval Checker per tipe (Transportasi, Kasbon, Expense, Periodik, PO, Direct).'],
+  ['request_payment_list_approve_management.html','Request Payment - Management','request_payment/list_approve_management','Approval Management; yang disetujui masuk Payment List.'],
+  ['pembayaran_material_payment_list.html','Payment List','pembayaran_material/payment_list','Payment PR dan Non PR atas request yang sudah Approved.']
 ];
 page.innerHTML = '<div class="cards">' + items.map(function (i) {
   return '<a class="card" href="' + i[0] + '"><h3>' + i[1] + '</h3><small>modul <code>' + i[2] + '</code></small><p>' + i[3] + '</p></a>'; }).join('') + '</div>' +
