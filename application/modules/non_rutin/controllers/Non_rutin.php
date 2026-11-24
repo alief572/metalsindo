@@ -141,8 +141,8 @@ class Non_rutin extends Admin_Controller
 				$ArrDetail = array();
 				if (!empty($detail)) {
 					foreach ($detail as $val => $valx) {
-						$qty 	= str_replace(',', '', $valx['qty']);
-						$harga 	= str_replace(',', '', $valx['harga']);
+						$qty 	= (float) str_replace(',', '', $valx['qty']);
+						$harga 	= (float) str_replace(',', '', $valx['harga']);
 
 						// print_r($harga);
 						// exit;
