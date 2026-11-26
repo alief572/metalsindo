@@ -42,7 +42,7 @@
     ['approval_po_non_material', 'Approval PO Non Material', 'approval_po_non_material', 'Pembelian Non Material', 4, 'Persetujuan PO Non Material'],
     ['incoming_departemen', 'Incoming Departemen', 'incoming_departemen', 'Penerimaan', 5, 'Penerimaan barang / jasa departemen'],
     ['incoming_asset_asset', 'Incoming Asset', 'incoming_asset/asset', 'Penerimaan', 5, 'Penerimaan asset berdasarkan PO'],
-    ['purchase_order_payment', 'Receive Invoice (DP / Incoming / Progress)', 'purchase_order_payment', 'Hutang & Pembayaran', 6, 'Satu modul Receive Invoice untuk semua PO (Non Material dan Material): DP, Incoming, Progress'],
+    ['purchase_order_payment', 'Receive Invoice (DP / Incoming)', 'purchase_order_payment', 'Hutang & Pembayaran', 6, 'Satu modul Receive Invoice untuk semua PO (Non Material dan Material): DP dan Incoming'],
     ['request_payment_list_approve_checker', 'Request Payment - Checker', 'request_payment/list_approve_checker', 'Hutang & Pembayaran', 7, 'Approval Request Payment oleh Checker'],
     ['request_payment_list_approve_management', 'Request Payment - Management', 'request_payment/list_approve_management', 'Hutang & Pembayaran', 7, 'Approval Request Payment oleh Management'],
     ['request_payment_index', 'Dashboard Pembayaran (Finance)', 'request_payment/index', 'Hutang & Pembayaran', 7, 'Ringkasan jumlah dan nominal pengajuan pembayaran per status, kategori, dan jatuh tempo (baca-saja)'],

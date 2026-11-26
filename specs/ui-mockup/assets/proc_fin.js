@@ -1,4 +1,4 @@
-/* Builder halaman penerimaan dan keuangan: Incoming Departemen / Asset, Receive Invoice (DP / Incoming / Progress), Request Payment (Checker, Management), Payment List, peta alur. */
+/* Builder halaman penerimaan dan keuangan: Incoming Departemen / Asset, Receive Invoice (DP / Incoming), Request Payment (Checker, Management), Payment List, peta alur. */
 (function (M) {
   'use strict';
   var P = M.proc, R = P.R, esc = M.esc, fmt = M.fmt;
@@ -75,14 +75,14 @@
   P.build.incoming_departemen = function (h) { incomingPage(h, false); };
   P.build.incoming_asset_asset = function (h) { incomingPage(h, true); };
 
-  /* ===================================================== RECEIVE INVOICE (satu modul: DP / Incoming / Progress; PO Non Material + PO Material) =====================================================
+  /* ===================================================== RECEIVE INVOICE (satu modul: hanya DP dan Incoming; PO Non Material + PO Material) =====================================================
      Sumber PO: R.po (Non Material, status Approved) dan Mock.seedP.po (Material, status Approved). Satu tabel R.invoice dengan lines[] per PO.
-     Aturan: DP dan Progress = persen TOP x total PO. Incoming = nilai aktual yang diterima (qty diterima x harga PO + PPN, biaya kirim ikut proporsional)
-     dikurangi potongan DP proporsional (nilai incoming x persen DP) dan porsi Progress (nilai incoming x persen Progress), yang ditagih lewat termin masing-masing.
+     Aturan: DP = persen DP di TOP x total PO. Incoming = nilai aktual yang diterima (qty diterima x harga PO, biaya kirim ikut proporsional)
+     dikurangi potongan DP proporsional (nilai incoming x persen DP). Tidak ada tipe Progress.
      Total invoice per PO tidak boleh melebihi total PO. Retensi tidak ada di TOP. */
   var MAT_TOP = { /* TOP PO Material (belum ada tabel TOP pada data PO Material); selain ini dianggap Incoming 100% */
     P2600997:[{group:'DP', persen:30, ket:'Uang muka'}, {group:'Incoming', persen:70, ket:'Pelunasan setelah barang diterima'}],
-    P2601004:[{group:'DP', persen:20, ket:'Uang muka'}, {group:'Progress', persen:30, ket:'Progress produksi'}, {group:'Incoming', persen:50, ket:'Pelunasan setelah barang diterima'}]
+    P2601004:[{group:'DP', persen:20, ket:'Uang muka'}, {group:'Incoming', persen:80, ket:'Pelunasan setelah barang diterima'}]
   };
   var DEF_TOP = [{group:'Incoming', persen:100, ket:'Dibayar setelah barang diterima'}];
   var round = function (v, cur) { return cur === 'IDR' ? Math.round(v) : Math.round(v * 100) / 100; };
@@ -125,20 +125,20 @@
     return sub > 0 ? [{kode:'RCV-' + po.no, tgl:po.raw.tanggal, sj:'Penerimaan material', sub:sub, ppn:ppn, kirim:0, gross:round(sub, po.cur), po:po}] : [];
   }
   function incLine(d) { /* baris invoice Incoming dengan potongan DP proporsional */
-    var po = d.po, pd = round(d.gross * pct(po, 'DP') / 100, po.cur), pp = round(d.gross * pct(po, 'Progress') / 100, po.cur);
+    var po = d.po, pd = round(d.gross * pct(po, 'DP') / 100, po.cur), pp = 0;
     return withTax({src:po.src, no_po:po.id, no_surat:po.no, top_idx:-1, kode:d.kode, gross:d.gross, pot_dp:pd, pot_prog:pp, net:round(d.gross - pd - pp, po.cur)}, po.cur);
   }
   P.poLedger = function (po) {
-    var o = {DP:0, Incoming:0, Progress:0};
+    var o = {DP:0, Incoming:0};
     R.invoice.forEach(function (v) { v.lines.forEach(function (l) { if (l.src === po.src && l.no_po === po.id) o[v.tipe] += l.net; }); });
-    o.sum = o.DP + o.Incoming + o.Progress; o.sisa = po.total - o.sum; o.pct = po.total ? Math.round(o.sum / po.total * 1000) / 10 : 0; return o;
+    o.sum = o.DP + o.Incoming; o.sisa = po.total - o.sum; o.pct = po.total ? Math.round(o.sum / po.total * 1000) / 10 : 0; return o;
   };
   var overCap = function (po, add) { return P.poLedger(po).sum + add > po.total + (po.cur === 'IDR' ? 1 : 0.01); };
   var topText = function (po) { return po.top.map(function (t) { return t.group + ' ' + t.persen + '%'; }).join(' + '); };
   var bankOf = function (name) { var s = R.supplier.filter(function (x) { return x.nama === name; })[0]; return s ? {bank:s.bank, norek:s.norek} : {bank:'', norek:''}; };
   var pendTerm = function (g) { var n = 0; P.invPos().forEach(function (po) { po.top.forEach(function (t, i) { if (t.group === g && !termInv(po, i)) n++; }); }); return n; };
   var pendDocs = function () { var out = []; P.invPos().forEach(function (po) { if (pct(po, 'Incoming') > 0) incDocs(po).forEach(function (d) { if (!invOfDoc(d.kode)) out.push(d); }); }); return out; };
-  P.cnt.purchase_order_payment = function () { return pendTerm('DP') + pendTerm('Progress') + pendDocs().length + R.invoice.filter(function (v) { return P.invState(v).code === 'rej'; }).length; };
+  P.cnt.purchase_order_payment = function () { return pendTerm('DP') + pendDocs().length + R.invoice.filter(function (v) { return P.invState(v).code === 'rej'; }).length; };
 
   P.retax = function () { /* data lama (sebelum aturan DPP / PPn) dihitung ulang sekali */
     R.invoice.forEach(function (v) { if (v.taxed) return; var pos = P.invPos(), ok = true;
@@ -170,7 +170,7 @@
     doRequest(v, f.tb.value, 'Pembayaran ' + tipe + ' ' + lines.map(function (l) { return l.no_surat; }).filter(uniq).join(', '));
     return v;
   }
-  /* Pajak: DPP = Nilai x 11/12, PPn = DPP x 12%, Nilai Invoice = DPP + PPn. Nilai = nilai DP / Incoming / Progress sebelum PPN (setelah potongan DP/Progress). */
+  /* Pajak: DPP = Nilai x 11/12, PPn = DPP x 12%, Nilai Invoice = DPP + PPn. Nilai = nilai DP / Incoming sebelum PPN (setelah potongan DP). */
   var taxOf = function (n, cur) { var dpp = round(n * 11 / 12, cur), ppn = round(dpp * 0.12, cur); return {dpp:dpp, ppn:ppn, inv:round(dpp + ppn, cur)}; };
   var withTax = function (l, cur) { var t = taxOf(l.net, cur); l.dpp = t.dpp; l.ppn = t.ppn; l.inv = t.inv; return l; };
   var sumL = function (lines, k) { return lines.reduce(function (a, l) { return a + (l[k] || 0); }, 0); };
@@ -186,7 +186,7 @@
   function invLines(v) {
     return M.stable([{label:'No. PO', html:function (l) { return esc(l.no_surat); }}, {label:'Dasar', html:function (l) { return l.kode ? 'Incoming ' + esc(l.kode) : l.top_idx >= 0 ? 'Termin ' + esc(v.tipe) : '-'; }},
       {label:'Nilai Dasar (sebelum PPN)', cls:'num', html:function (l) { return fm(l.gross, v.cur); }}, {label:'Potongan DP (proporsional)', cls:'num', html:function (l) { return l.pot_dp ? fm(l.pot_dp, v.cur) : '-'; }},
-      {label:'Potongan Progress', cls:'num', html:function (l) { return l.pot_prog ? fm(l.pot_prog, v.cur) : '-'; }}, {label:'Nilai', cls:'num', html:function (l) { return fm(l.net, v.cur); }},
+      {label:'Nilai', cls:'num', html:function (l) { return fm(l.net, v.cur); }},
       {label:'DPP (Nilai x 11/12)', cls:'num', html:function (l) { return fm(l.dpp, v.cur); }}, {label:'PPn (12% x DPP)', cls:'num', html:function (l) { return fm(l.ppn, v.cur); }}, {label:'Nilai Invoice', cls:'num', html:function (l) { return '<b>' + fm(l.inv, v.cur) + '</b>'; }}], v.lines);
   }
   function invDoc(v) {
@@ -202,7 +202,7 @@
         {label:'Invoice', html:function (t, i) { if (t.group === 'Incoming') return '<small>lihat penerimaan di bawah</small>'; var v = termInv(po, i); return v ? esc(v.id) + ' ' + pill(P.invState(v)) : P.pill('Belum', 'warn'); }}], po.top) +
       '<div class="sect">Penerimaan (Incoming)</div>' + (docs.length ? M.stable([{label:'No. Incoming', key:'kode'}, {label:'Tgl', html:function (d) { return M.dstr(d.tgl); }}, {label:'No. SJ', html:function (d) { return esc(d.sj || '-'); }}, {label:'Nilai Incoming', cls:'num', html:function (d) { return fm(d.gross, po.cur); }},
         {label:'Invoice', html:function (d) { var v = invOfDoc(d.kode); return v ? esc(v.id) : P.pill('Belum', 'warn'); }}], docs) : '<small>Belum ada penerimaan.</small>') +
-      '<div class="sect">Posisi Tagihan (nilai sebelum PPN)</div><div class="sumbox"><div><small>DP</small><b>' + fm(lg.DP, po.cur) + '</b></div><div><small>Incoming</small><b>' + fm(lg.Incoming, po.cur) + '</b></div><div><small>Progress</small><b>' + fm(lg.Progress, po.cur) + '</b></div><div><small>Sudah di-invoice (' + lg.pct + '%)</small><b>' + fm(lg.sum, po.cur) + '</b></div><div><small>Sisa</small><b>' + fm(lg.sisa, po.cur) + '</b></div></div>' +
+      '<div class="sect">Posisi Tagihan (nilai sebelum PPN)</div><div class="sumbox"><div><small>DP</small><b>' + fm(lg.DP, po.cur) + '</b></div><div><small>Incoming</small><b>' + fm(lg.Incoming, po.cur) + '</b></div><div><small>Sudah di-invoice (' + lg.pct + '%)</small><b>' + fm(lg.sum, po.cur) + '</b></div><div><small>Sisa</small><b>' + fm(lg.sisa, po.cur) + '</b></div></div>' +
       '<div class="sect">Invoice</div>' + (invs.length ? M.stable([{label:'ID', key:'id'}, {label:'Tipe', key:'tipe'}, {label:'No. Invoice', key:'no_invoice'}, {label:'Nilai Invoice', cls:'num', html:function (v) { return fm(v.lines.filter(function (l) { return l.src === po.src && l.no_po === po.id; }).reduce(function (a, l) { return a + (l.inv || 0); }, 0), v.cur); }}, {label:'Status', html:function (v) { return pill(P.invState(v)); }}], invs) : '<small>Belum ada invoice.</small>');
   }
 
@@ -238,10 +238,10 @@
   var supBar = function (names, id) { return '<div class="filter-bar" style="margin:10px 0"><label>Supplier: <select id="sp" style="padding:5px;min-width:240px"><option value="">- Pilih Supplier -</option>' + names.map(function (s) { return '<option>' + esc(s) + '</option>'; }).join('') + '</select></label> <button type="button" class="btn btn-sm btn-primary" id="cari">🔍 Cari</button>' + (id || '') + '</div>'; };
   var payNo = function (v) { var r = v && reqOf(v); return r && r.pay_id ? r.pay_id : '-'; };
 
-  /* ---------- tipe DP / Progress (berdasarkan TOP) ---------- */
+  /* ---------- tipe DP (berdasarkan TOP) ---------- */
   function termForm(r, group, done) {
     var po = r.po, val = termVal(po, r.t), tx = taxOf(val, po.cur), sup = po.src === 'nm' ? {bank:po.bank, norek:po.norek} : bankOf(po.sup);
-    var b = M.modal('Receive Invoice ' + (group === 'DP' ? 'Down Payment (DP)' : 'Progress') + ' - ' + po.no, '<form novalidate><div class="grid2">' + M.fg('Nama Supplier', '<input type="text" readonly value="' + esc(po.sup) + '">') + M.fg('Nomor PO', '<input type="text" readonly value="' + esc(po.no) + '">') +
+    var b = M.modal('Receive Invoice Down Payment (DP) - ' + po.no, '<form novalidate><div class="grid2">' + M.fg('Nama Supplier', '<input type="text" readonly value="' + esc(po.sup) + '">') + M.fg('Nomor PO', '<input type="text" readonly value="' + esc(po.no) + '">') +
       COMMON(sup, po) + M.fg('Persen ' + group, '<input type="text" readonly value="' + r.t.persen + '%' + (r.t.ket ? ' - ' + esc(r.t.ket) : '') + '">') + M.fg('Total PO sebelum PPN (' + po.cur + ')', '<input type="text" readonly value="' + fm(po.total, po.cur) + '">') + M.fg('Nilai ' + group + ' (' + po.cur + ')', '<input type="text" readonly value="' + fm(val, po.cur) + '">') + M.fg('DPP (Nilai x 11/12)', '<input type="text" readonly value="' + fm(tx.dpp, po.cur) + '">') + M.fg('PPn (12% x DPP)', '<input type="text" readonly value="' + fm(tx.ppn, po.cur) + '">') + M.fg('Nilai Invoice (' + po.cur + ')', '<input type="text" readonly value="' + fm(tx.inv, po.cur) + '">') + '</div>' + RQ +
       '<div class="form-actions"><button class="btn btn-primary" type="submit">💾 Save</button></div></form>', {size:'xl'});
     var f = b.querySelector('form'); f.onsubmit = function (e) { e.preventDefault(); if (!M.validate(f)) return;
@@ -250,7 +250,7 @@
   }
   function termPanel(group, pane, done) {
     var ap = '', all = function () { var out = []; P.invPos().forEach(function (po) { po.top.forEach(function (t, i) { if (t.group === group) out.push({po:po, t:t, i:i, id:po.key + ':' + i, v:termInv(po, i)}); }); }); return out; };
-    pane.innerHTML = '<b>Receive Invoice ' + (group === 'DP' ? 'DP' : 'Progress') + '</b>' + supBar(all().map(function (r) { return r.po.sup; }).filter(uniq)) + '<div id="tb"></div>';
+    pane.innerHTML = '<b>Receive Invoice DP</b>' + supBar(all().map(function (r) { return r.po.sup; }).filter(uniq)) + '<div id="tb"></div>';
     var rows = function () { return all().filter(function (r) { return !ap || r.po.sup === ap; }); };
     var t = P.tbl(M.$('#tb'), rows, [
       {label:'No', html:function (r) { return rows().map(function (x) { return x.id; }).indexOf(r.id) + 1; }, text:function () { return ''; }, width:'45px'},
@@ -273,7 +273,7 @@
     var gross = lines.reduce(function (a, l) { return a + l.gross; }, 0), pot = lines.reduce(function (a, l) { return a + l.pot_dp + l.pot_prog; }, 0);
     var noDp = Object.keys(pos).filter(function (k) { var po = pos[k]; return pct(po, 'DP') > 0 && !po.top.some(function (t, i) { return t.group === 'DP' && termInv(po, i); }); });
     var b = M.modal('Receive Invoice Incoming', '<form novalidate><div class="grid2">' + M.fg('Nama Supplier', '<input type="text" readonly value="' + esc(po0.sup) + '">') + M.fg('Nomor Incoming', '<input type="text" readonly value="' + esc(docs.map(function (d) { return d.kode; }).join(', ')) + '">') + COMMON(sup, po0) +
-      M.fg('Total Incoming sebelum PPN (' + cur + ')', '<input type="text" readonly value="' + fm(gross, cur) + '">') + M.fg('Potongan DP / Progress (proporsional)', '<input type="text" readonly value="' + fm(pot, cur) + '">') + M.fg('Nilai (' + cur + ')', '<input type="text" readonly value="' + fm(sumL(lines, 'net'), cur) + '">') + M.fg('DPP (Nilai x 11/12)', '<input type="text" readonly value="' + fm(sumL(lines, 'dpp'), cur) + '">') + M.fg('PPn (12% x DPP)', '<input type="text" readonly value="' + fm(sumL(lines, 'ppn'), cur) + '">') + M.fg('Nilai Invoice (' + cur + ')', '<input type="text" readonly value="' + fm(tot, cur) + '">') + (cur !== 'IDR' ? M.fg('Nilai Rupiah', '<input type="text" readonly value="' + P.num(tot * po0.kurs) + '">') : '') + '</div>' +
+      M.fg('Total Incoming sebelum PPN (' + cur + ')', '<input type="text" readonly value="' + fm(gross, cur) + '">') + M.fg('Potongan DP (proporsional)', '<input type="text" readonly value="' + fm(pot, cur) + '">') + M.fg('Nilai (' + cur + ')', '<input type="text" readonly value="' + fm(sumL(lines, 'net'), cur) + '">') + M.fg('DPP (Nilai x 11/12)', '<input type="text" readonly value="' + fm(sumL(lines, 'dpp'), cur) + '">') + M.fg('PPn (12% x DPP)', '<input type="text" readonly value="' + fm(sumL(lines, 'ppn'), cur) + '">') + M.fg('Nilai Invoice (' + cur + ')', '<input type="text" readonly value="' + fm(tot, cur) + '">') + (cur !== 'IDR' ? M.fg('Nilai Rupiah', '<input type="text" readonly value="' + P.num(tot * po0.kurs) + '">') : '') + '</div>' +
       '<div class="sect">Detail Incoming</div>' + invLines({tipe:'Incoming', cur:cur, lines:lines}) +
       (noDp.length ? P.alert('warnbox', 'DP untuk ' + esc(noDp.map(function (k) { return pos[k].no; }).join(', ')) + ' belum di-invoice-kan. Potongan tetap dihitung proporsional; pastikan invoice DP dibuat di Receive Invoice DP.') : '') + RQ +
       '<div class="form-actions"><button class="btn btn-primary" type="submit">💾 Save</button></div></form>', {size:'xl'});
@@ -292,7 +292,7 @@
       {label:'No. Incoming', html:function (d) { return esc(d.kode); }, text:function (d) { return d.kode; }},
       {label:'No. PO', html:function (d) { return esc(d.po.no) + '<br>' + srcBadge(d.po.src); }, text:function (d) { return d.po.no; }},
       {label:'Nominal Incoming (sebelum PPN)', html:function (d) { return numCell(fm(d.gross, d.po.cur)); }, text:function (d) { return d.gross; }},
-      {label:'Potongan DP / Progress', html:function (d) { var l = incLine(d); return numCell(fm(l.pot_dp + l.pot_prog, d.po.cur)); }, text:function () { return ''; }},
+      {label:'Potongan DP', html:function (d) { var l = incLine(d); return numCell(fm(l.pot_dp + l.pot_prog, d.po.cur)); }, text:function () { return ''; }},
       {label:'Nilai Invoice (DPP + PPn)', html:function (d) { return numCell('<b>' + fm(incLine(d).inv, d.po.cur) + '</b>'); }, text:function (d) { return incLine(d).inv; }},
       {label:'Tanggal Incoming', html:function (d) { return M.dstr(d.tgl); }, text:function (d) { return d.tgl; }},
       {label:'Nama Supplier', html:function (d) { return esc(d.po.sup); }, text:function (d) { return d.po.sup; }}], function () {});
@@ -310,7 +310,7 @@
 
   /* ---------- Daftar Invoice (edit / hapus / perbaiki yang ditolak) ---------- */
   function listPanel(pane, done) {
-    pane.innerHTML = '<b>Daftar Invoice</b><div class="filter-bar" style="margin:10px 0"><label>Tipe: <select id="tf" style="padding:5px"><option value="">Semua</option><option>DP</option><option>Incoming</option><option>Progress</option></select></label> <label style="margin-left:10px">Status: <select id="stf" style="padding:5px"><option value="">Semua</option><option value="rej">Request Ditolak</option><option value="req">Dalam proses approval</option><option value="paid">Sudah dibayar</option></select></label></div><div id="tb"></div>';
+    pane.innerHTML = '<b>Daftar Invoice</b><div class="filter-bar" style="margin:10px 0"><label>Tipe: <select id="tf" style="padding:5px"><option value="">Semua</option><option>DP</option><option>Incoming</option></select></label> <label style="margin-left:10px">Status: <select id="stf" style="padding:5px"><option value="">Semua</option><option value="rej">Request Ditolak</option><option value="req">Dalam proses approval</option><option value="paid">Sudah dibayar</option></select></label></div><div id="tb"></div>';
     var tf = M.$('#tf'), stf = M.$('#stf');
     var t = P.tbl(M.$('#tb'), function () { return R.invoice.filter(function (v) { return (!tf.value || v.tipe === tf.value) && (!stf.value || P.invState(v).code === stf.value); }).slice().sort(function (a, b) { return a.id < b.id ? 1 : -1; }); }, [
       {label:'No. PO', html:function (v) { return P.bullets(v.lines.map(function (l) { return l.no_surat; }).filter(uniq)); }, text:function (v) { return v.lines.map(function (l) { return l.no_surat; }).join(' '); }},
@@ -324,14 +324,14 @@
 
   P.build.purchase_order_payment = function (host) { P.retax();
     var mode = 'dp';
-    host.innerHTML = '<div class="box primary"><div class="box-header"><h3 class="box-title">Receive Invoice</h3></div><div class="box-body"><p>Select Request Payment</p><div id="rd"></div><div id="dic"></div></div></div><div class="note">Satu modul Receive Invoice untuk <b>semua PO Approved</b> (<a href="approval_po_non_material.html">PO Non Material</a> dan <a href="purchase_order.html">PO Material</a>). Pilih tipe: <b>DP</b> (persen DP di TOP), <b>Incoming</b> (nilai aktual yang diterima dari <a href="incoming_departemen.html">Incoming Departemen</a> / <a href="incoming_asset_asset.html">Incoming Asset</a>, dikurangi potongan DP proporsional; mencakup sisa persen yang tidak diatur sebagai DP / Progress), dan <b>Progress</b> (persen Progress di TOP). Total invoice per PO tidak boleh melebihi nilai PO. <b>Request Payment otomatis terbentuk</b> saat invoice disimpan dan masuk ke <a href="request_payment_list_approve_checker.html">Checker</a>; tanggal pembayaran wajib diisi (default hari ini + TOP supplier). Invoice dapat diedit atau dihapus selama Waiting Checker; bila ditolak, perbaiki invoice dan menyimpannya akan mengirim ulang request (menu <i>Daftar Invoice</i>).</div>';
-    var MODES = [['dp', 'Receive Invoice DP', function () { return pendTerm('DP'); }], ['inc', 'Receive Invoice Incoming', function () { return pendDocs().length; }], ['pro', 'Receive Invoice Progress', function () { return pendTerm('Progress'); }],
+    host.innerHTML = '<div class="box primary"><div class="box-header"><h3 class="box-title">Receive Invoice</h3></div><div class="box-body"><p>Select Request Payment</p><div id="rd"></div><div id="dic"></div></div></div><div class="note">Satu modul Receive Invoice untuk <b>semua PO Approved</b> (<a href="approval_po_non_material.html">PO Non Material</a> dan <a href="purchase_order.html">PO Material</a>). Hanya ada dua tipe: <b>DP</b> (persen DP di TOP PO) dan <b>Incoming</b> (nilai aktual yang diterima dari <a href="incoming_departemen.html">Incoming Departemen</a> / <a href="incoming_asset_asset.html">Incoming Asset</a>, dikurangi potongan DP proporsional; mencakup seluruh sisa persen di luar DP). Total invoice per PO tidak boleh melebihi nilai PO. <b>Request Payment otomatis terbentuk</b> saat invoice disimpan dan masuk ke <a href="request_payment_list_approve_checker.html">Checker</a>; tanggal pembayaran wajib diisi (default hari ini + TOP supplier). Invoice dapat diedit atau dihapus selama Waiting Checker; bila ditolak, perbaiki invoice dan menyimpannya akan mengirim ulang request (menu <i>Daftar Invoice</i>).</div>';
+    var MODES = [['dp', 'Receive Invoice DP', function () { return pendTerm('DP'); }], ['inc', 'Receive Invoice Incoming', function () { return pendDocs().length; }],
       ['all', 'Daftar Invoice', function () { return R.invoice.filter(function (v) { return P.invState(v).code === 'rej'; }).length; }]];
     function paint() {
       P.after();
       M.$('#rd').innerHTML = MODES.map(function (m) { var n = m[2](); return '<label style="display:block;font-weight:normal;cursor:pointer"><input type="radio" name="checkbx" class="checkbx" value="' + m[0] + '"' + (mode === m[0] ? ' checked' : '') + ' style="width:auto"> ' + m[1] + (n ? ' <span class="lbl" style="background:' + (m[0] === 'all' ? '#dd4b39' : '#f39c12') + '">' + n + (m[0] === 'all' ? ' ditolak' : '') + '</span>' : '') + '</label>'; }).join('');
       var pane = M.$('#dic'); pane.innerHTML = '';
-      if (mode === 'dp') termPanel('DP', pane, paint); else if (mode === 'pro') termPanel('Progress', pane, paint); else if (mode === 'inc') incPanel(pane, paint); else listPanel(pane, paint);
+      if (mode === 'dp') termPanel('DP', pane, paint); else if (mode === 'inc') incPanel(pane, paint); else listPanel(pane, paint);
     }
     M.$('#rd').onchange = function (e) { if (e.target.name === 'checkbx') { mode = e.target.value; paint(); } };
     paint();

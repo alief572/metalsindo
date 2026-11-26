@@ -43,11 +43,11 @@
   };
 
   /* ===================================================== PURCHASE ORDER NON MATERIAL ===================================================== */
-  /* TOP hanya menyimpan DP dan Progress; sisa persen otomatis menjadi tagihan berdasarkan Incoming */
-  P.normTop = function (top) { var rows = (top || []).filter(function (t) { return t.group !== 'Incoming' && +t.persen > 0; }), s = rows.reduce(function (a, t) { return a + (+t.persen || 0); }, 0), rest = Math.round((100 - s) * 100) / 100; return rest > 0 ? rows.concat([{group:'Incoming', persen:rest, ket:'Sisa ditagih berdasarkan barang yang diterima', auto:true}]) : rows; };
+  /* TOP hanya menyimpan DP (opsional); sisa persen otomatis menjadi tagihan berdasarkan Incoming. Tidak ada Progress. */
+  P.normTop = function (top) { var rows = (top || []).filter(function (t) { return t.group === 'DP' && +t.persen > 0; }).slice(0, 1), s = rows.reduce(function (a, t) { return a + (+t.persen || 0); }, 0), rest = Math.round((100 - s) * 100) / 100; return rest > 0 ? rows.concat([{group:'Incoming', persen:rest, ket:'Sisa ditagih berdasarkan barang yang diterima', auto:true}]) : rows; };
   function topTable(p) {
     var c = P.poCalc(p);
-    return M.stable([{label:'Group TOP', key:'group'}, {label:'Persen (%)', cls:'num', html:function (r) { return r.persen; }}, {label:'Value', cls:'num', html:function (r) { return P.num(c.total * r.persen / 100); }}, {label:'Keterangan', html:function (r) { return esc(r.ket || '-'); }}], P.normTop(p.top));
+    return M.stable([{label:'Group TOP', key:'group'}, {label:'Persen (%)', cls:'num', html:function (r) { return r.persen; }}, {label:'Value (sebelum PPN)', cls:'num', html:function (r) { return P.num(Math.round((c.total - c.ppn) * r.persen / 100)); }}, {label:'Keterangan', html:function (r) { return esc(r.ket || '-'); }}], P.normTop(p.top));
   }
   function poDoc(p) {
     var c = P.poCalc(p), s = P.sup(p.id_suplier), st = P.poState(p);
@@ -119,22 +119,24 @@
         (edit && p.reject_reason ? P.alert('warnbox', 'PO ditolak: ' + esc(p.reject_reason) + '. Setelah disimpan, Revisi bertambah dan PO kembali ke Approval PO.') : '') +
         '<div class="sect">Item PO (kosongkan Qty PO atau isi 0 bila item tidak ikut)</div><div class="tbl-wrap"><table class="mini" id="it"></table></div>' +
         '<div class="grid2" style="margin-top:10px"><div>' + M.fg('Biaya Kirim', '<input type="number" name="kirim" min="0" value="' + esc(o.kirim) + '">') + '</div><div class="sumbox" id="sum" style="margin:0"></div></div>' +
-        '<div class="sect">Term of Payment (TOP) - pilih DP / Progress saja; sisanya otomatis ditagih berdasarkan Incoming</div><div id="top"></div><div id="topsum" class="eqnote"></div>' +
+        '<div class="sect">Term of Payment (TOP) - isi DP bila ada; sisanya otomatis ditagih berdasarkan Incoming</div><div id="top"></div><div id="topsum" class="eqnote"></div>' +
         '<div class="form-actions"><button type="button" class="btn btn-default" id="bk">« Back</button> <button class="btn btn-primary" type="submit">💾 Save</button></div></form></div></div>';
       var f = M.$('#f'); M.$('#bk').onclick = list;
       M.$('#it').innerHTML = '<thead><tr><th>#</th><th>No PR</th><th>Item</th><th>Spec</th><th>Sisa PR</th><th width="90">PO Qty</th><th>Unit</th><th width="120">Unit Price</th><th width="70">Disc %</th><th width="70">PPN %</th><th>Total Barang + PPN</th></tr></thead><tbody>' +
         rows.map(function (r, i) {
           var inp = function (k) { return '<td><input type="number" min="0" step="any" data-r="' + i + '" data-f="' + k + '" value="' + r[k] + '"></td>'; };
           return '<tr><td>' + (i + 1) + '</td><td>' + esc(r.no_pr) + '</td><td>' + esc(P.up(r.nm)) + '</td><td>' + esc(r.spec || '-') + '</td><td class="num">' + P.q(r.qty_pr) + '</td>' + inp('qty') + '<td>' + esc(r.satuan) + '</td>' + inp('harga') + inp('disc') + inp('ppn') + '<td class="num" id="rv' + i + '"></td></tr>'; }).join('') + '</tbody>';
-      var top = o.top.filter(function (x) { return x.group !== 'Incoming'; }).map(function (x) { return {group:x.group, persen:x.persen, ket:x.ket}; });
-      P.rowsEditor(M.$('#top'), top, [{k:'group', label:'Group TOP', type:'select', opts:['DP', 'Progress'], w:'160px'}, {k:'persen', label:'Persen (%)', type:'number', w:'120px'}, {k:'ket', label:'Keterangan'}], function () { return {group:'Progress', persen:0, ket:''}; });
+      var top = o.top.filter(function (x) { return x.group === 'DP'; }).slice(0, 1).map(function (x) { return {group:'DP', persen:x.persen, ket:x.ket}; });
+      var dp0 = top[0] || {persen:'', ket:''};
+      M.$('#top').innerHTML = '<div class="grid2"><div>' + M.fg('DP (%)', '<input type="number" id="dp" min="0" max="100" step="any" value="' + esc(dp0.persen) + '" placeholder="kosongkan bila tanpa DP">') + '</div><div>' + M.fg('Keterangan DP', '<input type="text" id="dpk" value="' + esc(dp0.ket || '') + '">') + '</div></div>';
+      M.$('#top').addEventListener('input', function () { var v = parseFloat(M.$('#dp').value) || 0; top.length = 0; if (v > 0) top.push({group:'DP', persen:v, ket:M.$('#dpk').value}); recalc(); });
       function used() { return rows.filter(function (r) { return r.qty > 0; }); }
       function recalc() {
         var c = P.poCalc({items:used(), kirim:+f.kirim.value || 0});
         rows.forEach(function (r, i) { var a = r.qty * r.harga * (1 - r.disc / 100); M.$('#rv' + i).textContent = P.num(a * (1 + r.ppn / 100)); });
         M.$('#sum').innerHTML = '<div><small>Sub Total</small><b>' + P.num(c.sub) + '</b></div><div><small>Discount</small><b>' + P.num(c.disc) + '</b></div><div><small>PPN</small><b>' + P.num(c.ppn) + '</b></div><div><small>Total Order</small><b>' + P.num(c.total) + '</b></div>';
         var s = top.reduce(function (a, x) { return a + (+x.persen || 0); }, 0);
-        M.$('#topsum').innerHTML = 'DP + Progress: <b>' + s + '%</b> ' + (s > 100 ? '(melebihi 100%)' : '&middot; Sisa <b>' + (Math.round((100 - s) * 100) / 100) + '%</b> ditagih berdasarkan Incoming') + (top.length ? ' &middot; ' + top.map(function (x) { return esc(x.group) + ' ' + P.num(c.total * (+x.persen || 0) / 100); }).join(' &middot; ') : '');
+        M.$('#topsum').innerHTML = 'DP: <b>' + s + '%</b> ' + (s > 100 ? '(melebihi 100%)' : '&middot; Sisa <b>' + (Math.round((100 - s) * 100) / 100) + '%</b> ditagih berdasarkan Incoming') + (top.length ? ' &middot; ' + top.map(function (x) { return esc(x.group) + ' ' + P.num(Math.round((c.total - c.ppn) * (+x.persen || 0) / 100)); }).join(' &middot; ') + ' (nilai sebelum PPN)' : '');
       }
       f.addEventListener('input', function (e) { var t = e.target; if (t.dataset.r != null) rows[+t.dataset.r][t.dataset.f] = parseFloat(t.value) || 0; recalc(); });
       f.addEventListener('click', function () { setTimeout(recalc, 0); }); f.addEventListener('change', function () { setTimeout(recalc, 0); });
@@ -147,7 +149,7 @@
         if (bad.length) { P.warn('PO Qty tidak boleh melebihi sisa PR dan Unit Price harus lebih dari 0 (' + bad[0].nm + ').'); return; }
         var s = top.reduce(function (a, x) { return a + (+x.persen || 0); }, 0);
         if (top.some(function (x) { return !(+x.persen > 0); })) { P.warn('Persen setiap baris TOP harus lebih dari 0.'); return; }
-        if (s > 100) { P.warn('Total DP + Progress tidak boleh melebihi 100% (sekarang ' + s + '%).'); return; }
+        if (s > 100) { P.warn('DP tidak boleh melebihi 100% (sekarang ' + s + '%).'); return; }
         M.saveFlow({text:'PO akan disimpan dan menunggu approval.', done:'PO berhasil disimpan.', save:function () {
           var x = p || {no_po:P.nextNo('PO' + P.YM, R.po, 'no_po', 3), tanggal:P.TODAY, matauang:'IDR', kurs:1, status:1, reject_reason:'', revisi:0, close_po:null, by:R.me, created:P.NOW};
           if (!p) { x.no_surat = 'PO-NM/26/XI/' + P.pad(parseInt(x.no_po.slice(-3), 10), 4); R.po.push(x); }

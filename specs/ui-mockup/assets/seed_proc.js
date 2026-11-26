@@ -109,7 +109,7 @@ Mock.seedR = (function () {
         top:[{group:'Incoming', persen:100, ket:'Cash setelah barang diterima'}]},
       {no_po:'PO2611003', no_surat:'PO-NM/26/XI/0003', tanggal:'2026-11-02', id_suplier:'S2600005', loi:'Lokal', cif:'LOCO', matauang:'IDR', kurs:1, delivery_date:'2026-11-20', pic:'Maintenance - Yusuf', note:'Termasuk pelatihan operator', kirim:2500000, status:2, reject_reason:'', revisi:0, close_po:null, by:'Rama', created:'2026-11-02 09:30',
         items:[{iid:'A1a', no_pr:'PRA26110001', tipe_pr:'Asset', nm:'Forklift Elektrik 2 Ton', spec:'Kapasitas 2 ton, mast 3 m, baterai lithium', satuan:'UNIT', qty_pr:1, qty:1, harga:420000000, disc:0, ppn:11, qty_in:0, ket:''}],
-        top:[{group:'DP', persen:30, ket:'Uang muka'}, {group:'Progress', persen:60, ket:'Barang tiba di pabrik'}, {group:'Progress', persen:10, ket:'Setelah masa garansi 30 hari'}]},
+        top:[{group:'DP', persen:30, ket:'Uang muka'}]},
       {no_po:'PO2611004', no_surat:'PO-NM/26/XI/0004', tanggal:'2026-11-07', id_suplier:'S2600003', loi:'Lokal', cif:'LOCO', matauang:'IDR', kurs:1, delivery_date:'2026-11-14', pic:'Gudang - Andi', note:'', kirim:0, status:1, reject_reason:'Harga di atas penawaran terakhir (Rp 195.000). Mohon negosiasi ulang.', revisi:1, close_po:null, by:'Rama', created:'2026-11-07 10:10',
         items:[{iid:'D2b', no_pr:'PRN26110001', tipe_pr:'Department', nm:'Grease SKF LGMT2 1 kg', spec:'Kaleng 1 kg', satuan:'PCS', qty_pr:6, qty:6, harga:215000, disc:0, ppn:11, qty_in:0, ket:''}],
         top:[{group:'Incoming', persen:100, ket:'30 hari setelah invoice'}]}

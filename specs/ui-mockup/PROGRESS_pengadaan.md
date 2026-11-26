@@ -77,3 +77,15 @@ Keputusan user setelah membaca kode asli `application/modules/request_payment` (
 - Seluruh perhitungan DP/Progress/potongan/batas total per PO sekarang memakai nilai sebelum PPN (total PO sebelum PPN = subtotal setelah diskon + biaya kirim). Total PO termasuk PPN 11% tetap ditampilkan di detail PO.
 - Form dan tabel menampilkan Nilai, DPP, PPn, Nilai Invoice. Request Payment memakai Nilai Invoice. Data contoh lama dihitung ulang otomatis (`P.retax`).
 - Uji: t6.js 9/9; 26 halaman proc tanpa error.
+
+## Revisi 2026-11-26: Receive Invoice hanya DP dan Incoming (Progress dihapus)
+
+- Keputusan user: Receive Invoice hanya **berdasarkan DP** atau **berdasarkan Incoming**. Tipe Progress dihapus total.
+- TOP di PO: hanya satu isian **DP (%)** (opsional, 0 sampai 100) plus keterangan; sisa persen otomatis ditagih lewat Incoming. Group "Progress" tidak ada lagi di form PO.
+- Receive Invoice: radio DP / Incoming / Daftar Invoice. Potongan Progress dan kolom Progress dihapus dari rincian, posisi tagihan, dan filter. Data contoh PO2611003 dan PO Material P2601004 disesuaikan (tanpa Progress).
+- Uji: t7.js 10/10, t6.js (DPP/PPn) 9/9, 26 halaman proc tanpa error.
+
+## Revisi 2026-11-26: Nilai TOP di layar PO sebelum PPN
+
+- Keputusan user: samakan layar PO dengan Receive Invoice. Nilai per baris TOP (form PO, detail PO, approval) sekarang **sebelum PPN**: round(persen x (Sub Total - Discount + Biaya Kirim)). Contoh PO 6,500,000 + PPN 715,000, DP 30% = 1,950,000 (sebelumnya 2,164,500). Kolom berlabel "Value (sebelum PPN)".
+- Total Order tetap termasuk PPN. Case 1 pada FAT: semua 18 test case Passed.
